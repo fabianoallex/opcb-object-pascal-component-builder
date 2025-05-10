@@ -320,6 +320,8 @@ begin
   Tab.Caption := 'Grid Simples';
 
   Grid := TGridLayout.Create;
+  Grid.Top := 200;
+  Grid.Left := 200;
   Grid.Rows := 3;
   Grid.Columns := 3;
   Grid.ColumnWidths := 80;

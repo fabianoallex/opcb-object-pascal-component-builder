@@ -192,9 +192,11 @@ type
   private
     FCells: TGridCellList;
     FCellSettingsList: TGridCellSettingsList;
+    FLeft: Integer;
     FMargins: TMargins;
     FRows: Integer;
     FColumns: Integer;
+    FTop: Integer;
     FVerticalSpacings: Integer;
     FHorizontalSpacings: Integer;
     FRowHeights: Integer;
@@ -219,10 +221,12 @@ type
     function GetVerticalSpacing(Index: Integer): Integer;
     procedure SetColumnShift(Index: Integer; AValue: Integer);
     procedure SetHorizontalSpacing(Index: Integer; AValue: Integer);
+    procedure SetLeft(AValue: Integer);
     procedure SetRowHeight(Index: Integer; Value: Integer);
     function GetColumnWidth(Index: Integer): Integer;
     procedure SetColumnWidth(Index: Integer; Value: Integer);
     procedure SetRowShift(Index: Integer; AValue: Integer);
+    procedure SetTop(AValue: Integer);
     procedure SetVerticalSpacing(Index: Integer; AValue: Integer);
   public
     constructor Create;
@@ -254,6 +258,8 @@ type
     property Margins: TMargins read FMargins;
     property ContentWidth: Integer read GetContentWidth;
     property ContentHeight: Integer read GetContentHeight;
+    property Top: Integer read FTop write SetTop;
+    property Left: Integer read FLeft write SetLeft;
   end;
 
   { TControlLayoutItem }
@@ -524,6 +530,8 @@ begin
   FHorizontalSpacings := 0;
   FRowHeights := 10;
   FColumnWidths := 10;
+  FTop := 0;
+  FLeft := 0;
 end;
 
 destructor TGridLayout.Destroy;
@@ -679,6 +687,13 @@ begin
   FHorizontalSpacingDic.AddOrSetValue(Index, AValue);
 end;
 
+procedure TGridLayout.SetLeft(AValue: Integer);
+begin
+  if FLeft = AValue then
+    Exit;
+  FLeft := AValue;
+end;
+
 procedure TGridLayout.SetRowHeight(Index: Integer; Value: Integer);
 begin
   FRowHeightDic.AddOrSetValue(Index, Value);
@@ -698,6 +713,12 @@ end;
 procedure TGridLayout.SetRowShift(Index: Integer; AValue: Integer);
 begin
   FRowShift.AddOrSetValue(Index, AValue);
+end;
+
+procedure TGridLayout.SetTop(AValue: Integer);
+begin
+  if FTop = AValue then Exit;
+  FTop := AValue;
 end;
 
 procedure TGridLayout.SetVerticalSpacing(Index: Integer; AValue: Integer);
@@ -826,8 +847,8 @@ begin
     end;
 
     Item.SetBounds(
-      ALeft + X + Cell.OffsetX,
-      ATop + Y + Cell.OffsetY,
+      FLeft + ALeft + X + Cell.OffsetX,
+      FTop + ATop + Y + Cell.OffsetY,
       W,
       H
     );

@@ -29,6 +29,7 @@ type
     function EnableAutoFreeOnDone: TGridLayoutBuilder;
     function DisableAutoFreeOnDone: TGridLayoutBuilder;
     function WithDimensions(ARows, AColumns: Integer): TGridLayoutBuilder;
+    function WithTopLeft(ATop, ALeft: Integer): TGridLayoutBuilder;
     function WithColumnsWidth(AWidth: Integer): TGridLayoutBuilder;
     function WithRowsHeight(AHight: Integer): TGridLayoutBuilder; overload;
     function WithRowsHeight(ARowsIndex: array of Integer; AHeight: Integer): TGridLayoutBuilder; overload;
@@ -100,11 +101,19 @@ begin
   Result := Self;
 end;
 
+function TGridLayoutBuilder.WithTopLeft(ATop, ALeft: Integer
+  ): TGridLayoutBuilder;
+begin
+  Result := Self;
+  FGridLayout.Top := ATop;
+  FGridLayout.Left := ALeft;
+end;
+
 function TGridLayoutBuilder.WithColumnsWidth(AWidth: Integer
   ): TGridLayoutBuilder;
 begin
-  FGridLayout.ColumnWidths := AWidth;
   Result := Self;
+  FGridLayout.ColumnWidths := AWidth;
 end;
 
 function TGridLayoutBuilder.WithRowsHeight(AHight: Integer

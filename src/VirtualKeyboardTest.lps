@@ -98,8 +98,9 @@
         <Filename Value="ulayout.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="97"/>
+        <TopLine Value="99"/>
         <CursorPos X="50" Y="105"/>
         <UsageCount Value="154"/>
         <Loaded Value="True"/>
@@ -114,8 +115,8 @@
       <Unit>
         <Filename Value="uvirtualkeyregistry.pas"/>
         <UnitName Value="UVirtualKeyRegistry"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
+        <TopLine Value="125"/>
         <CursorPos Y="41"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>

@@ -112,10 +112,10 @@ var
   Btn: TButton;
 begin
   Grid := TGridLayout.Create;
+  Grid.Top := 50;
   Grid.Rows := 4;
   Grid.Columns := 4;
   Grid.ColumnWidths := 80;
-  //Grid.ColumnWidth[0] := 80;
   Grid.RowHeights := 50;
   Grid.HorizontalSpacings := 5;
   Grid.VerticalSpacings := 5;
