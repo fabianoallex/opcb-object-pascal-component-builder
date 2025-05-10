@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <SessionStorage Value="InProjectDir"/>
+      <Title Value="VirtualKeyboardTest"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <Icon Value="0"/>
+    </General>
+    <BuildModes>
+      <Item Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+    </RunParams>
+    <RequiredPackages>
+      <Item>
+        <PackageName Value="fpcunittestrunner"/>
+      </Item>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+      <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+    </RequiredPackages>
+    <Units>
+      <Unit>
+        <Filename Value="VirtualKeyboardTest.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="test\ukeytest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UKeyTest"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyboardclasses.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyboardClasses"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit1"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit2"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit3.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit3"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit4.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit4"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyBlockGridLayoutTest"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyblocklayouts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyBlockLayouts"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugridlayouttest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutTest"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ulayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ULayout"/>
+      </Unit>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="VirtualKeyboardTest"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="test"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions>
+      <Item>
+        <Name Value="EAbort"/>
+      </Item>
+      <Item>
+        <Name Value="ECodetoolError"/>
+      </Item>
+      <Item>
+        <Name Value="EFOpenError"/>
+      </Item>
+      <Item>
+        <Name Value="EAssertionFailedError"/>
+      </Item>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

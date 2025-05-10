@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <SessionStorage Value="InProjectDir"/>
+      <Title Value="GridLayoutExamples"/>
+      <Scaled Value="True"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <XPManifest>
+        <DpiAware Value="True"/>
+      </XPManifest>
+      <Icon Value="0"/>
+    </General>
+    <BuildModes>
+      <Item Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+    </RunParams>
+    <RequiredPackages>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+    </RequiredPackages>
+    <Units>
+      <Unit>
+        <Filename Value="GridLayoutExamples.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uexamplesmain.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FExamplesMain"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UExamplesMain"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ulayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ULayout"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugridlayoutbuilder.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutBuilder"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugridlayoutfillerfactory.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutFillerFactory"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugridlayoutfill.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutFill"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugridalayoutresizer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridaLayoutResizer"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ufcolumnresizergridlayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FColumnResizerGridLayout"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFColumnResizerGridLayout"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ufrowresizergridlayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FRowResizerGridLayout"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFRowResizerGridLayout"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uffullresizergridlayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FFullResizerGridLayout"/>
+        <ResourceBaseClass Value="Form"/>
+      </Unit>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="GridLayoutExamples"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <OtherUnitFiles Value="."/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions>
+      <Item>
+        <Name Value="EAbort"/>
+      </Item>
+      <Item>
+        <Name Value="ECodetoolError"/>
+      </Item>
+      <Item>
+        <Name Value="EFOpenError"/>
+      </Item>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

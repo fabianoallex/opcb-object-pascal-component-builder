@@ -1,0 +1,9 @@
+object FFullResizerGridLayout: TFFullResizerGridLayout
+  Left = 2650
+  Height = 673
+  Top = 250
+  Width = 885
+  Caption = 'FFullResizerGridLayout'
+  DesignTimePPI = 120
+  OnCreate = FormCreate
+end

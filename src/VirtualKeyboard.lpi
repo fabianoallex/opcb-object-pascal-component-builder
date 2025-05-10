@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectOptions>
+    <Version Value="12"/>
+    <PathDelim Value="\"/>
+    <General>
+      <SessionStorage Value="InProjectDir"/>
+      <Title Value="VirtualKeyboard"/>
+      <Scaled Value="True"/>
+      <ResourceType Value="res"/>
+      <UseXPManifest Value="True"/>
+      <XPManifest>
+        <DpiAware Value="True"/>
+      </XPManifest>
+      <Icon Value="0"/>
+    </General>
+    <BuildModes>
+      <Item Name="Default" Default="True"/>
+    </BuildModes>
+    <PublishOptions>
+      <Version Value="2"/>
+      <UseFileFilters Value="True"/>
+    </PublishOptions>
+    <RunParams>
+      <FormatVersion Value="2"/>
+    </RunParams>
+    <RequiredPackages>
+      <Item>
+        <PackageName Value="LCL"/>
+      </Item>
+    </RequiredPackages>
+    <Units>
+      <Unit>
+        <Filename Value="VirtualKeyboard.lpr"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="umain.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UMain"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyboardclasses.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyboardClasses"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeydefinitions.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyDefinitions"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyregistry.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyRegistry"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyblocklayouts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyBlockLayouts"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ulayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ULayout"/>
+      </Unit>
+    </Units>
+  </ProjectOptions>
+  <CompilerOptions>
+    <Version Value="11"/>
+    <PathDelim Value="\"/>
+    <Target>
+      <Filename Value="VirtualKeyboard"/>
+    </Target>
+    <SearchPaths>
+      <IncludeFiles Value="$(ProjOutDir)"/>
+      <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
+    </SearchPaths>
+    <Linking>
+      <Debugging>
+        <DebugInfoType Value="dsDwarf3"/>
+        <UseHeaptrc Value="True"/>
+      </Debugging>
+      <Options>
+        <Win32>
+          <GraphicApplication Value="True"/>
+        </Win32>
+      </Options>
+    </Linking>
+  </CompilerOptions>
+  <Debugging>
+    <Exceptions>
+      <Item>
+        <Name Value="EAbort"/>
+      </Item>
+      <Item>
+        <Name Value="ECodetoolError"/>
+      </Item>
+      <Item>
+        <Name Value="EFOpenError"/>
+      </Item>
+    </Exceptions>
+  </Debugging>
+</CONFIG>

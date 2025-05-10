@@ -1,0 +1,75 @@
+# Arquivos binários
+*.exe
+*.dll
+*.bpl
+*.dcu
+*.dcp
+*.dsk
+*.~*
+*.map
+*.tds
+*.ppu
+*.o
+*.a
+
+# Arquivos de backup do Delphi
+*.bak
+*.~*
+
+# Arquivos de log
+*.log
+
+# Arquivos intermediários da compilação
+*.obj
+*.rsm
+*.dcu
+*.dcuil
+*.dcp
+*.drc
+*.identcache
+*.ilc
+*.ild
+*.ilf
+*.ils
+*.tds
+
+# Lazarus-specific
+lib/
+backup/
+*.compiled
+*.o
+*.ppu
+*.rst
+*.or
+*.ppl
+*.compiled
+*.lps    # Lazarus project session
+*.lpi~   # Lazarus backup project info
+*.lps~   # Lazarus backup session info
+
+# Delphi-specific
+__history/
+*.identcache
+*.local
+*.tvsconfig
+*.dproj.local
+*.dproj.*.local
+*.groupproj.local
+*.groupproj.*.local
+
+# Diretórios e arquivos gerados
+/bin/
+/build/
+/output/
+
+# Configurações de IDE específicas (opcional ignorar)
+*.dproj.user
+*.dsk
+*.vssscc
+*.suo
+*.ncb
+*.sdf
+
+# Outras IDEs/ambientes
+.idea/
+.vscode/
