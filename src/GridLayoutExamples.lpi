@@ -79,6 +79,7 @@
         <Filename Value="ufrowresizergridlayout.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FRowResizerGridLayout"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFRowResizerGridLayout"/>
       </Unit>
@@ -86,6 +87,7 @@
         <Filename Value="uffullresizergridlayout.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FFullResizerGridLayout"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
       </Unit>
     </Units>

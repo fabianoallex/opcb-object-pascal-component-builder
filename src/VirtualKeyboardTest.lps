@@ -8,8 +8,8 @@
       <Unit>
         <Filename Value="VirtualKeyboardTest.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="3"/>
-        <CursorPos X="49" Y="12"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="37" Y="6"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
       </Unit>
@@ -17,16 +17,16 @@
         <Filename Value="test\ukeytest.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UKeyTest"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="71" Y="27"/>
         <UsageCount Value="203"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyboardclasses.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UVirtualKeyboardClasses"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="89"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="59"/>
         <CursorPos X="69" Y="59"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
@@ -71,7 +71,6 @@
         <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UVirtualKeyBlockGridLayoutTest"/>
-        <EditorIndex Value="1"/>
         <TopLine Value="34"/>
         <CursorPos X="36" Y="51"/>
         <UsageCount Value="155"/>
@@ -81,7 +80,7 @@
         <Filename Value="uvirtualkeyblocklayouts.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UVirtualKeyBlockLayouts"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="1"/>
         <UsageCount Value="154"/>
         <Loaded Value="True"/>
       </Unit>
@@ -89,9 +88,8 @@
         <Filename Value="ugridlayouttest.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutTest"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="7"/>
-        <TopLine Value="1642"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="1659"/>
         <CursorPos X="32" Y="1687"/>
         <UsageCount Value="154"/>
         <Loaded Value="True"/>
@@ -100,7 +98,7 @@
         <Filename Value="ulayout.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="6"/>
         <TopLine Value="97"/>
         <CursorPos X="50" Y="105"/>
         <UsageCount Value="154"/>
@@ -116,19 +114,18 @@
       <Unit>
         <Filename Value="uvirtualkeyregistry.pas"/>
         <UnitName Value="UVirtualKeyRegistry"/>
-        <EditorIndex Value="6"/>
-        <TopLine Value="119"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="4"/>
         <CursorPos Y="41"/>
         <UsageCount Value="103"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\include\control.inc"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1544"/>
         <CursorPos X="31" Y="1625"/>
         <UsageCount Value="103"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\lcltype.pp"/>
@@ -253,10 +250,6 @@
       </Position>
       <Position>
         <Filename Value="ulayout.pas"/>
-        <Caret Line="203" Column="35" TopLine="367"/>
-      </Position>
-      <Position>
-        <Filename Value="ulayout.pas"/>
         <Caret Line="192" Column="3" TopLine="186"/>
       </Position>
       <Position>
@@ -274,6 +267,10 @@
       <Position>
         <Filename Value="ulayout.pas"/>
         <Caret Line="669" Column="3" TopLine="663"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1687" Column="32" TopLine="1659"/>
       </Position>
     </JumpHistory>
     <RunParams>

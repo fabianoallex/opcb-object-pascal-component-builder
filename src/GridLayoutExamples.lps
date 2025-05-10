@@ -19,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UExamplesMain"/>
-        <TopLine Value="130"/>
-        <CursorPos X="27" Y="148"/>
+        <TopLine Value="890"/>
+        <CursorPos Y="905"/>
         <UsageCount Value="198"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -30,8 +30,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
         <EditorIndex Value="5"/>
-        <TopLine Value="262"/>
-        <CursorPos X="5" Y="296"/>
+        <TopLine Value="522"/>
+        <CursorPos Y="549"/>
         <UsageCount Value="198"/>
         <Loaded Value="True"/>
       </Unit>
@@ -39,9 +39,10 @@
         <Filename Value="ugridlayoutbuilder.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutBuilder"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="8"/>
-        <CursorPos X="26" Y="29"/>
+        <TopLine Value="88"/>
+        <CursorPos Y="99"/>
         <UsageCount Value="198"/>
         <Loaded Value="True"/>
       </Unit>
@@ -49,7 +50,7 @@
         <Filename Value="ugridlayoutfillerfactory.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutFillerFactory"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="7"/>
         <CursorPos X="9" Y="18"/>
         <UsageCount Value="198"/>
         <Loaded Value="True"/>
@@ -58,7 +59,7 @@
         <Filename Value="ugridlayoutfill.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutFill"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="154"/>
         <CursorPos X="5" Y="7"/>
         <UsageCount Value="198"/>
@@ -89,6 +90,33 @@
         <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
+        <Filename Value="ufrowresizergridlayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FRowResizerGridLayout"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFRowResizerGridLayout"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="48"/>
+        <CursorPos Y="50"/>
+        <UsageCount Value="27"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uffullresizergridlayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FFullResizerGridLayout"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="48"/>
+        <CursorPos X="47" Y="56"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\inc\objpash.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="332"/>
@@ -105,139 +133,139 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\objpas.pp"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="32"/>
         <CursorPos X="8" Y="46"/>
         <UsageCount Value="34"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="282"/>
         <CursorPos X="3" Y="298"/>
         <UsageCount Value="34"/>
-        <Loaded Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ufrowresizergridlayout.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="FRowResizerGridLayout"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UFRowResizerGridLayout"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="48"/>
-        <CursorPos Y="50"/>
-        <UsageCount Value="27"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uffullresizergridlayout.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="FFullResizerGridLayout"/>
-        <ResourceBaseClass Value="Form"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="4"/>
-        <TopLine Value="48"/>
-        <CursorPos X="47" Y="56"/>
-        <UsageCount Value="20"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="22">
+    <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="716" Column="50" TopLine="691"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="734" Column="45" TopLine="700"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="790" Column="47" TopLine="759"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="793" Column="41" TopLine="762"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="808" Column="47" TopLine="777"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="811" Column="41" TopLine="778"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="668" Column="80" TopLine="648"/>
-      </Position>
-      <Position>
-        <Filename Value="ufrowresizergridlayout.pas"/>
-        <Caret Line="36" Column="5" TopLine="19"/>
-      </Position>
-      <Position>
-        <Filename Value="ufrowresizergridlayout.pas"/>
-        <Caret Line="61" Column="3" TopLine="58"/>
-      </Position>
-      <Position>
-        <Filename Value="ufrowresizergridlayout.pas"/>
-        <Caret Line="34" Column="20" TopLine="8"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="160" Column="18" TopLine="135"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="650" Column="3" TopLine="647"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="160" Column="17" TopLine="141"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="650" Column="3" TopLine="647"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <Caret Line="160" Column="22" TopLine="141"/>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="886" TopLine="874"/>
       </Position>
       <Position>
         <Filename Value="uexamplesmain.pas"/>
-        <Caret Line="356" Column="59" TopLine="354"/>
+        <Caret Line="887" TopLine="884"/>
       </Position>
       <Position>
         <Filename Value="uexamplesmain.pas"/>
-        <Caret Line="357" Column="59" TopLine="355"/>
+        <Caret Line="889" TopLine="884"/>
       </Position>
       <Position>
         <Filename Value="uexamplesmain.pas"/>
-        <Caret Line="267" Column="3" TopLine="264"/>
+        <Caret Line="890" TopLine="884"/>
       </Position>
       <Position>
         <Filename Value="uexamplesmain.pas"/>
-        <Caret Line="272" Column="8" TopLine="264"/>
+        <Caret Line="891" TopLine="884"/>
       </Position>
       <Position>
         <Filename Value="uexamplesmain.pas"/>
-        <Caret Line="148" Column="33" TopLine="125"/>
+        <Caret Line="893" TopLine="884"/>
       </Position>
       <Position>
-        <Filename Value="uffullresizergridlayout.pas"/>
-        <Caret Line="20" Column="22" TopLine="7"/>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="894" TopLine="884"/>
       </Position>
       <Position>
-        <Filename Value="ufrowresizergridlayout.pas"/>
-        <Caret Line="35" Column="5" TopLine="13"/>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="895" TopLine="884"/>
       </Position>
       <Position>
-        <Filename Value="uffullresizergridlayout.pas"/>
-        <Caret Line="76" Column="37" TopLine="48"/>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="896" TopLine="884"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="897" TopLine="884"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="891" TopLine="884"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="893" TopLine="884"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="894" TopLine="884"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="895" TopLine="895"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="896" TopLine="893"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="897" TopLine="893"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="891" TopLine="881"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="893" TopLine="881"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="894" TopLine="881"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="900" TopLine="890"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="901" TopLine="890"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="902" TopLine="890"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="905" TopLine="890"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="904" TopLine="890"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="905" TopLine="890"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayoutbuilder.pas"/>
+        <Caret Line="66" TopLine="55"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayoutbuilder.pas"/>
+        <Caret Line="67" TopLine="55"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayoutbuilder.pas"/>
+        <Caret Line="68" TopLine="55"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayoutbuilder.pas"/>
+        <Caret Line="69" Column="24" TopLine="55"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayoutbuilder.pas"/>
+        <Caret Line="68" TopLine="63"/>
       </Position>
     </JumpHistory>
     <RunParams>
@@ -260,6 +288,20 @@
         <WatchKind Value="wpkWrite"/>
         <Source Value="ugridalayoutresizer.pas"/>
         <Line Value="121"/>
+      </Item>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="uexamplesmain.pas"/>
+        <Line Value="187"/>
+      </Item>
+      <Item>
+        <Kind Value="bpkSource"/>
+        <WatchScope Value="wpsLocal"/>
+        <WatchKind Value="wpkWrite"/>
+        <Source Value="ugridlayoutbuilder.pas"/>
+        <Line Value="99"/>
       </Item>
     </BreakPoints>
     <Watches>

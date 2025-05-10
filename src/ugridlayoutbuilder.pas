@@ -61,16 +61,10 @@ uses
 { TGridLayoutBuilder }
 
 constructor TGridLayoutBuilder.Create;
-var
-  AGridLayout: TGridLayout;
 begin
   inherited Create;
   FFreeOnDone := True;
-  if not Assigned(AGridLayout) then
-    AGridLayout := TGridLayout.Create;
-  FGridLayout := AGridLayout;
-
-  //Create(TGridLayout.Create);
+  FGridLayout := TGridLayout.Create;
 end;
 
 constructor TGridLayoutBuilder.Create(AGridLayout: TGridLayout);

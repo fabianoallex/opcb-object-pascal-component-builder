@@ -3,7 +3,7 @@ program VirtualKeyboardTest;
 {$mode objfpc}{$H+}
 
 uses
-  Interfaces, Forms, GuiTestRunner, UKeyTest, UVirtualKeyboardClasses,
+  Interfaces, Forms, GuiTestRunner, UVirtualKeyboardClasses,
   UVirtualKeyBlockGridLayoutTest, UVirtualKeyBlockLayouts, ULayout,
   UGridLayoutTest;
 
