@@ -4,7 +4,7 @@ program GridLayoutTests;
 
 uses
   Interfaces, Forms, GuiTestRunner,
-  ULayout in '../src/Ulayout.pas',
+  ULayout in '../src/ulayout.pas',
   UGridLayoutTest;
 
 {$R *.res}

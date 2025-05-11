@@ -8,15 +8,40 @@
       <Unit>
         <Filename Value="GridLayoutTests.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="1"/>
-        <CursorPos X="33" Y="7"/>
+        <CursorPos X="28" Y="16"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="test\ukeytest.pas"/>
+        <Filename Value="ugridlayouttest.pas"/>
         <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutTest"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="13" Y="3"/>
+        <UsageCount Value="156"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ulayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ULayout"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="37"/>
+        <CursorPos X="43" Y="11"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ulayout.pas"/>
+        <UnitName Value="ULayout"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="58"/>
+        <CursorPos X="61" Y="110"/>
+        <UsageCount Value="156"/>
+      </Unit>
+      <Unit>
+        <Filename Value="test\ukeytest.pas"/>
         <UnitName Value="UKeyTest"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="71" Y="27"/>
@@ -24,7 +49,6 @@
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyboardclasses.pas"/>
-        <IsPartOfProject Value="True"/>
         <UnitName Value="UVirtualKeyboardClasses"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="59"/>
@@ -33,7 +57,6 @@
       </Unit>
       <Unit>
         <Filename Value="unit1.pas"/>
-        <IsPartOfProject Value="True"/>
         <UnitName Value="Unit1"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
@@ -42,7 +65,6 @@
       </Unit>
       <Unit>
         <Filename Value="unit2.pas"/>
-        <IsPartOfProject Value="True"/>
         <UnitName Value="Unit2"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="29"/>
@@ -51,7 +73,6 @@
       </Unit>
       <Unit>
         <Filename Value="unit3.pas"/>
-        <IsPartOfProject Value="True"/>
         <UnitName Value="Unit3"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
@@ -60,7 +81,6 @@
       </Unit>
       <Unit>
         <Filename Value="unit4.pas"/>
-        <IsPartOfProject Value="True"/>
         <UnitName Value="Unit4"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
@@ -69,34 +89,15 @@
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
-        <IsPartOfProject Value="True"/>
         <UnitName Value="UVirtualKeyBlockGridLayoutTest"/>
-        <CursorPos X="36" Y="51"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="33" Y="21"/>
         <UsageCount Value="157"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyblocklayouts.pas"/>
-        <IsPartOfProject Value="True"/>
         <UnitName Value="UVirtualKeyBlockLayouts"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="156"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ugridlayouttest.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridLayoutTest"/>
-        <EditorIndex Value="3"/>
-        <UsageCount Value="156"/>
-        <Loaded Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ulayout.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ULayout"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="58"/>
-        <CursorPos X="61" Y="110"/>
         <UsageCount Value="156"/>
       </Unit>
       <Unit>
@@ -144,16 +145,8 @@
         <CursorPos X="5" Y="1675"/>
         <UsageCount Value="3"/>
       </Unit>
-      <Unit>
-        <Filename Value="..\src\ulayout.pas"/>
-        <UnitName Value="ULayout"/>
-        <EditorIndex Value="2"/>
-        <CursorPos X="19" Y="7"/>
-        <UsageCount Value="10"/>
-        <Loaded Value="True"/>
-      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="27">
+    <JumpHistory HistoryIndex="26">
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
         <Caret Line="770" Column="27" TopLine="749"/>
@@ -257,10 +250,6 @@
       <Position>
         <Filename Value="GridLayoutTests.lpr"/>
         <Caret Line="7" Column="3"/>
-      </Position>
-      <Position>
-        <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
-        <Caret Line="51" Column="36"/>
       </Position>
       <Position>
         <Filename Value="GridLayoutTests.lpr"/>

@@ -37,52 +37,12 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="test\ukeytest.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UKeyTest"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uvirtualkeyboardclasses.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UVirtualKeyboardClasses"/>
-      </Unit>
-      <Unit>
-        <Filename Value="unit1.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Unit1"/>
-      </Unit>
-      <Unit>
-        <Filename Value="unit2.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Unit2"/>
-      </Unit>
-      <Unit>
-        <Filename Value="unit3.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Unit3"/>
-      </Unit>
-      <Unit>
-        <Filename Value="unit4.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="Unit4"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UVirtualKeyBlockGridLayoutTest"/>
-      </Unit>
-      <Unit>
-        <Filename Value="uvirtualkeyblocklayouts.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UVirtualKeyBlockLayouts"/>
-      </Unit>
-      <Unit>
         <Filename Value="ugridlayouttest.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutTest"/>
       </Unit>
       <Unit>
-        <Filename Value="ulayout.pas"/>
+        <Filename Value="..\src\ulayout.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
       </Unit>
@@ -96,7 +56,6 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="test"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>
