@@ -10,9 +10,15 @@ uses
   athreads,
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
-  Forms, UExamplesMain, ULayout, UGridLayoutBuilder, UGridLayoutFillerFactory,
-  UGridLayoutFill, UGridaLayoutResizer, UFColumnResizerGridLayout, 
-UFRowResizerGridLayout, uffullresizergridlayout;
+  Forms, UExamplesMain,
+  ULayout in '../src/ULayout.pas',
+  UGridLayoutBuilder in '../src/UGridLayoutBuilder.pas',
+  UGridLayoutFillerFactory in '../src/UGridLayoutFillerFactory.pas',
+  UGridLayoutFill in '../src/UGridLayoutFill.pas',
+  UGridaLayoutResizer in '../src/UGridaLayoutResizer.pas',
+  UFColumnResizerGridLayout,
+  UFRowResizerGridLayout,
+  uffullresizergridlayout;
 
 {$R *.res}
 
