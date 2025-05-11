@@ -71,7 +71,7 @@
         <EditorIndex Value="6"/>
         <TopLine Value="647"/>
         <CursorPos X="40" Y="670"/>
-        <UsageCount Value="138"/>
+        <UsageCount Value="139"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -83,9 +83,9 @@
         <UnitName Value="UFColumnResizerGridLayout"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="101"/>
-        <CursorPos X="17" Y="115"/>
-        <UsageCount Value="74"/>
+        <TopLine Value="95"/>
+        <CursorPos X="36" Y="116"/>
+        <UsageCount Value="75"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -99,7 +99,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="48"/>
         <CursorPos Y="50"/>
-        <UsageCount Value="32"/>
+        <UsageCount Value="33"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -112,7 +112,7 @@
         <EditorIndex Value="4"/>
         <TopLine Value="48"/>
         <CursorPos X="47" Y="56"/>
-        <UsageCount Value="25"/>
+        <UsageCount Value="26"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -121,7 +121,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="332"/>
         <CursorPos Y="344"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="2"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
@@ -129,21 +129,21 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="271"/>
         <CursorPos X="14" Y="288"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="5"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\objpas.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="32"/>
         <CursorPos X="8" Y="46"/>
-        <UsageCount Value="34"/>
+        <UsageCount Value="33"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="282"/>
         <CursorPos X="3" Y="298"/>
-        <UsageCount Value="34"/>
+        <UsageCount Value="33"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
