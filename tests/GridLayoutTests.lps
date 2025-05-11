@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="GridLayoutTests.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="33" Y="7"/>
+        <UsageCount Value="203"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="test\ukeytest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UKeyTest"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="71" Y="27"/>
+        <UsageCount Value="203"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyboardclasses.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyboardClasses"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="59"/>
+        <CursorPos X="69" Y="59"/>
+        <UsageCount Value="203"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit1"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11"/>
+        <CursorPos X="3" Y="28"/>
+        <UsageCount Value="202"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit2.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit2"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="29"/>
+        <CursorPos X="3" Y="46"/>
+        <UsageCount Value="202"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit3.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit3"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11"/>
+        <CursorPos X="13" Y="29"/>
+        <UsageCount Value="234"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit4.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="Unit4"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="11"/>
+        <CursorPos X="3" Y="28"/>
+        <UsageCount Value="234"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyBlockGridLayoutTest"/>
+        <CursorPos X="36" Y="51"/>
+        <UsageCount Value="157"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyblocklayouts.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UVirtualKeyBlockLayouts"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="156"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugridlayouttest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutTest"/>
+        <EditorIndex Value="3"/>
+        <UsageCount Value="156"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ulayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ULayout"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="58"/>
+        <CursorPos X="61" Y="110"/>
+        <UsageCount Value="156"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\fgl.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="25"/>
+        <CursorPos X="72" Y="316"/>
+        <UsageCount Value="99"/>
+      </Unit>
+      <Unit>
+        <Filename Value="uvirtualkeyregistry.pas"/>
+        <UnitName Value="UVirtualKeyRegistry"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="125"/>
+        <CursorPos Y="41"/>
+        <UsageCount Value="103"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\lcl\include\control.inc"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1544"/>
+        <CursorPos X="31" Y="1625"/>
+        <UsageCount Value="103"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\lcl\lcltype.pp"/>
+        <UnitName Value="LCLType"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="53"/>
+        <CursorPos X="3" Y="508"/>
+        <UsageCount Value="114"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\fpc\3.2.2\source\packages\fcl-fpcunit\src\fpcunit.pp"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="85"/>
+        <CursorPos X="21" Y="106"/>
+        <UsageCount Value="2"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus\lcl\stdctrls.pp"/>
+        <UnitName Value="StdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1641"/>
+        <CursorPos X="5" Y="1675"/>
+        <UsageCount Value="3"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ulayout.pas"/>
+        <UnitName Value="ULayout"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="19" Y="7"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="27">
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="770" Column="27" TopLine="749"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="845" Column="27" TopLine="823"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="929" Column="21" TopLine="908"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1048" Column="18" TopLine="1027"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1077" Column="10" TopLine="1055"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1103" Column="24" TopLine="1079"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1136" Column="26" TopLine="1112"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1170" Column="26" TopLine="1149"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1208" Column="20" TopLine="1187"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1211" Column="26" TopLine="1190"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1245" Column="24" TopLine="1223"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1284" Column="24" TopLine="1262"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1325" Column="18" TopLine="1304"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1357" Column="21" TopLine="1336"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1423" Column="20" TopLine="1402"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1425" Column="24" TopLine="1404"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1460" Column="23" TopLine="1438"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1499" Column="20" TopLine="1478"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1526" Column="20" TopLine="1506"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1552" Column="20" TopLine="1532"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1580" Column="20" TopLine="1559"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1603" Column="20" TopLine="1583"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1645" Column="25" TopLine="1618"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="1687" Column="32" TopLine="1659"/>
+      </Position>
+      <Position>
+        <Filename Value="GridLayoutTests.lpr"/>
+        <Caret Line="6" Column="37"/>
+      </Position>
+      <Position>
+        <Filename Value="GridLayoutTests.lpr"/>
+        <Caret Line="7" Column="3"/>
+      </Position>
+      <Position>
+        <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
+        <Caret Line="51" Column="36"/>
+      </Position>
+      <Position>
+        <Filename Value="GridLayoutTests.lpr"/>
+        <Caret Line="7" Column="11"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
