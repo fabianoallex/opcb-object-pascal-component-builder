@@ -16,20 +16,21 @@
         <Filename Value="ugridlayouttest.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutTest"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="13" Y="3"/>
-        <UsageCount Value="158"/>
+        <TopLine Value="150"/>
+        <CursorPos X="68" Y="162"/>
+        <UsageCount Value="159"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\src\ulayout.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="28"/>
+        <TopLine Value="79"/>
         <CursorPos X="50" Y="47"/>
-        <UsageCount Value="22"/>
+        <UsageCount Value="23"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -146,71 +147,7 @@
         <UsageCount Value="3"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="26">
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="770" Column="27" TopLine="749"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="845" Column="27" TopLine="823"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="929" Column="21" TopLine="908"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1048" Column="18" TopLine="1027"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1077" Column="10" TopLine="1055"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1103" Column="24" TopLine="1079"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1136" Column="26" TopLine="1112"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1170" Column="26" TopLine="1149"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1208" Column="20" TopLine="1187"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1211" Column="26" TopLine="1190"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1245" Column="24" TopLine="1223"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1284" Column="24" TopLine="1262"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1325" Column="18" TopLine="1304"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1357" Column="21" TopLine="1336"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1423" Column="20" TopLine="1402"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1425" Column="24" TopLine="1404"/>
-      </Position>
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
         <Caret Line="1460" Column="23" TopLine="1438"/>
@@ -254,6 +191,82 @@
       <Position>
         <Filename Value="GridLayoutTests.lpr"/>
         <Caret Line="7" Column="11"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="20" Column="28" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="144" Column="38" TopLine="132"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="29" Column="52"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="176" Column="20" TopLine="164"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="142" Column="32" TopLine="120"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="21" Column="34" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="66" TopLine="65"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="29" Column="48" TopLine="10"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="146" TopLine="140"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="21" Column="28" TopLine="12"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="145" Column="62" TopLine="139"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="29" Column="51"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="166" Column="18" TopLine="154"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="20" Column="29" TopLine="12"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="145" Column="55" TopLine="140"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="146" Column="59" TopLine="140"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="18" Column="15"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="165" Column="3" TopLine="146"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="30" Column="48" TopLine="7"/>
       </Position>
     </JumpHistory>
     <RunParams>

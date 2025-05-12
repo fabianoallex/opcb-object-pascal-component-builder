@@ -25,6 +25,9 @@ type
     procedure TestPosicaoComponente_ComEspacamentoHorizontalEVertical;
     procedure TestPosicaoComponente_ComEspacamentoCustomizado;
     procedure TestPosicaoComponente_ComMargens;
+    procedure TestPosicaoComponente_ComTopLeftGrid;
+    procedure TestPosicaoComponente_ComColunaOculta;
+    procedure TestPosicaoComponente_ComLinhaOculta;
 
     procedure TestTamanhoComponente_ComRowColSpan_EspacamentoCustomizado;
     procedure TestTamanhoComponente;
@@ -104,6 +107,192 @@ begin
     SB := TSpeedButton.Create(nil);
 
     FGrid.Rows := 3;
+    FGrid.Columns := 4;
+    FGrid.ColumnWidths := 10;
+    FGrid.RowHeights := 20;
+
+    try
+      FGrid.AddItem(
+        TControlLayoutItem.Create(SB),
+        TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
+      );
+
+      FGrid.ArrangeItems;
+      AssertEquals(
+        Format(
+          'LeftExpected: Erro no caso %d: Posição(%d, %d)',
+          [I, Casos[I].Row, Casos[I].Col]
+        ),
+        Casos[I].LeftExpected,
+        SB.Left
+      );
+
+      AssertEquals(
+        Format(
+          'TopExpected: Erro no caso %d: Posição(%d, %d)',
+          [I, Casos[I].Row, Casos[I].Col]
+        ),
+        Casos[I].TopExpected,
+        SB.Top
+      );
+    finally
+      FGrid.Free;
+      SB.Free;
+    end;
+  end;
+end;
+
+
+procedure TGridLayoutTest.TestPosicaoComponente_ComLinhaOculta;
+type
+  TCaso = record
+    HiddenRow,
+    Row, Col,
+    LeftExpected, TopExpected: Integer;
+  end;
+var
+  FGrid: TGridLayout;
+  SB: TSpeedButton;
+  I: Integer;
+const
+  Casos: array[0..3] of TCaso = (
+    (HiddenRow: 1; Row: 0; Col: 0; LeftExpected: 0; TopExpected: 0),
+    (HiddenRow: 0; Row: 1; Col: 1; LeftExpected: 10; TopExpected: 0),
+    (HiddenRow: 1; Row: 2; Col: 2; LeftExpected: 20; TopExpected: 20),
+    (HiddenRow: 1; Row: 2; Col: 3; LeftExpected: 30; TopExpected: 20)
+  );
+begin
+  for I := Low(Casos) to High(Casos) do
+  begin
+    FGrid := TGridLayout.Create;
+    SB := TSpeedButton.Create(nil);
+
+    FGrid.Rows := 3;
+    FGrid.Columns := 4;
+    FGrid.ColumnWidths := 10;
+    FGrid.RowHeights := 20;
+    FGrid.VisibleRow[Casos[I].HiddenRow] := False;
+
+    try
+      FGrid.AddItem(
+        TControlLayoutItem.Create(SB),
+        TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
+      );
+
+      FGrid.ArrangeItems;
+      AssertEquals(
+        Format(
+          'LeftExpected: Erro no caso %d: Posição(%d, %d)',
+          [I, Casos[I].Row, Casos[I].Col]
+        ),
+        Casos[I].LeftExpected,
+        SB.Left
+      );
+
+      AssertEquals(
+        Format(
+          'TopExpected: Erro no caso %d: Posição(%d, %d)',
+          [I, Casos[I].Row, Casos[I].Col]
+        ),
+        Casos[I].TopExpected,
+        SB.Top
+      );
+    finally
+      FGrid.Free;
+      SB.Free;
+    end;
+  end;
+end;
+
+procedure TGridLayoutTest.TestPosicaoComponente_ComColunaOculta;
+type
+  TCaso = record
+    HiddenCol,
+    Row, Col,
+    LeftExpected, TopExpected: Integer;
+  end;
+var
+  FGrid: TGridLayout;
+  SB: TSpeedButton;
+  I: Integer;
+const
+  Casos: array[0..3] of TCaso = (
+    (HiddenCol: 1; Row: 0; Col: 0; LeftExpected: 0; TopExpected: 0),
+    (HiddenCol: 0; Row: 1; Col: 1; LeftExpected: 0; TopExpected: 20),
+    (HiddenCol: 1; Row: 2; Col: 2; LeftExpected: 10; TopExpected: 40),
+    (HiddenCol: 2; Row: 2; Col: 3; LeftExpected: 20; TopExpected: 40)
+  );
+begin
+  for I := Low(Casos) to High(Casos) do
+  begin
+    FGrid := TGridLayout.Create;
+    SB := TSpeedButton.Create(nil);
+
+    FGrid.Rows := 3;
+    FGrid.Columns := 4;
+    FGrid.ColumnWidths := 10;
+    FGrid.RowHeights := 20;
+    FGrid.VisibleColumn[Casos[I].HiddenCol] := False;
+
+    try
+      FGrid.AddItem(
+        TControlLayoutItem.Create(SB),
+        TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
+      );
+
+      FGrid.ArrangeItems;
+      AssertEquals(
+        Format(
+          'LeftExpected: Erro no caso %d: Posição(%d, %d)',
+          [I, Casos[I].Row, Casos[I].Col]
+        ),
+        Casos[I].LeftExpected,
+        SB.Left
+      );
+
+      AssertEquals(
+        Format(
+          'TopExpected: Erro no caso %d: Posição(%d, %d)',
+          [I, Casos[I].Row, Casos[I].Col]
+        ),
+        Casos[I].TopExpected,
+        SB.Top
+      );
+    finally
+      FGrid.Free;
+      SB.Free;
+    end;
+  end;
+end;
+
+procedure TGridLayoutTest.TestPosicaoComponente_ComTopLeftGrid;
+type
+  TCaso = record
+    Top, Left,   // Top e Left do Grid
+    Row, Col,
+    LeftExpected, TopExpected: Integer;
+  end;
+var
+  FGrid: TGridLayout;
+  SB: TSpeedButton;
+  I: Integer;
+const
+  Casos: array[0..4] of TCaso = (
+    (Top: 0; Left: 0; Row: 0; Col: 0; LeftExpected: 0; TopExpected: 0),
+    (Top: 5; Left: 7; Row: 1; Col: 1; LeftExpected: 17; TopExpected: 25),
+    (Top: -10; Left: -8; Row: 2; Col: 2; LeftExpected: 12; TopExpected: 30),
+    (Top: 5; Left: 0; Row: 2; Col: 3; LeftExpected: 30; TopExpected: 45),
+    (Top: 0; Left: 5; Row: 2; Col: 3; LeftExpected: 35; TopExpected: 40)
+  );
+begin
+  for I := Low(Casos) to High(Casos) do
+  begin
+    FGrid := TGridLayout.Create;
+    SB := TSpeedButton.Create(nil);
+
+    FGrid.Rows := 3;
+    FGrid.Top := Casos[I].Top;
+    FGrid.Left := Casos[I].Left;
     FGrid.Columns := 4;
     FGrid.ColumnWidths := 10;
     FGrid.RowHeights := 20;
