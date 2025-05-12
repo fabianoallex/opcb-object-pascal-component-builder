@@ -19,12 +19,18 @@ type
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
+    Button7: TButton;
+    Button8: TButton;
+    Button9: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
+    procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
+    procedure Button9Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
   private
@@ -99,6 +105,39 @@ end;
 
 procedure TFColumnResizerGridLayout.Button6Click(Sender: TObject);
 begin
+  Grid.VisibleColumn[0] := not Grid.VisibleColumn[0];
+
+  Resizer
+    .WithGridWidth(Self.Width)
+    .Resize(Grid);
+
+  Grid.ArrangeItems;
+end;
+
+procedure TFColumnResizerGridLayout.Button7Click(Sender: TObject);
+begin
+  Grid.VisibleColumn[1] := not Grid.VisibleColumn[1];
+
+  Resizer
+    .WithGridWidth(Self.Width)
+    .Resize(Grid);
+
+  Grid.ArrangeItems;
+end;
+
+procedure TFColumnResizerGridLayout.Button8Click(Sender: TObject);
+begin
+  Grid.VisibleColumn[2] := not Grid.VisibleColumn[2];
+
+  Resizer
+    .WithGridWidth(Self.Width)
+    .Resize(Grid);
+
+  Grid.ArrangeItems;
+end;
+
+procedure TFColumnResizerGridLayout.Button9Click(Sender: TObject);
+begin
   Grid.VisibleColumn[3] := not Grid.VisibleColumn[3];
 
   Resizer
@@ -140,7 +179,15 @@ begin
     Btn.Parent := Self;
     Btn.Caption := 'Botão ' + IntToStr(I + 1);
 
-    if I = 10 then
+    if I = 3 then
+    begin
+      Grid.AddItem(
+        Btn,
+        TGridCellSettings.Create(I div 4, I mod 4)
+          .WithColumnSpan(2)
+      )
+    end
+    else if I = 10 then
       Grid.AddItem(
         Btn,
         TGridCellSettings.Create(I div 4, I mod 4)

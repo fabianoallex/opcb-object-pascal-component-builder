@@ -582,57 +582,6 @@ begin
   end;
 end;
 
-{
-procedure TGridLayoutHeightResizer.Resize(AGrid: TGridLayout);
-var
-  TotalSpacingAndMargins: Integer;
-  FixedHeight: Integer;
-  FlexibleRows: TIntList;
-  AvailableHeight, NewColHeight: Integer;
-  I: Integer;
-begin
-  if (AGrid.Columns = 0) or (FGridHeight <= 0) then
-    Exit;
-
-  // Calcular o espaçamento total entre colunas
-  TotalSpacingAndMargins := AGrid.Margins.Bottom + AGrid.Margins.Top;
-  for I := 0 to AGrid.Rows - 2 do
-    Inc(TotalSpacingAndMargins, AGrid.VerticalSpacing[I]);
-
-  // Calcular a altura já ocupada pelas linhas fixas
-  FixedHeight := 0;
-  FlexibleRows := TIntList.Create;
-  try
-    for I := 0 to AGrid.Rows - 1 do
-    begin
-      if (FFixedRows.IndexOf(I) >= 0) then
-        Inc(FixedHeight, AGrid.RowHeight[I])
-      else
-        FlexibleRows.Add(I);
-    end;
-
-    AvailableHeight := FGridHeight - FixedHeight - TotalSpacingAndMargins;
-
-    if AvailableHeight <= 0 then
-      Exit;
-
-    if FlexibleRows.Count = 0 then
-      Exit;
-
-    NewColHeight := AvailableHeight div FlexibleRows.Count;
-
-    for I in FlexibleRows do
-      AGrid.RowHeight[I] := Max(NewColHeight, 1);
-
-    ApplyRowLimitsAndRedistribute(AGrid, FlexibleRows);
-  finally
-    FlexibleRows.Free;
-  end;
-end;
-}
-
-
-
 function TGridLayoutHeightResizer.GetGridHeight: Integer;
 begin
   Result := FGridHeight;

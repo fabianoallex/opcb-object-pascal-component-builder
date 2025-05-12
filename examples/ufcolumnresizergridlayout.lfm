@@ -7,6 +7,7 @@ object FColumnResizerGridLayout: TFColumnResizerGridLayout
   ClientHeight = 716
   ClientWidth = 1159
   DesignTimePPI = 120
+  LCLVersion = '4.0.0.4'
   OnCreate = FormCreate
   OnResize = FormResize
   object Button1: TButton
@@ -62,5 +63,32 @@ object FColumnResizerGridLayout: TFColumnResizerGridLayout
     Caption = 'Ocultar Coluna 1'
     TabOrder = 5
     OnClick = Button6Click
+  end
+  object Button7: TButton
+    Left = 248
+    Height = 31
+    Top = 328
+    Width = 214
+    Caption = 'Ocultar Coluna 2'
+    TabOrder = 6
+    OnClick = Button7Click
+  end
+  object Button8: TButton
+    Left = 248
+    Height = 31
+    Top = 368
+    Width = 214
+    Caption = 'Ocultar Coluna 3'
+    TabOrder = 7
+    OnClick = Button8Click
+  end
+  object Button9: TButton
+    Left = 248
+    Height = 31
+    Top = 408
+    Width = 214
+    Caption = 'Ocultar Coluna 4'
+    TabOrder = 8
+    OnClick = Button9Click
   end
 end

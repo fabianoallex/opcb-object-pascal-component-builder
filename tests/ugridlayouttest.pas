@@ -28,13 +28,22 @@ type
     procedure TestPosicaoComponente_ComTopLeftGrid;
     procedure TestPosicaoComponente_ComColunaOculta;
     procedure TestPosicaoComponente_ComLinhaOculta;
+    procedure TestTamanhoComponente_ComColSpanExcedeUltimaColuna;
+    procedure TestTamanhoComponente_ComRowSpanExcedeUltimaLinha;
 
     procedure TestTamanhoComponente_ComRowColSpan_EspacamentoCustomizado;
     procedure TestTamanhoComponente;
     procedure TestTamanhoComponente_ComLarguraEAlturaVariaveis;
     procedure TestTamanhoComponente_ComRowSpan;
     procedure TestTamanhoComponente_ComColumnSpan;
+    procedure TestTamanhoComponente_ComColumnSpan_ComColunaOculta;
     procedure TestTamanhoComponente_ComRowSpanEColumnSpan;
+
+
+    procedure TestVisibilidadeComponente_ComColunaOculta;
+    procedure TestVisibilidadeComponente_AdicionadoForaDosLimitesDoGrid;
+    procedure TestVisibilidadeComponente_AdicionadoDentroDosLimitesDoGrid;
+
 
     procedure TestMargensAfetamContentSize;
     procedure TestMargensComMultiplasCelulas;
@@ -134,6 +143,58 @@ begin
         ),
         Casos[I].TopExpected,
         SB.Top
+      );
+    finally
+      FGrid.Free;
+      SB.Free;
+    end;
+  end;
+end;
+
+procedure TGridLayoutTest.TestVisibilidadeComponente_ComColunaOculta;
+type
+  TCaso = record
+    HiddenCol,
+    Row, Col: Integer;
+    VisibilityExpected: Boolean;
+  end;
+var
+  FGrid: TGridLayout;
+  SB: TSpeedButton;
+  I: Integer;
+const
+  Casos: array[0..3] of TCaso = (
+    (HiddenCol: 0; Row: 0; Col: 0; VisibilityExpected: False),
+    (HiddenCol: 0; Row: 1; Col: 1; VisibilityExpected: True),
+    (HiddenCol: 2; Row: 2; Col: 2; VisibilityExpected: False),
+    (HiddenCol: 3; Row: 2; Col: 3; VisibilityExpected: False)
+  );
+begin
+  for I := Low(Casos) to High(Casos) do
+  begin
+    FGrid := TGridLayout.Create;
+    SB := TSpeedButton.Create(nil);
+
+    FGrid.Rows := 3;
+    FGrid.Columns := 4;
+    FGrid.ColumnWidths := 10;
+    FGrid.RowHeights := 20;
+    FGrid.VisibleColumn[Casos[I].HiddenCol] := False;
+
+    try
+      FGrid.AddItem(
+        TControlLayoutItem.Create(SB),
+        TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
+      );
+
+      FGrid.ArrangeItems;
+      AssertEquals(
+        Format(
+          'VisibilityExpected: Erro no caso %d: Posição(%d, %d)',
+          [I, Casos[I].Row, Casos[I].Col]
+        ),
+        Casos[I].VisibilityExpected,
+        SB.Visible
       );
     finally
       FGrid.Free;
@@ -742,6 +803,59 @@ begin
     FGrid.ColumnWidth[1] := 15;
     FGrid.ColumnWidth[2] := 20;
     FGrid.RowHeights := 25;
+
+    try
+      Settings := TGridCellSettings.Create(Casos[I].Row, Casos[I].Col);
+      Settings.WithColumnSpan(Casos[I].ColumnSpan);
+      FGrid.AddItem(TControlLayoutItem.Create(SB), Settings);
+
+      FGrid.ArrangeItems;
+
+      AssertEquals(
+        Format('Erro no caso %d: Width esperado com ColumnSpan=%d em (Col=%d):',
+          [I, Casos[I].ColumnSpan, Casos[I].Col]),
+        Casos[I].ExpectedWidth,
+        SB.Width
+      );
+    finally
+      FGrid.Free;
+      SB.Free;
+    end;
+  end;
+end;
+
+procedure TGridLayoutTest.TestTamanhoComponente_ComColumnSpan_ComColunaOculta;
+type
+  TCaso = record
+    HiddenCol,
+    Row, Col, ColumnSpan: Integer;
+    ExpectedWidth: Integer;
+  end;
+var
+  FGrid: TGridLayout;
+  SB: TSpeedButton;
+  I: Integer;
+  Settings: TGridCellSettings;
+const
+  Casos: array[0..2] of TCaso = (
+    (HiddenCol: 1; Row: 0; Col: 0; ColumnSpan: 1; ExpectedWidth: 10),
+    (HiddenCol: 1; Row: 0; Col: 0; ColumnSpan: 2; ExpectedWidth: 10),
+    (HiddenCol: 2; Row: 0; Col: 0; ColumnSpan: 3; ExpectedWidth: 25)
+  );
+begin
+  for I := Low(Casos) to High(Casos) do
+  begin
+    FGrid := TGridLayout.Create;
+    SB := TSpeedButton.Create(nil);
+
+    FGrid.Rows := 2;
+    FGrid.Columns := 3;
+    FGrid.ColumnWidth[0] := 10;
+    FGrid.ColumnWidth[1] := 15;
+    FGrid.ColumnWidth[2] := 20;
+    FGrid.RowHeights := 25;
+
+    FGrid.VisibleColumn[Casos[I].HiddenCol] := False;
 
     try
       Settings := TGridCellSettings.Create(Casos[I].Row, Casos[I].Col);
@@ -1719,6 +1833,106 @@ begin
 
   AssertEquals('Largura incorreta com Center (sem aplicar ExtraWidth)', 20, Btn.Width);
   AssertEquals('Altura incorreta com Center (sem aplicar ExtraHeight)', 20, Btn.Height);
+
+  Btn.Free;
+  Grid.Free;
+end;
+
+
+procedure TGridLayoutTest.TestTamanhoComponente_ComColSpanExcedeUltimaColuna;
+var
+  Grid: TGridLayout;
+  Btn: TSpeedButton;
+  Settings: TGridCellSettings;
+begin
+  Grid := TGridLayout.Create;
+  Btn := TSpeedButton.Create(nil);
+
+  Grid.Rows := 1;
+  Grid.Columns := 1;
+  Grid.RowHeights := 30;
+  Grid.ColumnWidths := 40;
+
+  Settings := TGridCellSettings.Create(0, 0);
+  Settings.WithColumnSpan(2);
+  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.ArrangeItems;
+
+  AssertEquals('Largura incorreta com ColSpan ultrapassando ultima coluna', 40, Btn.Width);
+
+  Btn.Free;
+  Grid.Free;
+end;
+
+procedure TGridLayoutTest.TestTamanhoComponente_ComRowSpanExcedeUltimaLinha;
+var
+  Grid: TGridLayout;
+  Btn: TSpeedButton;
+  Settings: TGridCellSettings;
+begin
+  Grid := TGridLayout.Create;
+  Btn := TSpeedButton.Create(nil);
+
+  Grid.Rows := 2;
+  Grid.Columns := 2;
+  Grid.RowHeights := 30;
+  Grid.ColumnWidths := 40;
+
+  Settings := TGridCellSettings.Create(0, 0);
+  Settings.WithRowSpan(3);
+  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.ArrangeItems;
+
+  AssertEquals('Altura incorreta com RowSpan ultrapassando ultima linha', 60, Btn.Height);
+
+  Btn.Free;
+  Grid.Free;
+end;
+
+procedure TGridLayoutTest.TestVisibilidadeComponente_AdicionadoForaDosLimitesDoGrid;
+var
+  Grid: TGridLayout;
+  Btn: TSpeedButton;
+  Settings: TGridCellSettings;
+begin
+  Grid := TGridLayout.Create;
+  Btn := TSpeedButton.Create(nil);
+
+  Grid.Rows := 1;
+  Grid.Columns := 1;
+  Grid.RowHeights := 30;
+  Grid.ColumnWidths := 40;
+
+  Settings := TGridCellSettings.Create(2, 2);
+  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.ArrangeItems;
+
+  AssertEquals('Componente fora dos limites do grid deve ficar invisível', False, Btn.Visible);
+
+  Btn.Free;
+  Grid.Free;
+end;
+
+procedure TGridLayoutTest.TestVisibilidadeComponente_AdicionadoDentroDosLimitesDoGrid;
+var
+  Grid: TGridLayout;
+  Btn: TSpeedButton;
+  Settings: TGridCellSettings;
+begin
+  Grid := TGridLayout.Create;
+  Btn := TSpeedButton.Create(nil);
+
+  Grid.Rows := 1;
+  Grid.Columns := 1;
+  Grid.RowHeights := 30;
+  Grid.ColumnWidths := 40;
+
+  Settings := TGridCellSettings.Create(0, 0);
+  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.ArrangeItems;
+
+  AssertEquals('Componente dentro dos limites do grid deve ficar visível',
+    True, Btn.Visible);
 
   Btn.Free;
   Grid.Free;

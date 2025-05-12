@@ -694,12 +694,18 @@ end;
 
 function TGridLayout.GetVisibleColumn(Index: Integer): Boolean;
 begin
-  Result := not FHiddenColumns.Contains(Index);
+  if Index >= Columns then
+    Result := False
+  else
+    Result := not FHiddenColumns.Contains(Index);
 end;
 
 function TGridLayout.GetVisibleRow(Index: Integer): Boolean;
 begin
-  Result := not FHiddenRows.Contains(Index);
+  if Index >= Rows then
+    Result := False
+  else
+    Result := not FHiddenRows.Contains(Index);
 end;
 
 procedure TGridLayout.SetColumnShift(Index: Integer; AValue: Integer);
