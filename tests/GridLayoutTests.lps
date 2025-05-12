@@ -18,7 +18,7 @@
         <UnitName Value="UGridLayoutTest"/>
         <EditorIndex Value="1"/>
         <CursorPos X="13" Y="3"/>
-        <UsageCount Value="156"/>
+        <UsageCount Value="158"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -27,9 +27,9 @@
         <UnitName Value="ULayout"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="37"/>
-        <CursorPos X="43" Y="11"/>
-        <UsageCount Value="20"/>
+        <TopLine Value="28"/>
+        <CursorPos X="50" Y="47"/>
+        <UsageCount Value="22"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>

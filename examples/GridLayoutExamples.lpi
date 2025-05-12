@@ -43,31 +43,6 @@
         <UnitName Value="UExamplesMain"/>
       </Unit>
       <Unit>
-        <Filename Value="ulayout.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="ULayout"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ugridlayoutbuilder.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridLayoutBuilder"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ugridlayoutfillerfactory.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridLayoutFillerFactory"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ugridlayoutfill.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridLayoutFill"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ugridalayoutresizer.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridaLayoutResizer"/>
-      </Unit>
-      <Unit>
         <Filename Value="ufcolumnresizergridlayout.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FColumnResizerGridLayout"/>
@@ -89,6 +64,31 @@
         <ComponentName Value="FFullResizerGridLayout"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ulayout.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="ULayout"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutBuilder"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ugridlayoutfillerfactory.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutFillerFactory"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridLayoutFill"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ugridalayoutresizer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridaLayoutResizer"/>
       </Unit>
     </Units>
   </ProjectOptions>

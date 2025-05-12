@@ -223,19 +223,39 @@ end;
 
 procedure TGridLayoutWidthResizer.Resize(AGrid: TGridLayout);
 var
-  TotalSpacingAndMargins: Integer;
   FixedWidth: Integer;
   FlexibleCols: TIntList;
   AvailableWidth, NewColWidth: Integer;
   I: Integer;
+
+  function CalculateTotalSpacingWithMargins: Integer;
+  var
+    I, LastVisibleCol: Integer;
+  begin
+    LastVisibleCol := -1;
+    for I := AGrid.Columns - 1 downto 0 do
+      if AGrid.VisibleColumn[I] then
+      begin
+        LastVisibleCol := I;
+        Break;
+      end;
+
+    if LastVisibleCol = -1 then
+    begin
+      Result := 0;   // se nao tem nenhuma coluna visivel, retorna sem margens
+      Exit;
+    end;
+
+    Result := AGrid.Margins.Left + AGrid.Margins.Right;
+
+    for I := 0 to LastVisibleCol - 1 do
+      if AGrid.VisibleColumn[I] then
+        Inc(Result, AGrid.HorizontalSpacing[I]);
+  end;
+
 begin
   if (AGrid.Columns = 0) or (FGridWidth <= 0) then
     Exit;
-
-  // Calcular o espaçamento total entre colunas
-  TotalSpacingAndMargins := AGrid.Margins.Left + AGrid.Margins.Right;
-  for I := 0 to AGrid.Columns - 2 do
-    Inc(TotalSpacingAndMargins, AGrid.HorizontalSpacing[I]);
 
   // Calcular a largura já ocupada pelas colunas fixas
   FixedWidth := 0;
@@ -243,13 +263,18 @@ begin
   try
     for I := 0 to AGrid.Columns - 1 do
     begin
+      if not AGrid.VisibleColumn[I] then
+        Continue;
+
       if (FFixedColumns.IndexOf(I) >= 0) then
         Inc(FixedWidth, AGrid.ColumnWidth[I])
       else
         FlexibleCols.Add(I);
     end;
 
-    AvailableWidth := FGridWidth - FixedWidth - TotalSpacingAndMargins;
+    AvailableWidth := FGridWidth
+      - FixedWidth
+      - CalculateTotalSpacingWithMargins;
 
     if AvailableWidth <= 0 then
       Exit;

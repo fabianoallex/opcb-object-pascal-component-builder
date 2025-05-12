@@ -320,8 +320,8 @@ begin
   Tab.Caption := 'Grid Simples';
 
   Grid := TGridLayout.Create;
-  Grid.Top := 200;
-  Grid.Left := 200;
+  //Grid.Top := 200;
+  //Grid.Left := 200;
   Grid.Rows := 3;
   Grid.Columns := 3;
   Grid.ColumnWidths := 80;
@@ -329,6 +329,9 @@ begin
   Grid.HorizontalSpacings := 10;
   Grid.VerticalSpacings := 10;
   Grid.Margins.All := 10;
+
+  //Grid.VisibleRow[0] := False;
+  Grid.VisibleColumn[0] := False;
 
   for I := 0 to 8 do
   begin

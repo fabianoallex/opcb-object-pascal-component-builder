@@ -185,6 +185,7 @@ type
   TGridCellList = specialize TObjectList<TGridCell>;
   TGridCellSettingsList = specialize TObjectList<TGridCellSettings>;
   TIntIntDictionary = specialize TDictionary<Integer, Integer>;
+  TIntList = specialize TList<Integer>;
 
   { TGridLayout }
 
@@ -207,6 +208,8 @@ type
     FVerticalSpacingDic: TIntIntDictionary;
     FRowShift: TIntIntDictionary;
     FColumnShift: TIntIntDictionary;
+    FHiddenRows: TIntList;
+    FHiddenColumns: TIntList;
     function CalculateCellWidth(Cell: TGridCell): Integer;
     function CalculateCellHeight(Cell: TGridCell): Integer;
     function CalculateCellLeft(Cell: TGridCell): Integer;
@@ -219,6 +222,8 @@ type
     function GetRowHeight(Index: Integer): Integer;
     function GetRowShift(Index: Integer): Integer;
     function GetVerticalSpacing(Index: Integer): Integer;
+    function GetVisibleColumn(Index: Integer): Boolean;
+    function GetVisibleRow(Index: Integer): Boolean;
     procedure SetColumnShift(Index: Integer; AValue: Integer);
     procedure SetHorizontalSpacing(Index: Integer; AValue: Integer);
     procedure SetLeft(AValue: Integer);
@@ -228,6 +233,8 @@ type
     procedure SetRowShift(Index: Integer; AValue: Integer);
     procedure SetTop(AValue: Integer);
     procedure SetVerticalSpacing(Index: Integer; AValue: Integer);
+    procedure SetVisibleColumn(Index: Integer; AValue: Boolean);
+    procedure SetVisibleRow(Index: Integer; AValue: Boolean);
   public
     constructor Create;
     destructor Destroy; override;
@@ -236,6 +243,8 @@ type
     procedure AddItem(AItem: TGridLayout; ASettings: TGridCellSettings); overload;
     procedure ArrangeItems; overload;
     procedure ArrangeItems(ALeft, ATop: Integer); overload;
+    procedure ApplyCellsVisibility;
+    function IsVisibleCell(Cell: TGridCell): Boolean;
     procedure Clear;
     procedure ClearRowAndColumnShifts;
     procedure ResetColumnWidthsToDefault;
@@ -255,6 +264,8 @@ type
     property HorizontalSpacing[Index: Integer]: Integer read GetHorizontalSpacing write SetHorizontalSpacing;
     property RowShift[Index: Integer]: Integer read GetRowShift write SetRowShift;
     property ColumnShift[Index: Integer]: Integer read GetColumnShift write SetColumnShift;
+    property VisibleRow[Index: Integer]: Boolean read GetVisibleRow write SetVisibleRow;
+    property VisibleColumn[Index: Integer]: Boolean read GetVisibleColumn write SetVisibleColumn;
     property Margins: TMargins read FMargins;
     property ContentWidth: Integer read GetContentWidth;
     property ContentHeight: Integer read GetContentHeight;
@@ -525,6 +536,8 @@ begin
   FHorizontalSpacingDic := TIntIntDictionary.Create;
   FRowShift := TIntIntDictionary.Create;
   FColumnShift := TIntIntDictionary.Create;
+  FHiddenRows := TIntList.Create;
+  FHiddenColumns := TIntList.Create;
   FMargins := TMargins.Create;
   FVerticalSpacings := 0;
   FHorizontalSpacings := 0;
@@ -544,6 +557,8 @@ begin
   FHorizontalSpacingDic.Free;
   FRowShift.Free;
   FColumnShift.Free;
+  FHiddenRows.Free;
+  FHiddenColumns.Free;
   FMargins.Free;
   inherited;
 end;
@@ -677,6 +692,16 @@ begin
     Result := FVerticalSpacings;
 end;
 
+function TGridLayout.GetVisibleColumn(Index: Integer): Boolean;
+begin
+  Result := not FHiddenColumns.Contains(Index);
+end;
+
+function TGridLayout.GetVisibleRow(Index: Integer): Boolean;
+begin
+  Result := not FHiddenRows.Contains(Index);
+end;
+
 procedure TGridLayout.SetColumnShift(Index: Integer; AValue: Integer);
 begin
   FColumnShift.AddOrSetValue(Index, AValue);
@@ -726,15 +751,44 @@ begin
   FVerticalSpacingDic.AddOrSetValue(Index, AValue);
 end;
 
+procedure TGridLayout.SetVisibleColumn(Index: Integer; AValue: Boolean);
+begin
+  if AValue then
+  begin
+    if FHiddenColumns.Contains(Index) then
+      FHiddenColumns.Remove(Index);
+  end
+  else
+  begin
+    if not FHiddenColumns.Contains(Index) then
+      FHiddenColumns.Add(Index);
+  end;
+end;
+
+procedure TGridLayout.SetVisibleRow(Index: Integer; AValue: Boolean);
+begin
+  if AValue then
+  begin
+    if FHiddenRows.Contains(Index) then
+      FHiddenRows.Remove(Index);
+  end
+  else
+  begin
+    if not FHiddenRows.Contains(Index) then
+      FHiddenRows.Add(Index);
+  end;
+end;
+
 function TGridLayout.CalculateCellLeft(Cell: TGridCell): Integer;
 var
   I: Integer;
 begin
   Result := Self.RowShift[Cell.Row] + Margins.Left;
   for I := 0 to Cell.Column - 1 do
-    Result := Result
-      + GetColumnWidth(I)
-      + GetHorizontalSpacing(I);
+    if VisibleColumn[I] then
+      Result := Result
+        + GetColumnWidth(I)
+        + GetHorizontalSpacing(I);
 end;
 
 function TGridLayout.CalculateCellHeight(Cell: TGridCell): Integer;
@@ -770,7 +824,6 @@ begin
   end;
 end;
 
-
 function TGridLayout.CalculateCellTop(Cell: TGridCell): Integer;
 var
   Row, I: Integer;
@@ -778,9 +831,10 @@ begin
   Result := Self.ColumnShift[Cell.Column] + Margins.Top;
 
   for I := 0 to Cell.Row - 1 do
-    Result := Result
-      + GetRowHeight(I)
-      + GetVerticalSpacing(I);
+    if VisibleRow[I] then
+      Result := Result
+        + GetRowHeight(I)
+        + GetVerticalSpacing(I);
 end;
 
 procedure TGridLayout.ArrangeItems(ALeft, ATop: Integer);
@@ -790,6 +844,8 @@ var
   X, Y, W, H: Integer;
   Control: TControl;
 begin
+  ApplyCellsVisibility;
+
   for Cell in FCells do
   begin
     Item := Cell.Item;
@@ -798,6 +854,9 @@ begin
 
     Control := Item.GetControl;
     if Control = nil then
+      Continue;
+
+    if not IsVisibleCell(Cell) then
       Continue;
 
     // Posição e tamanho baseados na célula
@@ -853,6 +912,19 @@ begin
       H
     );
   end;
+end;
+
+procedure TGridLayout.ApplyCellsVisibility;
+var
+  Cell: TGridCell;
+begin
+  for Cell in FCells do
+    Cell.Item.GetControl.Visible := IsVisibleCell(Cell);
+end;
+
+function TGridLayout.IsVisibleCell(Cell: TGridCell): Boolean;
+begin
+  Result := VisibleRow[Cell.Row] and VisibleColumn[Cell.Column];
 end;
 
 procedure TGridLayout.ArrangeItems;
