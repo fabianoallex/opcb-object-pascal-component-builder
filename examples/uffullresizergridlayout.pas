@@ -21,7 +21,6 @@ type
     procedure CreateGrid;
     procedure SetGrid(AValue: TGridLayout);
     procedure SetResizer(AValue: IGridLayoutFullResizer);
-
   public
     property Grid: TGridLayout read FGrid write SetGrid;
     property Resizer: IGridLayoutFullResizer read FResizer write SetResizer;

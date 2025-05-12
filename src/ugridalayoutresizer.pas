@@ -509,6 +509,80 @@ begin
   inherited Destroy;
 end;
 
+
+procedure TGridLayoutHeightResizer.Resize(AGrid: TGridLayout);
+var
+  FixedHeight: Integer;
+  FlexibleRows: TIntList;
+  AvailableHeight, NewRowHeight: Integer;
+  I: Integer;
+
+  function CalculateTotalSpacingWithMargins: Integer;
+  var
+    I, LastVisibleRow: Integer;
+  begin
+    LastVisibleRow := -1;
+    for I := AGrid.Rows - 1 downto 0 do
+      if AGrid.VisibleRow[I] then
+      begin
+        LastVisibleRow := I;
+        Break;
+      end;
+
+    if LastVisibleRow = -1 then
+    begin
+      Result := 0;   // se nao tem nenhuma coluna visivel, retorna sem margens
+      Exit;
+    end;
+
+    Result := AGrid.Margins.Left + AGrid.Margins.Right;
+
+    for I := 0 to LastVisibleRow - 1 do
+      if AGrid.VisibleRow[I] then
+        Inc(Result, AGrid.VerticalSpacing[I]);
+  end;
+
+begin
+  if (AGrid.Rows = 0) or (FGridHeight <= 0) then
+    Exit;
+
+  // Calcular a largura já ocupada pelas colunas fixas
+  FixedHeight := 0;
+  FlexibleRows := TIntList.Create;
+  try
+    for I := 0 to AGrid.Rows - 1 do
+    begin
+      if not AGrid.VisibleRow[I] then
+        Continue;
+
+      if (FFixedRows.IndexOf(I) >= 0) then
+        Inc(FixedHeight, AGrid.RowHeight[I])
+      else
+        FlexibleRows.Add(I);
+    end;
+
+    AvailableHeight := FGridHeight
+      - FixedHeight
+      - CalculateTotalSpacingWithMargins;
+
+    if AvailableHeight <= 0 then
+      Exit;
+
+    if FlexibleRows.Count = 0 then
+      Exit;
+
+    NewRowHeight := AvailableHeight div FlexibleRows.Count;
+
+    for I in FlexibleRows do
+      AGrid.RowHeight[I] := Max(NewRowHeight, 1);
+
+    ApplyRowLimitsAndRedistribute(AGrid, FlexibleRows);
+  finally
+    FlexibleRows.Free;
+  end;
+end;
+
+{
 procedure TGridLayoutHeightResizer.Resize(AGrid: TGridLayout);
 var
   TotalSpacingAndMargins: Integer;
@@ -555,6 +629,9 @@ begin
     FlexibleRows.Free;
   end;
 end;
+}
+
+
 
 function TGridLayoutHeightResizer.GetGridHeight: Integer;
 begin

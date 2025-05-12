@@ -1,5 +1,5 @@
 object FFullResizerGridLayout: TFFullResizerGridLayout
-  Left = 2650
+  Left = 0
   Height = 673
   Top = 250
   Width = 885

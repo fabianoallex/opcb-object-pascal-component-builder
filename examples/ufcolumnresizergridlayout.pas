@@ -99,7 +99,7 @@ end;
 
 procedure TFColumnResizerGridLayout.Button6Click(Sender: TObject);
 begin
-  Grid.VisibleColumn[1] := not Grid.VisibleColumn[1];
+  Grid.VisibleColumn[3] := not Grid.VisibleColumn[3];
 
   Resizer
     .WithGridWidth(Self.Width)

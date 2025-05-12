@@ -792,16 +792,48 @@ begin
 end;
 
 function TGridLayout.CalculateCellHeight(Cell: TGridCell): Integer;
-var
-  I: Integer;
+  function GetLastVisibleRow: Integer;
+  var
+    I: Integer;
+  begin
+    Result := -1;
+    for I := Cell.Row + Cell.RowSpan - 1 downto Cell.Row do
+      if VisibleRow[I] then
+        Exit(I);
+  end;
+
+  function CalculateTotalSpacings: Integer;
+  var
+    I, LastVisibleRow: Integer;
+  begin
+    Result := 0;
+    LastVisibleRow := GetLastVisibleRow;
+    for I := Cell.Row to LastVisibleRow - 1 do
+      if VisibleRow[I] then
+        Inc(Result, VerticalSpacing[I]);
+  end;
+
+  function CalculateTotalHeight: Integer;
+  var
+    I: Integer;
+  begin
+    Result := 0;
+
+    for I := Cell.Row to Cell.Row + Cell.RowSpan - 1 do
+      if not VisibleRow[I] then
+        Continue
+      else
+        Result := Result + GetRowHeight(I);
+  end;
 begin
   Result := 0;
-  for I := Cell.Row to Cell.Row + Cell.RowSpan - 1 do
-  begin
-    Result := Result + GetRowHeight(I);
-    if I < Cell.Row + Cell.RowSpan - 1 then
-      Result := Result + GetVerticalSpacing(I);
-  end;
+
+  if Cell.Row >= FRows then
+    Exit;
+
+  Result := Result
+    + CalculateTotalHeight
+    + CalculateTotalSpacings;
 end;
 
 function TGridLayout.CalculateCellWidth(Cell: TGridCell): Integer;
@@ -812,16 +844,50 @@ function TGridLayout.CalculateCellWidth(Cell: TGridCell): Integer;
 //   0   1   2   3   4
 //   |
 //   Column Width Index
-var
-  I: Integer;
+
+  function GetLastVisibleCol: Integer;
+  var
+    I: Integer;
+  begin
+    Result := -1;
+    for I := Cell.Column + Cell.ColSpan - 1 downto Cell.Column do
+      if VisibleColumn[I] then
+        Exit(I);
+  end;
+
+  function CalculateTotalSpacings: Integer;
+  var
+    I, LastVisibleCol: Integer;
+  begin
+    Result := 0;
+    LastVisibleCol := GetLastVisibleCol;
+    for I := Cell.Column to LastVisibleCol - 1 do
+      if VisibleColumn[I] then
+        Inc(Result, HorizontalSpacing[I]);
+  end;
+
+  function CalculateTotalWidth: Integer;
+  var
+    I: Integer;
+  begin
+    Result := 0;
+
+    for I := Cell.Column to Cell.Column + Cell.ColSpan - 1 do
+      if not VisibleColumn[I] then
+        Continue
+      else
+        Result := Result + GetColumnWidth(I);
+  end;
+
 begin
   Result := 0;
-  for I := Cell.Column to Cell.Column + Cell.ColSpan - 1 do
-  begin
-    Result := Result + GetColumnWidth(I);
-    if I < Cell.Column + Cell.ColSpan - 1 then
-      Result := Result + GetHorizontalSpacing(I);
-  end;
+
+  if Cell.Column >= FColumns then
+    Exit;
+
+  Result := Result
+    + CalculateTotalWidth
+    + CalculateTotalSpacings;
 end;
 
 function TGridLayout.CalculateCellTop(Cell: TGridCell): Integer;
@@ -829,7 +895,6 @@ var
   Row, I: Integer;
 begin
   Result := Self.ColumnShift[Cell.Column] + Margins.Top;
-
   for I := 0 to Cell.Row - 1 do
     if VisibleRow[I] then
       Result := Result
@@ -853,7 +918,7 @@ begin
       Continue;
 
     Control := Item.GetControl;
-    if Control = nil then
+    if not Assigned(Control) then
       Continue;
 
     if not IsVisibleCell(Cell) then
