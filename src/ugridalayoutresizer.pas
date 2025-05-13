@@ -77,6 +77,8 @@ type
     function WithMaxGridHeight(AMax: Integer): IGridLayoutHeightResizer;
     function WithMinGridHeight(AMin: Integer): IGridLayoutHeightResizer;
     function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridLayoutHeightResizer;
+    function WithHeightRange(ARowIndex: Integer; const AValues: array of Integer;
+      ASelectRangeMode: TValueRangeMode): IGridLayoutHeightResizer;
     property GridHeight: Integer read GetGridHeight ;
   end;
 
@@ -108,24 +110,42 @@ type
     function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridLayoutFullResizer;
   end;
 
-  { TGridLayoutWidthResizer }
+  { TGridLayoutResizerBase }
 
-  TGridLayoutWidthResizer = class(TInterfacedObject, IGridLayoutWidthResizer)
-  private
-    FMinGridWidth: Integer;
-    FMaxGridWidth: Integer;
-    FGridWidth: Integer;
-    FFixedColumns: TIntList;
-    FMinWidths: TIntIntDictionary;
-    FMaxWidths: TIntIntDictionary;
-    FWidthsRanges: TIntTValueRangeDictionary;
-    procedure ApplyColumnLimitsAndRedistribute(AGrid: TGridLayout;
-      AFlexibleCols: TIntList);
+  TGridLayoutResizerBase = class abstract(TInterfacedObject, IGridLayoutResizer)
+  protected
+    FMinTotalSize: Integer;
+    FMaxTotalSize: Integer;
+    FTotalSize: Integer;
+    FFixedIndexes: TIntList;
+    FMinSizes: TIntIntDictionary;
+    FMaxSizes: TIntIntDictionary;
+    FSizesRanges: TIntTValueRangeDictionary;
+    procedure ApplyLimitsAndRedistribute(AGrid: TGridLayout; AFlexibleIndexes: TIntList);
+    function GetItemCount(AGrid: TGridLayout): Integer; virtual; abstract;
+    function GetVisibleItem(AGrid: TGridLayout; AIndex: Integer): Boolean; virtual; abstract;
+    function GetItemSize(AGrid: TGridLayout; AIndex: Integer): Integer; virtual; abstract;
+    procedure SetItemSize(AGrid: TGridLayout; AIndex, ASize: Integer); virtual; abstract;
+    function GetSpacing(AGrid: TGridLayout; AIndex: Integer): Integer; virtual; abstract;
+    function GetTotalMargin(AGrid: TGridLayout): Integer; virtual; abstract;
   public
     constructor Create;
     destructor Destroy; override;
-    function GetGridWidth: Integer;
     procedure Resize(AGrid: TGridLayout);
+  end;
+
+  { TGridLayoutWidthResizer }
+
+  TGridLayoutWidthResizer = class(TGridLayoutResizerBase, IGridLayoutWidthResizer)
+  protected
+    function GetItemCount(AGrid: TGridLayout): Integer; override;
+    function GetVisibleItem(AGrid: TGridLayout; AIndex: Integer): Boolean; override;
+    function GetItemSize(AGrid: TGridLayout; AIndex: Integer): Integer; override;
+    procedure SetItemSize(AGrid: TGridLayout; AIndex, ASize: Integer); override;
+    function GetSpacing(AGrid: TGridLayout; AIndex: Integer): Integer; override;
+    function GetTotalMargin(AGrid: TGridLayout): Integer; override;
+  public
+    function GetGridWidth: Integer;
     function WithGridWidth(ANewWidth: Integer): IGridLayoutWidthResizer;
     function WithFixedColumns(const AFixedColumns: array of Integer): IGridLayoutWidthResizer;
     function DisableFixedColumn(AColIndex: Integer): IGridLayoutWidthResizer; overload;
@@ -140,25 +160,23 @@ type
     function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridLayoutWidthResizer;
     function WithWidthRange(AColIndex: Integer; const AValues: array of Integer;
       ASelectRangeMode: TValueRangeMode): IGridLayoutWidthResizer;
-    property GridWidth: Integer read GetGridWidth write FGridWidth;
+    property GridWidth: Integer read GetGridWidth write FTotalSize;
   end;
+
+
+
 
   { TGridLayoutHeightResizer }
 
-  TGridLayoutHeightResizer = class(TInterfacedObject, IGridLayoutHeightResizer)
-  private
-    FMinGridHeight: Integer;
-    FMaxGridHeight: Integer;
-    FGridHeight: Integer;
-    FFixedRows: TIntList;
-    FMinHeights: TIntIntDictionary;
-    FMaxHeights: TIntIntDictionary;
-    procedure ApplyRowLimitsAndRedistribute(AGrid: TGridLayout;
-      AFlexibleRows: TIntList);
+  TGridLayoutHeightResizer = class(TGridLayoutResizerBase, IGridLayoutHeightResizer)
+  protected
+    function GetItemCount(AGrid: TGridLayout): Integer; override;
+    function GetVisibleItem(AGrid: TGridLayout; AIndex: Integer): Boolean; override;
+    function GetItemSize(AGrid: TGridLayout; AIndex: Integer): Integer; override;
+    procedure SetItemSize(AGrid: TGridLayout; AIndex, ASize: Integer); override;
+    function GetSpacing(AGrid: TGridLayout; AIndex: Integer): Integer; override;
+    function GetTotalMargin(AGrid: TGridLayout): Integer; override;
   public
-    constructor Create;
-    destructor Destroy; override;
-    procedure Resize(AGrid: TGridLayout);
     function GetGridHeight: Integer;
     function WithGridHeight(ANewHeight: Integer): IGridLayoutHeightResizer;
     function WithFixedRows(const AFixedRows: array of Integer): IGridLayoutHeightResizer;
@@ -172,8 +190,12 @@ type
     function WithMaxGridHeight(AMax: Integer): IGridLayoutHeightResizer;
     function WithMinGridHeight(AMin: Integer): IGridLayoutHeightResizer;
     function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridLayoutHeightResizer;
-    property GridHeight: Integer read GetGridHeight write FGridHeight;
+    function WithHeightRange(ARowIndex: Integer; const AValues: array of Integer;
+      ASelectRangeMode: TValueRangeMode): IGridLayoutHeightResizer;
+
+    property GridHeight: Integer read GetGridHeight write FTotalSize;
   end;
+
 
   { TGridLayoutFullResizer }
 
@@ -297,189 +319,229 @@ begin
     Free;
 end;
 
-{ TGridLayoutWidthResizer }
+{ TGridLayoutResizerBase }
 
-constructor TGridLayoutWidthResizer.Create;
+procedure TGridLayoutResizerBase.ApplyLimitsAndRedistribute(AGrid: TGridLayout;
+  AFlexibleIndexes: TIntList);
+var
+  Index, MinS, MaxS, Range: Integer;
+  AdjustedIndexes: TIntList;
+  Excess: Integer;
+  Dist: Integer;
+
+  function ApplyRange(Index: Integer): Integer;
+  begin
+    if FSizesRanges.ContainsKey(Index) then
+      Result := FSizesRanges[Index].Select(GetItemSize(AGrid, Index))  // AGrid.ColumnWidth[Col]
+    else
+      Result := GetItemSize(AGrid, Index); // AGrid.ColumnWidth[Col];
+  end;
+
+  function ApplyMaxValue(Index: Integer): Integer;
+  begin
+    if not FMaxSizes.TryGetValue(Index, Result) then  // if not FMaxWidths.TryGetValue(Col, Result) then
+      Result := MaxInt;
+  end;
+
+  function ApplyMinValue(Index: Integer): Integer;
+  begin
+    if not FMinSizes.TryGetValue(Index, Result) then  // if not FMinWidths.TryGetValue(Col, Result) then
+      Result := 0;
+  end;
+
 begin
-  FMinGridWidth := 0;
-  FMaxGridWidth := MaxInt;
-  FFixedColumns := TIntList.Create;
-  FMinWidths := TIntIntDictionary.Create;
-  FMaxWidths := TIntIntDictionary.Create;
-  FWidthsRanges := TIntTValueRangeDictionary.Create;
+  AdjustedIndexes := TIntList.Create;
+  try
+    Excess := 0;
+
+    // Aplicar limites e acumular excesso
+    for Index in AFlexibleIndexes do
+    begin
+      MinS := ApplyMinValue(Index);
+      MaxS := ApplyMaxValue(Index);
+      Range := ApplyRange(Index);
+
+      if GetItemSize(AGrid, Index) < MinS then    // if AGrid.ColumnWidth[Col] < MinW then
+      begin
+        Excess := Excess - (MinS - GetItemSize(AGrid, Index));  // Excess := Excess - (MinS - AGrid.ColumnWidth[Col]);
+        SetItemSize(AGrid, Index, MinS);  //AGrid.ColumnWidth[Col] := MinW;
+      end
+      else if GetItemSize(AGrid, Index) > MaxS then  // else if AGrid.ColumnWidth[Col] > MaxW then
+      begin
+        Excess := Excess + (GetItemSize(AGrid, Index) - MaxS);  // Excess := Excess + (AGrid.ColumnWidth[Col] - MaxW);
+        SetItemSize(AGrid, Index, MaxS);   // AGrid.ColumnWidth[Col] := MaxW;
+      end
+      else if GetItemSize(AGrid, Index) <> Range then    // else if AGrid.ColumnWidth[Col] <> Range then
+      begin
+        Excess := Excess + (GetItemSize(AGrid, Index) - Range);  // Excess := Excess + (AGrid.ColumnWidth[Col] - Range);
+        SetItemSize(AGrid, Index, Range);  // AGrid.ColumnWidth[Col] := Range;
+      end
+      else
+        AdjustedIndexes.Add(Index);
+    end;
+
+    if (Excess <> 0) and (AdjustedIndexes.Count > 0) then
+    begin
+      Dist := Excess div AdjustedIndexes.Count;
+      for Index in AdjustedIndexes do
+        SetItemSize(
+          AGrid,
+          Index,
+          Max(GetItemSize(AGrid, Index) + Dist, 0)
+        );                                         // AGrid.ColumnWidth[Col] := Max(AGrid.ColumnWidth[Col] + DistWidth, 0);
+    end;
+  finally
+    AdjustedIndexes.Free;
+  end;
 end;
 
-destructor TGridLayoutWidthResizer.Destroy;
+constructor TGridLayoutResizerBase.Create;
+begin
+  FMinTotalSize := 0;
+  FMaxTotalSize := MaxInt;
+  FFixedIndexes := TIntList.Create;
+  FMinSizes := TIntIntDictionary.Create;
+  FMaxSizes := TIntIntDictionary.Create;
+  FSizesRanges := TIntTValueRangeDictionary.Create;
+end;
+
+destructor TGridLayoutResizerBase.Destroy;
 var
   Pair: specialize TPair<Integer, TValueRange>;
 begin
-  FMaxWidths.Free;
-  FMinWidths.Free;
-  FFixedColumns.Free;
-  for Pair in FWidthsRanges do
+  FMaxSizes.Free;
+  FMinSizes.Free;
+  FFixedIndexes.Free;
+  for Pair in FSizesRanges do
     Pair.Value.Free;
-  FWidthsRanges.Free;
+  FSizesRanges.Free;
   inherited Destroy;
 end;
 
-function TGridLayoutWidthResizer.GetGridWidth: Integer;
-begin
-  Result := FGridWidth;
-end;
-
-procedure TGridLayoutWidthResizer.Resize(AGrid: TGridLayout);
+procedure TGridLayoutResizerBase.Resize(AGrid: TGridLayout);
 var
-  FixedWidth: Integer;
-  FlexibleCols: TIntList;
-  AvailableWidth, NewColWidth: Integer;
+  FixedSize: Integer;
+  FlexibleIndexes: TIntList;
+  AvailableSize, NewSize: Integer;
   I: Integer;
-  SizeRange: TValueRange;
 
   function CalculateTotalSpacingWithMargins: Integer;
   var
-    I, LastVisibleCol: Integer;
+    I, LastVisibleIndex: Integer;
   begin
-    LastVisibleCol := -1;
-    for I := AGrid.Columns - 1 downto 0 do
-      if AGrid.VisibleColumn[I] then
+    LastVisibleIndex := -1;
+    for I := GetItemCount(AGrid) downto 0 do   // for I := AGrid.Columns - 1 downto 0 do
+      if GetVisibleItem(AGrid, I) then   // if AGrid.VisibleColumn[I] then
       begin
-        LastVisibleCol := I;
+        LastVisibleIndex := I;
         Break;
       end;
 
-    if LastVisibleCol = -1 then
+    if LastVisibleIndex = -1 then
     begin
       Result := 0;   // se nao tem nenhuma coluna visivel, retorna sem margens
       Exit;
     end;
 
-    Result := AGrid.Margins.Left + AGrid.Margins.Right;
+    Result := GetTotalMargin(AGrid);  // AGrid.Margins.Left + AGrid.Margins.Right;
 
-    for I := 0 to LastVisibleCol - 1 do
-      if AGrid.VisibleColumn[I] then
-        Inc(Result, AGrid.HorizontalSpacing[I]);
+    for I := 0 to LastVisibleIndex - 1 do
+      if GetVisibleItem(AGrid, I) then  //  if AGrid.VisibleColumn[I] then
+        Inc(Result, GetSpacing(AGrid, I));  //Inc(Result, AGrid.HorizontalSpacing[I]);
   end;
 
 begin
-  if (AGrid.Columns = 0) or (FGridWidth <= 0) then
+  if (GetItemCount(AGrid) = 0) or (FTotalSize <= 0) then  // if (AGrid.Columns = 0) or (FGridWidth <= 0) then
     Exit;
 
   // Calcular a largura já ocupada pelas colunas fixas
-  FixedWidth := 0;
-  FlexibleCols := TIntList.Create;
+  FixedSize := 0;
+  FlexibleIndexes := TIntList.Create;
   try
-    for I := 0 to AGrid.Columns - 1 do
+    for I := 0 to GetItemCount(AGrid) - 1 do   // for I := 0 to AGrid.Columns - 1 do
     begin
-      if not AGrid.VisibleColumn[I] then
+      if not GetVisibleItem(AGrid, I) then   // if not AGrid.VisibleColumn[I] then
         Continue;
 
-      if (FFixedColumns.IndexOf(I) >= 0) then
-        Inc(FixedWidth, AGrid.ColumnWidth[I])
+      if (FlexibleIndexes.IndexOf(I) >= 0) then
+        Inc(FixedSize, GetItemSize(AGrid, I))  // AGrid.ColumnWidth[I]
       else
-        FlexibleCols.Add(I);
+        FlexibleIndexes.Add(I);
     end;
 
-    AvailableWidth := FGridWidth
-      - FixedWidth
+    AvailableSize := FTotalSize
+      - FixedSize
       - CalculateTotalSpacingWithMargins;
 
-    if AvailableWidth <= 0 then
+    if AvailableSize <= 0 then
       Exit;
 
-    if FlexibleCols.Count = 0 then
+    if FlexibleIndexes.Count = 0 then
       Exit;
 
-    NewColWidth := AvailableWidth div FlexibleCols.Count;
+    NewSize := AvailableSize div FlexibleIndexes.Count;
 
-    for I in FlexibleCols do
-      AGrid.ColumnWidth[I] := Max(NewColWidth, 1);
+    for I in FlexibleIndexes do
+      SetItemSize(AGrid, I, Max(NewSize, 1));  // AGrid.ColumnWidth[I] := Max(NewColWidth, 1);
 
-    ApplyColumnLimitsAndRedistribute(AGrid, FlexibleCols);
+    ApplyLimitsAndRedistribute(AGrid, FlexibleIndexes);
   finally
-    FlexibleCols.Free;
+    FlexibleIndexes.Free;
   end;
 end;
 
-procedure TGridLayoutWidthResizer.ApplyColumnLimitsAndRedistribute(
-  AGrid: TGridLayout; AFlexibleCols: TIntList);
-var
-  Col, MinW, MaxW, Range: Integer;
-  AdjustedCols: TIntList;
-  Excess: Integer;
-  DistWidth: Integer;
+{ TGridLayoutWidthResizer }
 
-  function ApplyRange(Col: Integer): Integer;
-  begin
-    if FWidthsRanges.ContainsKey(Col) then
-      Result := FWidthsRanges[Col].Select(AGrid.ColumnWidth[Col])
-    else
-      Result := AGrid.ColumnWidth[Col];
-  end;
-
-  function ApplyMaxValue(Col: Integer): Integer;
-  begin
-    if not FMaxWidths.TryGetValue(Col, Result) then
-      Result := MaxInt;
-  end;
-
-  function ApplyMinValue(Col: Integer): Integer;
-  begin
-    if not FMinWidths.TryGetValue(Col, Result) then
-      Result := 0;
-  end;
-
+function TGridLayoutWidthResizer.GetItemCount(AGrid: TGridLayout): Integer;
 begin
-  AdjustedCols := TIntList.Create;
-  try
-    Excess := 0;
+  Result := AGrid.Columns;
+end;
 
-    // Aplicar limites e acumular excesso
-    for Col in AFlexibleCols do
-    begin
-      MinW := ApplyMinValue(Col);
-      MaxW := ApplyMaxValue(Col);
-      Range := ApplyRange(Col);
+function TGridLayoutWidthResizer.GetVisibleItem(AGrid: TGridLayout;
+  AIndex: Integer): Boolean;
+begin
+  Result := AGrid.VisibleColumn[AIndex];
+end;
 
-      if AGrid.ColumnWidth[Col] < MinW then
-      begin
-        Excess := Excess - (MinW - AGrid.ColumnWidth[Col]);
-        AGrid.ColumnWidth[Col] := MinW;
-      end
-      else if AGrid.ColumnWidth[Col] > MaxW then
-      begin
-        Excess := Excess + (AGrid.ColumnWidth[Col] - MaxW);
-        AGrid.ColumnWidth[Col] := MaxW;
-      end
-      else if AGrid.ColumnWidth[Col] <> Range then
-      begin
-        Excess := Excess + (AGrid.ColumnWidth[Col] - Range);
-        AGrid.ColumnWidth[Col] := Range;
-      end
-      else
-        AdjustedCols.Add(Col);
-    end;
+function TGridLayoutWidthResizer.GetItemSize(AGrid: TGridLayout;
+  AIndex: Integer): Integer;
+begin
+  Result := AGrid.ColumnWidth[AIndex];
+end;
 
-    if (Excess <> 0) and (AdjustedCols.Count > 0) then
-    begin
-      DistWidth := Excess div AdjustedCols.Count;
-      for Col in AdjustedCols do
-        AGrid.ColumnWidth[Col] := Max(AGrid.ColumnWidth[Col] + DistWidth, 0);
-    end;
-  finally
-    AdjustedCols.Free;
-  end;
+procedure TGridLayoutWidthResizer.SetItemSize(AGrid: TGridLayout;
+  AIndex, ASize: Integer);
+begin
+  AGrid.ColumnWidth[AIndex] := ASize;
+end;
+
+function TGridLayoutWidthResizer.GetSpacing(AGrid: TGridLayout;
+  AIndex: Integer): Integer;
+begin
+  Result := AGrid.HorizontalSpacing[AIndex];
+end;
+
+function TGridLayoutWidthResizer.GetTotalMargin(AGrid: TGridLayout
+  ): Integer;
+begin
+  Result := AGrid.Margins.Left + AGrid.Margins.Right;
+end;
+
+function TGridLayoutWidthResizer.GetGridWidth: Integer;
+begin
+  Result := FTotalSize;
 end;
 
 function TGridLayoutWidthResizer.WithGridWidth(ANewWidth: Integer
   ): IGridLayoutWidthResizer;
 begin
   Result := Self;
-  if ANewWidth < FMinGridWidth then
-    FGridWidth := FMinGridWidth
-  else if ANewWidth > FMaxGridWidth then
-    FGridWidth := FMaxGridWidth
+  if ANewWidth < FMinTotalSize then
+    FTotalSize := FMinTotalSize
+  else if ANewWidth > FMaxTotalSize then
+    FTotalSize := FMaxTotalSize
   else
-    FGridWidth := ANewWidth;
+    FTotalSize := ANewWidth;
 end;
 
 function TGridLayoutWidthResizer.WithFixedColumns
@@ -488,18 +550,25 @@ var
   I: Integer;
 begin
   Result := Self;
-  FFixedColumns.Clear;
+  FFixedIndexes.Clear;
   for I := 0 to High(AFixedColumns) do
-    if FFixedColumns.IndexOf(I) = -1 then
-      FFixedColumns.Add(AFixedColumns[I]);
+    if FFixedIndexes.IndexOf(I) = -1 then
+      FFixedIndexes.Add(AFixedColumns[I]);
 end;
 
-function TGridLayoutWidthResizer.EnableFixedColumn(
-  AColIndex: Integer): IGridLayoutWidthResizer;
+function TGridLayoutWidthResizer.DisableFixedColumn(AColIndex: Integer
+  ): IGridLayoutWidthResizer;
 begin
   Result := Self;
-  if FFixedColumns.IndexOf(AColIndex) = -1 then
-    FFixedColumns.Add(AColIndex);
+  FFixedIndexes.Remove(AColIndex);
+end;
+
+function TGridLayoutWidthResizer.EnableFixedColumn(AColIndex: Integer
+  ): IGridLayoutWidthResizer;
+begin
+  Result := Self;
+  if FFixedIndexes.IndexOf(AColIndex) = -1 then
+    FFixedIndexes.Add(AColIndex);
 end;
 
 function TGridLayoutWidthResizer.DisableFixedColumn
@@ -509,7 +578,7 @@ var
 begin
   Result := Self;
   for I := 0 to High(AFixedColumns) do
-    FFixedColumns.Remove(AFixedColumns[I]);
+    FFixedIndexes.Remove(AFixedColumns[I]);
 end;
 
 function TGridLayoutWidthResizer.EnableFixedColumn
@@ -519,23 +588,24 @@ var
 begin
   Result := Self;
   for I := 0 to High(AFixedColumns) do
-    if FFixedColumns.IndexOf(I) = -1 then
-      FFixedColumns.Add(AFixedColumns[I]);
+    if FFixedIndexes.IndexOf(I) = -1 then
+      FFixedIndexes.Add(AFixedColumns[I]);
 end;
 
-function TGridLayoutWidthResizer.DisableFixedColumn(
-  AColIndex: Integer): IGridLayoutWidthResizer;
+function TGridLayoutWidthResizer.WithMaxColumnWidth(AColIndex, AMax: Integer
+  ): IGridLayoutWidthResizer;
 begin
   Result := Self;
-  FFixedColumns.Remove(AColIndex);
+  if not FMaxSizes.ContainsKey(AColIndex) then
+    FMaxSizes.Add(AColIndex, AMax);
 end;
 
 function TGridLayoutWidthResizer.WithMinColumnWidth(AColIndex, AMin: Integer
   ): IGridLayoutWidthResizer;
 begin
   Result := Self;
-  if not FMinWidths.ContainsKey(AColIndex) then
-    FMinWidths.Add(AColIndex, AMin);
+  if not FMinSizes.ContainsKey(AColIndex) then
+    FMinSizes.Add(AColIndex, AMin);
 end;
 
 function TGridLayoutWidthResizer.WithMinAndMaxColumnWidth
@@ -550,26 +620,27 @@ function TGridLayoutWidthResizer.WithMaxGridWidth(AMax: Integer
   ): IGridLayoutWidthResizer;
 begin
   Result := Self;
-  FMaxGridWidth := AMax;
+  FMaxTotalSize := AMax;
 end;
 
 function TGridLayoutWidthResizer.WithMinGridWidth(AMin: Integer
   ): IGridLayoutWidthResizer;
 begin
   Result := Self;
-  FMinGridWidth := AMin;
+  FMinTotalSize := AMin;
 end;
 
-function TGridLayoutWidthResizer.WithMinAndMaxGridWidth
-  (Amin, AMax: Integer): IGridLayoutWidthResizer;
+function TGridLayoutWidthResizer.WithMinAndMaxGridWidth(Amin, AMax: Integer
+  ): IGridLayoutWidthResizer;
 begin
   Result := Self
     .WithMinGridWidth(Amin)
-    .WithMaxGridWidth(AMax)
+    .WithMaxGridWidth(AMax);
 end;
 
 function TGridLayoutWidthResizer.WithWidthRange(AColIndex: Integer;
-  const AValues: array of Integer; ASelectRangeMode: TValueRangeMode): IGridLayoutWidthResizer;
+  const AValues: array of Integer; ASelectRangeMode: TValueRangeMode
+  ): IGridLayoutWidthResizer;
 var
   I: Integer;
   List: TIntList;
@@ -582,172 +653,64 @@ begin
       List.Add(AValues[I]);
   List.Sort;
 
-  FWidthsRanges.AddOrSetValue(
+  FSizesRanges.AddOrSetValue(
     AColIndex,
     TValueRange.Create(List, ASelectRangeMode, False)
   );
 end;
 
-function TGridLayoutWidthResizer.WithMaxColumnWidth(AColIndex, AMax: Integer): IGridLayoutWidthResizer;
-begin
-  Result := Self;
-  if not FMaxWidths.ContainsKey(AColIndex) then
-    FMaxWidths.Add(AColIndex, AMax);
-end;
-
 { TGridLayoutHeightResizer }
 
-procedure TGridLayoutHeightResizer.ApplyRowLimitsAndRedistribute
-  (AGrid: TGridLayout; AFlexibleRows: TIntList);
-var
-  Row, MinH, MaxH: Integer;
-  AdjustedRows: TIntList;
-  Excess: Integer;
-  DistHeight: Integer;
+function TGridLayoutHeightResizer.GetItemCount(AGrid: TGridLayout): Integer;
 begin
-  AdjustedRows := TIntList.Create;
-  try
-    Excess := 0;
-
-    // Aplicar limites e acumular excesso
-    for Row in AFlexibleRows do
-    begin
-      if not FMinHeights.TryGetValue(Row, MinH) then
-        MinH := 1;
-      if not FMaxHeights.TryGetValue(Row, MaxH) then
-        MaxH := MaxInt-1;
-
-      if AGrid.RowHeight[Row] < MinH then
-      begin
-        Excess := Excess - (MinH - AGrid.RowHeight[Row]); // agora é negativo
-        AGrid.RowHeight[Row] := MinH;
-      end
-      else if AGrid.RowHeight[Row] > MaxH then
-      begin
-        Excess := Excess + (AGrid.RowHeight[Row] - MaxH); // positivo como antes
-        AGrid.RowHeight[Row] := MaxH;
-      end
-      else
-        AdjustedRows.Add(Row);
-    end;
-
-    if (Excess <> 0) and (AdjustedRows.Count > 0) then
-    begin
-      // Redistribuir o excesso entre colunas que ainda não atingiram o limite
-      DistHeight := Excess div AdjustedRows.Count;
-      for Row in AdjustedRows do
-        AGrid.RowHeight[Row] := Max(AGrid.RowHeight[Row] + DistHeight, 0);
-    end;
-  finally
-    AdjustedRows.Free;
-  end;
+  Result := AGrid.Rows;
 end;
 
-constructor TGridLayoutHeightResizer.Create;
+function TGridLayoutHeightResizer.GetVisibleItem(AGrid: TGridLayout;
+  AIndex: Integer): Boolean;
 begin
-  FMinGridHeight := 0;
-  FMaxGridHeight := MaxInt;
-  FFixedRows := TIntList.Create;
-  FMinHeights := TIntIntDictionary.Create;
-  FMaxHeights := TIntIntDictionary.Create;
+  Result := AGrid.VisibleRow[AIndex];
 end;
 
-destructor TGridLayoutHeightResizer.Destroy;
+function TGridLayoutHeightResizer.GetItemSize(AGrid: TGridLayout;
+  AIndex: Integer): Integer;
 begin
-  FMaxHeights.Free;
-  FMinHeights.Free;
-  FFixedRows.Free;
-  inherited Destroy;
+  Result := AGrid.RowHeight[AIndex];
 end;
 
-
-procedure TGridLayoutHeightResizer.Resize(AGrid: TGridLayout);
-var
-  FixedHeight: Integer;
-  FlexibleRows: TIntList;
-  AvailableHeight, NewRowHeight: Integer;
-  I: Integer;
-
-  function CalculateTotalSpacingWithMargins: Integer;
-  var
-    I, LastVisibleRow: Integer;
-  begin
-    LastVisibleRow := -1;
-    for I := AGrid.Rows - 1 downto 0 do
-      if AGrid.VisibleRow[I] then
-      begin
-        LastVisibleRow := I;
-        Break;
-      end;
-
-    if LastVisibleRow = -1 then
-    begin
-      Result := 0;   // se nao tem nenhuma coluna visivel, retorna sem margens
-      Exit;
-    end;
-
-    Result := AGrid.Margins.Left + AGrid.Margins.Right;
-
-    for I := 0 to LastVisibleRow - 1 do
-      if AGrid.VisibleRow[I] then
-        Inc(Result, AGrid.VerticalSpacing[I]);
-  end;
-
+procedure TGridLayoutHeightResizer.SetItemSize(AGrid: TGridLayout;
+  AIndex, ASize: Integer);
 begin
-  if (AGrid.Rows = 0) or (FGridHeight <= 0) then
-    Exit;
+  AGrid.RowHeight[AIndex] := ASize;
+end;
 
-  // Calcular a largura já ocupada pelas colunas fixas
-  FixedHeight := 0;
-  FlexibleRows := TIntList.Create;
-  try
-    for I := 0 to AGrid.Rows - 1 do
-    begin
-      if not AGrid.VisibleRow[I] then
-        Continue;
+function TGridLayoutHeightResizer.GetSpacing(AGrid: TGridLayout;
+  AIndex: Integer): Integer;
+begin
+  Result := AGrid.VerticalSpacing[AIndex];
+end;
 
-      if (FFixedRows.IndexOf(I) >= 0) then
-        Inc(FixedHeight, AGrid.RowHeight[I])
-      else
-        FlexibleRows.Add(I);
-    end;
-
-    AvailableHeight := FGridHeight
-      - FixedHeight
-      - CalculateTotalSpacingWithMargins;
-
-    if AvailableHeight <= 0 then
-      Exit;
-
-    if FlexibleRows.Count = 0 then
-      Exit;
-
-    NewRowHeight := AvailableHeight div FlexibleRows.Count;
-
-    for I in FlexibleRows do
-      AGrid.RowHeight[I] := Max(NewRowHeight, 1);
-
-    ApplyRowLimitsAndRedistribute(AGrid, FlexibleRows);
-  finally
-    FlexibleRows.Free;
-  end;
+function TGridLayoutHeightResizer.GetTotalMargin(AGrid: TGridLayout
+  ): Integer;
+begin
+  Result := AGrid.Margins.Top + AGrid.Margins.Bottom;
 end;
 
 function TGridLayoutHeightResizer.GetGridHeight: Integer;
 begin
-  Result := FGridHeight;
+  Result := FTotalSize;
 end;
 
 function TGridLayoutHeightResizer.WithGridHeight(ANewHeight: Integer
   ): IGridLayoutHeightResizer;
 begin
   Result := Self;
-  if ANewHeight < FMinGridHeight then
-    FGridHeight := FMinGridHeight
-  else if ANewHeight > FMaxGridHeight then
-    FGridHeight := FMaxGridHeight
+  if ANewHeight < FMinTotalSize then
+    FTotalSize := FMinTotalSize
+  else if ANewHeight > FMaxTotalSize then
+    FTotalSize := FMaxTotalSize
   else
-    FGridHeight := ANewHeight;
+    FTotalSize := ANewHeight;
 end;
 
 function TGridLayoutHeightResizer.WithFixedRows
@@ -756,25 +719,25 @@ var
   I: Integer;
 begin
   Result := Self;
-  FFixedRows.Clear;
+  FFixedIndexes.Clear;
   for I := 0 to High(AFixedRows) do
-    if FFixedRows.IndexOf(I) = -1 then
-      FFixedRows.Add(AFixedRows[I]);
+    if FFixedIndexes.IndexOf(I) = -1 then
+      FFixedIndexes.Add(AFixedRows[I]);
 end;
 
 function TGridLayoutHeightResizer.DisableFixedRow(ARowIndex: Integer
   ): IGridLayoutHeightResizer;
 begin
   Result := Self;
-  FFixedRows.Remove(ARowIndex);
+  FFixedIndexes.Remove(ARowIndex);
 end;
 
 function TGridLayoutHeightResizer.EnableFixedRow(ARowIndex: Integer
   ): IGridLayoutHeightResizer;
 begin
   Result := Self;
-  if FFixedRows.IndexOf(ARowIndex) = -1 then
-    FFixedRows.Add(ARowIndex);
+  if FFixedIndexes.IndexOf(ARowIndex) = -1 then
+    FFixedIndexes.Add(ARowIndex);
 end;
 
 function TGridLayoutHeightResizer.DisableFixedRow
@@ -784,7 +747,7 @@ var
 begin
   Result := Self;
   for I := 0 to High(AFixedRows) do
-    FFixedRows.Remove(AFixedRows[I]);
+    FFixedIndexes.Remove(AFixedRows[I]);
 end;
 
 function TGridLayoutHeightResizer.EnableFixedRow
@@ -794,24 +757,24 @@ var
 begin
   Result := Self;
   for I := 0 to High(AFixedRows) do
-    if FFixedRows.IndexOf(I) = -1 then
-      FFixedRows.Add(AFixedRows[I]);
+    if FFixedIndexes.IndexOf(I) = -1 then
+      FFixedIndexes.Add(AFixedRows[I]);
 end;
 
 function TGridLayoutHeightResizer.WithMaxRowHeight(ARowIndex, AMax: Integer
   ): IGridLayoutHeightResizer;
 begin
   Result := Self;
-  if not FMaxHeights.ContainsKey(ARowIndex) then
-    FMaxHeights.Add(ARowIndex, AMax);
+  if not FMaxSizes.ContainsKey(ARowIndex) then
+    FMaxSizes.Add(ARowIndex, AMax);
 end;
 
 function TGridLayoutHeightResizer.WithMinRowHeight(ARowIndex, AMin: Integer
   ): IGridLayoutHeightResizer;
 begin
   Result := Self;
-  if not FMinHeights.ContainsKey(ARowIndex) then
-    FMinHeights.Add(ARowIndex, AMin);
+  if not FMinSizes.ContainsKey(ARowIndex) then
+    FMinSizes.Add(ARowIndex, AMin);
 end;
 
 function TGridLayoutHeightResizer.WithMinAndMaxRowHeight
@@ -826,22 +789,43 @@ function TGridLayoutHeightResizer.WithMaxGridHeight(AMax: Integer
   ): IGridLayoutHeightResizer;
 begin
   Result := Self;
-  FMaxGridHeight := AMax;
+  FMaxTotalSize := AMax;
 end;
 
 function TGridLayoutHeightResizer.WithMinGridHeight(AMin: Integer
   ): IGridLayoutHeightResizer;
 begin
   Result := Self;
-  FMinGridHeight := AMin;
+  FMinTotalSize := AMin;
 end;
 
-function TGridLayoutHeightResizer.WithMinAndMaxGridHeight(Amin, AMax: Integer
-  ): IGridLayoutHeightResizer;
+function TGridLayoutHeightResizer.WithMinAndMaxGridHeight
+  (Amin, AMax: Integer): IGridLayoutHeightResizer;
 begin
   Result := Self
-    .WithMinGridHeight(Amin)
-    .WithMaxGridHeight(AMax)
+    .WithMinGridHeight(AMin)
+    .WithMaxGridHeight(AMax);
+end;
+
+function TGridLayoutHeightResizer.WithHeightRange(ARowIndex: Integer;
+  const AValues: array of Integer; ASelectRangeMode: TValueRangeMode
+  ): IGridLayoutHeightResizer;
+var
+  I: Integer;
+  List: TIntList;
+begin
+  Result := Self;
+
+  List := TIntList.Create;
+  for I:=Low(AValues) to High(AValues) do
+    if not List.Contains(AValues[I]) then
+      List.Add(AValues[I]);
+  List.Sort;
+
+  FSizesRanges.AddOrSetValue(
+    ARowIndex,
+    TValueRange.Create(List, ASelectRangeMode, False)
+  );
 end;
 
 { TGridLayoutFullResizer }
