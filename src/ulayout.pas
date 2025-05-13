@@ -694,7 +694,7 @@ end;
 
 function TGridLayout.GetVisibleColumn(Index: Integer): Boolean;
 begin
-  if Index >= Columns then
+  if (Index < 0) or (Index >= Columns) then
     Result := False
   else
     Result := not FHiddenColumns.Contains(Index);
@@ -702,7 +702,7 @@ end;
 
 function TGridLayout.GetVisibleRow(Index: Integer): Boolean;
 begin
-  if Index >= Rows then
+  if (Index < 0) or (Index >= Rows) then
     Result := False
   else
     Result := not FHiddenRows.Contains(Index);

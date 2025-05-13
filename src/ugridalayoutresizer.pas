@@ -11,6 +11,28 @@ type
   TIntList = specialize TList<Integer>;
   TIntIntDictionary = specialize TDictionary<Integer, Integer>;
 
+  { TValueRange }
+
+  TValueRangeMode = (vrmFloor, vrmCeil, vrmNearest);
+  TValueRange = class
+  private
+    FValues: TIntList;
+    FMode: TValueRangeMode;
+    FFreeOnSelect: Boolean;
+    function GetFloor(Value: Integer): Integer;
+    function GeCeil(Value: Integer): Integer;
+    function GetNearest(Value: Integer): Integer;
+  public
+    constructor Create(AValues: TIntList; AMode: TValueRangeMode;
+      AFreeOnSelect: Boolean=True);
+    destructor Destroy; override;
+    function Select(AValue: Integer): Integer;
+    property Values: TIntList read FValues;
+    property Mode: TValueRangeMode read FMode;
+  end;
+
+  TIntTValueRangeDictionary = specialize TDictionary<Integer, TValueRange>;
+
   IGridLayoutResizer = interface
     ['{CDDFEEED-72B4-4699-99AA-23714658C2DE}']
     procedure Resize(AGrid: TGridLayout);
@@ -33,6 +55,8 @@ type
     function WithMaxGridWidth(AMax: Integer): IGridLayoutWidthResizer;
     function WithMinGridWidth(AMin: Integer): IGridLayoutWidthResizer;
     function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridLayoutWidthResizer;
+    function WithWidthRange(AColIndex: Integer; const AValues: array of Integer;
+      ASelectRangeMode: TValueRangeMode): IGridLayoutWidthResizer;
     property GridWidth: Integer read GetGridWidth;
   end;
 
@@ -94,6 +118,7 @@ type
     FFixedColumns: TIntList;
     FMinWidths: TIntIntDictionary;
     FMaxWidths: TIntIntDictionary;
+    FWidthsRanges: TIntTValueRangeDictionary;
     procedure ApplyColumnLimitsAndRedistribute(AGrid: TGridLayout;
       AFlexibleCols: TIntList);
   public
@@ -113,6 +138,8 @@ type
     function WithMaxGridWidth(AMax: Integer): IGridLayoutWidthResizer;
     function WithMinGridWidth(AMin: Integer): IGridLayoutWidthResizer;
     function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridLayoutWidthResizer;
+    function WithWidthRange(AColIndex: Integer; const AValues: array of Integer;
+      ASelectRangeMode: TValueRangeMode): IGridLayoutWidthResizer;
     property GridWidth: Integer read GetGridWidth write FGridWidth;
   end;
 
@@ -197,6 +224,79 @@ implementation
 uses
   Math;
 
+{ TValueRange }
+
+constructor TValueRange.Create(AValues: TIntList; AMode: TValueRangeMode;
+  AFreeOnSelect: Boolean);
+begin
+  inherited Create;
+  FMode := AMode;
+  FValues := AValues;
+  FFreeOnSelect := AFreeOnSelect;
+end;
+
+destructor TValueRange.Destroy;
+begin
+  inherited Destroy;
+end;
+
+function TValueRange.GetFloor(Value: Integer): Integer;
+var
+  I: Integer;
+begin
+  for I := 0 to FValues.Count-1 do
+    if FValues[I] >= Value then
+      Exit(FValues[I]);
+
+  Result := FValues.Last;
+end;
+
+function TValueRange.GeCeil(Value: Integer): Integer;
+var
+  I: Integer;
+begin
+  for I := FValues.Count - 1 downto 0 do
+    if FValues[I] <= Value then
+      Exit(FValues[I]);
+
+  Result := FValues.First;
+end;
+
+function TValueRange.GetNearest(Value: Integer): Integer;
+var
+  Lower, Upper: Integer;
+begin
+  if Value <= FValues.First then
+    Exit(FValues.First)
+  else if Value >= FValues.Last then
+    Exit(FValues.Last);
+
+  Lower := GeCeil(Value);
+  Upper := GetFloor(Value);
+
+  if Abs(Upper - Value) < Abs(Lower - Value) then
+    Result := Upper
+  else
+    Result := Lower;
+end;
+
+function TValueRange.Select(AValue: Integer): Integer;
+begin
+  case FMode of
+    vrmNearest:
+      Result := GetNearest(AValue);
+    vrmFloor:
+      Result := GeCeil(AValue);
+    vrmCeil:
+      Result := GetFloor(AValue);
+  else
+    Result := AValue; // fallback
+  end;
+
+  if FFreeOnSelect then
+    Free;
+end;
+
 { TGridLayoutWidthResizer }
 
 constructor TGridLayoutWidthResizer.Create;
@@ -206,13 +306,19 @@ begin
   FFixedColumns := TIntList.Create;
   FMinWidths := TIntIntDictionary.Create;
   FMaxWidths := TIntIntDictionary.Create;
+  FWidthsRanges := TIntTValueRangeDictionary.Create;
 end;
 
 destructor TGridLayoutWidthResizer.Destroy;
+var
+  Pair: specialize TPair<Integer, TValueRange>;
 begin
   FMaxWidths.Free;
   FMinWidths.Free;
   FFixedColumns.Free;
+  for Pair in FWidthsRanges do
+    Pair.Value.Free;
+  FWidthsRanges.Free;
   inherited Destroy;
 end;
 
@@ -227,6 +333,7 @@ var
   FlexibleCols: TIntList;
   AvailableWidth, NewColWidth: Integer;
   I: Integer;
+  SizeRange: TValueRange;
 
   function CalculateTotalSpacingWithMargins: Integer;
   var
@@ -296,10 +403,31 @@ end;
 procedure TGridLayoutWidthResizer.ApplyColumnLimitsAndRedistribute(
   AGrid: TGridLayout; AFlexibleCols: TIntList);
 var
-  Col, MinW, MaxW: Integer;
+  Col, MinW, MaxW, Range: Integer;
   AdjustedCols: TIntList;
   Excess: Integer;
   DistWidth: Integer;
+
+  function ApplyRange(Col: Integer): Integer;
+  begin
+    if FWidthsRanges.ContainsKey(Col) then
+      Result := FWidthsRanges[Col].Select(AGrid.ColumnWidth[Col])
+    else
+      Result := AGrid.ColumnWidth[Col];
+  end;
+
+  function ApplyMaxValue(Col: Integer): Integer;
+  begin
+    if not FMaxWidths.TryGetValue(Col, Result) then
+      Result := MaxInt;
+  end;
+
+  function ApplyMinValue(Col: Integer): Integer;
+  begin
+    if not FMinWidths.TryGetValue(Col, Result) then
+      Result := 0;
+  end;
+
 begin
   AdjustedCols := TIntList.Create;
   try
@@ -308,20 +436,24 @@ begin
     // Aplicar limites e acumular excesso
     for Col in AFlexibleCols do
     begin
-      if not FMinWidths.TryGetValue(Col, MinW) then
-        MinW := 1;
-      if not FMaxWidths.TryGetValue(Col, MaxW) then
-        MaxW := MaxInt-1;
+      MinW := ApplyMinValue(Col);
+      MaxW := ApplyMaxValue(Col);
+      Range := ApplyRange(Col);
 
       if AGrid.ColumnWidth[Col] < MinW then
       begin
-        Excess := Excess - (MinW - AGrid.ColumnWidth[Col]); // agora é negativo
+        Excess := Excess - (MinW - AGrid.ColumnWidth[Col]);
         AGrid.ColumnWidth[Col] := MinW;
       end
       else if AGrid.ColumnWidth[Col] > MaxW then
       begin
-        Excess := Excess + (AGrid.ColumnWidth[Col] - MaxW); // positivo como antes
+        Excess := Excess + (AGrid.ColumnWidth[Col] - MaxW);
         AGrid.ColumnWidth[Col] := MaxW;
+      end
+      else if AGrid.ColumnWidth[Col] <> Range then
+      begin
+        Excess := Excess + (AGrid.ColumnWidth[Col] - Range);
+        AGrid.ColumnWidth[Col] := Range;
       end
       else
         AdjustedCols.Add(Col);
@@ -329,7 +461,6 @@ begin
 
     if (Excess <> 0) and (AdjustedCols.Count > 0) then
     begin
-      // Redistribuir o excesso entre colunas que ainda não atingiram o limite
       DistWidth := Excess div AdjustedCols.Count;
       for Col in AdjustedCols do
         AGrid.ColumnWidth[Col] := Max(AGrid.ColumnWidth[Col] + DistWidth, 0);
@@ -435,6 +566,26 @@ begin
   Result := Self
     .WithMinGridWidth(Amin)
     .WithMaxGridWidth(AMax)
+end;
+
+function TGridLayoutWidthResizer.WithWidthRange(AColIndex: Integer;
+  const AValues: array of Integer; ASelectRangeMode: TValueRangeMode): IGridLayoutWidthResizer;
+var
+  I: Integer;
+  List: TIntList;
+begin
+  Result := Self;
+
+  List := TIntList.Create;
+  for I:=Low(AValues) to High(AValues) do
+    if not List.Contains(AValues[I]) then
+      List.Add(AValues[I]);
+  List.Sort;
+
+  FWidthsRanges.AddOrSetValue(
+    AColIndex,
+    TValueRange.Create(List, ASelectRangeMode, False)
+  );
 end;
 
 function TGridLayoutWidthResizer.WithMaxColumnWidth(AColIndex, AMax: Integer): IGridLayoutWidthResizer;

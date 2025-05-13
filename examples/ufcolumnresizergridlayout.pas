@@ -201,8 +201,11 @@ begin
     .Create
     .WithFixedColumns([0])
     .WithMinAndMaxColumnWidth(1, 150, 250)
+    .WithMinAndMaxColumnWidth(2, 150, 250)
     .WithMinAndMaxGridWidth(350, 1200)
-    .WithGridWidth(Self.Width);
+    .WithGridWidth(Self.Width)
+    .WithWidthRange(3, [50, 250, 450], vrmFloor)
+  ;
 
   Resizer.Resize(Grid);
 
