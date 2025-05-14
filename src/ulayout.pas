@@ -990,7 +990,8 @@ var
   Cell: TGridCell;
 begin
   for Cell in FCells do
-    Cell.Item.GetControl.Visible := IsVisibleCell(Cell);
+    if Assigned(Cell.Item.GetControl) then
+      Cell.Item.GetControl.Visible := IsVisibleCell(Cell);
 end;
 
 function TGridLayout.IsVisibleCell(Cell: TGridCell): Boolean;

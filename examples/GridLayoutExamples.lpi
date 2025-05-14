@@ -26,6 +26,12 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="LazControls"/>
+      </Item>
+      <Item>
+        <PackageName Value="LazControlDsgn"/>
+      </Item>
+      <Item>
         <PackageName Value="LCL"/>
       </Item>
     </RequiredPackages>
@@ -89,6 +95,13 @@
         <Filename Value="..\src\ugridalayoutresizer.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridaLayoutResizer"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ufcolunabotoes.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FColunaBotoes"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFColunaBotoes"/>
       </Unit>
     </Units>
   </ProjectOptions>

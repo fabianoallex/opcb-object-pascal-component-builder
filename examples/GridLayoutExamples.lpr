@@ -15,10 +15,10 @@ uses
   UGridLayoutFillerFactory in '../src/UGridLayoutFillerFactory.pas',
   UGridLayoutFill in '../src/UGridLayoutFill.pas',
   UGridaLayoutResizer in '../src/UGridaLayoutResizer.pas',
-  Forms, UExamplesMain,
+  Forms, lazcontrols, UExamplesMain,
   UFColumnResizerGridLayout,
   UFRowResizerGridLayout,
-  uffullresizergridlayout;
+  uffullresizergridlayout, UFColunaBotoes;
 
 {$R *.res}
 
@@ -30,6 +30,7 @@ begin
   Application.CreateForm(TFColumnResizerGridLayout, FColumnResizerGridLayout);
   Application.CreateForm(TFRowResizerGridLayout, FRowResizerGridLayout);
   Application.CreateForm(TFFullResizerGridLayout, FFullResizerGridLayout);
+  Application.CreateForm(TFColunaBotoes, FColunaBotoes);
   Application.Run;
 end.
 

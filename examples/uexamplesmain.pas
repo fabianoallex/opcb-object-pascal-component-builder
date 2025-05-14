@@ -39,6 +39,7 @@ type
     Button30: TButton;
     Button31: TButton;
     Button32: TButton;
+    Button33: TButton;
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
@@ -72,6 +73,7 @@ type
     procedure Button30Click(Sender: TObject);
     procedure Button31Click(Sender: TObject);
     procedure Button32Click(Sender: TObject);
+    procedure Button33Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -145,7 +147,7 @@ implementation
 
 uses
   StrUtils, UGridLayoutFill, UGridaLayoutResizer, UFColumnResizerGridLayout,
-  UFRowResizerGridLayout, UFFullResizerGridLayout;
+  UFRowResizerGridLayout, UFFullResizerGridLayout, UFColunaBotoes;
 
 procedure TFExamplesMain.Button1Click(Sender: TObject);
 begin
@@ -270,6 +272,11 @@ end;
 procedure TFExamplesMain.Button32Click(Sender: TObject);
 begin
   FFullResizerGridLayout.ShowModal;
+end;
+
+procedure TFExamplesMain.Button33Click(Sender: TObject);
+begin
+  FColunaBotoes.ShowModal;
 end;
 
 procedure TFExamplesMain.Button3Click(Sender: TObject);

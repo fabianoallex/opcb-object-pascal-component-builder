@@ -312,5 +312,14 @@ object FExamplesMain: TFExamplesMain
       TabOrder = 31
       OnClick = Button32Click
     end
+    object Button33: TButton
+      Left = 200
+      Height = 31
+      Top = 459
+      Width = 184
+      Caption = 'Coluna Botoes'
+      TabOrder = 32
+      OnClick = Button33Click
+    end
   end
 end
