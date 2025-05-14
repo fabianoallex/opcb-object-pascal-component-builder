@@ -204,7 +204,6 @@ type
 
   TGridCellList = specialize TObjectList<TGridCell>;
   TGridCellSettingsList = specialize TObjectList<TGridCellSettings>;
-  // TIntIntDictionary = specialize TDictionary<Integer, Integer>;
   TIntList = specialize TList<Integer>;
 
   TGridAxisDivisionInfoDictionary = specialize TDictionary<Integer, TGridAxisDivisionInfo>;
@@ -246,18 +245,8 @@ type
     FHorizontalSpacings: Integer;
     FRowHeights: Integer;
     FColumnWidths: Integer;
-
     FRowsInfoDic: TGridAxisDivisionInfoDictionary;
     FColumnsInfoDic: TGridAxisDivisionInfoDictionary;
-
-    // FRowHeightDic: TIntIntDictionary;
-    // FColumnWidthDic: TIntIntDictionary;
-    // FHorizontalSpacingDic: TIntIntDictionary;
-    // FVerticalSpacingDic: TIntIntDictionary;
-    // FRowShift: TIntIntDictionary;
-    // FColumnShift: TIntIntDictionary;
-    // FHiddenRows: TIntList;
-    // FHiddenColumns: TIntList;
     function CalculateCellWidth(Cell: TGridCell): Integer;
     function CalculateCellHeight(Cell: TGridCell): Integer;
     function CalculateCellLeft(Cell: TGridCell): Integer;
@@ -605,18 +594,8 @@ constructor TGridLayout.Create;
 begin
   FCells := TGridCellList.Create(True);
   FCellSettingsList := TGridCellSettingsList.Create(True);
-
   FRowsInfoDic := TGridAxisDivisionInfoDictionary.Create;
   FColumnsInfoDic := TGridAxisDivisionInfoDictionary.Create;
-
-  // FRowHeightDic := TIntIntDictionary.Create;
-  // FColumnWidthDic := TIntIntDictionary.Create;
-  // FVerticalSpacingDic := TIntIntDictionary.Create;
-  // FHorizontalSpacingDic := TIntIntDictionary.Create;
-  // FRowShift := TIntIntDictionary.Create;
-  // FColumnShift := TIntIntDictionary.Create;
-  // FHiddenRows := TIntList.Create;
-  // FHiddenColumns := TIntList.Create;
   FMargins := TMargins.Create;
   FVerticalSpacings := 0;
   FHorizontalSpacings := 0;
@@ -630,18 +609,8 @@ destructor TGridLayout.Destroy;
 begin
   FCells.Free;
   FCellSettingsList.Free;
-
   FRowsInfoDic.Free;
   FColumnsInfoDic.Free;
-
-  // FRowHeightDic.Free;
-  // FColumnWidthDic.Free;
-  // FVerticalSpacingDic.Free;
-  // FHorizontalSpacingDic.Free;
-  // FRowShift.Free;
-  // FColumnShift.Free;
-  // FHiddenRows.Free;
-  // FHiddenColumns.Free;
   FMargins.Free;
   inherited;
 end;
@@ -709,9 +678,6 @@ end;
 function TGridLayout.GetHorizontalSpacing(AIndex: Integer): Integer;
 begin
   Result := FColumnsInfoDic.GetSpacingOrDefault(AIndex, FHorizontalSpacings);
-
-  // if not FHorizontalSpacingDic.TryGetValue(AIndex, Result) then
-  //   Result := FHorizontalSpacings;
 end;
 
 procedure TGridLayout.Clear;
@@ -724,14 +690,11 @@ procedure TGridLayout.ClearRowAndColumnShifts;
 begin
   FRowsInfoDic.ClearShifts;
   FColumnsInfoDic.ClearShifts;
-  // FRowShift.Clear;
-  // FColumnShift.Clear;
 end;
 
 procedure TGridLayout.ResetColumnWidthsToDefault;
 begin
   FColumnsInfoDic.ClearSizes;
-  // FColumnWidthDic.Clear;
 end;
 
 procedure TGridLayout.ResetRowHeightsToDefault;
@@ -758,13 +721,11 @@ var
   Info: TGridAxisDivisionInfo;
 begin
   Result := FColumnsInfoDic.IsSizeDefined(ACol);
-  // Result := FColumnWidthDic.ContainsKey(ACol);
 end;
 
 function TGridLayout.IsVerticalSpacingCustomized(ARow: Integer): Boolean;
 begin
   Result := FRowsInfoDic.IsSpacingDefined(ARow);
-  // Result := FVerticalSpacingDic.ContainsKey(AIndex);
 end;
 
 function TGridLayout.IsHorizontalSpacingCustomized(ACol: Integer): Boolean;
@@ -772,7 +733,6 @@ var
   Info: TGridAxisDivisionInfo;
 begin
   Result := FColumnsInfoDic.IsSpacingDefined(ACol);
-  // Result := FHorizontalSpacingDic.ContainsKey(ACol);
 end;
 
 procedure TGridLayout.InsertRow(AIndex: Integer);
@@ -788,25 +748,16 @@ end;
 function TGridLayout.GetRowHeight(AIndex: Integer): Integer;
 begin
   Result := FRowsInfoDic.GetSizeOrDefault(AIndex, FRowHeights);
-
-  // if not FRowHeightDic.TryGetValue(Index, Result) then
-  //   Result := FRowHeights;
 end;
 
 function TGridLayout.GetRowShift(ARow: Integer): Integer;
 begin
   Result := FRowsInfoDic.GetShiftOrDefault(ARow, 0);
-
-  // if not FRowShift.TryGetValue(Index, Result) then
-  //   Result := 0;
 end;
 
 function TGridLayout.GetVerticalSpacing(ARow: Integer): Integer;
 begin
   Result := FRowsInfoDic.GetSpacingOrDefault(ARow, FVerticalSpacings);
-
-  // if not FVerticalSpacingDic.TryGetValue(Index, Result) then
-  //   Result := FVerticalSpacings;
 end;
 
 function TGridLayout.GetVisibleColumn(ACol: Integer): Boolean;
@@ -815,7 +766,6 @@ begin
     Result := False
   else
     Result := not FColumnsInfoDic.GetHidden(ACol);
-    //Result := not FHiddenColumns.Contains(Index);
 end;
 
 function TGridLayout.GetVisibleRow(ARow: Integer): Boolean;
@@ -824,23 +774,16 @@ begin
     Result := False
   else
     Result := not FRowsInfoDic.GetHidden(ARow);
-
-  // if (Index < 0) or (Index >= Rows) then
-  //   Result := False
-  // else
-  //   Result := not FHiddenRows.Contains(Index);
 end;
 
 procedure TGridLayout.SetColumnShift(ACol: Integer; AValue: Integer);
 begin
   FColumnsInfoDic.SetShift(ACol, AValue);
-  // FColumnShift.AddOrSetValue(Index, AValue);
 end;
 
 procedure TGridLayout.SetHorizontalSpacing(ACol: Integer; AValue: Integer);
 begin
   FColumnsInfoDic.SetSpacing(ACol, AValue);
-  // FHorizontalSpacingDic.AddOrSetValue(Index, AValue);
 end;
 
 procedure TGridLayout.SetLeft(AValue: Integer);
@@ -853,28 +796,21 @@ end;
 procedure TGridLayout.SetRowHeight(AIndex: Integer; AValue: Integer);
 begin
   FRowsInfoDic.SetSize(AIndex, AValue);
-  // FRowHeightDic.AddOrSetValue(Index, Value);
 end;
 
 function TGridLayout.GetColumnWidth(AIndex: Integer): Integer;
 begin
   Result := FColumnsInfoDic.GetSizeOrDefault(AIndex, FColumnWidths);
-
-  // if not FColumnWidthDic.TryGetValue(Index, Result) then
-  //   Result := FColumnWidths;
 end;
 
 procedure TGridLayout.SetColumnWidth(AIndex: Integer; AValue: Integer);
 begin
   FColumnsInfoDic.SetSize(AIndex, AValue);
-
-  // FColumnWidthDic.AddOrSetValue(AIndex, AValue);
 end;
 
 procedure TGridLayout.SetRowShift(ARow: Integer; AValue: Integer);
 begin
   FRowsInfoDic.SetShift(ARow, AValue);
-  // FRowShift.AddOrSetValue(Index, AValue);
 end;
 
 procedure TGridLayout.SetTop(AValue: Integer);
@@ -886,39 +822,16 @@ end;
 procedure TGridLayout.SetVerticalSpacing(ARow: Integer; AValue: Integer);
 begin
   FRowsInfoDic.SetSpacing(ARow, AValue);
-  // FVerticalSpacingDic.AddOrSetValue(Index, AValue);
 end;
 
 procedure TGridLayout.SetVisibleColumn(ACol: Integer; AValue: Boolean);
 begin
   FColumnsInfoDic.SetHidden(ACol, not AValue);
-
-  //if AValue then
-  //begin
-  //  if FHiddenColumns.Contains(Index) then
-  //    FHiddenColumns.Remove(Index);
-  //end
-  //else
-  //begin
-  //  if not FHiddenColumns.Contains(Index) then
-  //    FHiddenColumns.Add(Index);
-  //end;
 end;
 
 procedure TGridLayout.SetVisibleRow(ARow: Integer; AValue: Boolean);
 begin
   FRowsInfoDic.SetHidden(ARow, not AValue);
-
-  //if AValue then
-  //begin
-  //  if FHiddenRows.Contains(Index) then
-  //    FHiddenRows.Remove(Index);
-  //end
-  //else
-  //begin
-  //  if not FHiddenRows.Contains(Index) then
-  //    FHiddenRows.Add(Index);
-  //end;
 end;
 
 function TGridLayout.CalculateCellLeft(Cell: TGridCell): Integer;

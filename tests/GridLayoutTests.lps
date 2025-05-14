@@ -28,8 +28,8 @@
         <UnitName Value="ULayout"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="183"/>
-        <CursorPos X="6" Y="207"/>
+        <TopLine Value="1266"/>
+        <CursorPos Y="836"/>
         <UsageCount Value="30"/>
         <Loaded Value="True"/>
       </Unit>
@@ -150,10 +150,6 @@
     <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="1866" Column="55" TopLine="1860"/>
-      </Position>
-      <Position>
-        <Filename Value="ugridlayouttest.pas"/>
         <Caret Line="32" Column="64" TopLine="4"/>
       </Position>
       <Position>
@@ -265,6 +261,10 @@
       </Position>
       <Position>
         <Filename Value="..\src\ulayout.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="203" Column="37" TopLine="183"/>
       </Position>
     </JumpHistory>
     <RunParams>
