@@ -1,6 +1,7 @@
 unit ULayout;
 
 {$mode ObjFPC}{$H+}
+{$MODESWITCH ADVANCEDRECORDS}
 
 interface
 
@@ -15,6 +16,25 @@ type
   end;
 
   TLayoutAlignment = (laStretch, laCenter, laStart, laEnd);
+
+  { TOptionalInt }
+
+  TOptionalInt = record
+    HasValue: Boolean;
+    Value: Integer;
+    class function Some(AValue: Integer): TOptionalInt; static;
+    class function None: TOptionalInt; static;
+  end;
+
+  { TGridAxisDivisionInfo}
+
+  TGridAxisDivisionInfo = record
+    Size: TOptionalInt;
+    Spacing: TOptionalInt;
+    Shift: TOptionalInt;
+    Hidden: Boolean;
+    class function Default: TGridAxisDivisionInfo; static;
+  end;
 
   { TMargins }
 
@@ -187,6 +207,9 @@ type
   TIntIntDictionary = specialize TDictionary<Integer, Integer>;
   TIntList = specialize TList<Integer>;
 
+  TRowInfoDictionary = specialize TDictionary<Integer, TGridAxisDivisionInfo>;
+  TColumnInfoDictionary = specialize TDictionary<Integer, TGridAxisDivisionInfo>;
+
   { TGridLayout }
 
   TGridLayout = class
@@ -202,6 +225,10 @@ type
     FHorizontalSpacings: Integer;
     FRowHeights: Integer;
     FColumnWidths: Integer;
+
+    FRowInfoDic: TRowInfoDictionary;
+    FColumnInfoDic: TColumnInfoDictionary;
+
     FRowHeightDic: TIntIntDictionary;
     FColumnWidthDic: TIntIntDictionary;
     FHorizontalSpacingDic: TIntIntDictionary;
@@ -252,6 +279,8 @@ type
     function IsColumnWidthCustomized(ACol: Integer): Boolean;
     function IsVerticalSpacingCustomized(AIndex: Integer): Boolean;
     function IsHorizontalSpacingCustomized(AIndex: Integer): Boolean;
+    procedure InsertRow(AIndex: Integer);
+    procedure InsertColumn(AIndex: Integer);
     property Rows: Integer read FRows write FRows;
     property Columns: Integer read FColumns write FColumns;
     property VerticalSpacings: Integer read FVerticalSpacings write FVerticalSpacings;
@@ -330,6 +359,30 @@ begin
   FExtraWidth := ASettings.ExtraWidth;
   FHorizontalAlignment := ASettings.HorizontalAlignment;
   FVerticalAlignment := ASettings.VerticalAlignment;
+end;
+
+{ TOptionalInt }
+
+class function TOptionalInt.Some(AValue: Integer): TOptionalInt;
+begin
+  Result.HasValue := True;
+  Result.Value := AValue;
+end;
+
+class function TOptionalInt.None: TOptionalInt;
+begin
+  Result.Value := -1;
+  Result.HasValue := False;
+end;
+
+{ TGridAxisDivisionInfo }
+
+class function TGridAxisDivisionInfo.Default: TGridAxisDivisionInfo;
+begin
+  Result.Size := TOptionalInt.None;
+  Result.Shift := TOptionalInt.None;
+  Result.Spacing := TOptionalInt.None;
+  Result.Hidden := False;
 end;
 
 { TMargins }
@@ -530,6 +583,10 @@ constructor TGridLayout.Create;
 begin
   FCells := TGridCellList.Create(True);
   FCellSettingsList := TGridCellSettingsList.Create(True);
+
+  FRowInfoDic.Create;
+  FColumnInfoDic.Create;
+
   FRowHeightDic := TIntIntDictionary.Create;
   FColumnWidthDic := TIntIntDictionary.Create;
   FVerticalSpacingDic := TIntIntDictionary.Create;
@@ -672,6 +729,16 @@ end;
 function TGridLayout.IsHorizontalSpacingCustomized(AIndex: Integer): Boolean;
 begin
   Result := FHorizontalSpacingDic.ContainsKey(AIndex);
+end;
+
+procedure TGridLayout.InsertRow(AIndex: Integer);
+begin
+
+end;
+
+procedure TGridLayout.InsertColumn(AIndex: Integer);
+begin
+
 end;
 
 function TGridLayout.GetRowHeight(Index: Integer): Integer;

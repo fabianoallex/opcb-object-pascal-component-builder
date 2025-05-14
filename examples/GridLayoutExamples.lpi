@@ -100,6 +100,7 @@
         <Filename Value="ufcolunabotoes.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FColunaBotoes"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFColunaBotoes"/>
       </Unit>
