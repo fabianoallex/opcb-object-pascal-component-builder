@@ -7,7 +7,6 @@ object FColumnResizerGridLayout: TFColumnResizerGridLayout
   ClientHeight = 716
   ClientWidth = 1159
   DesignTimePPI = 120
-  LCLVersion = '4.0.0.4'
   OnCreate = FormCreate
   OnResize = FormResize
   object Button1: TButton

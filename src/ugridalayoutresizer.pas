@@ -463,7 +463,7 @@ begin
       if not GetVisibleItem(AGrid, I) then   // if not AGrid.VisibleColumn[I] then
         Continue;
 
-      if (FlexibleIndexes.IndexOf(I) >= 0) then
+      if (FFixedIndexes.IndexOf(I) >= 0) then
         Inc(FixedSize, GetItemSize(AGrid, I))  // AGrid.ColumnWidth[I]
       else
         FlexibleIndexes.Add(I);

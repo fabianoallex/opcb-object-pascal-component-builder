@@ -1607,6 +1607,7 @@ var
     AddCell(IntToStr(AQty), AIdx, ColQty, False, laEnd);
     AddCell(FormatFloat('0.00', APrice), AIdx, ColPrice, False, laEnd);
     AddCell(FormatFloat('0.00', Total), AIdx, ColTotal, False, laEnd);
+    Grid.Rows := Grid.Rows + 1;
   end;
 
 var
@@ -1652,6 +1653,7 @@ begin
     AddCell('Total Geral:', Row, 0, True);
     Grid.AddItem(ILayoutItem(nil), TGridCellSettings.Create(Row, 1).WithColumnSpan(2)); // espaço vazio
     AddCell(FormatFloat('0.00', GrandTotal), Row, 3, True, laEnd);
+    Grid.Rows := Grid.Rows + 2;
 
     Grid.ArrangeItems;
   finally

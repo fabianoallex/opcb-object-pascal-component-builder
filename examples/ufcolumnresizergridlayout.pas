@@ -204,7 +204,7 @@ begin
     .WithMinAndMaxColumnWidth(2, 150, 250)
     .WithMinAndMaxGridWidth(350, 1200)
     .WithGridWidth(Self.Width)
-    .WithWidthRange(3, [50, 250, 450], vrmFloor)
+    .WithWidthRange(3, [50, 250, 450], vrmCeil)
   ;
 
   Resizer.Resize(Grid);
