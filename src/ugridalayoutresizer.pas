@@ -33,86 +33,85 @@ type
 
   TIntTValueRangeDictionary = specialize TDictionary<Integer, TValueRange>;
 
-  IGridLayoutResizer = interface
+  IGridResizer = interface
     ['{CDDFEEED-72B4-4699-99AA-23714658C2DE}']
     procedure Resize(AGrid: TGridLayout);
   end;
 
-  { IGridLayoutWidthResizer }
+  { IGridWidthResizer }
 
-  IGridLayoutWidthResizer = interface(IGridLayoutResizer)
+  IGridWidthResizer = interface(IGridResizer)
     ['{8F19CDBF-F294-4F4E-B1EE-3A844BEDA43C}']
     function GetGridWidth: Integer;
-    function WithGridWidth(ANewWidth: Integer): IGridLayoutWidthResizer;
-    function WithFixedColumns(const AFixedColumns: array of Integer): IGridLayoutWidthResizer;
-    function DisableFixedColumn(AColIndex: Integer): IGridLayoutWidthResizer; overload;
-    function EnableFixedColumn(AColIndex: Integer): IGridLayoutWidthResizer; overload;
-    function DisableFixedColumn(const AFixedColumns: array of Integer): IGridLayoutWidthResizer; overload;
-    function EnableFixedColumn(const AFixedColumns: array of Integer): IGridLayoutWidthResizer; overload;
-    function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridLayoutWidthResizer;
-    function WithMinColumnWidth(AColIndex, AMin: Integer): IGridLayoutWidthResizer;
-    function WithMinAndMaxColumnWidth(AColIndex, AMin, AMax: Integer): IGridLayoutWidthResizer;
-    function WithMaxGridWidth(AMax: Integer): IGridLayoutWidthResizer;
-    function WithMinGridWidth(AMin: Integer): IGridLayoutWidthResizer;
-    function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridLayoutWidthResizer;
+    function WithGridWidth(ANewWidth: Integer): IGridWidthResizer;
+    function WithFixedColumns(const AFixedColumns: array of Integer): IGridWidthResizer;
+    function DisableFixedColumn(AColIndex: Integer): IGridWidthResizer; overload;
+    function EnableFixedColumn(AColIndex: Integer): IGridWidthResizer; overload;
+    function DisableFixedColumn(const AFixedColumns: array of Integer): IGridWidthResizer; overload;
+    function EnableFixedColumn(const AFixedColumns: array of Integer): IGridWidthResizer; overload;
+    function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridWidthResizer;
+    function WithMinColumnWidth(AColIndex, AMin: Integer): IGridWidthResizer;
+    function WithMinAndMaxColumnWidth(AColIndex, AMin, AMax: Integer): IGridWidthResizer;
+    function WithMaxGridWidth(AMax: Integer): IGridWidthResizer;
+    function WithMinGridWidth(AMin: Integer): IGridWidthResizer;
+    function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridWidthResizer;
     function WithWidthRange(AColIndex: Integer; const AValues: array of Integer;
-      ASelectRangeMode: TValueRangeMode): IGridLayoutWidthResizer;
+      ASelectRangeMode: TValueRangeMode): IGridWidthResizer;
     property GridWidth: Integer read GetGridWidth;
   end;
 
-  { IGridLayoutHeightResizer }
+  { IGridHeightResizer }
 
-  IGridLayoutHeightResizer = interface(IGridLayoutResizer)
+  IGridHeightResizer = interface(IGridResizer)
     ['{F8FC03F3-843B-4D84-8CDE-2B1F77425078}']
     function GetGridHeight: Integer;
-    function WithGridHeight(ANewHeight: Integer): IGridLayoutHeightResizer;
-    function WithFixedRows(const AFixedRows: array of Integer): IGridLayoutHeightResizer;
-    function DisableFixedRow(ARowIndex: Integer): IGridLayoutHeightResizer; overload;
-    function EnableFixedRow(ARowIndex: Integer): IGridLayoutHeightResizer; overload;
-    function DisableFixedRow(const AFixedRows: array of Integer): IGridLayoutHeightResizer; overload;
-    function EnableFixedRow(const AFixedRows: array of Integer): IGridLayoutHeightResizer; overload;
-    function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridLayoutHeightResizer;
-    function WithMinRowHeight(ARowIndex, AMin: Integer): IGridLayoutHeightResizer;
-    function WithMinAndMaxRowHeight(ARowIndex, AMin, AMax: Integer): IGridLayoutHeightResizer;
-    function WithMaxGridHeight(AMax: Integer): IGridLayoutHeightResizer;
-    function WithMinGridHeight(AMin: Integer): IGridLayoutHeightResizer;
-    function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridLayoutHeightResizer;
+    function WithGridHeight(ANewHeight: Integer): IGridHeightResizer;
+    function WithFixedRows(const AFixedRows: array of Integer): IGridHeightResizer;
+    function DisableFixedRow(ARowIndex: Integer): IGridHeightResizer; overload;
+    function EnableFixedRow(ARowIndex: Integer): IGridHeightResizer; overload;
+    function DisableFixedRow(const AFixedRows: array of Integer): IGridHeightResizer; overload;
+    function EnableFixedRow(const AFixedRows: array of Integer): IGridHeightResizer; overload;
+    function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridHeightResizer;
+    function WithMinRowHeight(ARowIndex, AMin: Integer): IGridHeightResizer;
+    function WithMinAndMaxRowHeight(ARowIndex, AMin, AMax: Integer): IGridHeightResizer;
+    function WithMaxGridHeight(AMax: Integer): IGridHeightResizer;
+    function WithMinGridHeight(AMin: Integer): IGridHeightResizer;
+    function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridHeightResizer;
     function WithHeightRange(ARowIndex: Integer; const AValues: array of Integer;
-      ASelectRangeMode: TValueRangeMode): IGridLayoutHeightResizer;
+      ASelectRangeMode: TValueRangeMode): IGridHeightResizer;
     property GridHeight: Integer read GetGridHeight ;
   end;
 
-  IGridLayoutFullResizer = interface(IGridLayoutResizer)
-    function WithGridWidth(ANewWidth: Integer): IGridLayoutFullResizer;
-    function WithFixedColumns(const AFixedColumns: array of Integer): IGridLayoutFullResizer;
-    function DisableFixedColumn(AColIndex: Integer): IGridLayoutFullResizer; overload;
-    function EnableFixedColumn(AColIndex: Integer): IGridLayoutFullResizer; overload;
-    function DisableFixedColumn(const AFixedColumns: array of Integer): IGridLayoutFullResizer; overload;
-    function EnableFixedColumn(const AFixedColumns: array of Integer): IGridLayoutFullResizer; overload;
-    function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridLayoutFullResizer;
-    function WithMinColumnWidth(AColIndex, AMin: Integer): IGridLayoutFullResizer;
-    function WithMinAndMaxColumnWidth(AColIndex, AMin, AMax: Integer): IGridLayoutFullResizer;
-    function WithMaxGridWidth(AMax: Integer): IGridLayoutFullResizer;
-    function WithMinGridWidth(AMin: Integer): IGridLayoutFullResizer;
-    function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridLayoutFullResizer;
-
-    function WithGridHeight(ANewHeight: Integer): IGridLayoutFullResizer;
-    function WithFixedRows(const AFixedRows: array of Integer): IGridLayoutFullResizer;
-    function DisableFixedRow(ARowIndex: Integer): IGridLayoutFullResizer; overload;
-    function EnableFixedRow(ARowIndex: Integer): IGridLayoutFullResizer; overload;
-    function DisableFixedRow(const AFixedRows: array of Integer): IGridLayoutFullResizer; overload;
-    function EnableFixedRow(const AFixedRows: array of Integer): IGridLayoutFullResizer; overload;
-    function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridLayoutFullResizer;
-    function WithMinRowHeight(ARowIndex, AMin: Integer): IGridLayoutFullResizer;
-    function WithMinAndMaxRowHeight(ARowIndex, AMin, AMax: Integer): IGridLayoutFullResizer;
-    function WithMaxGridHeight(AMax: Integer): IGridLayoutFullResizer;
-    function WithMinGridHeight(AMin: Integer): IGridLayoutFullResizer;
-    function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridLayoutFullResizer;
+  IGridFullResizer = interface(IGridResizer)
+    function WithGridWidth(ANewWidth: Integer): IGridFullResizer;
+    function WithFixedColumns(const AFixedColumns: array of Integer): IGridFullResizer;
+    function DisableFixedColumn(AColIndex: Integer): IGridFullResizer; overload;
+    function EnableFixedColumn(AColIndex: Integer): IGridFullResizer; overload;
+    function DisableFixedColumn(const AFixedColumns: array of Integer): IGridFullResizer; overload;
+    function EnableFixedColumn(const AFixedColumns: array of Integer): IGridFullResizer; overload;
+    function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridFullResizer;
+    function WithMinColumnWidth(AColIndex, AMin: Integer): IGridFullResizer;
+    function WithMinAndMaxColumnWidth(AColIndex, AMin, AMax: Integer): IGridFullResizer;
+    function WithMaxGridWidth(AMax: Integer): IGridFullResizer;
+    function WithMinGridWidth(AMin: Integer): IGridFullResizer;
+    function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridFullResizer;
+    function WithGridHeight(ANewHeight: Integer): IGridFullResizer;
+    function WithFixedRows(const AFixedRows: array of Integer): IGridFullResizer;
+    function DisableFixedRow(ARowIndex: Integer): IGridFullResizer; overload;
+    function EnableFixedRow(ARowIndex: Integer): IGridFullResizer; overload;
+    function DisableFixedRow(const AFixedRows: array of Integer): IGridFullResizer; overload;
+    function EnableFixedRow(const AFixedRows: array of Integer): IGridFullResizer; overload;
+    function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridFullResizer;
+    function WithMinRowHeight(ARowIndex, AMin: Integer): IGridFullResizer;
+    function WithMinAndMaxRowHeight(ARowIndex, AMin, AMax: Integer): IGridFullResizer;
+    function WithMaxGridHeight(AMax: Integer): IGridFullResizer;
+    function WithMinGridHeight(AMin: Integer): IGridFullResizer;
+    function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridFullResizer;
   end;
 
-  { TGridLayoutResizerBase }
+  { TGridResizerBase }
 
-  TGridLayoutResizerBase = class abstract(TInterfacedObject, IGridLayoutResizer)
+  TGridResizerBase = class abstract(TInterfacedObject, IGridResizer)
   protected
     FMinTotalSize: Integer;
     FMaxTotalSize: Integer;
@@ -134,9 +133,9 @@ type
     procedure Resize(AGrid: TGridLayout);
   end;
 
-  { TGridLayoutWidthResizer }
+  { TGridWidthResizer }
 
-  TGridLayoutWidthResizer = class(TGridLayoutResizerBase, IGridLayoutWidthResizer)
+  TGridWidthResizer = class(TGridResizerBase, IGridWidthResizer)
   protected
     function GetItemCount(AGrid: TGridLayout): Integer; override;
     function GetVisibleItem(AGrid: TGridLayout; AIndex: Integer): Boolean; override;
@@ -146,29 +145,26 @@ type
     function GetTotalMargin(AGrid: TGridLayout): Integer; override;
   public
     function GetGridWidth: Integer;
-    function WithGridWidth(ANewWidth: Integer): IGridLayoutWidthResizer;
-    function WithFixedColumns(const AFixedColumns: array of Integer): IGridLayoutWidthResizer;
-    function DisableFixedColumn(AColIndex: Integer): IGridLayoutWidthResizer; overload;
-    function EnableFixedColumn(AColIndex: Integer): IGridLayoutWidthResizer; overload;
-    function DisableFixedColumn(const AFixedColumns: array of Integer): IGridLayoutWidthResizer; overload;
-    function EnableFixedColumn(const AFixedColumns: array of Integer): IGridLayoutWidthResizer; overload;
-    function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridLayoutWidthResizer;
-    function WithMinColumnWidth(AColIndex, AMin: Integer): IGridLayoutWidthResizer;
-    function WithMinAndMaxColumnWidth(AColIndex, AMin, AMax: Integer): IGridLayoutWidthResizer;
-    function WithMaxGridWidth(AMax: Integer): IGridLayoutWidthResizer;
-    function WithMinGridWidth(AMin: Integer): IGridLayoutWidthResizer;
-    function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridLayoutWidthResizer;
+    function WithGridWidth(ANewWidth: Integer): IGridWidthResizer;
+    function WithFixedColumns(const AFixedColumns: array of Integer): IGridWidthResizer;
+    function DisableFixedColumn(AColIndex: Integer): IGridWidthResizer; overload;
+    function EnableFixedColumn(AColIndex: Integer): IGridWidthResizer; overload;
+    function DisableFixedColumn(const AFixedColumns: array of Integer): IGridWidthResizer; overload;
+    function EnableFixedColumn(const AFixedColumns: array of Integer): IGridWidthResizer; overload;
+    function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridWidthResizer;
+    function WithMinColumnWidth(AColIndex, AMin: Integer): IGridWidthResizer;
+    function WithMinAndMaxColumnWidth(AColIndex, AMin, AMax: Integer): IGridWidthResizer;
+    function WithMaxGridWidth(AMax: Integer): IGridWidthResizer;
+    function WithMinGridWidth(AMin: Integer): IGridWidthResizer;
+    function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridWidthResizer;
     function WithWidthRange(AColIndex: Integer; const AValues: array of Integer;
-      ASelectRangeMode: TValueRangeMode): IGridLayoutWidthResizer;
+      ASelectRangeMode: TValueRangeMode): IGridWidthResizer;
     property GridWidth: Integer read GetGridWidth write FTotalSize;
   end;
 
+  { TGridHeightResizer }
 
-
-
-  { TGridLayoutHeightResizer }
-
-  TGridLayoutHeightResizer = class(TGridLayoutResizerBase, IGridLayoutHeightResizer)
+  TGridHeightResizer = class(TGridResizerBase, IGridHeightResizer)
   protected
     function GetItemCount(AGrid: TGridLayout): Integer; override;
     function GetVisibleItem(AGrid: TGridLayout; AIndex: Integer): Boolean; override;
@@ -178,66 +174,61 @@ type
     function GetTotalMargin(AGrid: TGridLayout): Integer; override;
   public
     function GetGridHeight: Integer;
-    function WithGridHeight(ANewHeight: Integer): IGridLayoutHeightResizer;
-    function WithFixedRows(const AFixedRows: array of Integer): IGridLayoutHeightResizer;
-    function DisableFixedRow(ARowIndex: Integer): IGridLayoutHeightResizer; overload;
-    function EnableFixedRow(ARowIndex: Integer): IGridLayoutHeightResizer; overload;
-    function DisableFixedRow(const AFixedRows: array of Integer): IGridLayoutHeightResizer; overload;
-    function EnableFixedRow(const AFixedRows: array of Integer): IGridLayoutHeightResizer; overload;
-    function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridLayoutHeightResizer;
-    function WithMinRowHeight(ARowIndex, AMin: Integer): IGridLayoutHeightResizer;
-    function WithMinAndMaxRowHeight(ARowIndex, AMin, AMax: Integer): IGridLayoutHeightResizer;
-    function WithMaxGridHeight(AMax: Integer): IGridLayoutHeightResizer;
-    function WithMinGridHeight(AMin: Integer): IGridLayoutHeightResizer;
-    function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridLayoutHeightResizer;
+    function WithGridHeight(ANewHeight: Integer): IGridHeightResizer;
+    function WithFixedRows(const AFixedRows: array of Integer): IGridHeightResizer;
+    function DisableFixedRow(ARowIndex: Integer): IGridHeightResizer; overload;
+    function EnableFixedRow(ARowIndex: Integer): IGridHeightResizer; overload;
+    function DisableFixedRow(const AFixedRows: array of Integer): IGridHeightResizer; overload;
+    function EnableFixedRow(const AFixedRows: array of Integer): IGridHeightResizer; overload;
+    function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridHeightResizer;
+    function WithMinRowHeight(ARowIndex, AMin: Integer): IGridHeightResizer;
+    function WithMinAndMaxRowHeight(ARowIndex, AMin, AMax: Integer): IGridHeightResizer;
+    function WithMaxGridHeight(AMax: Integer): IGridHeightResizer;
+    function WithMinGridHeight(AMin: Integer): IGridHeightResizer;
+    function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridHeightResizer;
     function WithHeightRange(ARowIndex: Integer; const AValues: array of Integer;
-      ASelectRangeMode: TValueRangeMode): IGridLayoutHeightResizer;
-
+      ASelectRangeMode: TValueRangeMode): IGridHeightResizer;
     property GridHeight: Integer read GetGridHeight write FTotalSize;
   end;
 
+  { TGridFullResizer }
 
-  { TGridLayoutFullResizer }
-
-  TGridLayoutFullResizer = class(TInterfacedObject, IGridLayoutFullResizer)
+  TGridFullResizer = class(TInterfacedObject, IGridFullResizer)
   private
     FGridHeight: Integer;
     FGridWidth: Integer;
-    FWidthResizer: IGridLayoutWidthResizer;
-    FHeightResizer: IGridLayoutHeightResizer;
+    FWidthResizer: IGridWidthResizer;
+    FHeightResizer: IGridHeightResizer;
   public
     constructor Create;
     procedure Resize(AGrid: TGridLayout);
-
     function GetGridHeight: Integer;
-    function WithGridHeight(ANewHeight: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithFixedRows(const AFixedRows: array of Integer): IGridLayoutFullResizer; reintroduce;
-    function DisableFixedRow(ARowIndex: Integer): IGridLayoutFullResizer; overload; reintroduce;
-    function EnableFixedRow(ARowIndex: Integer): IGridLayoutFullResizer; overload; reintroduce;
-    function DisableFixedRow(const AFixedRows: array of Integer): IGridLayoutFullResizer; reintroduce; overload;
-    function EnableFixedRow(const AFixedRows: array of Integer): IGridLayoutFullResizer; reintroduce; overload;
-    function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMinRowHeight(ARowIndex, AMin: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMinAndMaxRowHeight(ARowIndex, AMin, AMax: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMaxGridHeight(AMax: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMinGridHeight(AMin: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridLayoutFullResizer; reintroduce;
+    function WithGridHeight(ANewHeight: Integer): IGridFullResizer; reintroduce;
+    function WithFixedRows(const AFixedRows: array of Integer): IGridFullResizer; reintroduce;
+    function DisableFixedRow(ARowIndex: Integer): IGridFullResizer; overload; reintroduce;
+    function EnableFixedRow(ARowIndex: Integer): IGridFullResizer; overload; reintroduce;
+    function DisableFixedRow(const AFixedRows: array of Integer): IGridFullResizer; reintroduce; overload;
+    function EnableFixedRow(const AFixedRows: array of Integer): IGridFullResizer; reintroduce; overload;
+    function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridFullResizer; reintroduce;
+    function WithMinRowHeight(ARowIndex, AMin: Integer): IGridFullResizer; reintroduce;
+    function WithMinAndMaxRowHeight(ARowIndex, AMin, AMax: Integer): IGridFullResizer; reintroduce;
+    function WithMaxGridHeight(AMax: Integer): IGridFullResizer; reintroduce;
+    function WithMinGridHeight(AMin: Integer): IGridFullResizer; reintroduce;
+    function WithMinAndMaxGridHeight(Amin, AMax: Integer): IGridFullResizer; reintroduce;
     property GridHeight: Integer read GetGridHeight write FGridHeight;
-
-
     function GetGridWidth: Integer;
-    function WithGridWidth(ANewWidth: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithFixedColumns(const AFixedColumns: array of Integer): IGridLayoutFullResizer; reintroduce;
-    function DisableFixedColumn(AColIndex: Integer): IGridLayoutFullResizer; overload; reintroduce;
-    function EnableFixedColumn(AColIndex: Integer): IGridLayoutFullResizer; overload; reintroduce;
-    function DisableFixedColumn(const AFixedColumns: array of Integer): IGridLayoutFullResizer; reintroduce; overload;
-    function EnableFixedColumn(const AFixedColumns: array of Integer): IGridLayoutFullResizer; reintroduce; overload;
-    function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMinColumnWidth(AColIndex, AMin: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMinAndMaxColumnWidth(AColIndex, AMin, AMax: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMaxGridWidth(AMax: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMinGridWidth(AMin: Integer): IGridLayoutFullResizer; reintroduce;
-    function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridLayoutFullResizer; reintroduce;
+    function WithGridWidth(ANewWidth: Integer): IGridFullResizer; reintroduce;
+    function WithFixedColumns(const AFixedColumns: array of Integer): IGridFullResizer; reintroduce;
+    function DisableFixedColumn(AColIndex: Integer): IGridFullResizer; overload; reintroduce;
+    function EnableFixedColumn(AColIndex: Integer): IGridFullResizer; overload; reintroduce;
+    function DisableFixedColumn(const AFixedColumns: array of Integer): IGridFullResizer; reintroduce; overload;
+    function EnableFixedColumn(const AFixedColumns: array of Integer): IGridFullResizer; reintroduce; overload;
+    function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridFullResizer; reintroduce;
+    function WithMinColumnWidth(AColIndex, AMin: Integer): IGridFullResizer; reintroduce;
+    function WithMinAndMaxColumnWidth(AColIndex, AMin, AMax: Integer): IGridFullResizer; reintroduce;
+    function WithMaxGridWidth(AMax: Integer): IGridFullResizer; reintroduce;
+    function WithMinGridWidth(AMin: Integer): IGridFullResizer; reintroduce;
+    function WithMinAndMaxGridWidth(Amin, AMax: Integer): IGridFullResizer; reintroduce;
     property GridWidth: Integer read GetGridWidth write FGridWidth;
   end;
 
@@ -319,9 +310,9 @@ begin
     Free;
 end;
 
-{ TGridLayoutResizerBase }
+{ TGridResizerBase }
 
-procedure TGridLayoutResizerBase.ApplyLimitsAndRedistribute(AGrid: TGridLayout;
+procedure TGridResizerBase.ApplyLimitsAndRedistribute(AGrid: TGridLayout;
   AFlexibleIndexes: TIntList);
 var
   Index, MinS, MaxS, Range: Integer;
@@ -395,7 +386,7 @@ begin
   end;
 end;
 
-constructor TGridLayoutResizerBase.Create;
+constructor TGridResizerBase.Create;
 begin
   FMinTotalSize := 0;
   FMaxTotalSize := MaxInt;
@@ -405,7 +396,7 @@ begin
   FSizesRanges := TIntTValueRangeDictionary.Create;
 end;
 
-destructor TGridLayoutResizerBase.Destroy;
+destructor TGridResizerBase.Destroy;
 var
   Pair: specialize TPair<Integer, TValueRange>;
 begin
@@ -418,7 +409,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TGridLayoutResizerBase.Resize(AGrid: TGridLayout);
+procedure TGridResizerBase.Resize(AGrid: TGridLayout);
 var
   FixedSize: Integer;
   FlexibleIndexes: TIntList;
@@ -490,50 +481,50 @@ begin
   end;
 end;
 
-{ TGridLayoutWidthResizer }
+{ TGridWidthResizer }
 
-function TGridLayoutWidthResizer.GetItemCount(AGrid: TGridLayout): Integer;
+function TGridWidthResizer.GetItemCount(AGrid: TGridLayout): Integer;
 begin
   Result := AGrid.Columns;
 end;
 
-function TGridLayoutWidthResizer.GetVisibleItem(AGrid: TGridLayout;
+function TGridWidthResizer.GetVisibleItem(AGrid: TGridLayout;
   AIndex: Integer): Boolean;
 begin
   Result := AGrid.VisibleColumn[AIndex];
 end;
 
-function TGridLayoutWidthResizer.GetItemSize(AGrid: TGridLayout;
+function TGridWidthResizer.GetItemSize(AGrid: TGridLayout;
   AIndex: Integer): Integer;
 begin
   Result := AGrid.ColumnWidth[AIndex];
 end;
 
-procedure TGridLayoutWidthResizer.SetItemSize(AGrid: TGridLayout;
+procedure TGridWidthResizer.SetItemSize(AGrid: TGridLayout;
   AIndex, ASize: Integer);
 begin
   AGrid.ColumnWidth[AIndex] := ASize;
 end;
 
-function TGridLayoutWidthResizer.GetSpacing(AGrid: TGridLayout;
+function TGridWidthResizer.GetSpacing(AGrid: TGridLayout;
   AIndex: Integer): Integer;
 begin
   Result := AGrid.HorizontalSpacing[AIndex];
 end;
 
-function TGridLayoutWidthResizer.GetTotalMargin(AGrid: TGridLayout
+function TGridWidthResizer.GetTotalMargin(AGrid: TGridLayout
   ): Integer;
 begin
   Result := AGrid.Margins.Left + AGrid.Margins.Right;
 end;
 
-function TGridLayoutWidthResizer.GetGridWidth: Integer;
+function TGridWidthResizer.GetGridWidth: Integer;
 begin
   Result := FTotalSize;
 end;
 
-function TGridLayoutWidthResizer.WithGridWidth(ANewWidth: Integer
-  ): IGridLayoutWidthResizer;
+function TGridWidthResizer.WithGridWidth(ANewWidth: Integer
+  ): IGridWidthResizer;
 begin
   Result := Self;
   if ANewWidth < FMinTotalSize then
@@ -544,8 +535,8 @@ begin
     FTotalSize := ANewWidth;
 end;
 
-function TGridLayoutWidthResizer.WithFixedColumns
-  (const AFixedColumns: array of Integer): IGridLayoutWidthResizer;
+function TGridWidthResizer.WithFixedColumns
+  (const AFixedColumns: array of Integer): IGridWidthResizer;
 var
   I: Integer;
 begin
@@ -556,23 +547,23 @@ begin
       FFixedIndexes.Add(AFixedColumns[I]);
 end;
 
-function TGridLayoutWidthResizer.DisableFixedColumn(AColIndex: Integer
-  ): IGridLayoutWidthResizer;
+function TGridWidthResizer.DisableFixedColumn(AColIndex: Integer
+  ): IGridWidthResizer;
 begin
   Result := Self;
   FFixedIndexes.Remove(AColIndex);
 end;
 
-function TGridLayoutWidthResizer.EnableFixedColumn(AColIndex: Integer
-  ): IGridLayoutWidthResizer;
+function TGridWidthResizer.EnableFixedColumn(AColIndex: Integer
+  ): IGridWidthResizer;
 begin
   Result := Self;
   if FFixedIndexes.IndexOf(AColIndex) = -1 then
     FFixedIndexes.Add(AColIndex);
 end;
 
-function TGridLayoutWidthResizer.DisableFixedColumn
-  (const AFixedColumns: array of Integer): IGridLayoutWidthResizer;
+function TGridWidthResizer.DisableFixedColumn
+  (const AFixedColumns: array of Integer): IGridWidthResizer;
 var
   I: Integer;
 begin
@@ -581,8 +572,8 @@ begin
     FFixedIndexes.Remove(AFixedColumns[I]);
 end;
 
-function TGridLayoutWidthResizer.EnableFixedColumn
-  (const AFixedColumns: array of Integer): IGridLayoutWidthResizer;
+function TGridWidthResizer.EnableFixedColumn
+  (const AFixedColumns: array of Integer): IGridWidthResizer;
 var
   I: Integer;
 begin
@@ -592,55 +583,55 @@ begin
       FFixedIndexes.Add(AFixedColumns[I]);
 end;
 
-function TGridLayoutWidthResizer.WithMaxColumnWidth(AColIndex, AMax: Integer
-  ): IGridLayoutWidthResizer;
+function TGridWidthResizer.WithMaxColumnWidth(AColIndex, AMax: Integer
+  ): IGridWidthResizer;
 begin
   Result := Self;
   if not FMaxSizes.ContainsKey(AColIndex) then
     FMaxSizes.Add(AColIndex, AMax);
 end;
 
-function TGridLayoutWidthResizer.WithMinColumnWidth(AColIndex, AMin: Integer
-  ): IGridLayoutWidthResizer;
+function TGridWidthResizer.WithMinColumnWidth(AColIndex, AMin: Integer
+  ): IGridWidthResizer;
 begin
   Result := Self;
   if not FMinSizes.ContainsKey(AColIndex) then
     FMinSizes.Add(AColIndex, AMin);
 end;
 
-function TGridLayoutWidthResizer.WithMinAndMaxColumnWidth
-  (AColIndex, AMin, AMax: Integer): IGridLayoutWidthResizer;
+function TGridWidthResizer.WithMinAndMaxColumnWidth
+  (AColIndex, AMin, AMax: Integer): IGridWidthResizer;
 begin
   Result := Self
     .WithMinColumnWidth(AColIndex, AMin)
     .WithMaxColumnWidth(AColIndex, AMax);
 end;
 
-function TGridLayoutWidthResizer.WithMaxGridWidth(AMax: Integer
-  ): IGridLayoutWidthResizer;
+function TGridWidthResizer.WithMaxGridWidth(AMax: Integer
+  ): IGridWidthResizer;
 begin
   Result := Self;
   FMaxTotalSize := AMax;
 end;
 
-function TGridLayoutWidthResizer.WithMinGridWidth(AMin: Integer
-  ): IGridLayoutWidthResizer;
+function TGridWidthResizer.WithMinGridWidth(AMin: Integer
+  ): IGridWidthResizer;
 begin
   Result := Self;
   FMinTotalSize := AMin;
 end;
 
-function TGridLayoutWidthResizer.WithMinAndMaxGridWidth(Amin, AMax: Integer
-  ): IGridLayoutWidthResizer;
+function TGridWidthResizer.WithMinAndMaxGridWidth(Amin, AMax: Integer
+  ): IGridWidthResizer;
 begin
   Result := Self
     .WithMinGridWidth(Amin)
     .WithMaxGridWidth(AMax);
 end;
 
-function TGridLayoutWidthResizer.WithWidthRange(AColIndex: Integer;
+function TGridWidthResizer.WithWidthRange(AColIndex: Integer;
   const AValues: array of Integer; ASelectRangeMode: TValueRangeMode
-  ): IGridLayoutWidthResizer;
+  ): IGridWidthResizer;
 var
   I: Integer;
   List: TIntList;
@@ -659,50 +650,50 @@ begin
   );
 end;
 
-{ TGridLayoutHeightResizer }
+{ TGridHeightResizer }
 
-function TGridLayoutHeightResizer.GetItemCount(AGrid: TGridLayout): Integer;
+function TGridHeightResizer.GetItemCount(AGrid: TGridLayout): Integer;
 begin
   Result := AGrid.Rows;
 end;
 
-function TGridLayoutHeightResizer.GetVisibleItem(AGrid: TGridLayout;
+function TGridHeightResizer.GetVisibleItem(AGrid: TGridLayout;
   AIndex: Integer): Boolean;
 begin
   Result := AGrid.VisibleRow[AIndex];
 end;
 
-function TGridLayoutHeightResizer.GetItemSize(AGrid: TGridLayout;
+function TGridHeightResizer.GetItemSize(AGrid: TGridLayout;
   AIndex: Integer): Integer;
 begin
   Result := AGrid.RowHeight[AIndex];
 end;
 
-procedure TGridLayoutHeightResizer.SetItemSize(AGrid: TGridLayout;
+procedure TGridHeightResizer.SetItemSize(AGrid: TGridLayout;
   AIndex, ASize: Integer);
 begin
   AGrid.RowHeight[AIndex] := ASize;
 end;
 
-function TGridLayoutHeightResizer.GetSpacing(AGrid: TGridLayout;
+function TGridHeightResizer.GetSpacing(AGrid: TGridLayout;
   AIndex: Integer): Integer;
 begin
   Result := AGrid.VerticalSpacing[AIndex];
 end;
 
-function TGridLayoutHeightResizer.GetTotalMargin(AGrid: TGridLayout
+function TGridHeightResizer.GetTotalMargin(AGrid: TGridLayout
   ): Integer;
 begin
   Result := AGrid.Margins.Top + AGrid.Margins.Bottom;
 end;
 
-function TGridLayoutHeightResizer.GetGridHeight: Integer;
+function TGridHeightResizer.GetGridHeight: Integer;
 begin
   Result := FTotalSize;
 end;
 
-function TGridLayoutHeightResizer.WithGridHeight(ANewHeight: Integer
-  ): IGridLayoutHeightResizer;
+function TGridHeightResizer.WithGridHeight(ANewHeight: Integer
+  ): IGridHeightResizer;
 begin
   Result := Self;
   if ANewHeight < FMinTotalSize then
@@ -713,8 +704,8 @@ begin
     FTotalSize := ANewHeight;
 end;
 
-function TGridLayoutHeightResizer.WithFixedRows
-  (const AFixedRows: array of Integer): IGridLayoutHeightResizer;
+function TGridHeightResizer.WithFixedRows
+  (const AFixedRows: array of Integer): IGridHeightResizer;
 var
   I: Integer;
 begin
@@ -725,23 +716,23 @@ begin
       FFixedIndexes.Add(AFixedRows[I]);
 end;
 
-function TGridLayoutHeightResizer.DisableFixedRow(ARowIndex: Integer
-  ): IGridLayoutHeightResizer;
+function TGridHeightResizer.DisableFixedRow(ARowIndex: Integer
+  ): IGridHeightResizer;
 begin
   Result := Self;
   FFixedIndexes.Remove(ARowIndex);
 end;
 
-function TGridLayoutHeightResizer.EnableFixedRow(ARowIndex: Integer
-  ): IGridLayoutHeightResizer;
+function TGridHeightResizer.EnableFixedRow(ARowIndex: Integer
+  ): IGridHeightResizer;
 begin
   Result := Self;
   if FFixedIndexes.IndexOf(ARowIndex) = -1 then
     FFixedIndexes.Add(ARowIndex);
 end;
 
-function TGridLayoutHeightResizer.DisableFixedRow
-  (const AFixedRows: array of Integer): IGridLayoutHeightResizer;
+function TGridHeightResizer.DisableFixedRow
+  (const AFixedRows: array of Integer): IGridHeightResizer;
 var
   I: Integer;
 begin
@@ -750,8 +741,8 @@ begin
     FFixedIndexes.Remove(AFixedRows[I]);
 end;
 
-function TGridLayoutHeightResizer.EnableFixedRow
-  (const AFixedRows: array of Integer): IGridLayoutHeightResizer;
+function TGridHeightResizer.EnableFixedRow
+  (const AFixedRows: array of Integer): IGridHeightResizer;
 var
   I: Integer;
 begin
@@ -761,55 +752,55 @@ begin
       FFixedIndexes.Add(AFixedRows[I]);
 end;
 
-function TGridLayoutHeightResizer.WithMaxRowHeight(ARowIndex, AMax: Integer
-  ): IGridLayoutHeightResizer;
+function TGridHeightResizer.WithMaxRowHeight(ARowIndex, AMax: Integer
+  ): IGridHeightResizer;
 begin
   Result := Self;
   if not FMaxSizes.ContainsKey(ARowIndex) then
     FMaxSizes.Add(ARowIndex, AMax);
 end;
 
-function TGridLayoutHeightResizer.WithMinRowHeight(ARowIndex, AMin: Integer
-  ): IGridLayoutHeightResizer;
+function TGridHeightResizer.WithMinRowHeight(ARowIndex, AMin: Integer
+  ): IGridHeightResizer;
 begin
   Result := Self;
   if not FMinSizes.ContainsKey(ARowIndex) then
     FMinSizes.Add(ARowIndex, AMin);
 end;
 
-function TGridLayoutHeightResizer.WithMinAndMaxRowHeight
-  (ARowIndex, AMin, AMax: Integer): IGridLayoutHeightResizer;
+function TGridHeightResizer.WithMinAndMaxRowHeight
+  (ARowIndex, AMin, AMax: Integer): IGridHeightResizer;
 begin
   Result := Self
     .WithMinRowHeight(ARowIndex, AMin)
     .WithMaxRowHeight(ARowIndex, AMax);
 end;
 
-function TGridLayoutHeightResizer.WithMaxGridHeight(AMax: Integer
-  ): IGridLayoutHeightResizer;
+function TGridHeightResizer.WithMaxGridHeight(AMax: Integer
+  ): IGridHeightResizer;
 begin
   Result := Self;
   FMaxTotalSize := AMax;
 end;
 
-function TGridLayoutHeightResizer.WithMinGridHeight(AMin: Integer
-  ): IGridLayoutHeightResizer;
+function TGridHeightResizer.WithMinGridHeight(AMin: Integer
+  ): IGridHeightResizer;
 begin
   Result := Self;
   FMinTotalSize := AMin;
 end;
 
-function TGridLayoutHeightResizer.WithMinAndMaxGridHeight
-  (Amin, AMax: Integer): IGridLayoutHeightResizer;
+function TGridHeightResizer.WithMinAndMaxGridHeight
+  (Amin, AMax: Integer): IGridHeightResizer;
 begin
   Result := Self
     .WithMinGridHeight(AMin)
     .WithMaxGridHeight(AMax);
 end;
 
-function TGridLayoutHeightResizer.WithHeightRange(ARowIndex: Integer;
+function TGridHeightResizer.WithHeightRange(ARowIndex: Integer;
   const AValues: array of Integer; ASelectRangeMode: TValueRangeMode
-  ): IGridLayoutHeightResizer;
+  ): IGridHeightResizer;
 var
   I: Integer;
   List: TIntList;
@@ -828,193 +819,193 @@ begin
   );
 end;
 
-{ TGridLayoutFullResizer }
+{ TGridFullResizer }
 
-constructor TGridLayoutFullResizer.Create;
+constructor TGridFullResizer.Create;
 begin
-  FHeightResizer := TGridLayoutHeightResizer.Create;
-  FWidthResizer := TGridLayoutWidthResizer.Create;
+  FHeightResizer := TGridHeightResizer.Create;
+  FWidthResizer := TGridWidthResizer.Create;
 end;
 
-procedure TGridLayoutFullResizer.Resize(AGrid: TGridLayout);
+procedure TGridFullResizer.Resize(AGrid: TGridLayout);
 begin
   FWidthResizer.Resize(AGrid);
   FHeightResizer.Resize(AGrid);
 end;
 
-function TGridLayoutFullResizer.GetGridHeight: Integer;
+function TGridFullResizer.GetGridHeight: Integer;
 begin
   Result := FGridHeight;
 end;
 
-function TGridLayoutFullResizer.WithGridHeight(ANewHeight: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithGridHeight(ANewHeight: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.WithGridHeight(ANewHeight)
 end;
 
-function TGridLayoutFullResizer.WithFixedRows(const AFixedRows: array of Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithFixedRows(const AFixedRows: array of Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.WithFixedRows(AFixedRows);
 end;
 
-function TGridLayoutFullResizer.DisableFixedRow(ARowIndex: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.DisableFixedRow(ARowIndex: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.DisableFixedRow(ARowIndex);
 end;
 
-function TGridLayoutFullResizer.EnableFixedRow(ARowIndex: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.EnableFixedRow(ARowIndex: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.EnableFixedRow(ARowIndex);
 end;
 
-function TGridLayoutFullResizer.DisableFixedRow
-  (const AFixedRows: array of Integer): IGridLayoutFullResizer;
+function TGridFullResizer.DisableFixedRow
+  (const AFixedRows: array of Integer): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.DisableFixedRow(AFixedRows);
 end;
 
-function TGridLayoutFullResizer.EnableFixedRow
-  (const AFixedRows: array of Integer): IGridLayoutFullResizer;
+function TGridFullResizer.EnableFixedRow
+  (const AFixedRows: array of Integer): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.EnableFixedRow(AFixedRows);
 end;
 
-function TGridLayoutFullResizer.WithMaxRowHeight(ARowIndex, AMax: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMaxRowHeight(ARowIndex, AMax: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.WithMaxRowHeight(ARowIndex, AMax);
 end;
 
-function TGridLayoutFullResizer.WithMinRowHeight(ARowIndex, AMin: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMinRowHeight(ARowIndex, AMin: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.WithMinRowHeight(ARowIndex, AMin);
 end;
 
-function TGridLayoutFullResizer.WithMinAndMaxRowHeight
-  (ARowIndex, AMin, AMax: Integer): IGridLayoutFullResizer;
+function TGridFullResizer.WithMinAndMaxRowHeight
+  (ARowIndex, AMin, AMax: Integer): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.WithMinAndMaxRowHeight(ARowIndex, AMin, AMax);
 end;
 
-function TGridLayoutFullResizer.WithMaxGridHeight(AMax: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMaxGridHeight(AMax: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.WithMaxGridHeight(AMax);
 end;
 
-function TGridLayoutFullResizer.WithMinGridHeight(AMin: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMinGridHeight(AMin: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.WithMinGridHeight(AMin);
 end;
 
-function TGridLayoutFullResizer.WithMinAndMaxGridHeight(Amin, AMax: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMinAndMaxGridHeight(Amin, AMax: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FHeightResizer.WithMinAndMaxGridHeight(Amin, AMax);
 end;
 
-function TGridLayoutFullResizer.GetGridWidth: Integer;
+function TGridFullResizer.GetGridWidth: Integer;
 begin
   Result := FGridWidth;
 end;
 
-function TGridLayoutFullResizer.WithGridWidth(ANewWidth: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithGridWidth(ANewWidth: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.WithGridWidth(ANewWidth);
 end;
 
-function TGridLayoutFullResizer.WithFixedColumns
-  (const AFixedColumns: array of Integer): IGridLayoutFullResizer;
+function TGridFullResizer.WithFixedColumns
+  (const AFixedColumns: array of Integer): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.WithFixedColumns(AFixedColumns);
 end;
 
-function TGridLayoutFullResizer.DisableFixedColumn(AColIndex: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.DisableFixedColumn(AColIndex: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.DisableFixedColumn(AColIndex);
 end;
 
-function TGridLayoutFullResizer.EnableFixedColumn(AColIndex: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.EnableFixedColumn(AColIndex: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.EnableFixedColumn(AColIndex);
 end;
 
-function TGridLayoutFullResizer.DisableFixedColumn
-  (const AFixedColumns: array of Integer): IGridLayoutFullResizer;
+function TGridFullResizer.DisableFixedColumn
+  (const AFixedColumns: array of Integer): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.DisableFixedColumn(AFixedColumns);
 end;
 
-function TGridLayoutFullResizer.EnableFixedColumn
-  (const AFixedColumns: array of Integer): IGridLayoutFullResizer;
+function TGridFullResizer.EnableFixedColumn
+  (const AFixedColumns: array of Integer): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.EnableFixedColumn(AFixedColumns);
 end;
 
-function TGridLayoutFullResizer.WithMaxColumnWidth(AColIndex, AMax: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMaxColumnWidth(AColIndex, AMax: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.WithMaxColumnWidth(AColIndex, AMax);
 end;
 
-function TGridLayoutFullResizer.WithMinColumnWidth(AColIndex, AMin: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMinColumnWidth(AColIndex, AMin: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.WithMinColumnWidth(AColIndex, AMin);
 end;
 
-function TGridLayoutFullResizer.WithMinAndMaxColumnWidth
-  (AColIndex, AMin, AMax: Integer): IGridLayoutFullResizer;
+function TGridFullResizer.WithMinAndMaxColumnWidth
+  (AColIndex, AMin, AMax: Integer): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.WithMinAndMaxColumnWidth(AColIndex, AMin, AMax);
 end;
 
-function TGridLayoutFullResizer.WithMaxGridWidth(AMax: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMaxGridWidth(AMax: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.WithMaxGridWidth(AMax);
 end;
 
-function TGridLayoutFullResizer.WithMinGridWidth(AMin: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMinGridWidth(AMin: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.WithMinGridWidth(AMin);
 end;
 
-function TGridLayoutFullResizer.WithMinAndMaxGridWidth(Amin, AMax: Integer
-  ): IGridLayoutFullResizer;
+function TGridFullResizer.WithMinAndMaxGridWidth(Amin, AMax: Integer
+  ): IGridFullResizer;
 begin
   Result := Self;
   FWidthResizer.WithMinAndMaxGridWidth(Amin, AMax);

@@ -9,13 +9,13 @@ uses
   Classes, SysUtils, Controls, Generics.Collections;
 
 type
-  ILayoutItem = interface
+  IGridItem = interface
     ['{C28F4715-03C4-428B-AEBA-E2CDE48378B7}']
     function GetControl: TControl;
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
-  TLayoutAlignment = (laStretch, laCenter, laStart, laEnd);
+  TItemAlignment = (laStretch, laCenter, laStart, laEnd);
 
   { TOptionalInt }
 
@@ -26,14 +26,14 @@ type
     class function None: TOptionalInt; static;
   end;
 
-  { TGridAxisDivisionInfo}
+  { TGridTrackInfo}
 
-  TGridAxisDivisionInfo = record
+  TGridTrackInfo = record
     Size: TOptionalInt;
     Spacing: TOptionalInt;
     Shift: TOptionalInt;
     Hidden: Boolean;
-    class function Default: TGridAxisDivisionInfo; static;
+    class function Default: TGridTrackInfo; static;
   end;
 
   { TMargins }
@@ -99,12 +99,12 @@ type
     FColumn: Integer;
     FExtraHeight: Integer;
     FExtraWidth: Integer;
-    FHorizontalAlignment: TLayoutAlignment;
+    FHorizontalAlignment: TItemAlignment;
     FOffsetX: Integer;
     FOffsetY: Integer;
     FRow: Integer;
     FRowSpan: Integer;
-    FVerticalAlignment: TLayoutAlignment;
+    FVerticalAlignment: TItemAlignment;
   public
     constructor Create(ARow, AColumn: Integer); reintroduce;
     function WithRow(ARow: Integer): TGridCellSettings;
@@ -113,10 +113,10 @@ type
     function WithColumnSpan(AColSpan: Integer): TGridCellSettings;
     function WithOffsetX(AOffsetX: Integer): TGridCellSettings;
     function WithOffsetY(AOffsetY: Integer): TGridCellSettings;
-    function WithHorizontalAlignment(AHorizontalAlignment: TLayoutAlignment): TGridCellSettings;
-    function WithVerticalAlignment(AVerticalAlignment: TLayoutAlignment): TGridCellSettings;
-    function WithAlignment(AHorizontalAlignment: TLayoutAlignment;
-      AVerticalAlignment: TLayoutAlignment): TGridCellSettings;
+    function WithHorizontalAlignment(AHorizontalAlignment: TItemAlignment): TGridCellSettings;
+    function WithVerticalAlignment(AVerticalAlignment: TItemAlignment): TGridCellSettings;
+    function WithAlignment(AHorizontalAlignment: TItemAlignment;
+      AVerticalAlignment: TItemAlignment): TGridCellSettings;
     function WithExtraWidth(AExtraWidth: Integer): TGridCellSettings;
     function WithExtraHeight(AExtraHeight: Integer): TGridCellSettings;
     property Row: Integer read FRow;
@@ -125,8 +125,8 @@ type
     property RowSpan: Integer read FRowSpan;
     property OffsetX: Integer read FOffsetX;
     property OffsetY: Integer read FOffsetY;
-    property HorizontalAlignment: TLayoutAlignment read FHorizontalAlignment;
-    property VerticalAlignment: TLayoutAlignment read FVerticalAlignment;
+    property HorizontalAlignment: TItemAlignment read FHorizontalAlignment;
+    property VerticalAlignment: TItemAlignment read FVerticalAlignment;
     property ExtraWidth: Integer read FExtraWidth;
     property ExtraHeight: Integer read FExtraHeight;
   end;
@@ -137,19 +137,19 @@ type
   private
     FExtraHeight: Integer;
     FExtraWidth: Integer;
-    FItem: ILayoutItem;
+    FItem: IGridItem;
     FRow: Integer;
     FColumn: Integer;
     FRowSpan: Integer;
     FColSpan: Integer;
     FOffsetX: Integer;
     FOffsetY: Integer;
-    FHorizontalAlignment: TLayoutAlignment;
-    FVerticalAlignment: TLayoutAlignment;
+    FHorizontalAlignment: TItemAlignment;
+    FVerticalAlignment: TItemAlignment;
   public
-    constructor Create(AControl: ILayoutItem; ASettings:
+    constructor Create(AControl: IGridItem; ASettings:
       TGridCellSettings); reintroduce; overload;
-    property Item: ILayoutItem read FItem;
+    property Item: IGridItem read FItem;
     property Row: Integer read FRow;
     property Column: Integer read FColumn;
     property RowSpan: Integer read FRowSpan;
@@ -158,8 +158,8 @@ type
     property OffsetY: Integer read FOffsetY write FOffsetY;
     property ExtraWidth: Integer read FExtraWidth write FExtraWidth;
     property ExtraHeight: Integer read FExtraHeight write FExtraWidth;
-    property HorizontalAlignment: TLayoutAlignment read FHorizontalAlignment write FHorizontalAlignment;
-    property VerticalAlignment: TLayoutAlignment read FVerticalAlignment write FVerticalAlignment;
+    property HorizontalAlignment: TItemAlignment read FHorizontalAlignment write FHorizontalAlignment;
+    property VerticalAlignment: TItemAlignment read FVerticalAlignment write FVerticalAlignment;
   end;
 
   IGridFill = interface;
@@ -168,7 +168,7 @@ type
   TGridFillBeforePlaceEvent = procedure(
     AGridFill: IGridFill;
     AGrid: TGridLayout;
-    AItem: ILayoutItem;
+    AItem: IGridItem;
     APos: IGridPosition;
     var ASettings: TGridCellSettings;
     var ACanPlace: Boolean
@@ -177,7 +177,7 @@ type
   TGridFillAfterPlaceEvent = procedure(
     AGridFill: IGridFill;
     AGrid: TGridLayout;
-    AItem: ILayoutItem;
+    AItem: IGridItem;
     var APosition: IGridPosition
   ) of object;
 
@@ -191,7 +191,7 @@ type
     procedure SetOnAfterPlaceItem(AValue: TGridFillAfterPlaceEvent);
     procedure SetOnBeforePlaceItem(AValue: TGridFillBeforePlaceEvent);
     function GetGrid: TGridLayout;
-    procedure PlaceItem(AItem: ILayoutItem); overload;
+    procedure PlaceItem(AItem: IGridItem); overload;
     procedure PlaceItem(AItem: TControl); overload;
     procedure Skip(ACount: Integer=1);
     procedure InitialPos(APos: IGridPosition);
@@ -203,29 +203,25 @@ type
   end;
 
   TGridCellList = specialize TObjectList<TGridCell>;
-  TGridCellSettingsList = specialize TObjectList<TGridCellSettings>;
   TIntList = specialize TList<Integer>;
 
-  TGridAxisDivisionInfoDictionary = specialize TDictionary<Integer, TGridAxisDivisionInfo>;
+  TGridTrackInfoDictionary = specialize TDictionary<Integer, TGridTrackInfo>;
 
-  { TGridAxisDivisionInfoDictionaryHelper }
+  { TGridTrackInfoDictionaryHelper }
 
-  TGridAxisDivisionInfoDictionaryHelper = class helper for TGridAxisDivisionInfoDictionary
+  TGridTrackInfoDictionaryHelper = class helper for TGridTrackInfoDictionary
     function GetSizeOrDefault(Index: Integer; const ADefault: Integer): Integer;
     procedure SetSize(AIndex: Integer; ASize: Integer);
     function IsSizeDefined(AIndex: Integer): Boolean;
     procedure ClearSizes;
-
     function GetSpacingOrDefault(Index: Integer; const ADefault: Integer): Integer;
     procedure SetSpacing(AIndex: Integer; ASpacing: Integer);
     function IsSpacingDefined(AIndex: Integer): Boolean;
     procedure ClearSpacings;
-
     function GetShiftOrDefault(Index: Integer; const ADefault: Integer): Integer;
     procedure SetShift(AIndex: Integer; AShift: Integer);
     function IsShiftDefined(AIndex: Integer): Boolean;
     procedure ClearShifts;
-
     function GetHidden(Index: Integer): Boolean;
     procedure SetHidden(AIndex: Integer; AValue: Boolean);
   end;
@@ -235,7 +231,6 @@ type
   TGridLayout = class
   private
     FCells: TGridCellList;
-    FCellSettingsList: TGridCellSettingsList;
     FLeft: Integer;
     FMargins: TMargins;
     FRows: Integer;
@@ -245,8 +240,8 @@ type
     FHorizontalSpacings: Integer;
     FRowHeights: Integer;
     FColumnWidths: Integer;
-    FRowsInfoDic: TGridAxisDivisionInfoDictionary;
-    FColumnsInfoDic: TGridAxisDivisionInfoDictionary;
+    FRowsInfoDic: TGridTrackInfoDictionary;
+    FColumnsInfoDic: TGridTrackInfoDictionary;
     function CalculateCellWidth(Cell: TGridCell): Integer;
     function CalculateCellHeight(Cell: TGridCell): Integer;
     function CalculateCellLeft(Cell: TGridCell): Integer;
@@ -275,7 +270,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure AddItem(AItem: ILayoutItem; ASettings: TGridCellSettings); overload;
+    procedure AddItem(AItem: IGridItem; ASettings: TGridCellSettings); overload;
     procedure AddItem(AItem: TControl; ASettings: TGridCellSettings); overload;
     procedure AddItem(AItem: TGridLayout; ASettings: TGridCellSettings); overload;
     procedure ArrangeItems; overload;
@@ -313,9 +308,9 @@ type
     property Left: Integer read FLeft write SetLeft;
   end;
 
-  { TControlLayoutItem }
+  { TControlGridItem }
 
-  TControlLayoutItem = class(TInterfacedObject, ILayoutItem)
+  TControlGridItem = class(TInterfacedObject, IGridItem)
   protected
     FControl: TControl;
     procedure AfterSetBounds; virtual;
@@ -330,9 +325,9 @@ type
   TVirtualContainer = class(TWinControl)
   end;
 
-  { TSubGridLayoutItem }
+  { TSubGridItem }
 
-  TSubGridLayoutItem = class(TControlLayoutItem)
+  TSubGridItem = class(TControlGridItem)
   private
     FLayout: TGridLayout;
     procedure ContainerResize(Sender: TObject);
@@ -355,7 +350,7 @@ uses
 
 { TGridCell }
 
-constructor TGridCell.Create(AControl: ILayoutItem; ASettings: TGridCellSettings);
+constructor TGridCell.Create(AControl: IGridItem; ASettings: TGridCellSettings);
 begin
   Assert(AControl <> nil, 'AControl cannot be nil');
   Assert(ASettings <> nil, 'ASettings cannot be nil');
@@ -386,9 +381,9 @@ begin
   Result.HasValue := False;
 end;
 
-{ TGridAxisDivisionInfo }
+{ TGridTrackInfo }
 
-class function TGridAxisDivisionInfo.Default: TGridAxisDivisionInfo;
+class function TGridTrackInfo.Default: TGridTrackInfo;
 begin
   Result.Size := TOptionalInt.None;
   Result.Shift := TOptionalInt.None;
@@ -553,14 +548,14 @@ begin
 end;
 
 function TGridCellSettings.WithHorizontalAlignment(
-  AHorizontalAlignment: TLayoutAlignment): TGridCellSettings;
+  AHorizontalAlignment: TItemAlignment): TGridCellSettings;
 begin
   FHorizontalAlignment := AHorizontalAlignment;
   Result := Self;
 end;
 
 function TGridCellSettings.WithVerticalAlignment(
-  AVerticalAlignment: TLayoutAlignment): TGridCellSettings;
+  AVerticalAlignment: TItemAlignment): TGridCellSettings;
 begin
   FVerticalAlignment := AVerticalAlignment;
   Result := Self;
@@ -580,8 +575,8 @@ begin
   Result := Self;
 end;
 
-function TGridCellSettings.WithAlignment(AHorizontalAlignment: TLayoutAlignment;
-  AVerticalAlignment: TLayoutAlignment): TGridCellSettings;
+function TGridCellSettings.WithAlignment(AHorizontalAlignment: TItemAlignment;
+  AVerticalAlignment: TItemAlignment): TGridCellSettings;
 begin
   FHorizontalAlignment := AHorizontalAlignment;
   FVerticalAlignment := AVerticalAlignment;
@@ -593,9 +588,8 @@ end;
 constructor TGridLayout.Create;
 begin
   FCells := TGridCellList.Create(True);
-  FCellSettingsList := TGridCellSettingsList.Create(True);
-  FRowsInfoDic := TGridAxisDivisionInfoDictionary.Create;
-  FColumnsInfoDic := TGridAxisDivisionInfoDictionary.Create;
+  FRowsInfoDic := TGridTrackInfoDictionary.Create;
+  FColumnsInfoDic := TGridTrackInfoDictionary.Create;
   FMargins := TMargins.Create;
   FVerticalSpacings := 0;
   FHorizontalSpacings := 0;
@@ -608,31 +602,31 @@ end;
 destructor TGridLayout.Destroy;
 begin
   FCells.Free;
-  FCellSettingsList.Free;
+  // FCellSettingsList.Free;
   FRowsInfoDic.Free;
   FColumnsInfoDic.Free;
   FMargins.Free;
   inherited;
 end;
 
-procedure TGridLayout.AddItem(AItem: ILayoutItem; ASettings: TGridCellSettings);
+procedure TGridLayout.AddItem(AItem: IGridItem; ASettings: TGridCellSettings);
 var
   GridCell: TGridCell;
 begin
   Assert(ASettings <> nil, 'Settings cannot be nil');
   GridCell := TGridCell.Create(AItem, ASettings);
   FCells.Add(GridCell);
-  FCellSettingsList.Add(ASettings);
+  // FCellSettingsList.Add(ASettings);
 end;
 
 procedure TGridLayout.AddItem(AItem: TControl; ASettings: TGridCellSettings);
 begin
-  Self.AddItem(TControlLayoutItem.Create(AItem), ASettings);
+  Self.AddItem(TControlGridItem.Create(AItem), ASettings);
 end;
 
 procedure TGridLayout.AddItem(AItem: TGridLayout; ASettings: TGridCellSettings);
 begin
-  Self.AddItem(TSubGridLayoutItem.Create(AItem), ASettings);
+  Self.AddItem(TSubGridItem.Create(AItem), ASettings);
 end;
 
 function TGridLayout.CreateDefaultSettings(ARow, AColumn: Integer): TGridCellSettings;
@@ -649,8 +643,6 @@ end;
 function TGridLayout.GetColumnShift(ACol: Integer): Integer;
 begin
   Result := FColumnsInfoDic.GetShiftOrDefault(ACol, 0);
-  // if not FColumnShift.TryGetValue(Index, Result) then
-  //  Result := 0;
 end;
 
 function TGridLayout.GetContentHeight: Integer;
@@ -683,7 +675,6 @@ end;
 procedure TGridLayout.Clear;
 begin
   FCells.Clear;
-  FCellSettingsList.Clear;
 end;
 
 procedure TGridLayout.ClearRowAndColumnShifts;
@@ -718,7 +709,7 @@ end;
 
 function TGridLayout.IsColumnWidthCustomized(ACol: Integer): Boolean;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   Result := FColumnsInfoDic.IsSizeDefined(ACol);
 end;
@@ -730,7 +721,7 @@ end;
 
 function TGridLayout.IsHorizontalSpacingCustomized(ACol: Integer): Boolean;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   Result := FColumnsInfoDic.IsSpacingDefined(ACol);
 end;
@@ -960,7 +951,7 @@ end;
 procedure TGridLayout.ArrangeItems(ALeft, ATop: Integer);
 var
   Cell: TGridCell;
-  Item: ILayoutItem;
+  Item: IGridItem;
   X, Y, W, H: Integer;
   Control: TControl;
 begin
@@ -1053,12 +1044,12 @@ begin
   Self.ArrangeItems(0, 0);
 end;
 
-{ TGridAxisDivisionInfoDictionaryHelper }
+{ TGridTrackInfoDictionaryHelper }
 
-function TGridAxisDivisionInfoDictionaryHelper.GetSizeOrDefault(Index: Integer;
+function TGridTrackInfoDictionaryHelper.GetSizeOrDefault(Index: Integer;
   const ADefault: Integer): Integer;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   if Self.TryGetValue(Index, Info) and Info.Size.HasValue then
     Result := Info.Size.Value
@@ -1066,21 +1057,21 @@ begin
     Result := ADefault;
 end;
 
-procedure TGridAxisDivisionInfoDictionaryHelper.SetSize(AIndex: Integer;
+procedure TGridTrackInfoDictionaryHelper.SetSize(AIndex: Integer;
   ASize: Integer);
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   if not Self.TryGetValue(AIndex, Info) then
-    Info := TGridAxisDivisionInfo.Default;
+    Info := TGridTrackInfo.Default;
   Info.Size := TOptionalInt.Some(ASize);
   Self.AddOrSetValue(AIndex, Info);
 end;
 
-procedure TGridAxisDivisionInfoDictionaryHelper.ClearSizes;
+procedure TGridTrackInfoDictionaryHelper.ClearSizes;
 var
   Key: Integer;
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   for Key in Self.Keys do
   begin
@@ -1092,18 +1083,18 @@ begin
   end;
 end;
 
-function TGridAxisDivisionInfoDictionaryHelper.IsSizeDefined(AIndex: Integer
+function TGridTrackInfoDictionaryHelper.IsSizeDefined(AIndex: Integer
   ): Boolean;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   Result := Self.TryGetValue(AIndex, Info) and Info.Size.HasValue;
 end;
 
-function TGridAxisDivisionInfoDictionaryHelper.GetSpacingOrDefault
+function TGridTrackInfoDictionaryHelper.GetSpacingOrDefault
   (Index: Integer; const ADefault: Integer): Integer;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   if Self.TryGetValue(Index, Info) and Info.Spacing.HasValue then
     Result := Info.Spacing.Value
@@ -1111,29 +1102,29 @@ begin
     Result := ADefault;
 end;
 
-procedure TGridAxisDivisionInfoDictionaryHelper.SetSpacing(AIndex: Integer;
+procedure TGridTrackInfoDictionaryHelper.SetSpacing(AIndex: Integer;
   ASpacing: Integer);
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   if not Self.TryGetValue(AIndex, Info) then
-    Info := TGridAxisDivisionInfo.Default;
+    Info := TGridTrackInfo.Default;
   Info.Spacing := TOptionalInt.Some(ASpacing);
   Self.AddOrSetValue(AIndex, Info);
 end;
 
-function TGridAxisDivisionInfoDictionaryHelper.IsSpacingDefined(AIndex: Integer
+function TGridTrackInfoDictionaryHelper.IsSpacingDefined(AIndex: Integer
   ): Boolean;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   Result := Self.TryGetValue(AIndex, Info) and Info.Spacing.HasValue;
 end;
 
-procedure TGridAxisDivisionInfoDictionaryHelper.ClearSpacings;
+procedure TGridTrackInfoDictionaryHelper.ClearSpacings;
 var
   Key: Integer;
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   for Key in Self.Keys do
   begin
@@ -1145,10 +1136,10 @@ begin
   end;
 end;
 
-function TGridAxisDivisionInfoDictionaryHelper.GetShiftOrDefault
+function TGridTrackInfoDictionaryHelper.GetShiftOrDefault
   (Index: Integer; const ADefault: Integer): Integer;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   if Self.TryGetValue(Index, Info) and Info.Shift.HasValue then
     Result := Info.Shift.Value
@@ -1156,29 +1147,29 @@ begin
     Result := ADefault;
 end;
 
-procedure TGridAxisDivisionInfoDictionaryHelper.SetShift(AIndex: Integer;
+procedure TGridTrackInfoDictionaryHelper.SetShift(AIndex: Integer;
   AShift: Integer);
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   if not Self.TryGetValue(AIndex, Info) then
-    Info := TGridAxisDivisionInfo.Default;
+    Info := TGridTrackInfo.Default;
   Info.Shift := TOptionalInt.Some(AShift);
   Self.AddOrSetValue(AIndex, Info);
 end;
 
-function TGridAxisDivisionInfoDictionaryHelper.IsShiftDefined(AIndex: Integer
+function TGridTrackInfoDictionaryHelper.IsShiftDefined(AIndex: Integer
   ): Boolean;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   Result := Self.TryGetValue(AIndex, Info) and Info.Shift.HasValue;
 end;
 
-procedure TGridAxisDivisionInfoDictionaryHelper.ClearShifts;
+procedure TGridTrackInfoDictionaryHelper.ClearShifts;
 var
   Key: Integer;
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   for Key in Self.Keys do
   begin
@@ -1190,10 +1181,10 @@ begin
   end;
 end;
 
-function TGridAxisDivisionInfoDictionaryHelper.GetHidden(Index: Integer
+function TGridTrackInfoDictionaryHelper.GetHidden(Index: Integer
   ): Boolean;
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   if Self.TryGetValue(Index, Info) then
     Result := Info.Hidden
@@ -1201,44 +1192,44 @@ begin
     Result := False;
 end;
 
-procedure TGridAxisDivisionInfoDictionaryHelper.SetHidden(AIndex: Integer;
+procedure TGridTrackInfoDictionaryHelper.SetHidden(AIndex: Integer;
   AValue: Boolean);
 var
-  Info: TGridAxisDivisionInfo;
+  Info: TGridTrackInfo;
 begin
   if not Self.TryGetValue(AIndex, Info) then
-    Info := TGridAxisDivisionInfo.Default;
+    Info := TGridTrackInfo.Default;
   Info.Hidden := AValue;
   Self.AddOrSetValue(AIndex, Info);
 end;
 
-{ TControlLayoutItem }
+{ TControlGridItem }
 
-procedure TControlLayoutItem.AfterSetBounds;
+procedure TControlGridItem.AfterSetBounds;
 begin
   // Nessa classe não faz nada
 end;
 
-constructor TControlLayoutItem.Create(AControl: TControl);
+constructor TControlGridItem.Create(AControl: TControl);
 begin
   inherited Create;
   FControl := AControl;
 end;
 
-function TControlLayoutItem.GetControl: TControl;
+function TControlGridItem.GetControl: TControl;
 begin
   Result := FControl;
 end;
 
-procedure TControlLayoutItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
 begin
   FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
   AfterSetBounds;
 end;
 
-{ TSubGridLayoutItem }
+{ TSubGridItem }
 
-procedure TSubGridLayoutItem.AfterSetBounds;
+procedure TSubGridItem.AfterSetBounds;
 var
   IsVirtual: Boolean;
 begin
@@ -1251,13 +1242,13 @@ begin
       FLayout.ArrangeItems;
 end;
 
-procedure TSubGridLayoutItem.ContainerResize(Sender: TObject);
+procedure TSubGridItem.ContainerResize(Sender: TObject);
 begin
   FLayout.RowHeights := TVirtualContainer(Sender).Height div FLayout.Rows;
   FLayout.ColumnWidths := TVirtualContainer(Sender).Width div FLayout.Columns;
 end;
 
-constructor TSubGridLayoutItem.Create(ALayout: TGridLayout);
+constructor TSubGridItem.Create(ALayout: TGridLayout);
 begin
   inherited Create(nil);
   FContainer := TVirtualContainer.Create(nil);
@@ -1267,7 +1258,7 @@ begin
   FContainer.OnResize := @ContainerResize;
 end;
 
-constructor TSubGridLayoutItem.CreateWithContainerClass(ALayout: TGridLayout;
+constructor TSubGridItem.CreateWithContainerClass(ALayout: TGridLayout;
   AOwner: TWinControl; AContainerClass: TWinControlClass);
 begin
   inherited Create(nil); // Nenhum controle visível é passado diretamente
@@ -1284,7 +1275,7 @@ begin
   FControl := FContainer;
 end;
 
-destructor TSubGridLayoutItem.Destroy;
+destructor TSubGridItem.Destroy;
 begin
   if FControl is TVirtualContainer then
     FControl.Free;

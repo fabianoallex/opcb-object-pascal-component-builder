@@ -17,13 +17,13 @@ type
     procedure FormResize(Sender: TObject);
   private
     FGrid: TGridLayout;
-    FResizer: IGridLayoutFullResizer;
+    FResizer: IGridFullResizer;
     procedure CreateGrid;
     procedure SetGrid(AValue: TGridLayout);
-    procedure SetResizer(AValue: IGridLayoutFullResizer);
+    procedure SetResizer(AValue: IGridFullResizer);
   public
     property Grid: TGridLayout read FGrid write SetGrid;
-    property Resizer: IGridLayoutFullResizer read FResizer write SetResizer;
+    property Resizer: IGridFullResizer read FResizer write SetResizer;
   end;
 
 var
@@ -35,7 +35,7 @@ implementation
 
 { TFFullResizerGridLayout }
 
-procedure TFFullResizerGridLayout.SetResizer(AValue: IGridLayoutFullResizer);
+procedure TFFullResizerGridLayout.SetResizer(AValue: IGridFullResizer);
 begin
   if FResizer = AValue then Exit;
   FResizer := AValue;
@@ -78,7 +78,7 @@ begin
     Grid.AddItem(Btn, TGridCellSettings.Create(I div 4, I mod 4));
   end;
 
-  Resizer := TGridLayoutFullResizer
+  Resizer := TGridFullResizer
     .Create
     .WithFixedRows([0])
     .WithMinAndMaxRowHeight(1, 150, 250)

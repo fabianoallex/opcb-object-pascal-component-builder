@@ -112,12 +112,12 @@ type
     procedure AddExample_GridFillWithSpansBeforePlaceItem(
       AGridFill: IGridFill;
       AGrid: TGridLayout;
-      AItem: ILayoutItem;
+      AItem: IGridItem;
       APos: IGridPosition;
       var ASettings: TGridCellSettings;
       var ACanPlace: Boolean);
     procedure AddExample_GridFillWithSpansAfterPlaceItem(AGridFill: IGridFill;
-      AGrid: TGridLayout; AItem: ILayoutItem; var APos: IGridPosition);
+      AGrid: TGridLayout; AItem: IGridItem; var APos: IGridPosition);
     procedure AddExample_ReportGrid(AOwner: TForm; APageControl: TPageControl);
     procedure AddExample_RowAndColumnShift(AOwner: TForm;
       APageControl: TPageControl);
@@ -135,7 +135,7 @@ type
     procedure AddExample_WeeklyAgenda(AOwner: TForm; APageControl: TPageControl);
     procedure AddExample_NestedGridNoContainerSubGridBuilder(AOwner: TForm; APageControl: TPageControl);
     function CreateButtonFactory(APosition: IGridPosition; AOwner: TWinControl
-      ): ILayoutItem;
+      ): IGridItem;
   public
 
   end;
@@ -359,13 +359,13 @@ var
   Grid: TGridLayout;
   I: Integer;
   Btn: TButton;
-  Resizer: IGridLayoutWidthResizer;
+  Resizer: IGridWidthResizer;
 begin
   Tab := TTabSheet.Create(PageControl);
   Tab.PageControl := PageControl;
   Tab.Caption := 'Grid Simples';
 
-  Resizer := TGridLayoutWidthResizer
+  Resizer := TGridWidthResizer
     .Create
     .WithGridWidth(Tab.Width);
 
@@ -762,7 +762,7 @@ begin
 end;
 
 procedure TFExamplesMain.AddExample_GridFillWithSpansBeforePlaceItem(
-  AGridFill: IGridFill; AGrid: TGridLayout; AItem: ILayoutItem; APos: IGridPosition;
+  AGridFill: IGridFill; AGrid: TGridLayout; AItem: IGridItem; APos: IGridPosition;
   var ASettings: TGridCellSettings; var ACanPlace: Boolean);
 begin
   if (AItem.GetControl is TButton) and (TButton(AItem.GetControl).Tag = 4) then
@@ -772,7 +772,7 @@ begin
 end;
 
 procedure TFExamplesMain.AddExample_GridFillWithSpansAfterPlaceItem(
-  AGridFill: IGridFill; AGrid: TGridLayout; AItem: ILayoutItem;
+  AGridFill: IGridFill; AGrid: TGridLayout; AItem: IGridItem;
   var APos: IGridPosition);
 begin
   if (AItem.GetControl is TButton) and (TButton(AItem.GetControl).Tag = 4) then
@@ -832,14 +832,14 @@ end;
 
 
 function TFExamplesMain.CreateButtonFactory(APosition: IGridPosition;
-  AOwner: TWinControl): ILayoutItem;
+  AOwner: TWinControl): IGridItem;
 var
   Btn: TButton;
 begin
   Btn := TButton.Create(AOwner);
   Btn.Parent := AOwner;
   Btn.Caption := Format('Btn %d', [APosition.Row * APosition.Column + APosition.Column]);
-  Result := TControlLayoutItem.Create(Btn);
+  Result := TControlGridItem.Create(Btn);
 end;
 
 
@@ -1581,7 +1581,7 @@ const
 var
   Tab: TTabSheet;
   Grid: TGridLayout;
-  procedure AddCell(const AText: string; ARow, ACol: Integer; ABold: Boolean = False; AAlignH: TLayoutAlignment = laStart; AAlignV: TLayoutAlignment = laCenter);
+  procedure AddCell(const AText: string; ARow, ACol: Integer; ABold: Boolean = False; AAlignH: TItemAlignment = laStart; AAlignV: TItemAlignment = laCenter);
   var
     Lbl: TLabel;
   begin
@@ -1651,7 +1651,7 @@ begin
 
     // Linha Total
     AddCell('Total Geral:', Row, 0, True);
-    Grid.AddItem(ILayoutItem(nil), TGridCellSettings.Create(Row, 1).WithColumnSpan(2)); // espaço vazio
+    Grid.AddItem(IGridItem(nil), TGridCellSettings.Create(Row, 1).WithColumnSpan(2)); // espaço vazio
     AddCell(FormatFloat('0.00', GrandTotal), Row, 3, True, laEnd);
     Grid.Rows := Grid.Rows + 2;
 
@@ -1819,7 +1819,7 @@ procedure TFExamplesMain.AddExample_NestedGrid(AOwner: TForm; APageControl: TPag
 var
   Tab: TTabSheet;
   MainGrid, SubGrid: TGridLayout;
-  SubItem: TSubGridLayoutItem;
+  SubItem: TSubGridItem;
   BtnMain, Btn: TButton;
   I: Integer;
 begin
@@ -1853,7 +1853,7 @@ begin
       SubGrid.Margins.All := 10;
 
       // Criando SubGrid
-      SubItem := TSubGridLayoutItem.CreateWithContainerClass(
+      SubItem := TSubGridItem.CreateWithContainerClass(
         SubGrid,
         Tab,
         TGroupBox
@@ -1904,7 +1904,7 @@ procedure TFExamplesMain.AddExample_NestedGridNoContainer(AOwner: TForm;
 var
   Tab: TTabSheet;
   MainGrid, SubGrid: TGridLayout;
-  SubItem: TSubGridLayoutItem;
+  SubItem: TSubGridItem;
   BtnMain, Btn: TButton;
   I: Integer;
 begin
@@ -1938,7 +1938,7 @@ begin
       SubGrid.Margins.All := 10;
 
       // Criando SubGrid
-      SubItem := TSubGridLayoutItem.Create(SubGrid);
+      SubItem := TSubGridItem.Create(SubGrid);
 
       for I := 0 to 8 do
       begin

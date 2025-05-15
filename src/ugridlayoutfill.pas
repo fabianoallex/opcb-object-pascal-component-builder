@@ -21,7 +21,7 @@ type
     procedure SetOnAfterPlaceItem(AValue: TGridFillAfterPlaceEvent); virtual; abstract;
     procedure SetOnBeforePlaceItem(AValue: TGridFillBeforePlaceEvent); virtual; abstract;
     function GetGrid: TGridLayout; virtual; abstract;
-    procedure PlaceItem(AItem: ILayoutItem); overload; virtual; abstract;
+    procedure PlaceItem(AItem: IGridItem); overload; virtual; abstract;
     procedure PlaceItem(AItem: TControl); overload; virtual; abstract;
     procedure Skip(ACount: Integer = 1); virtual; abstract;
     procedure InitialPos(APos: IGridPosition); virtual; abstract;
@@ -49,7 +49,7 @@ type
   public
     constructor Create(AGrid: TGridLayout); override; overload;
     function NextPosition: IGridPosition; override;
-    procedure PlaceItem(AItem: ILayoutItem); override; overload;
+    procedure PlaceItem(AItem: IGridItem); override; overload;
     procedure PlaceItem(AItem: TControl); override; overload;
     procedure Skip(ACount: Integer=1); override;
     procedure InitialPos(APos: IGridPosition); override;
@@ -77,7 +77,7 @@ type
   public
     constructor Create(AGrid: TGridLayout); override;
     function NextPosition: IGridPosition; override;
-    procedure PlaceItem(AItem: ILayoutItem); override;
+    procedure PlaceItem(AItem: IGridItem); override;
     procedure PlaceItem(AItem: TControl); override;
     procedure Skip(ACount: Integer=1); override;
     procedure InitialPos(APos: IGridPosition); override;
@@ -175,7 +175,7 @@ begin
   FGrid := AGrid;
 end;
 
-procedure TGridFillRowFirst.PlaceItem(AItem: ILayoutItem);
+procedure TGridFillRowFirst.PlaceItem(AItem: IGridItem);
 var
   Pos: IGridPosition;
   Settings: TGridCellSettings;
@@ -205,7 +205,7 @@ end;
 
 procedure TGridFillRowFirst.PlaceItem(AItem: TControl);
 begin
-  Self.PlaceItem(TControlLayoutItem.Create(AItem));
+  Self.PlaceItem(TControlGridItem.Create(AItem));
 end;
 
 procedure TGridFillRowFirst.Skip(ACount: Integer);
@@ -279,7 +279,7 @@ begin
   Result := SafeFindNextPosition(@SafeNextPosition);
 end;
 
-procedure TGridFillColumnFirst.PlaceItem(AItem: ILayoutItem);
+procedure TGridFillColumnFirst.PlaceItem(AItem: IGridItem);
 var
   Pos: IGridPosition;
   Settings: TGridCellSettings;
@@ -306,7 +306,7 @@ end;
 
 procedure TGridFillColumnFirst.PlaceItem(AItem: TControl);
 begin
-  Self.PlaceItem(TControlLayoutItem.Create(AItem));
+  Self.PlaceItem(TControlGridItem.Create(AItem));
 end;
 
 procedure TGridFillColumnFirst.Skip(ACount: Integer);

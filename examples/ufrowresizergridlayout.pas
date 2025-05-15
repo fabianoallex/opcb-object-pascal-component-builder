@@ -27,13 +27,13 @@ type
     procedure FormResize(Sender: TObject);
   private
     FGrid: TGridLayout;
-    FResizer: IGridLayoutHeightResizer;
+    FResizer: IGridHeightResizer;
     procedure SetGrid(AValue: TGridLayout);
-    procedure SetResizer(AValue: IGridLayoutHeightResizer);
+    procedure SetResizer(AValue: IGridHeightResizer);
   public
     procedure CreateGrid;
     property Grid: TGridLayout read FGrid write SetGrid;
-    property Resizer: IGridLayoutHeightResizer read FResizer write SetResizer;
+    property Resizer: IGridHeightResizer read FResizer write SetResizer;
   end;
 
 var
@@ -112,7 +112,7 @@ begin
   FGrid := AValue;
 end;
 
-procedure TFRowResizerGridLayout.SetResizer(AValue: IGridLayoutHeightResizer);
+procedure TFRowResizerGridLayout.SetResizer(AValue: IGridHeightResizer);
 begin
   if FResizer = AValue then Exit;
   FResizer := AValue;
@@ -141,7 +141,7 @@ begin
     Grid.AddItem(Btn, TGridCellSettings.Create(I div 4, I mod 4));
   end;
 
-  Resizer := TGridLayoutHeightResizer
+  Resizer := TGridHeightResizer
     .Create
     .WithFixedRows([0])
     .WithMinAndMaxRowHeight(1, 150, 250)

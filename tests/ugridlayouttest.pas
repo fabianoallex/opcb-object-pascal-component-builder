@@ -8,7 +8,7 @@ uses
   Classes, SysUtils, fpcunit, testutils, testregistry, ULayout;
 
 type
-  TSubGridLayoutItemTest = class (TSubGridLayoutItem)
+  TSubGridItemTest = class (TSubGridItem)
   end;
 
   { TGridLayoutTest }
@@ -122,7 +122,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -183,7 +183,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -236,7 +236,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -297,7 +297,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -360,7 +360,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -449,7 +449,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -535,7 +535,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -596,7 +596,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -654,7 +654,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -736,7 +736,7 @@ begin
     try
       Settings := TGridCellSettings.Create(Casos[I].Row, Casos[I].Col);
       Settings.WithRowSpan(Casos[I].RowSpan);
-      FGrid.AddItem(TControlLayoutItem.Create(SB), Settings);
+      FGrid.AddItem(TControlGridItem.Create(SB), Settings);
 
       FGrid.ArrangeItems;
 
@@ -807,7 +807,7 @@ begin
     try
       Settings := TGridCellSettings.Create(Casos[I].Row, Casos[I].Col);
       Settings.WithColumnSpan(Casos[I].ColumnSpan);
-      FGrid.AddItem(TControlLayoutItem.Create(SB), Settings);
+      FGrid.AddItem(TControlGridItem.Create(SB), Settings);
 
       FGrid.ArrangeItems;
 
@@ -860,7 +860,7 @@ begin
     try
       Settings := TGridCellSettings.Create(Casos[I].Row, Casos[I].Col);
       Settings.WithColumnSpan(Casos[I].ColumnSpan);
-      FGrid.AddItem(TControlLayoutItem.Create(SB), Settings);
+      FGrid.AddItem(TControlGridItem.Create(SB), Settings);
 
       FGrid.ArrangeItems;
 
@@ -935,7 +935,7 @@ begin
       Settings := TGridCellSettings.Create(Casos[I].Row, Casos[I].Col);
       Settings.WithRowSpan(Casos[I].RowSpan).WithColumnSpan(Casos[I].ColSpan);
 
-      FGrid.AddItem(TControlLayoutItem.Create(SB), Settings);
+      FGrid.AddItem(TControlGridItem.Create(SB), Settings);
       FGrid.ArrangeItems;
 
       AssertEquals(
@@ -1001,7 +1001,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -1074,7 +1074,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -1149,7 +1149,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -1242,7 +1242,7 @@ begin
 
     try
       FGrid.AddItem(
-        TControlLayoutItem.Create(SB),
+        TControlGridItem.Create(SB),
         TGridCellSettings.Create(Casos[I].Row, Casos[I].Col)
       );
 
@@ -1324,7 +1324,7 @@ begin
         .WithRowSpan(3)
         .WithColumnSpan(3);
 
-    FGrid.AddItem(TControlLayoutItem.Create(SB), Settings);
+    FGrid.AddItem(TControlGridItem.Create(SB), Settings);
 
     FGrid.ArrangeItems;
 
@@ -1354,7 +1354,7 @@ begin
 
   try
     Grid.AddItem(
-      TControlLayoutItem.Create(SB),
+      TControlGridItem.Create(SB),
       TGridCellSettings.Create(0, 0)
     );
     Grid.ArrangeItems;
@@ -1409,7 +1409,7 @@ begin
 
   try
     Grid.AddItem(
-      TControlLayoutItem.Create(SB),
+      TControlGridItem.Create(SB),
       TGridCellSettings.Create(1, 1)
     );
     Grid.ArrangeItems;
@@ -1480,7 +1480,7 @@ begin
       .WithRowSpan(2)
       .WithColumnSpan(2);
 
-    Grid.AddItem(TControlLayoutItem.Create(SB), Settings);
+    Grid.AddItem(TControlGridItem.Create(SB), Settings);
     Grid.ArrangeItems;
 
     // Esperado:
@@ -1519,7 +1519,7 @@ begin
     Settings.WithOffsetX(5);
     Settings.WithOffsetY(7);
 
-    Grid.AddItem(TControlLayoutItem.Create(SB), Settings);
+    Grid.AddItem(TControlGridItem.Create(SB), Settings);
     Grid.ArrangeItems;
 
     // Esperado: posição inicial é 0,0 (sem margens), + offset aplicado
@@ -1554,7 +1554,7 @@ begin
     Settings.WithOffsetX(-2);
     Settings.WithOffsetY(3);
 
-    Grid.AddItem(TControlLayoutItem.Create(SB), Settings);
+    Grid.AddItem(TControlGridItem.Create(SB), Settings);
     Grid.ArrangeItems;
 
     // Esperado:
@@ -1595,7 +1595,7 @@ begin
       .WithOffsetX(6)
       .WithOffsetY(-2);
 
-    Grid.AddItem(TControlLayoutItem.Create(SB), Settings);
+    Grid.AddItem(TControlGridItem.Create(SB), Settings);
     Grid.ArrangeItems;
 
     // Width = 30 + 50 + spacing (3) = 83
@@ -1634,7 +1634,7 @@ begin
     Settings := TGridCellSettings.Create(0, 0);
     Settings.WithHorizontalAlignment(laCenter);
 
-    Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+    Grid.AddItem(TControlGridItem.Create(Btn), Settings);
     Grid.ArrangeItems;
 
     // 100 de largura de célula → 40 de controle → centralizado: Left = (100 - 40) div 2 = 30
@@ -1666,7 +1666,7 @@ begin
     Settings := TGridCellSettings.Create(0, 0);
     Settings.WithVerticalAlignment(laEnd);
 
-    Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+    Grid.AddItem(TControlGridItem.Create(Btn), Settings);
     Grid.ArrangeItems;
 
     // 40 de altura de célula → 20 de controle → alinhado ao fundo: Top = 40 - 20 = 20
@@ -1699,7 +1699,7 @@ begin
     Settings.WithHorizontalAlignment(laEnd);
     Settings.WithVerticalAlignment(laCenter);
 
-    Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+    Grid.AddItem(TControlGridItem.Create(Btn), Settings);
     Grid.ArrangeItems;
 
     AssertEquals('Btn Left', 50, Btn.Left);  // 50
@@ -1734,7 +1734,7 @@ begin
     Settings.WithRowSpan(2);
     Settings.WithVerticalAlignment(laCenter);
 
-    Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+    Grid.AddItem(TControlGridItem.Create(Btn), Settings);
     Grid.ArrangeItems;
 
     // Altura da célula estendida: 30 + 10 (spacing) + 40 = 80
@@ -1771,7 +1771,7 @@ begin
     Settings.WithHorizontalAlignment(laCenter);
     Settings.WithVerticalAlignment(laCenter);
 
-    FGrid.AddItem(TControlLayoutItem.Create(SB), Settings);
+    FGrid.AddItem(TControlGridItem.Create(SB), Settings);
     FGrid.ArrangeItems;
 
     // Verificações:
@@ -1807,7 +1807,7 @@ begin
   Settings.WithVerticalAlignment(laStretch);
   Settings.WithHorizontalAlignment(laStretch);
 
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   // Quando alinhamento é laStretch, o ExtraWidth/ExtraHeight devem ser somados
@@ -1828,7 +1828,7 @@ begin
   Grid.RowHeight[0] := 30;
   Grid.ColumnWidths := 40;
 
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   AssertEquals('Largura incorreta com Center (sem aplicar ExtraWidth)', 20, Btn.Width);
@@ -1855,7 +1855,7 @@ begin
 
   Settings := TGridCellSettings.Create(0, 0);
   Settings.WithColumnSpan(2);
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   AssertEquals('Largura incorreta com ColSpan ultrapassando ultima coluna', 40, Btn.Width);
@@ -1880,7 +1880,7 @@ begin
 
   Settings := TGridCellSettings.Create(0, 0);
   Settings.WithRowSpan(3);
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   AssertEquals('Altura incorreta com RowSpan ultrapassando ultima linha', 60, Btn.Height);
@@ -1904,7 +1904,7 @@ begin
   Grid.ColumnWidths := 40;
 
   Settings := TGridCellSettings.Create(2, 2);
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   AssertEquals('Componente fora dos limites do grid deve ficar invisível', False, Btn.Visible);
@@ -1928,7 +1928,7 @@ begin
   Grid.ColumnWidths := 40;
 
   Settings := TGridCellSettings.Create(0, 0);
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   AssertEquals('Componente dentro dos limites do grid deve ficar visível',
@@ -1961,7 +1961,7 @@ begin
   Settings.WithVerticalAlignment(laStart);
   Settings.WithHorizontalAlignment(laStart);
 
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   AssertEquals('laStart - largura deve ignorar ExtraWidth', 20, Btn.Width);
@@ -1981,7 +1981,7 @@ begin
   Grid.Columns := 1;
   Grid.RowHeight[0] := 30;
   Grid.ColumnWidths := 40;
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   AssertEquals('laEnd - largura deve ignorar ExtraWidth', 25, Btn.Width);
@@ -2013,7 +2013,7 @@ begin
   Settings.WithVerticalAlignment(laStretch);
   Settings.WithHorizontalAlignment(laStretch);
 
-  Grid.AddItem(TControlLayoutItem.Create(Btn), Settings);
+  Grid.AddItem(TControlGridItem.Create(Btn), Settings);
   Grid.ArrangeItems;
 
   AssertEquals('Stretch + OffsetX + ExtraWidth: largura', 60, Btn.Width);
@@ -2030,7 +2030,7 @@ var
   MainGrid, SubGrid: TGridLayout;
   MainContainer,
   SubContainer: TWinControl;
-  SubItem: TSubGridLayoutItem;
+  SubItem: TSubGridItem;
   Btn: TSpeedButton;
 begin
   MainContainer := TPanel.Create(nil); // ou TPanel
@@ -2056,7 +2056,7 @@ begin
 
     SubGrid.ArrangeItems;
 
-    SubItem := TSubGridLayoutItem.CreateWithContainerClass(SubGrid, MainContainer, TGroupBox);
+    SubItem := TSubGridItem.CreateWithContainerClass(SubGrid, MainContainer, TGroupBox);
     SubItem.Container.Parent := MainContainer;
     TGroupBox(SubItem.Container).Caption := 'SubGrid';
 
@@ -2086,7 +2086,7 @@ end;
 procedure TGridLayoutTest.TestSubGrid_WithVirtualContainer_PositionedCorrectly;
 var
   MainGrid, SubGrid: TGridLayout;
-  SubItem: TSubGridLayoutItemTest;
+  SubItem: TSubGridItemTest;
   Virtual: TVirtualContainer;
   SubButton: TSpeedButton;
 begin
@@ -2102,7 +2102,7 @@ begin
   Virtual.SetBounds(100, 200, 0, 0); // posição esperada do subgrid
 
   // SubItem com container virtual
-  SubItem := TSubGridLayoutItemTest.Create(SubGrid);
+  SubItem := TSubGridItemTest.Create(SubGrid);
   SubItem.FControl := Virtual; // simulando uso interno
   SubItem.FContainer := Virtual;
 

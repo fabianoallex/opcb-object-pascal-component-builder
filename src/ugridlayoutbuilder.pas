@@ -9,7 +9,7 @@ uses
 
 type
   TGridFillClass = class of TInterfacedObject;
-  TItemBuilderProc = function(AGridPos: IGridPosition; AOwner: TWinControl): ILayoutItem of object;
+  TItemBuilderProc = function(AGridPos: IGridPosition; AOwner: TWinControl): IGridItem of object;
 
   { TGridLayoutBuilder }
 
@@ -18,7 +18,7 @@ type
     FParentBuilder: TGridLayoutBuilder;
     FSettingsToApply: TGridCellSettings;
 
-    FCurrentItem: ILayoutItem;
+    FCurrentItem: IGridItem;
     FGridLayout: TGridLayout;
     FFiller: IGridFill;
     FFreeOnDone: Boolean;
@@ -40,10 +40,10 @@ type
     function WithSpacings(AHSpacing, AVSpacing: Integer): TGridLayoutBuilder; overload;
     function WithMargins(ATop, ARight, ABottom, ALeft: Integer): TGridLayoutBuilder; overload;
     function WithMargins(AAll: Integer): TGridLayoutBuilder; overload;
-    function AddItem(AItem: ILayoutItem; ASettings: TGridCellSettings): TGridLayoutBuilder; overload;
+    function AddItem(AItem: IGridItem; ASettings: TGridCellSettings): TGridLayoutBuilder; overload;
     function AddItem(AItem: TControl; ASettings: TGridCellSettings): TGridLayoutBuilder; overload;
     function UsingFiller(AFillerType: TFillerType): TGridLayoutBuilder; overload;
-    function AddItem(AItem: ILayoutItem): TGridLayoutBuilder; overload;
+    function AddItem(AItem: IGridItem): TGridLayoutBuilder; overload;
     function FillItems(AControls: array of TControl;
       AInitialPosition: IGridPosition=nil): TGridLayoutBuilder;
 
@@ -185,7 +185,7 @@ begin
   Result := Self;
 end;
 
-function TGridLayoutBuilder.AddItem(AItem: ILayoutItem;
+function TGridLayoutBuilder.AddItem(AItem: IGridItem;
   ASettings: TGridCellSettings): TGridLayoutBuilder;
 begin
   FCurrentItem := AItem;
@@ -196,7 +196,7 @@ end;
 function TGridLayoutBuilder.AddItem(AItem: TControl;
   ASettings: TGridCellSettings): TGridLayoutBuilder;
 begin
-  FCurrentItem := TControlLayoutItem.Create(AItem);
+  FCurrentItem := TControlGridItem.Create(AItem);
   FGridLayout.AddItem(FCurrentItem, ASettings);
   Result := Self;
 end;
@@ -207,7 +207,7 @@ begin
   FFiller := TGridLayoutFillerFactory.CreateFiller(AFillerType, FGridLayout);
 end;
 
-function TGridLayoutBuilder.AddItem(AItem: ILayoutItem): TGridLayoutBuilder;
+function TGridLayoutBuilder.AddItem(AItem: IGridItem): TGridLayoutBuilder;
 begin
   Result := Self;
   if Assigned(FFiller) then
@@ -249,10 +249,10 @@ end;
 
 function TGridLayoutBuilder.EndSubGrid: TGridLayoutBuilder;
 var
-  SubGridItem: TSubGridLayoutItem;
+  SubGridItem: TSubGridItem;
 begin
   Result := FParentBuilder;
-  SubGridItem := TSubGridLayoutItem.Create(FGridLayout);
+  SubGridItem := TSubGridItem.Create(FGridLayout);
   Result.AddItem(SubGridItem, FSettingsToApply);
   SubGridItem.Container.Height := FGridLayout.ContentHeight;
   SubGridItem.Container.Width := FGridLayout.ContentWidth;
