@@ -54,4 +54,13 @@ object FRowResizerGridLayout: TFRowResizerGridLayout
     TabOrder = 4
     OnClick = Button5Click
   end
+  object Button6: TButton
+    Left = 776
+    Height = 31
+    Top = 248
+    Width = 214
+    Caption = 'Inserir linha (2)'
+    TabOrder = 5
+    OnClick = Button6Click
+  end
 end

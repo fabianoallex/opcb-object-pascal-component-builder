@@ -5,7 +5,7 @@ unit UGridLayoutTest;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testutils, testregistry, ULayout;
+  Classes, SysUtils, fpcunit, testregistry, ULayout;
 
 type
   TSubGridItemTest = class (TSubGridItem)
@@ -66,6 +66,11 @@ type
 
     procedure TestNestedGrid_PositionAndSize;
     procedure TestSubGrid_WithVirtualContainer_PositionedCorrectly;
+
+    procedure TestInsertAt_TGridTrackInfoDictionaryHelper;
+    procedure TestMoveKey_From1To3;
+    procedure TestMoveKey_From3To1;
+    procedure TestMoveKey_From3To1_DontExistFrom;
   end;
 
 implementation
@@ -2123,12 +2128,173 @@ begin
   SubButton.Free;
   SubItem.Free;
   SubGrid.Free;
-  //Virtual.Free;
+end;
+
+procedure TGridLayoutTest.TestMoveKey_From1To3;
+type
+  TDict = specialize TIntegerKeyDictionary<Integer>;
+var
+  Dict: TDict;
+  I: Integer;
+begin
+  Dict := TDict.Create;
+  try
+    // Dados iniciais: [1→10, 2→20, 3→30, 4→40, 5→50]
+    Dict.Add(1, 10);
+    Dict.Add(2, 20);
+    Dict.Add(3, 30);
+    Dict.Add(4, 40);
+    Dict.Add(5, 50);
+
+    Dict.MoveKey(1, 3);
+
+    // Esperado: [1→20, 2→30, 3→10, 4→40, 5→50]
+    AssertTrue(Dict[1] = 20);
+    AssertTrue(Dict[2] = 30);
+    AssertTrue(Dict[3] = 10);
+    AssertTrue(Dict[4] = 40);
+    AssertTrue(Dict[5] = 50);
+  finally
+    Dict.Free;
+  end;
+end;
+
+procedure TGridLayoutTest.TestMoveKey_From3To1;
+type
+  TDict = specialize TIntegerKeyDictionary<Integer>;
+var
+  Dict: TDict;
+begin
+  Dict := TDict.Create;
+  try
+    // Dados iniciais: [1→10, 2→20, 3→30, 4→40, 5→50]
+    Dict.Add(1, 10);
+    Dict.Add(2, 20);
+    Dict.Add(3, 30);
+    Dict.Add(4, 40);
+    Dict.Add(5, 50);
+
+    Dict.MoveKey(3, 1);
+
+    // Esperado: [1→30, 2→10, 3→20, 4→40, 5→50]
+    AssertTrue(Dict[1] = 30);
+    AssertTrue(Dict[2] = 10);
+    AssertTrue(Dict[3] = 20);
+    AssertTrue(Dict[4] = 40);
+    AssertTrue(Dict[5] = 50);
+  finally
+    Dict.Free;
+  end;
 end;
 
 
-initialization
+procedure TGridLayoutTest.TestMoveKey_From3To1_DontExistFrom;
+type
+  TDict = specialize TIntegerKeyDictionary<Integer>;
+var
+  Dict: TDict;
+  I: Integer;
+begin
+  Dict := TDict.Create;
+  try
+    // Dados iniciais: [1→10, 2→20, 3→30, 4→40, 5→50]
+    Dict.Add(1, 10);
+    Dict.Add(2, 20);
+    // Dict.Add(3, 30);  // não usa a chave 3, mas mesmo assim tem que poder 'mover' como se existisse
+    Dict.Add(4, 40);
+    Dict.Add(5, 50);
+    Dict.Add(6, 60);
 
+    Dict.MoveKey(3, 1);
+
+    // Esperado: [1→X, 2→10, 3→20, 4→40, 5→50]
+    AssertTrue(not Dict.TryGetValue(1, I)); // o 3 que não existia sobrepoem 1 (remove)
+    AssertTrue(Dict[2] = 10);
+    AssertTrue(Dict[3] = 20);
+    AssertTrue(Dict[4] = 40);
+    AssertTrue(Dict[5] = 50);
+    AssertTrue(Dict[6] = 60);
+  finally
+    Dict.Free;
+  end;
+end;
+
+procedure TGridLayoutTest.TestInsertAt_TGridTrackInfoDictionaryHelper;
+var
+  Dic: TGridTrackInfoDictionary;
+  InfoA, InfoB, InfoC, InfoD, InfoRes:  TGridTrackInfo;
+begin
+  InfoA := TGridTrackInfo.Default;
+  InfoB := TGridTrackInfo.Default;
+  InfoC := TGridTrackInfo.Default;
+  InfoD := TGridTrackInfo.Default;
+  InfoRes := TGridTrackInfo.Default;
+
+  Dic := TGridTrackInfoDictionary.Create;
+  try
+    InfoA.Size := 10;
+    Dic.AddOrSetValue(0, InfoA);          // 0    // não deve mover
+
+    InfoB.Shift := 3;
+    Dic.AddOrSetValue(1, InfoB);          // 1    // não deve mover
+
+    InfoC.Size := 8;
+    InfoC.Shift := 2;
+    Dic.AddOrSetValue(4, InfoC);          // 4    // Deve mover para pos 5
+
+    InfoD.Spacing := 9;
+    Dic.AddOrSetValue(7, InfoD);          // 7    // Deve mover para pos 8
+
+    Dic.InsertTrackAt(3);                      // 3: move 4, 7 to 5, 8
+
+    // Testa se o item 0 continua na posição 0
+    if Dic.TryGetValue(0, InfoRes) then
+      AssertEquals(
+        'Item na chave 0 não tem o ''Size'' esperado',
+        10,
+        InfoRes.Size.Value
+      )
+    else
+      Fail('Deveria existir item na chave 0');
+
+    // Testa se o item 1 continua na posição 0
+    if Dic.TryGetValue(1, InfoRes) then
+      AssertEquals(
+        'Item na chave 1 não tem o ''Shift'' esperado',
+        3,
+        InfoRes.Shift.Value
+      )
+    else
+      Fail('Deveria existir item na chave 0');
+
+    // Testa se a chave 4 não existe mais (pois foi movido)
+    AssertEquals(
+      'Chave 4 deveria ter sido movida para posição 5',
+      False,
+      Dic.TryGetValue(4, InfoRes)
+    );
+
+    // Testa se a chave 5 existe (pois espera-se que 4 seja movido para 5)
+    AssertEquals(
+      'Chave 5 deveria existir',
+      True,
+      Dic.TryGetValue(5, InfoRes)
+    );
+
+    // Testa se o valor atribuido na chave 4, é o mesmo depois de movido para a chave 5
+    Dic.TryGetValue(5, InfoRes);
+    AssertEquals(
+      'Item na chave 5 diferente do esperado',
+      8,
+      InfoRes.Size.Value
+    );
+  finally
+    Dic.Free;
+  end;
+end;
+
+initialization
   RegisterTest(TGridLayoutTest);
+
 end.
 

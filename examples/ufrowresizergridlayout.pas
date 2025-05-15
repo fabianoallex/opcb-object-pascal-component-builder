@@ -18,11 +18,13 @@ type
     Button3: TButton;
     Button4: TButton;
     Button5: TButton;
+    Button6: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
+    procedure Button6Click(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormResize(Sender: TObject);
   private
@@ -103,6 +105,17 @@ begin
     .WithGridHeight(Self.Height)
     .EnableFixedRow(3)
     .Resize(Grid);
+  Grid.ArrangeItems;
+end;
+
+procedure TFRowResizerGridLayout.Button6Click(Sender: TObject);
+begin
+  Grid.InsertRow(2);
+
+  Resizer
+    .WithGridHeight(Self.Height)
+    .Resize(Grid);
+
   Grid.ArrangeItems;
 end;
 

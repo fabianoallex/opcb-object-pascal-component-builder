@@ -6,7 +6,7 @@ unit ULayout;
 interface
 
 uses
-  Classes, SysUtils, Controls, Generics.Collections;
+  Classes, SysUtils, Controls, Generics.Collections, Generics.Defaults;
 
 type
   IGridItem = interface
@@ -22,16 +22,17 @@ type
   TOptionalInt = record
     HasValue: Boolean;
     Value: Integer;
+    class operator :=(AValue: Integer): TOptionalInt;
     class function Some(AValue: Integer): TOptionalInt; static;
     class function None: TOptionalInt; static;
   end;
 
   { TGridTrackInfo}
 
-  TGridTrackInfo = record
-    Size: TOptionalInt;
-    Spacing: TOptionalInt;
-    Shift: TOptionalInt;
+  TGridTrackInfo = record      // col      | row
+    Size: TOptionalInt;        // width    | hight
+    Spacing: TOptionalInt;     // vertical | horizontal
+    Shift: TOptionalInt;       // vertical | horizontal
     Hidden: Boolean;
     class function Default: TGridTrackInfo; static;
   end;
@@ -205,11 +206,17 @@ type
   TGridCellList = specialize TObjectList<TGridCell>;
   TIntList = specialize TList<Integer>;
 
-  TGridTrackInfoDictionary = specialize TDictionary<Integer, TGridTrackInfo>;
+  { TIntegerKeyDictionary }
 
-  { TGridTrackInfoDictionaryHelper }
+  generic TIntegerKeyDictionary<T> = class(specialize TDictionary<Integer, T>)
+  public
+    procedure AddWithShiftAt(AIndex: Integer; const AValue: T);
+    procedure MoveKey(const FromIndex, ToIndex: Integer);
+  end;
 
-  TGridTrackInfoDictionaryHelper = class helper for TGridTrackInfoDictionary
+  { TGridTrackInfoDictionary }
+
+  TGridTrackInfoDictionary = class(specialize TIntegerKeyDictionary<TGridTrackInfo>)
     function GetSizeOrDefault(Index: Integer; const ADefault: Integer): Integer;
     procedure SetSize(AIndex: Integer; ASize: Integer);
     function IsSizeDefined(AIndex: Integer): Boolean;
@@ -224,13 +231,14 @@ type
     procedure ClearShifts;
     function GetHidden(Index: Integer): Boolean;
     procedure SetHidden(AIndex: Integer; AValue: Boolean);
+    procedure InsertTrackAt(AIndex: Integer);
+    procedure MoveTrack(AFrom, ATo: Integer);
   end;
 
   { TGridLayout }
 
   TGridLayout = class
   private
-    FCells: TGridCellList;
     FLeft: Integer;
     FMargins: TMargins;
     FRows: Integer;
@@ -240,8 +248,9 @@ type
     FHorizontalSpacings: Integer;
     FRowHeights: Integer;
     FColumnWidths: Integer;
-    FRowsInfoDic: TGridTrackInfoDictionary;
-    FColumnsInfoDic: TGridTrackInfoDictionary;
+    FCells: TGridCellList;
+    FRowsInfo: TGridTrackInfoDictionary;
+    FColumnsInfo: TGridTrackInfoDictionary;
     function CalculateCellWidth(Cell: TGridCell): Integer;
     function CalculateCellHeight(Cell: TGridCell): Integer;
     function CalculateCellLeft(Cell: TGridCell): Integer;
@@ -285,8 +294,8 @@ type
     function IsColumnWidthCustomized(ACol: Integer): Boolean;
     function IsVerticalSpacingCustomized(ARow: Integer): Boolean;
     function IsHorizontalSpacingCustomized(ACol: Integer): Boolean;
-    procedure InsertRow(AIndex: Integer);
-    procedure InsertColumn(AIndex: Integer);
+    procedure InsertRow(ARow: Integer);
+    procedure InsertColumn(AColumn: Integer);
     property Rows: Integer read FRows write FRows;
     property Columns: Integer read FColumns write FColumns;
     property VerticalSpacings: Integer read FVerticalSpacings write FVerticalSpacings;
@@ -368,6 +377,11 @@ begin
 end;
 
 { TOptionalInt }
+
+class operator TOptionalInt.:=(AValue: Integer): TOptionalInt;
+begin
+  Result := TOptionalInt.Some(AValue);
+end;
 
 class function TOptionalInt.Some(AValue: Integer): TOptionalInt;
 begin
@@ -588,8 +602,8 @@ end;
 constructor TGridLayout.Create;
 begin
   FCells := TGridCellList.Create(True);
-  FRowsInfoDic := TGridTrackInfoDictionary.Create;
-  FColumnsInfoDic := TGridTrackInfoDictionary.Create;
+  FRowsInfo := TGridTrackInfoDictionary.Create;
+  FColumnsInfo := TGridTrackInfoDictionary.Create;
   FMargins := TMargins.Create;
   FVerticalSpacings := 0;
   FHorizontalSpacings := 0;
@@ -602,21 +616,16 @@ end;
 destructor TGridLayout.Destroy;
 begin
   FCells.Free;
-  // FCellSettingsList.Free;
-  FRowsInfoDic.Free;
-  FColumnsInfoDic.Free;
+  FRowsInfo.Free;
+  FColumnsInfo.Free;
   FMargins.Free;
   inherited;
 end;
 
 procedure TGridLayout.AddItem(AItem: IGridItem; ASettings: TGridCellSettings);
-var
-  GridCell: TGridCell;
 begin
   Assert(ASettings <> nil, 'Settings cannot be nil');
-  GridCell := TGridCell.Create(AItem, ASettings);
-  FCells.Add(GridCell);
-  // FCellSettingsList.Add(ASettings);
+  FCells.Add(TGridCell.Create(AItem, ASettings));
 end;
 
 procedure TGridLayout.AddItem(AItem: TControl; ASettings: TGridCellSettings);
@@ -642,7 +651,7 @@ end;
 
 function TGridLayout.GetColumnShift(ACol: Integer): Integer;
 begin
-  Result := FColumnsInfoDic.GetShiftOrDefault(ACol, 0);
+  Result := FColumnsInfo.GetShiftOrDefault(ACol, 0);
 end;
 
 function TGridLayout.GetContentHeight: Integer;
@@ -669,7 +678,7 @@ end;
 
 function TGridLayout.GetHorizontalSpacing(AIndex: Integer): Integer;
 begin
-  Result := FColumnsInfoDic.GetSpacingOrDefault(AIndex, FHorizontalSpacings);
+  Result := FColumnsInfo.GetSpacingOrDefault(AIndex, FHorizontalSpacings);
 end;
 
 procedure TGridLayout.Clear;
@@ -679,18 +688,18 @@ end;
 
 procedure TGridLayout.ClearRowAndColumnShifts;
 begin
-  FRowsInfoDic.ClearShifts;
-  FColumnsInfoDic.ClearShifts;
+  FRowsInfo.ClearShifts;
+  FColumnsInfo.ClearShifts;
 end;
 
 procedure TGridLayout.ResetColumnWidthsToDefault;
 begin
-  FColumnsInfoDic.ClearSizes;
+  FColumnsInfo.ClearSizes;
 end;
 
 procedure TGridLayout.ResetRowHeightsToDefault;
 begin
-  FRowsInfoDic.ClearSizes;
+  FRowsInfo.ClearSizes;
 end;
 
 function TGridLayout.IsCellOccupied(ARow, ACol: Integer): Boolean;
@@ -708,47 +717,55 @@ begin
 end;
 
 function TGridLayout.IsColumnWidthCustomized(ACol: Integer): Boolean;
-var
-  Info: TGridTrackInfo;
 begin
-  Result := FColumnsInfoDic.IsSizeDefined(ACol);
+  Result := FColumnsInfo.IsSizeDefined(ACol);
 end;
 
 function TGridLayout.IsVerticalSpacingCustomized(ARow: Integer): Boolean;
 begin
-  Result := FRowsInfoDic.IsSpacingDefined(ARow);
+  Result := FRowsInfo.IsSpacingDefined(ARow);
 end;
 
 function TGridLayout.IsHorizontalSpacingCustomized(ACol: Integer): Boolean;
+begin
+  Result := FColumnsInfo.IsSpacingDefined(ACol);
+end;
+
+procedure TGridLayout.InsertRow(ARow: Integer);
 var
-  Info: TGridTrackInfo;
+  Cell: TGridCell;
 begin
-  Result := FColumnsInfoDic.IsSpacingDefined(ACol);
+  for Cell in FCells do
+    if Cell.Row >= ARow then
+      Cell.FRow := Cell.FRow + 1;
+  FRows := FRows + 1;
+  FRowsInfo.InsertTrackAt(ARow);
 end;
 
-procedure TGridLayout.InsertRow(AIndex: Integer);
+procedure TGridLayout.InsertColumn(AColumn: Integer);
+var
+  Cell: TGridCell;
 begin
-  // implementar
-end;
-
-procedure TGridLayout.InsertColumn(AIndex: Integer);
-begin
-  // implementar
+  for Cell in FCells do
+    if Cell.Column >= AColumn then
+      Cell.FColumn := Cell.FColumn + 1;
+  FColumns := FColumns + 1;
+  FColumnsInfo.InsertTrackAt(AColumn);
 end;
 
 function TGridLayout.GetRowHeight(AIndex: Integer): Integer;
 begin
-  Result := FRowsInfoDic.GetSizeOrDefault(AIndex, FRowHeights);
+  Result := FRowsInfo.GetSizeOrDefault(AIndex, FRowHeights);
 end;
 
 function TGridLayout.GetRowShift(ARow: Integer): Integer;
 begin
-  Result := FRowsInfoDic.GetShiftOrDefault(ARow, 0);
+  Result := FRowsInfo.GetShiftOrDefault(ARow, 0);
 end;
 
 function TGridLayout.GetVerticalSpacing(ARow: Integer): Integer;
 begin
-  Result := FRowsInfoDic.GetSpacingOrDefault(ARow, FVerticalSpacings);
+  Result := FRowsInfo.GetSpacingOrDefault(ARow, FVerticalSpacings);
 end;
 
 function TGridLayout.GetVisibleColumn(ACol: Integer): Boolean;
@@ -756,7 +773,7 @@ begin
   if (ACol < 0) or (ACol >= Columns) then
     Result := False
   else
-    Result := not FColumnsInfoDic.GetHidden(ACol);
+    Result := not FColumnsInfo.GetHidden(ACol);
 end;
 
 function TGridLayout.GetVisibleRow(ARow: Integer): Boolean;
@@ -764,17 +781,17 @@ begin
   if (ARow < 0) or (ARow >= Rows) then
     Result := False
   else
-    Result := not FRowsInfoDic.GetHidden(ARow);
+    Result := not FRowsInfo.GetHidden(ARow);
 end;
 
 procedure TGridLayout.SetColumnShift(ACol: Integer; AValue: Integer);
 begin
-  FColumnsInfoDic.SetShift(ACol, AValue);
+  FColumnsInfo.SetShift(ACol, AValue);
 end;
 
 procedure TGridLayout.SetHorizontalSpacing(ACol: Integer; AValue: Integer);
 begin
-  FColumnsInfoDic.SetSpacing(ACol, AValue);
+  FColumnsInfo.SetSpacing(ACol, AValue);
 end;
 
 procedure TGridLayout.SetLeft(AValue: Integer);
@@ -786,22 +803,22 @@ end;
 
 procedure TGridLayout.SetRowHeight(AIndex: Integer; AValue: Integer);
 begin
-  FRowsInfoDic.SetSize(AIndex, AValue);
+  FRowsInfo.SetSize(AIndex, AValue);
 end;
 
 function TGridLayout.GetColumnWidth(AIndex: Integer): Integer;
 begin
-  Result := FColumnsInfoDic.GetSizeOrDefault(AIndex, FColumnWidths);
+  Result := FColumnsInfo.GetSizeOrDefault(AIndex, FColumnWidths);
 end;
 
 procedure TGridLayout.SetColumnWidth(AIndex: Integer; AValue: Integer);
 begin
-  FColumnsInfoDic.SetSize(AIndex, AValue);
+  FColumnsInfo.SetSize(AIndex, AValue);
 end;
 
 procedure TGridLayout.SetRowShift(ARow: Integer; AValue: Integer);
 begin
-  FRowsInfoDic.SetShift(ARow, AValue);
+  FRowsInfo.SetShift(ARow, AValue);
 end;
 
 procedure TGridLayout.SetTop(AValue: Integer);
@@ -812,17 +829,17 @@ end;
 
 procedure TGridLayout.SetVerticalSpacing(ARow: Integer; AValue: Integer);
 begin
-  FRowsInfoDic.SetSpacing(ARow, AValue);
+  FRowsInfo.SetSpacing(ARow, AValue);
 end;
 
 procedure TGridLayout.SetVisibleColumn(ACol: Integer; AValue: Boolean);
 begin
-  FColumnsInfoDic.SetHidden(ACol, not AValue);
+  FColumnsInfo.SetHidden(ACol, not AValue);
 end;
 
 procedure TGridLayout.SetVisibleRow(ARow: Integer; AValue: Boolean);
 begin
-  FRowsInfoDic.SetHidden(ARow, not AValue);
+  FRowsInfo.SetHidden(ARow, not AValue);
 end;
 
 function TGridLayout.CalculateCellLeft(Cell: TGridCell): Integer;
@@ -970,13 +987,11 @@ begin
     if not IsVisibleCell(Cell) then
       Continue;
 
-    // Posição e tamanho baseados na célula
     X := CalculateCellLeft(Cell);
     Y := CalculateCellTop(Cell);
     W := CalculateCellWidth(Cell);
     H := CalculateCellHeight(Cell);
 
-    // Ajuste Horizontal
     case Cell.HorizontalAlignment of
       laStretch:
         W := W + Cell.ExtraWidth;
@@ -996,7 +1011,6 @@ begin
         end;
     end;
 
-    // Ajuste Vertical
     case Cell.VerticalAlignment of
       laStretch:
         H := H + Cell.ExtraHeight;
@@ -1044,9 +1058,95 @@ begin
   Self.ArrangeItems(0, 0);
 end;
 
-{ TGridTrackInfoDictionaryHelper }
+{ TIntegerKeyDictionary }
 
-function TGridTrackInfoDictionaryHelper.GetSizeOrDefault(Index: Integer;
+procedure TIntegerKeyDictionary.MoveKey(const FromIndex, ToIndex: Integer);
+type
+  TKeyList = specialize TList<Integer>;
+var
+  MovedValue: T;
+  KeysToShift: TKeyList;
+  Key: Integer;
+  Direction: Integer;
+  ExistFrom: Boolean;
+begin
+  if FromIndex = ToIndex then
+    Exit;
+
+  ExistFrom := Self.TryGetValue(FromIndex, MovedValue);
+
+  KeysToShift := TKeyList.Create;
+  try
+    // Determine direção
+    if FromIndex < ToIndex then
+    begin
+      // Mover para frente → deslocar [FromIndex+1 .. ToIndex] para trás
+      for Key in Self.Keys do
+        if (Key > FromIndex) and (Key <= ToIndex) then
+          KeysToShift.Add(Key);
+      KeysToShift.Sort;         // ordem crescente
+      Direction := -1;
+    end
+    else if FromIndex > ToIndex then
+    begin
+      // Mover para trás ← deslocar [ToIndex .. FromIndex-1] para frente
+      for Key in Self.Keys do
+        if (Key >= ToIndex) and (Key < FromIndex) then
+          KeysToShift.Add(Key);
+      KeysToShift.Sort;
+      KeysToShift.Reverse;      // ordem decrescente
+      Direction := +1;
+    end; // From = To → nada a fazer
+
+    if ExistFrom then
+      Self.Remove(FromIndex);
+
+    for Key in KeysToShift do
+    begin
+      Self.Add(Key + Direction, Self[Key]);
+      Self.Remove(Key);
+    end;
+
+    if ExistFrom then
+      Self.Add(ToIndex, MovedValue);
+  finally
+    KeysToShift.Free;
+  end;
+end;
+
+procedure TIntegerKeyDictionary.AddWithShiftAt(AIndex: Integer; const AValue: T);
+type
+  TKeyToShift = specialize TList<Integer>;
+var
+  KeysToShift: TKeyToShift;
+  Key: Integer;
+  Obj: T;
+begin
+  KeysToShift := TKeyToShift.Create;
+  try
+    for Key in Self.Keys do
+      if Key >= AIndex then
+        KeysToShift.add(Key);
+
+    KeysToShift.Sort;
+    KeysToShift.Reverse;
+
+    for Key in KeysToShift do
+    begin
+      Self.TryGetValue(Key, Obj);
+      Self.Add(Key + 1, Obj);
+      Self.Remove(Key);
+    end;
+
+    Self.AddOrSetValue(AIndex, AValue);
+  finally
+    KeysToShift.Free;
+  end;
+end;
+
+{ TGridTrackInfoDictionary }
+
+function TGridTrackInfoDictionary.GetSizeOrDefault(Index: Integer;
   const ADefault: Integer): Integer;
 var
   Info: TGridTrackInfo;
@@ -1057,7 +1157,7 @@ begin
     Result := ADefault;
 end;
 
-procedure TGridTrackInfoDictionaryHelper.SetSize(AIndex: Integer;
+procedure TGridTrackInfoDictionary.SetSize(AIndex: Integer;
   ASize: Integer);
 var
   Info: TGridTrackInfo;
@@ -1068,7 +1168,7 @@ begin
   Self.AddOrSetValue(AIndex, Info);
 end;
 
-procedure TGridTrackInfoDictionaryHelper.ClearSizes;
+procedure TGridTrackInfoDictionary.ClearSizes;
 var
   Key: Integer;
   Info: TGridTrackInfo;
@@ -1083,7 +1183,7 @@ begin
   end;
 end;
 
-function TGridTrackInfoDictionaryHelper.IsSizeDefined(AIndex: Integer
+function TGridTrackInfoDictionary.IsSizeDefined(AIndex: Integer
   ): Boolean;
 var
   Info: TGridTrackInfo;
@@ -1091,7 +1191,7 @@ begin
   Result := Self.TryGetValue(AIndex, Info) and Info.Size.HasValue;
 end;
 
-function TGridTrackInfoDictionaryHelper.GetSpacingOrDefault
+function TGridTrackInfoDictionary.GetSpacingOrDefault
   (Index: Integer; const ADefault: Integer): Integer;
 var
   Info: TGridTrackInfo;
@@ -1102,7 +1202,7 @@ begin
     Result := ADefault;
 end;
 
-procedure TGridTrackInfoDictionaryHelper.SetSpacing(AIndex: Integer;
+procedure TGridTrackInfoDictionary.SetSpacing(AIndex: Integer;
   ASpacing: Integer);
 var
   Info: TGridTrackInfo;
@@ -1113,7 +1213,7 @@ begin
   Self.AddOrSetValue(AIndex, Info);
 end;
 
-function TGridTrackInfoDictionaryHelper.IsSpacingDefined(AIndex: Integer
+function TGridTrackInfoDictionary.IsSpacingDefined(AIndex: Integer
   ): Boolean;
 var
   Info: TGridTrackInfo;
@@ -1121,7 +1221,7 @@ begin
   Result := Self.TryGetValue(AIndex, Info) and Info.Spacing.HasValue;
 end;
 
-procedure TGridTrackInfoDictionaryHelper.ClearSpacings;
+procedure TGridTrackInfoDictionary.ClearSpacings;
 var
   Key: Integer;
   Info: TGridTrackInfo;
@@ -1136,7 +1236,7 @@ begin
   end;
 end;
 
-function TGridTrackInfoDictionaryHelper.GetShiftOrDefault
+function TGridTrackInfoDictionary.GetShiftOrDefault
   (Index: Integer; const ADefault: Integer): Integer;
 var
   Info: TGridTrackInfo;
@@ -1147,7 +1247,7 @@ begin
     Result := ADefault;
 end;
 
-procedure TGridTrackInfoDictionaryHelper.SetShift(AIndex: Integer;
+procedure TGridTrackInfoDictionary.SetShift(AIndex: Integer;
   AShift: Integer);
 var
   Info: TGridTrackInfo;
@@ -1158,7 +1258,7 @@ begin
   Self.AddOrSetValue(AIndex, Info);
 end;
 
-function TGridTrackInfoDictionaryHelper.IsShiftDefined(AIndex: Integer
+function TGridTrackInfoDictionary.IsShiftDefined(AIndex: Integer
   ): Boolean;
 var
   Info: TGridTrackInfo;
@@ -1166,7 +1266,7 @@ begin
   Result := Self.TryGetValue(AIndex, Info) and Info.Shift.HasValue;
 end;
 
-procedure TGridTrackInfoDictionaryHelper.ClearShifts;
+procedure TGridTrackInfoDictionary.ClearShifts;
 var
   Key: Integer;
   Info: TGridTrackInfo;
@@ -1181,7 +1281,7 @@ begin
   end;
 end;
 
-function TGridTrackInfoDictionaryHelper.GetHidden(Index: Integer
+function TGridTrackInfoDictionary.GetHidden(Index: Integer
   ): Boolean;
 var
   Info: TGridTrackInfo;
@@ -1192,7 +1292,7 @@ begin
     Result := False;
 end;
 
-procedure TGridTrackInfoDictionaryHelper.SetHidden(AIndex: Integer;
+procedure TGridTrackInfoDictionary.SetHidden(AIndex: Integer;
   AValue: Boolean);
 var
   Info: TGridTrackInfo;
@@ -1201,6 +1301,16 @@ begin
     Info := TGridTrackInfo.Default;
   Info.Hidden := AValue;
   Self.AddOrSetValue(AIndex, Info);
+end;
+
+procedure TGridTrackInfoDictionary.InsertTrackAt(AIndex: Integer);
+begin
+  Self.AddWithShiftAt(AIndex, TGridTrackInfo.Default);
+end;
+
+procedure TGridTrackInfoDictionary.MoveTrack(AFrom, ATo: Integer);
+begin
+  Self.MoveKey(AFrom, ATo);
 end;
 
 { TControlGridItem }
