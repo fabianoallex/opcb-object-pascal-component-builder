@@ -2108,7 +2108,7 @@ begin
 
   // SubItem com container virtual
   SubItem := TSubGridItemTest.Create(SubGrid);
-  SubItem.FControl := Virtual; // simulando uso interno
+  SubItem.FControlElement := TControlVisualElement.Create(Virtual); // simulando uso interno
   SubItem.FContainer := Virtual;
 
   // Adiciona botão ao subgrid

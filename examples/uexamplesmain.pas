@@ -765,7 +765,7 @@ procedure TFExamplesMain.AddExample_GridFillWithSpansBeforePlaceItem(
   AGridFill: IGridFill; AGrid: TGridLayout; AItem: IGridItem; APos: IGridPosition;
   var ASettings: TGridCellSettings; var ACanPlace: Boolean);
 begin
-  if (AItem.GetControl is TButton) and (TButton(AItem.GetControl).Tag = 4) then
+  if (AItem.GetElement is TButton) and (TButton(AItem.GetElement).Tag = 4) then
   begin
     ASettings.WithColumnSpan(2);
   end;
@@ -775,12 +775,12 @@ procedure TFExamplesMain.AddExample_GridFillWithSpansAfterPlaceItem(
   AGridFill: IGridFill; AGrid: TGridLayout; AItem: IGridItem;
   var APos: IGridPosition);
 begin
-  if (AItem.GetControl is TButton) and (TButton(AItem.GetControl).Tag = 4) then
+  if (AItem.GetElement is TButton) and (TButton(AItem.GetElement).Tag = 4) then
   begin
     APos := AGridFill.NextPosition;
   end;
 
-  if (AItem.GetControl is TButton) and (TButton(AItem.GetControl).Tag = 8) then
+  if (AItem.GetElement is TButton) and (TButton(AItem.GetElement).Tag = 8) then
   begin
     APos := AGridFill.NextPosition;
   end;

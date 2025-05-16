@@ -9,9 +9,38 @@ uses
   Classes, SysUtils, Controls, Generics.Collections, Generics.Defaults;
 
 type
+  IVisualElement = interface
+    ['{02F693DD-5377-477F-9B17-05906737F1F1}']
+    function GetVisible: Boolean;
+    procedure SetVisible(AValue: Boolean);
+    function GetWidth: Integer;
+    procedure SetWidth(AValue: Integer);
+    function GetHeight: Integer;
+    procedure SetHeight(AValue: Integer);
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+    function IsOfType(AClass: TClass): Boolean;
+  end;
+
+  { TControlVisualElement }
+
+  TControlVisualElement = class(TInterfacedObject, IVisualElement)
+  private
+    FControl: TControl;
+  public
+    constructor Create(AControl: TControl);
+    function GetVisible: Boolean;
+    procedure SetVisible(AValue: Boolean);
+    function GetWidth: Integer;
+    procedure SetWidth(AValue: Integer);
+    function GetHeight: Integer;
+    procedure SetHeight(AValue: Integer);
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+    function IsOfType(AClass: TClass): Boolean;
+  end;
+
   IGridItem = interface
-    ['{C28F4715-03C4-428B-AEBA-E2CDE48378B7}']
-    function GetControl: TControl;
+    ['{7A972D12-00D4-4113-96C3-880C95E3FCD1}']
+    function GetElement: IVisualElement;
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
@@ -321,11 +350,11 @@ type
 
   TControlGridItem = class(TInterfacedObject, IGridItem)
   protected
-    FControl: TControl;
+    FControlElement: IVisualElement;
     procedure AfterSetBounds; virtual;
   public
     constructor Create(AControl: TControl);
-    function GetControl: TControl;
+    function GetElement: IVisualElement;
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
@@ -374,6 +403,71 @@ begin
   FExtraWidth := ASettings.ExtraWidth;
   FHorizontalAlignment := ASettings.HorizontalAlignment;
   FVerticalAlignment := ASettings.VerticalAlignment;
+end;
+
+{ TControlVisualElement }
+
+constructor TControlVisualElement.Create(AControl: TControl);
+begin
+  inherited Create;
+  FControl := AControl;
+end;
+
+function TControlVisualElement.GetVisible: Boolean;
+begin
+  if not Assigned(FControl) then
+    Exit;
+  Result := FControl.Visible;
+end;
+
+procedure TControlVisualElement.SetVisible(AValue: Boolean);
+begin
+  if not Assigned(FControl) then
+    Exit;
+  FControl.Visible := AValue;
+end;
+
+function TControlVisualElement.GetWidth: Integer;
+begin
+  if not Assigned(FControl) then
+    Exit;
+  Result := FControl.Width;
+end;
+
+procedure TControlVisualElement.SetWidth(AValue: Integer);
+begin
+  if not Assigned(FControl) then
+    Exit;
+  FControl.Width := AValue;
+end;
+
+function TControlVisualElement.GetHeight: Integer;
+begin
+  if not Assigned(FControl) then
+    Exit;
+  Result := FControl.Height;
+end;
+
+procedure TControlVisualElement.SetHeight(AValue: Integer);
+begin
+  if not Assigned(FControl) then
+    Exit;
+  FControl.Height := AValue;
+end;
+
+procedure TControlVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight: Integer
+  );
+begin
+  if not Assigned(FControl) then
+    Exit;
+  FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
+end;
+
+function TControlVisualElement.IsOfType(AClass: TClass): Boolean;
+begin
+  if not Assigned(FControl) then
+    Exit;
+  Result := FControl is AClass;
 end;
 
 { TOptionalInt }
@@ -978,18 +1072,18 @@ var
   Cell: TGridCell;
   Item: IGridItem;
   X, Y, W, H: Integer;
-  Control: TControl;
+  Element: IVisualElement;
 begin
   ApplyCellsVisibility;
 
   for Cell in FCells do
   begin
     Item := Cell.Item;
-    if Item = nil then
+    if not Assigned(Item) then
       Continue;
 
-    Control := Item.GetControl;
-    if not Assigned(Control) then
+    Element := Item.GetElement;
+    if not Assigned(Element) then
       Continue;
 
     if not IsVisibleCell(Cell) then
@@ -1005,16 +1099,16 @@ begin
         W := W + Cell.ExtraWidth;
       laCenter:
         begin
-          W := Control.Width;
+          W := Element.GetWidth;
           X := X + (CalculateCellWidth(Cell) - W) div 2;
         end;
       laStart:
         begin
-          W := Control.Width;
+          W := Element.GetWidth;
         end;
       laEnd:
         begin
-          W := Control.Width;
+          W := Element.GetWidth;
           X := X + (CalculateCellWidth(Cell) - W);
         end;
     end;
@@ -1024,16 +1118,16 @@ begin
         H := H + Cell.ExtraHeight;
       laCenter:
         begin
-          H := Control.Height;
+          H := Element.GetHeight;
           Y := Y + (CalculateCellHeight(Cell) - H) div 2;
         end;
       laStart:
         begin
-          H := Control.Height;
+          H := Element.GetHeight;
         end;
       laEnd:
         begin
-          H := Control.Height;
+          H := Element.GetHeight;
           Y := Y + (CalculateCellHeight(Cell) - H);
         end;
     end;
@@ -1050,10 +1144,20 @@ end;
 procedure TGridLayout.ApplyCellsVisibility;
 var
   Cell: TGridCell;
+  Item: IGridItem;
+  Element: IVisualElement;
 begin
   for Cell in FCells do
-    if Assigned(Cell.Item) and Assigned(Cell.Item.GetControl) then
-      Cell.Item.GetControl.Visible := IsVisibleCell(Cell);
+  begin
+    begin
+      if Assigned(Cell) then
+        Item := Cell.Item;
+      if Assigned(Item) then
+        Element := Item.GetElement;
+      if Assigned(Element) then
+        Element.SetVisible(IsVisibleCell(Cell));
+    end;
+  end;
 end;
 
 function TGridLayout.IsVisibleCell(Cell: TGridCell): Boolean;
@@ -1331,17 +1435,17 @@ end;
 constructor TControlGridItem.Create(AControl: TControl);
 begin
   inherited Create;
-  FControl := AControl;
+  FControlElement := TControlVisualElement.Create(AControl);
 end;
 
-function TControlGridItem.GetControl: TControl;
+function TControlGridItem.GetElement: IVisualElement;
 begin
-  Result := FControl;
+  Result := FControlElement;
 end;
 
 procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
 begin
-  FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
+  FControlElement.SetBounds(ALeft, ATop, AWidth, AHeight);
   AfterSetBounds;
 end;
 
@@ -1351,7 +1455,7 @@ procedure TSubGridItem.AfterSetBounds;
 var
   IsVirtual: Boolean;
 begin
-  IsVirtual := (Self.FControl is TVirtualContainer);
+  IsVirtual := Self.FControlElement.IsOfType(TVirtualContainer);
 
   if Assigned(FLayout) then
     if IsVirtual then
@@ -1371,7 +1475,7 @@ begin
   inherited Create(nil);
   FContainer := TVirtualContainer.Create(nil);
   FLayout := ALayout;
-  FControl := FContainer;
+  FControlElement := TControlVisualElement.Create(FContainer);
 
   FContainer.OnResize := @ContainerResize;
 end;
@@ -1390,13 +1494,13 @@ begin
   FContainer.Visible := True;
 
   // Define o item de layout como sendo o container
-  FControl := FContainer;
+  FControlElement := TControlVisualElement.Create(FContainer);
 end;
 
 destructor TSubGridItem.Destroy;
 begin
-  if FControl is TVirtualContainer then
-    FControl.Free;
+  // if FControlElement.IsOfType(TVirtualContainer) then
+  //  FControlElement.Free;
   inherited Destroy;
 end;
 
