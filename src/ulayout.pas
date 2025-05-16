@@ -36,6 +36,7 @@ type
     procedure SetHeight(AValue: Integer);
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     function IsOfType(AClass: TClass): Boolean;
+    function GetControl: TControl;
   end;
 
   IGridItem = interface
@@ -468,6 +469,11 @@ begin
   if not Assigned(FControl) then
     Exit;
   Result := FControl is AClass;
+end;
+
+function TControlVisualElement.GetControl: TControl;
+begin
+  Result := FControl;
 end;
 
 { TOptionalInt }
