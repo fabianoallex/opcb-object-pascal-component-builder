@@ -104,6 +104,18 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFColunaBotoes"/>
       </Unit>
+      <Unit>
+        <Filename Value="ugridtext.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridText"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ufgridtext.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FGridText"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFGridText"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

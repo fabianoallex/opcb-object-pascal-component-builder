@@ -18,7 +18,8 @@ type
     function GetHeight: Integer;
     procedure SetHeight(AValue: Integer);
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-    function IsOfType(AClass: TClass): Boolean;
+    function GetLeft: Integer;
+    function GetTop: Integer;
   end;
 
   { TControlVisualElement }
@@ -35,7 +36,9 @@ type
     function GetHeight: Integer;
     procedure SetHeight(AValue: Integer);
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-    function IsOfType(AClass: TClass): Boolean;
+    function GetLeft: Integer;
+    function GetTop: Integer;
+    function IsControlOfType(AClass: TClass): Boolean;
     function GetControl: TControl;
   end;
 
@@ -326,6 +329,15 @@ type
     function IsHorizontalSpacingCustomized(ACol: Integer): Boolean;
     procedure InsertRow(ARow: Integer);
     procedure InsertColumn(AColumn: Integer);
+
+
+    function IsInTopMargin(Y: Integer): Boolean;
+    function IsInBottomMargin(Y: Integer): Boolean;
+    function IsInLeftMargin(X: Integer): Boolean;
+    function IsInRightMargin(X: Integer): Boolean;
+    function IsInVerticalSpacing(X, Y: Integer): Boolean;
+    function IsInHorizontalSpacing(X, Y: Integer): Boolean;
+
     property Rows: Integer read FRows write FRows;
     property Columns: Integer read FColumns write FColumns;
     property VerticalSpacings: Integer read FVerticalSpacings write FVerticalSpacings;
@@ -464,7 +476,21 @@ begin
   FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
 end;
 
-function TControlVisualElement.IsOfType(AClass: TClass): Boolean;
+function TControlVisualElement.GetLeft: Integer;
+begin
+  if not Assigned(FControl) then
+    Exit;
+  Result := FControl.Left;
+end;
+
+function TControlVisualElement.GetTop: Integer;
+begin
+  if not Assigned(FControl) then
+    Exit;
+  Result := FControl.Top;
+end;
+
+function TControlVisualElement.IsControlOfType(AClass: TClass): Boolean;
 begin
   if not Assigned(FControl) then
     Exit;
@@ -760,9 +786,12 @@ var
 begin
   Result := FMargins.Top + FMargins.Bottom;
   for I := 0 to Rows - 1 do
-    Result := Result + GetRowHeight(I);
+    if VisibleRow[I] then
+      Result := Result + GetRowHeight(I);
+
   for I := 0 to Rows - 2 do
-    Result := Result + GetVerticalSpacing(I);
+    if VisibleRow[I] then
+      Result := Result + GetVerticalSpacing(I);
 end;
 
 function TGridLayout.GetContentWidth: Integer;
@@ -770,10 +799,14 @@ var
   I: Integer;
 begin
   Result := FMargins.Left + FMargins.Right;
+
   for I := 0 to Columns - 1 do
-    Result := Result + GetColumnWidth(I);
+    if VisibleColumn[I] then
+      Result := Result + GetColumnWidth(I);
+
   for I := 0 to Columns - 2 do
-    Result := Result + GetHorizontalSpacing(I);
+    if VisibleColumn[I] then
+      Result := Result + GetHorizontalSpacing(I);
 end;
 
 function TGridLayout.GetHorizontalSpacing(AIndex: Integer): Integer;
@@ -1071,6 +1104,94 @@ begin
       Result := Result
         + GetRowHeight(I)
         + GetVerticalSpacing(I);
+end;
+
+function TGridLayout.IsInTopMargin(Y: Integer): Boolean;
+begin
+  Result := (Y >= Top) and (Y < Top + Margins.Top);
+end;
+
+function TGridLayout.IsInBottomMargin(Y: Integer): Boolean;
+var
+  BottomStart: Integer;
+begin
+  BottomStart := Top + GetContentHeight - Margins.Bottom;
+  Result := (Y >= BottomStart) and (Y < Top + GetContentHeight);
+end;
+
+function TGridLayout.IsInLeftMargin(X: Integer): Boolean;
+begin
+  Result := (X >= Left) and (X < Left + Margins.Left);
+end;
+
+function TGridLayout.IsInRightMargin(X: Integer): Boolean;
+begin
+  Result :=
+    (X >= Left + ContentWidth - Margins.Right)
+    and
+    (X <  Left + ContentWidth);
+end;
+
+function TGridLayout.IsInVerticalSpacing(X, Y: Integer): Boolean;
+var
+  RowIndex, CurrentY, SpacingHeight: Integer;
+begin
+  Result := False;
+  CurrentY := Top + Margins.Top;
+
+  for RowIndex := 0 to Rows - 1 do
+  begin
+    if not VisibleRow[RowIndex] then
+      Continue;
+
+    // Avança a altura da linha visível
+    CurrentY := CurrentY + GetRowHeight(RowIndex);
+
+    // Verifica espaçamento, exceto após a última linha
+    if RowIndex < Rows - 1 then
+    begin
+      SpacingHeight := GetVerticalSpacing(RowIndex);
+      if (Y >= CurrentY) and (Y < CurrentY + SpacingHeight) then
+      begin
+        Result := True;
+        Exit;
+      end;
+
+      // Avança pelo espaçamento
+      CurrentY := CurrentY + SpacingHeight;
+    end;
+  end;
+end;
+
+function TGridLayout.IsInHorizontalSpacing(X, Y: Integer): Boolean;
+var
+  ColIndex, CurrentX, SpacingWidth: Integer;
+begin
+  Result := False;
+  CurrentX := Left + Margins.Left;
+
+  for ColIndex := 0 to Columns - 1 do
+  begin
+    if not VisibleColumn[ColIndex] then
+      Continue;
+
+    // Avança a largura da coluna visível
+    CurrentX := CurrentX + GetColumnWidth(ColIndex);
+
+    // Verifica espaçamento, exceto após a última coluna
+    if ColIndex < Columns - 1 then
+    begin
+      SpacingWidth := GetHorizontalSpacing(ColIndex);
+      if (X >= CurrentX) and (X < CurrentX + SpacingWidth) then
+      begin
+        Result := True;
+        Exit;
+      end;
+
+      // Avança pelo espaçamento
+      CurrentX := CurrentX + SpacingWidth;
+    end;
+  end;
 end;
 
 procedure TGridLayout.ArrangeItems(ALeft, ATop: Integer);
@@ -1461,7 +1582,10 @@ procedure TSubGridItem.AfterSetBounds;
 var
   IsVirtual: Boolean;
 begin
-  IsVirtual := Self.FControlElement.IsOfType(TVirtualContainer);
+  IsVirtual :=
+    (Self.FControlElement is TControlVisualElement)
+    and
+    TControlVisualElement(Self.FControlElement).IsControlOfType(TVirtualContainer);
 
   if Assigned(FLayout) then
     if IsVirtual then

@@ -18,7 +18,7 @@ uses
   Forms, lazcontrols, UExamplesMain,
   UFColumnResizerGridLayout,
   UFRowResizerGridLayout,
-  uffullresizergridlayout, UFColunaBotoes;
+  uffullresizergridlayout, UFColunaBotoes, ugridtext, UFGridText;
 
 {$R *.res}
 
@@ -31,6 +31,7 @@ begin
   Application.CreateForm(TFRowResizerGridLayout, FRowResizerGridLayout);
   Application.CreateForm(TFFullResizerGridLayout, FFullResizerGridLayout);
   Application.CreateForm(TFColunaBotoes, FColunaBotoes);
+  Application.CreateForm(TFGridText, FGridText);
   Application.Run;
 end.
 

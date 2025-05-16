@@ -28,6 +28,8 @@
         <UnitName Value="ULayout"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
+        <TopLine Value="601"/>
+        <CursorPos Y="488"/>
         <UsageCount Value="79"/>
         <Loaded Value="True"/>
       </Unit>
@@ -156,14 +158,6 @@
     <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="42" Column="47" TopLine="85"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1142" TopLine="1106"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
         <Caret Line="1061" Column="3" TopLine="1057"/>
       </Position>
       <Position>
@@ -273,6 +267,13 @@
       <Position>
         <Filename Value="..\src\ulayout.pas"/>
         <Caret Line="1157" Column="39" TopLine="1143"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="485" Column="8" TopLine="472"/>
       </Position>
     </JumpHistory>
     <RunParams>

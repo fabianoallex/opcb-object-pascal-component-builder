@@ -40,6 +40,7 @@ type
     Button31: TButton;
     Button32: TButton;
     Button33: TButton;
+    Button34: TButton;
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
@@ -74,6 +75,7 @@ type
     procedure Button31Click(Sender: TObject);
     procedure Button32Click(Sender: TObject);
     procedure Button33Click(Sender: TObject);
+    procedure Button34Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -147,7 +149,7 @@ implementation
 
 uses
   StrUtils, UGridLayoutFill, UGridaLayoutResizer, UFColumnResizerGridLayout,
-  UFRowResizerGridLayout, UFFullResizerGridLayout, UFColunaBotoes;
+  UFRowResizerGridLayout, UFFullResizerGridLayout, UFColunaBotoes, UFGridText;
 
 procedure TFExamplesMain.Button1Click(Sender: TObject);
 begin
@@ -277,6 +279,11 @@ end;
 procedure TFExamplesMain.Button33Click(Sender: TObject);
 begin
   FColunaBotoes.ShowModal;
+end;
+
+procedure TFExamplesMain.Button34Click(Sender: TObject);
+begin
+  FGridText.ShowModal;
 end;
 
 procedure TFExamplesMain.Button3Click(Sender: TObject);
@@ -768,7 +775,7 @@ var
   ControlElement: TControlVisualElement;
   Control: TControl;
 begin
-  if AItem.GetElement.IsOfType(TButton) then
+  if (AItem.GetElement as TControlVisualElement).IsControlOfType(TButton) then
   begin
     Control := nil;
     ControlElement := (AItem.GetElement as TControlVisualElement);
@@ -787,7 +794,7 @@ var
   ControlElement: TControlVisualElement;
   Control: TControl;
 begin
-  if AItem.GetElement.IsOfType(TButton) then
+  if (AItem.GetElement as TControlVisualElement).IsControlOfType(TButton) then
   begin
     Control := nil;
     ControlElement := (AItem.GetElement as TControlVisualElement);
