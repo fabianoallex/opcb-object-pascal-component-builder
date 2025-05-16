@@ -738,6 +738,10 @@ begin
   for Cell in FCells do
     if Cell.Row >= ARow then
       Cell.FRow := Cell.FRow + 1;
+
+  if ARow > FRows then
+    FRows := ARow;
+
   FRows := FRows + 1;
   FRowsInfo.InsertTrackAt(ARow);
 end;
@@ -749,6 +753,10 @@ begin
   for Cell in FCells do
     if Cell.Column >= AColumn then
       Cell.FColumn := Cell.FColumn + 1;
+
+  if AColumn > FColumns then
+    FColumns := AColumn;
+
   FColumns := FColumns + 1;
   FColumnsInfo.InsertTrackAt(AColumn);
 end;
@@ -1096,7 +1104,7 @@ begin
       KeysToShift.Sort;
       KeysToShift.Reverse;      // ordem decrescente
       Direction := +1;
-    end; // From = To → nada a fazer
+    end;
 
     if ExistFrom then
       Self.Remove(FromIndex);
