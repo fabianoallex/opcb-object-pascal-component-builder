@@ -32,4 +32,13 @@ object FGridText: TFGridText
     TabOrder = 1
     OnClick = Button1Click
   end
+  object Button2: TButton
+    Left = 864
+    Height = 31
+    Top = 120
+    Width = 94
+    Caption = 'Button2'
+    TabOrder = 2
+    OnClick = Button2Click
+  end
 end

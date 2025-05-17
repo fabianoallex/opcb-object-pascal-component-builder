@@ -63,6 +63,9 @@ type
     property IntersectionChar: Char read FIntersectionChar write SetIntersectionSpacingChar;
   end;
 
+  TTextAlignHorizontal = (taLeft, taCenter, taRight);
+  TTextAlignVertical = (taTop, taMiddle, taBottom);
+
   { TTextVisualElement }
 
   TTextVisualElement = class(TInterfacedObject, IVisualElement)
@@ -72,7 +75,11 @@ type
     FVisible: Boolean;
     procedure Redraw;
   private
+    FHorizontalAlign: TTextAlignHorizontal;
+    FVerticalAlign: TTextAlignVertical;
+    procedure AdjustSize;
     function FormatLine(const Line: string): string;
+    function GetAlignedLines: specialize TArray<string>;
   public
     constructor Create(const ARenderer: TGridTextRenderer);
     destructor Destroy; override;
@@ -87,6 +94,8 @@ type
     procedure SetWidth(AValue: Integer);
     procedure SetText(const AText: string);
     function GetTextLines: TStringList;
+    property HorizontalAlign: TTextAlignHorizontal read FHorizontalAlign write FHorizontalAlign;
+    property VerticalAlign: TTextAlignVertical read FVerticalAlign write FVerticalAlign;
   end;
 
   { TTextGridItem }
@@ -272,11 +281,10 @@ begin
       IsLeftMargin := FGrid.IsInLeftMargin(X);
       IsRightMargin := FGrid.IsInRightMargin(X);
 
-      if IsVerticalSpacing then
-        FCharMatrix.WriteCharAt(X, Y, FVerticalSpacingChar);
-
       if IsIntersection then
         FCharMatrix.WriteCharAt(X, Y, FIntersectionChar)
+      else if IsVerticalSpacing then
+        FCharMatrix.WriteCharAt(X, Y, FVerticalSpacingChar)
       else if IsHorizontalSpacing then
         FCharMatrix.WriteCharAt(X, Y, FHorizontaSpancingChar)
       else if IsTopMargin then
@@ -293,26 +301,101 @@ end;
 { TTextVisualElement }
 
 function TTextVisualElement.FormatLine(const Line: string): string;
+  function CenterText(const AText: string; AWidth: Integer): string;
+  var
+    TotalPadding, LeftPadding, RightPadding: Integer;
+  begin
+    TotalPadding := AWidth - Length(AText);
+    if TotalPadding <= 0 then
+      Result := Copy(AText, 1, AWidth)
+    else
+    begin
+      LeftPadding := TotalPadding div 2;
+      RightPadding := TotalPadding - LeftPadding;
+      Result := StringOfChar(' ', LeftPadding) + AText + StringOfChar(' ', RightPadding);
+    end;
+  end;
+
+  function LeftText(const AText: string; AWidth: Integer): string;
+  begin
+    if Length(AText) >= AWidth then
+      Result := Copy(AText, 1, AWidth)
+    else
+      Result := AText + StringOfChar(' ', AWidth - Length(AText));
+  end;
+
+  function RightText(const AText: string; AWidth: Integer): string;
+  begin
+    if Length(AText) >= AWidth then
+      Result := Copy(AText, 1, AWidth)
+    else
+      Result := StringOfChar(' ', AWidth - Length(AText)) + AText;
+  end;
 begin
-  Result := Copy(Line, 1, FWidth);
+  Result := Copy(
+    LeftText(Line, FWidth),
+    1,
+    FWidth
+  );
+end;
+
+function TTextVisualElement.GetAlignedLines: specialize TArray<string>;
+var
+  I, PadTop, LineIndex: Integer;
+  Line: string;
+  LeftPad, RightPad: Integer;
+begin
+  SetLength(Result, FHeight);
+
+  // Calcular padding superior (vertical alignment)
+  case FVerticalAlign of
+    taTop: PadTop := 0;
+    taMiddle: PadTop := (FHeight - FLines.Count) div 2;
+    taBottom: PadTop := FHeight - FLines.Count;
+  else
+    PadTop := 0;
+  end;
+
+  // Preenche com linhas em branco
+  for I := 0 to FHeight - 1 do
+    Result[I] := StringOfChar(' ', FWidth);
+
+  // Aplica alinhamento horizontal em cada linha
+  for I := 0 to FLines.Count - 1 do
+  begin
+    if PadTop + I >= FHeight then
+      Break;
+
+    Line := FLines[I];
+    case FHorizontalAlign of
+      taLeft:
+        Line := Line + StringOfChar(' ', FWidth - Length(Line));
+      taCenter:
+        begin
+          LeftPad := (FWidth - Length(Line)) div 2;
+          RightPad := FWidth - Length(Line) - LeftPad;
+          Line := StringOfChar(' ', LeftPad) + Line + StringOfChar(' ', RightPad);
+        end;
+      taRight:
+        Line := StringOfChar(' ', FWidth - Length(Line)) + Line;
+    end;
+
+    Result[PadTop + I] := Copy(Line, 1, FWidth); // Garante corte se necessário
+  end;
 end;
 
 procedure TTextVisualElement.Redraw;
 var
   I: Integer;
   Str: string;
+  AlignedLines: specialize TArray<string>;
 begin
   if (not Assigned(FRenderer)) or (not FVisible) then
     Exit;
 
-  for I:=0 to Self.FHeight-1 do
-  begin
-    if FLines.Count < I then
-      break;
-
-    Str := FormatLine(FLines[I]);
-    FRenderer.WriteTextAt(FLeft, FTop, Str);
-  end;
+  AlignedLines := GetAlignedLines;
+  for I := 0 to High(AlignedLines) do
+    FRenderer.WriteTextAt(FLeft, FTop + I, AlignedLines[I]);
 end;
 
 constructor TTextVisualElement.Create(const ARenderer: TGridTextRenderer);
@@ -378,9 +461,23 @@ begin
   FWidth := AValue;
 end;
 
+procedure TTextVisualElement.AdjustSize;
+var
+  I, MaxLineLength: Integer;
+begin
+  MaxLineLength := 0;
+  for I := 0 to FLines.Count - 1 do
+    if Length(FLines[I]) > MaxLineLength then
+      MaxLineLength := Length(FLines[I]);
+
+  FWidth := MaxLineLength;
+  FHeight := FLines.Count;
+end;
+
 procedure TTextVisualElement.SetText(const AText: string);
 begin
   FLines.Text := AText;
+  AdjustSize;
 end;
 
 function TTextVisualElement.GetTextLines: TStringList;
