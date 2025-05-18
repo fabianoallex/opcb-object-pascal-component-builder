@@ -8,7 +8,7 @@
       <Unit>
         <Filename Value="GridLayoutExamples.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="14"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="5"/>
         <CursorPos X="83" Y="21"/>
         <UsageCount Value="203"/>
@@ -21,8 +21,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UExamplesMain"/>
-        <TopLine Value="330"/>
-        <CursorPos X="70" Y="356"/>
+        <TopLine Value="1069"/>
+        <CursorPos X="49" Y="1092"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -34,12 +34,10 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFColumnResizerGridLayout"/>
-        <EditorIndex Value="1"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="176"/>
         <CursorPos X="47" Y="207"/>
         <UsageCount Value="200"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="ufrowresizergridlayout.pas"/>
@@ -48,7 +46,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFRowResizerGridLayout"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="10"/>
         <TopLine Value="111"/>
         <CursorPos Y="118"/>
         <UsageCount Value="200"/>
@@ -61,19 +59,17 @@
         <ComponentName Value="FFullResizerGridLayout"/>
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <CursorPos Y="24"/>
         <UsageCount Value="219"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\src\ulayout.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="141"/>
-        <CursorPos X="3" Y="142"/>
+        <TopLine Value="191"/>
+        <CursorPos X="37" Y="247"/>
         <UsageCount Value="212"/>
         <Loaded Value="True"/>
       </Unit>
@@ -81,9 +77,9 @@
         <Filename Value="..\src\ugridlayoutbuilder.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutBuilder"/>
-        <EditorIndex Value="3"/>
-        <TopLine Value="6"/>
-        <CursorPos X="14" Y="46"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="220"/>
+        <CursorPos X="63" Y="236"/>
         <UsageCount Value="213"/>
         <Loaded Value="True"/>
       </Unit>
@@ -91,7 +87,7 @@
         <Filename Value="..\src\ugridlayoutfillerfactory.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutFillerFactory"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="5"/>
         <CursorPos X="46" Y="8"/>
         <UsageCount Value="213"/>
         <Loaded Value="True"/>
@@ -100,7 +96,9 @@
         <Filename Value="..\src\ugridlayoutfill.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutFill"/>
-        <EditorIndex Value="5"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <CursorPos X="30" Y="10"/>
         <UsageCount Value="213"/>
         <Loaded Value="True"/>
       </Unit>
@@ -108,7 +106,7 @@
         <Filename Value="..\src\ugridalayoutresizer.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridaLayoutResizer"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="25"/>
         <CursorPos X="33" Y="8"/>
         <UsageCount Value="213"/>
@@ -121,12 +119,52 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFColunaBotoes"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="8"/>
         <TopLine Value="116"/>
         <CursorPos X="37" Y="143"/>
         <UsageCount Value="209"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugridtext.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridText"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="47"/>
+        <CursorPos X="47" Y="67"/>
+        <UsageCount Value="104"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ufgridtext.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="FGridText"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="UFGridText"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="15" Y="29"/>
+        <UsageCount Value="96"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugridrenderer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridRenderer"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="6"/>
+        <UsageCount Value="47"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugriditemfactory.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridItemFactory"/>
+        <EditorIndex Value="1"/>
+        <CursorPos X="14" Y="41"/>
+        <UsageCount Value="36"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\objpas.pp"/>
@@ -145,182 +183,134 @@
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
         <UnitName Value="Controls"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1170"/>
         <CursorPos X="3" Y="1188"/>
         <UsageCount Value="16"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\sysutils\syshelph.inc"/>
-        <EditorIndex Value="15"/>
+        <EditorIndex Value="12"/>
         <CursorPos X="11" Y="4"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit>
-      <Unit>
-        <Filename Value="ugridtext.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridText"/>
-        <EditorIndex Value="10"/>
-        <TopLine Value="82"/>
-        <CursorPos X="47" Y="97"/>
-        <UsageCount Value="100"/>
-        <Loaded Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ufgridtext.pas"/>
-        <IsPartOfProject Value="True"/>
-        <ComponentName Value="FGridText"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UFGridText"/>
-        <EditorIndex Value="8"/>
-        <TopLine Value="50"/>
-        <CursorPos X="39" Y="65"/>
-        <UsageCount Value="93"/>
-        <Loaded Value="True"/>
-        <LoadedDesigner Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ugridrenderer.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridRenderer"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="6"/>
-        <UsageCount Value="44"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ugriditemfactory.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridItemFactory"/>
-        <IsVisibleTab Value="True"/>
-        <EditorIndex Value="9"/>
-        <TopLine Value="137"/>
-        <CursorPos X="58" Y="156"/>
-        <UsageCount Value="33"/>
-        <Loaded Value="True"/>
-      </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
+    <JumpHistory HistoryIndex="28">
       <Position>
         <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="125" Column="30" TopLine="93"/>
+        <Caret Line="52" Column="14" TopLine="33"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <Caret Line="235" Column="10" TopLine="216"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <Caret Line="233" Column="31" TopLine="216"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <Caret Line="236" Column="63" TopLine="220"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="842" Column="7" TopLine="790"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="846" Column="34" TopLine="822"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="989" Column="15" TopLine="969"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="1041" Column="28" TopLine="1018"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="1099" Column="30" TopLine="1084"/>
       </Position>
       <Position>
         <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="25" Column="25" TopLine="8"/>
+        <Caret Line="41" Column="19" TopLine="20"/>
       </Position>
       <Position>
         <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="113" Column="22" TopLine="98"/>
+        <Caret Line="157" Column="3" TopLine="152"/>
       </Position>
       <Position>
-        <Filename Value="ufgridtext.pas"/>
-        <Caret Line="66" Column="17" TopLine="56"/>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <Caret Line="266" Column="38" TopLine="237"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="25" Column="27" TopLine="5"/>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <Caret Line="25"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="26" Column="30" TopLine="5"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="241" TopLine="225"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="35" Column="12" TopLine="14"/>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <Caret Line="52" TopLine="33"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="150" Column="3" TopLine="135"/>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <Caret Line="79" TopLine="60"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="51" TopLine="19"/>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <Caret Line="203" TopLine="184"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="35" Column="17" TopLine="19"/>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <Caret Line="192" Column="32" TopLine="177"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="151" Column="3" TopLine="136"/>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="1092" Column="49" TopLine="1069"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="35" Column="25" TopLine="19"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="241" TopLine="162"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="21" TopLine="16"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="114" Column="16" TopLine="106"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="119" TopLine="104"/>
+        <Filename Value="..\src\ulayout.pas"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="22" Column="7"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="114" Column="16" TopLine="82"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="18" Column="15"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="126" Column="57" TopLine="94"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="20" Column="8"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="218" Column="24" TopLine="186"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="40" Column="50" TopLine="22"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="227" Column="33" TopLine="195"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="145" Column="3" TopLine="137"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="236" Column="40" TopLine="204"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="39" Column="14" TopLine="24"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="242" Column="45" TopLine="210"/>
       </Position>
       <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="140" Column="3" TopLine="137"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="52" Column="68" TopLine="29"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="71" Column="89" TopLine="47"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="65" Column="43" TopLine="47"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="87" Column="3" TopLine="85"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="65" Column="14" TopLine="49"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="33" TopLine="4"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="28" Column="19"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="36" Column="19" TopLine="20"/>
-      </Position>
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="51" Column="19" TopLine="38"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="243" Column="41" TopLine="211"/>
       </Position>
     </JumpHistory>
     <RunParams>

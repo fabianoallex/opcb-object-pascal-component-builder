@@ -12,6 +12,7 @@ type
     ['{47B2A165-22AC-457E-A5C7-73F7DFFE0492}']
     function WithControl(AControl: TControl): IControlGridItemBuilder;
     function AddToGrid(AGrid: TGridLayout): IControlGridItemBuilder;
+    function AddWithFiller(AFiller: IGridFill): IControlGridItemBuilder;
   end;
 
   ITextGridItemBuilder = interface
@@ -21,6 +22,7 @@ type
     function WithHorizontalAlign(AHorizontalAlign: TTextAlignHorizontal): ITextGridItemBuilder;
     function WithVerticalAlign(AVerticalAlign: TTextAlignVertical): ITextGridItemBuilder;
     function WithCellSettings(ACellSettings: TGridCellSettings): ITextGridItemBuilder;
+    function WithAlignment(AHorizontal: TTextAlignHorizontal; AVertical: TTextAlignVertical): ITextGridItemBuilder;
     function AddToGrid(AGrid: TGridLayout): ITextGridItemBuilder; overload;
     function AddToGrid(AGrid: TGridLayout; ARow, AColumn: Integer): ITextGridItemBuilder; overload;
   end;
@@ -49,6 +51,7 @@ type
   public
     function WithControl(AControl: TControl): IControlGridItemBuilder;
     function AddToGrid(AGrid: TGridLayout): IControlGridItemBuilder;
+    function AddWithFiller(AFiller: IGridFill): IControlGridItemBuilder;
   end;
 
   { TTextGridItemBuilder }
@@ -65,6 +68,7 @@ type
     function WithText(AText: string): ITextGridItemBuilder;
     function WithHorizontalAlign(AHorizontalAlign: TTextAlignHorizontal): ITextGridItemBuilder;
     function WithVerticalAlign(AVerticalAlign: TTextAlignVertical): ITextGridItemBuilder;
+    function WithAlignment(AHorizontal: TTextAlignHorizontal; AVertical: TTextAlignVertical): ITextGridItemBuilder;
     function WithCellSettings(ACellSettings: TGridCellSettings): ITextGridItemBuilder;
     function AddToGrid(AGrid: TGridLayout): ITextGridItemBuilder; overload;
     function AddToGrid(AGrid: TGridLayout; ARow, AColumn: Integer): ITextGridItemBuilder; overload;
@@ -106,6 +110,14 @@ function TTextGridItemBuilder.WithVerticalAlign
 begin
   Result := Self;
   FTextElement.VerticalAlign := AVerticalAlign;
+end;
+
+function TTextGridItemBuilder.WithAlignment(AHorizontal: TTextAlignHorizontal;
+  AVertical: TTextAlignVertical): ITextGridItemBuilder;
+begin
+  Result := Self;
+  FTextElement.HorizontalAlign := AHorizontal;
+  FTextElement.VerticalAlign := AVertical;
 end;
 
 function TTextGridItemBuilder.WithCellSettings(ACellSettings: TGridCellSettings
@@ -163,6 +175,15 @@ function TControlGridItemBuilder.AddToGrid(AGrid: TGridLayout
   ): IControlGridItemBuilder;
 begin
 
+end;
+
+function TControlGridItemBuilder.AddWithFiller(AFiller: IGridFill
+  ): IControlGridItemBuilder;
+begin
+  Result := Self;
+  AFiller.PlaceItem(
+    TControlGridItem.Create(FControl)
+  );
 end;
 
 end.

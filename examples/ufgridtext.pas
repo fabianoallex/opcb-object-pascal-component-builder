@@ -65,18 +65,16 @@ var
     TGridItemFactory.Create
       .BuildTextItem(Renderer)
       .WithText(AText)
-      .WithHorizontalAlign(taCenter)
-      .WithVerticalAlign(taMiddle)
+      .WithAlignment(tahCenter, tavMiddle)
       .AddToGrid(Grid, 0, ACol);
   end;
 
-  procedure AddItemCell(const AText: string; ACol: Integer; Align: TTextAlignHorizontal = taLeft);
+  procedure AddItemCell(const AText: string; ACol: Integer; Align: TTextAlignHorizontal = tahLeft);
   begin
     TGridItemFactory.Create
       .BuildTextItem(Renderer)
       .WithText(AText)
-      .WithHorizontalAlign(Align)
-      .WithVerticalAlign(taMiddle)
+      .WithAlignment(Align, tavMiddle)
       .AddToGrid(Grid, Row, ACol);
   end;
 
@@ -135,15 +133,15 @@ begin
       TotalGeral := TotalGeral + Item.Total;
 
       AddItemCell(Item.Descricao, COL_DESC);
-      AddItemCell(Item.Unidade, COL_UNID, taCenter);
-      AddItemCell(FormatFloat('0.00', Item.ValorUnitario) + ' ', COL_VLR_UNIT, taRight);
-      AddItemCell(FormatFloat('0.00', Item.Total) + ' ', COL_TOTAL, taRight);
+      AddItemCell(Item.Unidade, COL_UNID, tahCenter);
+      AddItemCell(FormatFloat('0.00', Item.ValorUnitario) + ' ', COL_VLR_UNIT, tahRight);
+      AddItemCell(FormatFloat('0.00', Item.Total) + ' ', COL_TOTAL, tahRight);
     end;
 
     TextElement := TTextVisualElement.Create(Renderer);
     TextElement.SetText('Total Geral  ');
-    TextElement.HorizontalAlign := taRight;
-    TextElement.VerticalAlign := taMiddle;
+    TextElement.HorizontalAlign := tahRight;
+    TextElement.VerticalAlign := tavMiddle;
     Grid.AddItem(
       TTextGridItem.Create(TextElement),
       TGridCellSettings.Create(Row+1, 0)
@@ -153,8 +151,8 @@ begin
 
     TextElement := TTextVisualElement.Create(Renderer);
     TextElement.SetText(FormatFloat('0.00', TotalGeral) + ' ');
-    TextElement.HorizontalAlign := taRight;
-    TextElement.VerticalAlign := taMiddle;
+    TextElement.HorizontalAlign := tahRight;
+    TextElement.VerticalAlign := tavMiddle;
     Grid.AddItem(
       TTextGridItem.Create(TextElement),
       TGridCellSettings.Create(Row+1, 3)

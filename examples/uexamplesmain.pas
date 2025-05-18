@@ -149,7 +149,8 @@ implementation
 
 uses
   StrUtils, UGridLayoutFill, UGridaLayoutResizer, UFColumnResizerGridLayout,
-  UFRowResizerGridLayout, UFFullResizerGridLayout, UFColunaBotoes, UFGridText;
+  UFRowResizerGridLayout, UFFullResizerGridLayout, UFColunaBotoes, UFGridText,
+  UGridItemFactory;
 
 procedure TFExamplesMain.Button1Click(Sender: TObject);
 begin
@@ -839,7 +840,10 @@ begin
       if I = 5 then
         GridFill.Skip(2);
 
-      GridFill.PlaceItem(Btn);
+      TGridItemFactory.Create
+        .BuildControlItem
+        .WithControl(Btn)
+        .AddWithFiller(GridFill);
     end;
 
     Grid.ArrangeItems;
@@ -979,7 +983,14 @@ begin
       Btn.Parent := Tab;
       Btn.Caption := Format('Btn %d', [I + 1]);
       Btn.Tag := I;
-      GridFill.PlaceItem(Btn);
+
+      TGridItemFactory
+        .Create
+          .BuildControlItem
+            .WithControl(Btn)
+            .AddWithFiller(GridFill);
+
+      //GridFill.PlaceItem(Btn);
     end;
 
     Grid.ArrangeItems;
@@ -1021,7 +1032,13 @@ begin
       Btn.Caption := Keys[I];
       Btn.Font.Size := 14;
 
-      Fill.PlaceItem(Btn);
+      TGridItemFactory
+        .Create
+          .BuildControlItem
+            .WithControl(Btn)
+            .AddWithFiller(Fill);
+
+      //Fill.PlaceItem(Btn);
     end;
 
     Grid.ArrangeItems;
@@ -1069,7 +1086,11 @@ begin
       Btn := TButton.Create(Tab);
       Btn.Parent := Tab;
       Btn.Caption := Row0[I];
-      Fill.PlaceItem(Btn);
+
+      TGridItemFactory.Create
+        .BuildControlItem
+          .WithControl(Btn)
+          .AddWithFiller(Fill);
     end;
 
     for I := 0 to High(Row1) do
@@ -1077,7 +1098,11 @@ begin
       Btn := TButton.Create(Tab);
       Btn.Parent := Tab;
       Btn.Caption := Row1[I];
-      Fill.PlaceItem(Btn);
+
+      TGridItemFactory.Create
+        .BuildControlItem
+          .WithControl(Btn)
+          .AddWithFiller(Fill);
     end;
 
     for I := 0 to High(Row2) do
@@ -1085,7 +1110,11 @@ begin
       Btn := TButton.Create(Tab);
       Btn.Parent := Tab;
       Btn.Caption := Row2[I];
-      Fill.PlaceItem(Btn);
+
+      TGridItemFactory.Create
+        .BuildControlItem
+          .WithControl(Btn)
+          .AddWithFiller(Fill);
     end;
 
     Fill.Skip;
@@ -1095,7 +1124,12 @@ begin
       Btn := TButton.Create(Tab);
       Btn.Parent := Tab;
       Btn.Caption := Row3[I];
-      Fill.PlaceItem(Btn);
+      // Fill.PlaceItem(Btn);
+
+      TGridItemFactory.Create
+        .BuildControlItem
+          .WithControl(Btn)
+          .AddWithFiller(Fill);
     end;
 
     Fill.Skip(2);

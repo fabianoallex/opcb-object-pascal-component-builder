@@ -238,7 +238,6 @@ type
     procedure SetOnBeforePlaceItem(AValue: TGridFillBeforePlaceEvent);
     function GetGrid: TGridLayout;
     procedure PlaceItem(AItem: IGridItem); overload;
-    procedure PlaceItem(AItem: TControl); overload;
     procedure Skip(ACount: Integer=1);
     procedure InitialPos(APos: IGridPosition);
     function NextPosition: IGridPosition;

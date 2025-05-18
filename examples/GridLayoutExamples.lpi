@@ -113,6 +113,7 @@
         <Filename Value="ufgridtext.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FGridText"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFGridText"/>
       </Unit>

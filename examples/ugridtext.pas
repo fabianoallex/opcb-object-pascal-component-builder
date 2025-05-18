@@ -63,8 +63,8 @@ type
     property IntersectionChar: Char read FIntersectionChar write SetIntersectionSpacingChar;
   end;
 
-  TTextAlignHorizontal = (taLeft, taCenter, taRight);
-  TTextAlignVertical = (taTop, taMiddle, taBottom);
+  TTextAlignHorizontal = (tahLeft, tahCenter, tahRight);
+  TTextAlignVertical = (tavTop, tavMiddle, tavBottom);
 
   { TTextVisualElement }
 
@@ -309,9 +309,9 @@ begin
 
   // Calcular padding superior (vertical alignment)
   case FVerticalAlign of
-    taTop: PadTop := 0;
-    taMiddle: PadTop := (FHeight - FLines.Count) div 2;
-    taBottom: PadTop := FHeight - FLines.Count;
+    tavTop: PadTop := 0;
+    tavMiddle: PadTop := (FHeight - FLines.Count) div 2;
+    tavBottom: PadTop := FHeight - FLines.Count;
   else
     PadTop := 0;
   end;
@@ -328,15 +328,15 @@ begin
 
     Line := FLines[I];
     case FHorizontalAlign of
-      taLeft:
+      tahLeft:
         Line := Line + StringOfChar(' ', FWidth - Length(Line));
-      taCenter:
+      tahCenter:
         begin
           LeftPad := (FWidth - Length(Line)) div 2;
           RightPad := FWidth - Length(Line) - LeftPad;
           Line := StringOfChar(' ', LeftPad) + Line + StringOfChar(' ', RightPad);
         end;
-      taRight:
+      tahRight:
         Line := StringOfChar(' ', FWidth - Length(Line)) + Line;
     end;
 

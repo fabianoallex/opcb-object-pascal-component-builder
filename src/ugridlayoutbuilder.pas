@@ -57,7 +57,7 @@ type
 implementation
 
 uses
-  Classes, SysUtils, ExtCtrls;
+  Classes, SysUtils, ExtCtrls, UGridItemFactory;
 
 { TGridLayoutBuilder }
 
@@ -230,7 +230,10 @@ begin
     Control := AControls[I];
 
     if Assigned(Control) then
-      FFiller.PlaceItem(Control)
+       TGridItemFactory.Create
+         .BuildControlItem
+         .WithControl(Control)
+         .AddWithFiller(FFiller)  //FFiller.PlaceItem(Control)
     else
       FFiller.Skip;
   end;
