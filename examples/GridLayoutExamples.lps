@@ -8,11 +8,9 @@
       <Unit>
         <Filename Value="GridLayoutExamples.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="11"/>
-        <TopLine Value="5"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="83" Y="21"/>
         <UsageCount Value="203"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="uexamplesmain.pas"/>
@@ -21,8 +19,8 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UExamplesMain"/>
-        <TopLine Value="1069"/>
-        <CursorPos X="49" Y="1092"/>
+        <TopLine Value="1078"/>
+        <CursorPos X="7" Y="1090"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -68,8 +66,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
         <EditorIndex Value="6"/>
-        <TopLine Value="191"/>
-        <CursorPos X="37" Y="247"/>
+        <TopLine Value="279"/>
+        <CursorPos X="3" Y="232"/>
         <UsageCount Value="212"/>
         <Loaded Value="True"/>
       </Unit>
@@ -78,8 +76,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutBuilder"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="220"/>
-        <CursorPos X="63" Y="236"/>
+        <TopLine Value="210"/>
+        <CursorPos X="18" Y="200"/>
         <UsageCount Value="213"/>
         <Loaded Value="True"/>
       </Unit>
@@ -96,9 +94,8 @@
         <Filename Value="..\src\ugridlayoutfill.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutFill"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <CursorPos X="30" Y="10"/>
+        <CursorPos X="21" Y="24"/>
         <UsageCount Value="213"/>
         <Loaded Value="True"/>
       </Unit>
@@ -107,8 +104,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridaLayoutResizer"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="25"/>
-        <CursorPos X="33" Y="8"/>
+        <CursorPos X="15"/>
         <UsageCount Value="213"/>
         <Loaded Value="True"/>
       </Unit>
@@ -119,6 +115,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFColunaBotoes"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="8"/>
         <TopLine Value="116"/>
         <CursorPos X="37" Y="143"/>
@@ -131,9 +128,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridText"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="47"/>
         <CursorPos X="47" Y="67"/>
-        <UsageCount Value="104"/>
+        <UsageCount Value="117"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -145,7 +141,7 @@
         <UnitName Value="UFGridText"/>
         <EditorIndex Value="3"/>
         <CursorPos X="15" Y="29"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="109"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -155,15 +151,15 @@
         <UnitName Value="UGridRenderer"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="6"/>
-        <UsageCount Value="47"/>
+        <UsageCount Value="60"/>
       </Unit>
       <Unit>
         <Filename Value="ugriditemfactory.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridItemFactory"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="14" Y="41"/>
-        <UsageCount Value="36"/>
+        <CursorPos X="22"/>
+        <UsageCount Value="49"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -171,14 +167,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="32"/>
         <CursorPos X="8" Y="46"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="4"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="282"/>
         <CursorPos X="3" Y="298"/>
-        <UsageCount Value="6"/>
+        <UsageCount Value="4"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
@@ -186,21 +182,16 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1170"/>
         <CursorPos X="3" Y="1188"/>
-        <UsageCount Value="16"/>
+        <UsageCount Value="15"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\sysutils\syshelph.inc"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="11" Y="4"/>
         <UsageCount Value="101"/>
-        <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="28">
-      <Position>
-        <Filename Value="ugriditemfactory.pas"/>
-        <Caret Line="52" Column="14" TopLine="33"/>
-      </Position>
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="..\src\ugridlayoutbuilder.pas"/>
         <Caret Line="235" Column="10" TopLine="216"/>
@@ -311,6 +302,14 @@
       <Position>
         <Filename Value="..\src\ulayout.pas"/>
         <Caret Line="243" Column="41" TopLine="211"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="1081" Column="27" TopLine="1063"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <Caret Line="47" Column="41" TopLine="4"/>
       </Position>
     </JumpHistory>
     <RunParams>
