@@ -116,6 +116,16 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFGridText"/>
       </Unit>
+      <Unit>
+        <Filename Value="ugridrenderer.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridRenderer"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ugriditemfactory.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UGridItemFactory"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

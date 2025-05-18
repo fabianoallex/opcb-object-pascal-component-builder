@@ -21,7 +21,6 @@ type
   { TFGridText }
 
   TFGridText = class(TForm)
-    Button1: TButton;
     Button2: TButton;
     Memo1: TMemo;
     procedure Button1Click(Sender: TObject);
@@ -37,6 +36,9 @@ var
   FGridText: TFGridText;
 
 implementation
+
+uses
+  UGridItemFactory;
 
 {$R *.lfm}
 
@@ -54,27 +56,30 @@ var
   Renderer: TGridTextRenderer;
   I, Row: Integer;
   Item: TVendaItem;
-  TextItem: TTextVisualElement;
+  TextElement: TTextVisualElement;
   Items: array of TVendaItem;
   TotalGeral: Double;
 
   procedure AddHeaderCell(const AText: string; ACol: Integer);
   begin
-    TextItem := TTextVisualElement.Create(Renderer);
-    TextItem.SetText(AText);
-    TextItem.HorizontalAlign := taCenter;
-    TextItem.VerticalAlign := taMiddle;
-    Grid.AddItem(TTextGridItem.Create(TextItem), TGridCellSettings.Create(0, ACol));
+    TGridItemFactory.Create
+      .BuildTextItem(Renderer)
+      .WithText(AText)
+      .WithHorizontalAlign(taCenter)
+      .WithVerticalAlign(taMiddle)
+      .AddToGrid(Grid, 0, ACol);
   end;
 
   procedure AddItemCell(const AText: string; ACol: Integer; Align: TTextAlignHorizontal = taLeft);
   begin
-    TextItem := TTextVisualElement.Create(Renderer);
-    TextItem.SetText(AText);
-    TextItem.HorizontalAlign := Align;
-    TextItem.VerticalAlign := taMiddle;
-    Grid.AddItem(TTextGridItem.Create(TextItem), TGridCellSettings.Create(Row, ACol));
+    TGridItemFactory.Create
+      .BuildTextItem(Renderer)
+      .WithText(AText)
+      .WithHorizontalAlign(Align)
+      .WithVerticalAlign(taMiddle)
+      .AddToGrid(Grid, Row, ACol);
   end;
+
 begin
   // Simulando lista de itens
   SetLength(Items, 4);
@@ -135,28 +140,27 @@ begin
       AddItemCell(FormatFloat('0.00', Item.Total) + ' ', COL_TOTAL, taRight);
     end;
 
-    TextItem := TTextVisualElement.Create(Renderer);
-    TextItem.SetText('Total Geral  ');
-    TextItem.HorizontalAlign := taRight;
-    TextItem.VerticalAlign := taMiddle;
+    TextElement := TTextVisualElement.Create(Renderer);
+    TextElement.SetText('Total Geral  ');
+    TextElement.HorizontalAlign := taRight;
+    TextElement.VerticalAlign := taMiddle;
     Grid.AddItem(
-      TTextGridItem.Create(TextItem),
+      TTextGridItem.Create(TextElement),
       TGridCellSettings.Create(Row+1, 0)
         .WithColumnSpan(3)
         .WithRowSpan(3)
     );
 
-    TextItem := TTextVisualElement.Create(Renderer);
-    TextItem.SetText(FormatFloat('0.00', TotalGeral) + ' ');
-    TextItem.HorizontalAlign := taRight;
-    TextItem.VerticalAlign := taMiddle;
+    TextElement := TTextVisualElement.Create(Renderer);
+    TextElement.SetText(FormatFloat('0.00', TotalGeral) + ' ');
+    TextElement.HorizontalAlign := taRight;
+    TextElement.VerticalAlign := taMiddle;
     Grid.AddItem(
-      TTextGridItem.Create(TextItem),
+      TTextGridItem.Create(TextElement),
       TGridCellSettings.Create(Row+1, 3)
         .WithRowSpan(3)
     );
 
-    // Finaliza
     Grid.ArrangeItems;
     Memo1.Text := Renderer.GetAsString;
 

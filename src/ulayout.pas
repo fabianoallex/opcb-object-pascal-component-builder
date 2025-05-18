@@ -48,6 +48,18 @@ type
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
+  { TControlGridItem }
+
+  TControlGridItem = class(TInterfacedObject, IGridItem)
+  protected
+    FControlElement: IVisualElement;
+    procedure AfterSetBounds; virtual;
+  public
+    constructor Create(AControl: TControl);
+    function GetElement: IVisualElement;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+  end;
+
   TItemAlignment = (laStretch, laCenter, laStart, laEnd);
 
   { TOptionalInt }
@@ -181,7 +193,7 @@ type
     FHorizontalAlignment: TItemAlignment;
     FVerticalAlignment: TItemAlignment;
   public
-    constructor Create(AControl: IGridItem; ASettings:
+    constructor Create(AGridItem: IGridItem; ASettings:
       TGridCellSettings); reintroduce; overload;
     property Item: IGridItem read FItem;
     property Row: Integer read FRow;
@@ -329,15 +341,12 @@ type
     function IsHorizontalSpacingCustomized(ACol: Integer): Boolean;
     procedure InsertRow(ARow: Integer);
     procedure InsertColumn(AColumn: Integer);
-
-
     function IsInTopMargin(Y: Integer): Boolean;
     function IsInBottomMargin(Y: Integer): Boolean;
     function IsInLeftMargin(X: Integer): Boolean;
     function IsInRightMargin(X: Integer): Boolean;
     function IsInVerticalSpacing(X, Y: Integer): Boolean;
     function IsInHorizontalSpacing(X, Y: Integer): Boolean;
-
     property Rows: Integer read FRows write FRows;
     property Columns: Integer read FColumns write FColumns;
     property VerticalSpacings: Integer read FVerticalSpacings write FVerticalSpacings;
@@ -357,18 +366,6 @@ type
     property ContentHeight: Integer read GetContentHeight;
     property Top: Integer read FTop write SetTop;
     property Left: Integer read FLeft write SetLeft;
-  end;
-
-  { TControlGridItem }
-
-  TControlGridItem = class(TInterfacedObject, IGridItem)
-  protected
-    FControlElement: IVisualElement;
-    procedure AfterSetBounds; virtual;
-  public
-    constructor Create(AControl: TControl);
-    function GetElement: IVisualElement;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
   { TVirtualContainer }
@@ -401,11 +398,11 @@ uses
 
 { TGridCell }
 
-constructor TGridCell.Create(AControl: IGridItem; ASettings: TGridCellSettings);
+constructor TGridCell.Create(AGridItem: IGridItem; ASettings: TGridCellSettings);
 begin
-  Assert(AControl <> nil, 'AControl cannot be nil');
+  Assert(AGridItem <> nil, 'AControl cannot be nil');
   Assert(ASettings <> nil, 'ASettings cannot be nil');
-  FItem := AControl;
+  FItem := AGridItem;
   FRow := ASettings.Row;
   FColumn := ASettings.Column;
   FRowSpan := ASettings.RowSpan;

@@ -78,7 +78,6 @@ type
     FHorizontalAlign: TTextAlignHorizontal;
     FVerticalAlign: TTextAlignVertical;
     procedure AdjustSize;
-    function FormatLine(const Line: string): string;
     function GetAlignedLines: specialize TArray<string>;
   public
     constructor Create(const ARenderer: TGridTextRenderer);
@@ -299,45 +298,6 @@ begin
 end;
 
 { TTextVisualElement }
-
-function TTextVisualElement.FormatLine(const Line: string): string;
-  function CenterText(const AText: string; AWidth: Integer): string;
-  var
-    TotalPadding, LeftPadding, RightPadding: Integer;
-  begin
-    TotalPadding := AWidth - Length(AText);
-    if TotalPadding <= 0 then
-      Result := Copy(AText, 1, AWidth)
-    else
-    begin
-      LeftPadding := TotalPadding div 2;
-      RightPadding := TotalPadding - LeftPadding;
-      Result := StringOfChar(' ', LeftPadding) + AText + StringOfChar(' ', RightPadding);
-    end;
-  end;
-
-  function LeftText(const AText: string; AWidth: Integer): string;
-  begin
-    if Length(AText) >= AWidth then
-      Result := Copy(AText, 1, AWidth)
-    else
-      Result := AText + StringOfChar(' ', AWidth - Length(AText));
-  end;
-
-  function RightText(const AText: string; AWidth: Integer): string;
-  begin
-    if Length(AText) >= AWidth then
-      Result := Copy(AText, 1, AWidth)
-    else
-      Result := StringOfChar(' ', AWidth - Length(AText)) + AText;
-  end;
-begin
-  Result := Copy(
-    LeftText(Line, FWidth),
-    1,
-    FWidth
-  );
-end;
 
 function TTextVisualElement.GetAlignedLines: specialize TArray<string>;
 var

@@ -18,7 +18,7 @@ uses
   Forms, lazcontrols, UExamplesMain,
   UFColumnResizerGridLayout,
   UFRowResizerGridLayout,
-  uffullresizergridlayout, UFColunaBotoes, ugridtext, UFGridText;
+  uffullresizergridlayout, UFColunaBotoes, ugridtext, UFGridText, UGridItemFactory;
 
 {$R *.res}
 
