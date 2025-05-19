@@ -222,7 +222,6 @@ begin
   VerticalSpacingChar := '-';
   HorizontaSpancingChar := '|';
   IntersectionChar := '+';
-
   Clear;
 end;
 

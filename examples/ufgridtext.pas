@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ULayout,
-  UGridText;
+  UGridText, UGridHtmlTable;
 
 type
   TVendaItem = record
@@ -22,11 +22,14 @@ type
 
   TFGridText = class(TForm)
     Button2: TButton;
+    Button3: TButton;
     Memo1: TMemo;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
+    procedure Button3Click(Sender: TObject);
   private
     procedure GerarRelatorioVenda;
+    procedure GerarRelatorioVendaHtml;
 
   public
 
@@ -170,6 +173,135 @@ end;
 
 
 
+procedure TFGridText.GerarRelatorioVendaHtml;
+const
+  COL_DESC = 0;
+  COL_UNID = 1;
+  COL_VLR_UNIT = 2;
+  COL_TOTAL = 3;
+var
+  Grid: TGridLayout;
+  Renderer: TGridHtmlTableRenderer;
+  I, Row: Integer;
+  Item: TVendaItem;
+  Element: THtmlTableVisualElement;
+  Items: array of TVendaItem;
+  TotalGeral: Double;
+
+  procedure AddHeaderCell(const AText: string; ACol: Integer);
+  begin
+    TGridItemFactory.Create
+      .BuildHtmlTableItem(Renderer)
+      .WithStrContent(AText)
+      .WithCellSettings(
+        TGridCellSettings.Create(0, ACol)
+          .WithAlignment(laCenter, laCenter)
+      )
+      .AddToGrid(Grid);
+  end;
+
+  procedure AddItemCell(const AText: string; ACol: Integer; Align: TItemAlignment = laStart);
+  begin
+    TGridItemFactory.Create
+      .BuildHtmlTableItem(Renderer)
+      .WithStrContent(AText)
+      .WithCellSettings(
+        TGridCellSettings.Create(Row, ACol)
+          .WithAlignment(Align, laCenter)
+      )
+      .AddToGrid(Grid);
+  end;
+
+begin
+  // Simulando lista de itens
+  SetLength(Items, 4);
+  Items[0].Descricao := 'Arroz Branco';
+  Items[0].Unidade := 'kg';
+  Items[0].ValorUnitario := 5.40;
+  Items[0].Quantidade := 2;
+
+  Items[1].Descricao := 'Feijao Preto';
+  Items[1].Unidade := 'kg';
+  Items[1].ValorUnitario := 7.3;
+  Items[1].Quantidade := 1;
+
+  Items[2].Descricao := 'Oleo de Soja';
+  Items[2].Unidade := 'lt';
+  Items[2].ValorUnitario := 6.90;
+  Items[2].Quantidade := 3;
+
+  Items[3].Descricao := 'Sabao em po';
+  Items[3].Unidade := 'un';
+  Items[3].ValorUnitario := 10.90;
+  Items[3].Quantidade := 1;
+
+  Grid := TGridLayout.Create;
+  try
+    Grid.Columns := 4;
+    Grid.Rows := Length(Items) + 4; // +1 para cabeçalho, +3 para total
+    Grid.RowHeights := 50;
+    Grid.ColumnWidths := 200;
+    Grid.ColumnWidth[COL_DESC] := 300;
+    Grid.ColumnWidth[COL_UNID] := 100;
+    Grid.ColumnWidth[COL_VLR_UNIT] := 120;
+    Grid.ColumnWidth[COL_TOTAL] := 120;
+    Grid.HorizontalSpacings := 1;
+    Grid.VerticalSpacings := 0;
+    Grid.VerticalSpacing[0] := 1;
+    Grid.VerticalSpacing[Length(Items)] := 1;  // ultimo item
+    Grid.Margins.All := 5;
+
+    Renderer := TGridHtmlTableRenderer.Create(Grid);
+
+    AddHeaderCell('Descricao', COL_DESC);
+    AddHeaderCell('Unidade', COL_UNID);
+    AddHeaderCell('Vlr Unit.', COL_VLR_UNIT);
+    AddHeaderCell('Total', COL_TOTAL);
+
+    // Itens
+    TotalGeral := 0;
+    for I := 0 to High(Items) do
+    begin
+      Row := I + 1;
+      Item := Items[I];
+      TotalGeral := TotalGeral + Item.Total;
+
+      AddItemCell(Item.Descricao, COL_DESC);
+      AddItemCell(Item.Unidade, COL_UNID, laCenter);
+      AddItemCell(FormatFloat('0.00', Item.ValorUnitario) + ' ', COL_VLR_UNIT, laEnd);
+      AddItemCell(FormatFloat('0.00', Item.Total) + ' ', COL_TOTAL, laEnd);
+    end;
+
+    Element := THtmlTableVisualElement.Create(Renderer);
+    Element.StrContent := 'Total Geral  ';
+    Grid.AddItem(
+      THtmlTableGridItem.Create(Element),
+      TGridCellSettings.Create(Row+1, 0)
+        .WithAlignment(laEnd, laCenter)
+        .WithColumnSpan(3)
+        .WithRowSpan(3)
+    );
+
+    Element := THtmlTableVisualElement.Create(Renderer);
+    Element.StrContent := FormatFloat('0.00', TotalGeral) + ' ';
+    Grid.AddItem(
+      THtmlTableGridItem.Create(Element),
+      TGridCellSettings.Create(Row+1, 3)
+        .WithRowSpan(3)
+        .WithAlignment(laEnd, laCenter)
+    );
+
+    Grid.ArrangeItems;
+    Memo1.Text := Renderer.GetAsString;
+
+  finally
+    Renderer.Free;
+    Grid.Free;
+  end;
+end;
+
+
+
 function TVendaItem.Total: Double;
 begin
   Result := Quantidade * ValorUnitario;
@@ -184,6 +316,11 @@ end;
 procedure TFGridText.Button2Click(Sender: TObject);
 begin
   GerarRelatorioVenda;
+end;
+
+procedure TFGridText.Button3Click(Sender: TObject);
+begin
+  GerarRelatorioVendaHtml;
 end;
 
 

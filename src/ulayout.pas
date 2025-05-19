@@ -248,6 +248,7 @@ type
   end;
 
   TGridCellList = specialize TObjectList<TGridCell>;
+
   TIntList = specialize TList<Integer>;
 
   { TIntegerKeyDictionary }
@@ -335,6 +336,7 @@ type
     procedure ResetColumnWidthsToDefault;
     procedure ResetRowHeightsToDefault;
     function IsCellOccupied(ARow, ACol: Integer): Boolean;
+    function IsCellSpan(ARow, ACol: Integer): Boolean;
     function IsColumnWidthCustomized(ACol: Integer): Boolean;
     function IsVerticalSpacingCustomized(ARow: Integer): Boolean;
     function IsHorizontalSpacingCustomized(ACol: Integer): Boolean;
@@ -346,6 +348,7 @@ type
     function IsInRightMargin(X: Integer): Boolean;
     function IsInVerticalSpacing(X, Y: Integer): Boolean;
     function IsInHorizontalSpacing(X, Y: Integer): Boolean;
+    function GetCell(ARow, AColumn: Integer): TGridCell;
     property Rows: Integer read FRows write FRows;
     property Columns: Integer read FColumns write FColumns;
     property VerticalSpacings: Integer read FVerticalSpacings write FVerticalSpacings;
@@ -845,6 +848,23 @@ begin
   Result := False;
 end;
 
+function TGridLayout.IsCellSpan(ARow, ACol: Integer): Boolean;
+var
+  Cell: TGridCell;
+  R, C: Integer;
+begin
+  for Cell in FCells do
+    for R := Cell.Row to Cell.Row + Cell.RowSpan - 1 do
+      for C := Cell.Column to Cell.Column + Cell.ColSpan - 1 do
+        // Verifica se (ARow, ACol) está dentro da área de span,
+        // mas ignora a célula original (Cell.Row, Cell.Column)
+        if (R = ARow) and (C = ACol) and
+           not ((R = Cell.Row) and (C = Cell.Column)) then
+          Exit(True);
+
+  Result := False;
+end;
+
 function TGridLayout.IsColumnWidthCustomized(ACol: Integer): Boolean;
 begin
   Result := FColumnsInfo.IsSizeDefined(ACol);
@@ -977,6 +997,21 @@ end;
 procedure TGridLayout.SetVisibleRow(ARow: Integer; AValue: Boolean);
 begin
   FRowsInfo.SetHidden(ARow, not AValue);
+end;
+
+function TGridLayout.GetCell(ARow, AColumn: Integer): TGridCell;
+var
+  Cell: TGridCell;
+begin
+  Result := nil;
+  for Cell in FCells do
+  begin
+    if (Cell.Row = ARow) and (Cell.Column = AColumn) then
+    begin
+      Result := Cell;
+      Break;
+    end;
+  end;
 end;
 
 function TGridLayout.CalculateCellLeft(Cell: TGridCell): Integer;

@@ -1,11 +1,11 @@
-object FGridText: TFGridText
-  Left = 352
-  Height = 553
+object FGridHtmlTable: TFGridHtmlTable
+  Left = 150
+  Height = 723
   Top = 250
-  Width = 1021
-  Caption = 'FGridText'
-  ClientHeight = 553
-  ClientWidth = 1021
+  Width = 1214
+  Caption = 'FGridHtmlTable'
+  ClientHeight = 723
+  ClientWidth = 1214
   DesignTimePPI = 120
   object Memo1: TMemo
     Left = 32
@@ -28,18 +28,9 @@ object FGridText: TFGridText
     Left = 848
     Height = 31
     Top = 35
-    Width = 152
-    Caption = 'Gerar Texto'
+    Width = 118
+    Caption = 'Gerar'
     TabOrder = 1
     OnClick = Button2Click
-  end
-  object Button3: TButton
-    Left = 848
-    Height = 31
-    Top = 72
-    Width = 152
-    Caption = 'Gerar Html'
-    TabOrder = 2
-    OnClick = Button3Click
   end
 end

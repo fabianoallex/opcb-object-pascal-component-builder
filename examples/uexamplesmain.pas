@@ -41,6 +41,7 @@ type
     Button32: TButton;
     Button33: TButton;
     Button34: TButton;
+    Button35: TButton;
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
@@ -76,6 +77,7 @@ type
     procedure Button32Click(Sender: TObject);
     procedure Button33Click(Sender: TObject);
     procedure Button34Click(Sender: TObject);
+    procedure Button35Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
     procedure Button5Click(Sender: TObject);
@@ -150,7 +152,7 @@ implementation
 uses
   StrUtils, UGridLayoutFill, UGridaLayoutResizer, UFColumnResizerGridLayout,
   UFRowResizerGridLayout, UFFullResizerGridLayout, UFColunaBotoes, UFGridText,
-  UGridItemFactory;
+  UGridItemFactory, UFGridHtmlTable;
 
 procedure TFExamplesMain.Button1Click(Sender: TObject);
 begin
@@ -285,6 +287,11 @@ end;
 procedure TFExamplesMain.Button34Click(Sender: TObject);
 begin
   FGridText.ShowModal;
+end;
+
+procedure TFExamplesMain.Button35Click(Sender: TObject);
+begin
+  FGridHtmlTable.ShowModal;
 end;
 
 procedure TFExamplesMain.Button3Click(Sender: TObject);

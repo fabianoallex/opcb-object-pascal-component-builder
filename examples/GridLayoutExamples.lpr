@@ -13,7 +13,8 @@ uses
   ULayout, UGridLayoutBuilder, UGridLayoutFillerFactory, UGridLayoutFill,
   UGridaLayoutResizer, Forms, lazcontrols, UExamplesMain,
   UFColumnResizerGridLayout, UFRowResizerGridLayout, uffullresizergridlayout,
-  UFColunaBotoes, ugridtext, UFGridText, UGridItemFactory;
+  UFColunaBotoes, ugridtext, UFGridText, UGridItemFactory, UGridHtmlTable,
+  UFGridHtmlTable;
 
 {$R *.res}
 
@@ -27,6 +28,7 @@ begin
   Application.CreateForm(TFFullResizerGridLayout, FFullResizerGridLayout);
   Application.CreateForm(TFColunaBotoes, FColunaBotoes);
   Application.CreateForm(TFGridText, FGridText);
+  Application.CreateForm(TFGridHtmlTable, FGridHtmlTable);
   Application.Run;
 end.
 
