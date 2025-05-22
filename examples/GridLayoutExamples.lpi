@@ -114,7 +114,7 @@
         <UnitName Value="UFColunaBotoes"/>
       </Unit>
       <Unit>
-        <Filename Value="ugridtext.pas"/>
+        <Filename Value="..\src\ugridtext.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridText"/>
       </Unit>
@@ -132,12 +132,12 @@
         <UnitName Value="UGridRenderer"/>
       </Unit>
       <Unit>
-        <Filename Value="ugriditemfactory.pas"/>
+        <Filename Value="..\src\ugriditemfactory.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridItemFactory"/>
       </Unit>
       <Unit>
-        <Filename Value="ugridhtml.pas"/>
+        <Filename Value="..\src\ugridhtml.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridHtml"/>
       </Unit>

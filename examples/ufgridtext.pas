@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ULayout,
-  UGridText, ugridhtml;
+  UGridText, UGridHtml;
 
 type
   TVendaItem = record

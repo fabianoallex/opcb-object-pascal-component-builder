@@ -13,7 +13,7 @@ uses
   ULayout, UGridLayoutBuilder, UGridLayoutFillerFactory, UGridLayoutFill,
   UGridaLayoutResizer, Forms, lazcontrols, UExamplesMain,
   UFColumnResizerGridLayout, UFRowResizerGridLayout, uffullresizergridlayout,
-  UFColunaBotoes, ugridtext, UFGridText, UGridItemFactory, ugridhtml,
+  UFColunaBotoes, UGridText, UFGridText, UGridItemFactory, UGridHtml,
   UFGridHtmlTable;
 
 {$R *.res}

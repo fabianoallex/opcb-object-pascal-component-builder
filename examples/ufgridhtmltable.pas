@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, LazHelpHTML,
-  IpHtml, SynHighlighterHTML, ULayout, ugridhtml, UGridItemFactory;
+  IpHtml, SynHighlighterHTML, ULayout, UGridHtml, UGridItemFactory;
 
 type
 
