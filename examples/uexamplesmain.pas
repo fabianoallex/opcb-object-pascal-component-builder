@@ -781,10 +781,10 @@ var
   ControlElement: TControlVisualElement;
   Control: TControl;
 begin
-  if (AItem.GetElement as TControlVisualElement).IsControlOfType(TButton) then
+  if (AItem.GetVisualElement as TControlVisualElement).IsControlOfType(TButton) then
   begin
     Control := nil;
-    ControlElement := (AItem.GetElement as TControlVisualElement);
+    ControlElement := (AItem.GetVisualElement as TControlVisualElement);
     if Assigned(ControlElement) then
       Control := ControlElement.GetControl;
 
@@ -800,10 +800,10 @@ var
   ControlElement: TControlVisualElement;
   Control: TControl;
 begin
-  if (AItem.GetElement as TControlVisualElement).IsControlOfType(TButton) then
+  if (AItem.GetVisualElement as TControlVisualElement).IsControlOfType(TButton) then
   begin
     Control := nil;
-    ControlElement := (AItem.GetElement as TControlVisualElement);
+    ControlElement := (AItem.GetVisualElement as TControlVisualElement);
     if Assigned(ControlElement) then
       Control := ControlElement.GetControl;
 

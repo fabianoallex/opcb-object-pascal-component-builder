@@ -5,15 +5,15 @@ unit UGridItemFactory;
 interface
 
 uses
-  Classes, SysUtils, ULayout, Controls, UGridText, UGridHtmlTable;
+  Classes, SysUtils, ULayout, Controls, UGridText, ugridhtml;
 
 type
-  IHtmlTableGridItemBuilder = interface
+  IHtmlGridItemBuilder = interface
     ['{47B2A165-22AC-457E-A5C7-73F7DFFE0492}']
-    function WithStrContent(AContent: string): IHtmlTableGridItemBuilder;
-    function WithCellSettings(ACellSettings: TGridCellSettings): IHtmlTableGridItemBuilder;
-    function AddToGrid(AGrid: TGridLayout): IHtmlTableGridItemBuilder;
-    function AddWithFiller(AFiller: IGridFill): IHtmlTableGridItemBuilder;
+    function WithStrContent(AContent: string): IHtmlGridItemBuilder;
+    function WithCellSettings(ACellSettings: TGridCellSettings): IHtmlGridItemBuilder;
+    function AddToGrid(AGrid: TGridLayout): IHtmlGridItemBuilder;
+    function AddWithFiller(AFiller: IGridFill): IHtmlGridItemBuilder;
   end;
 
   IControlGridItemBuilder = interface
@@ -37,18 +37,18 @@ type
 
   IGridItemFactory = interface
     ['{BE27E7F4-BFD1-4BD8-8CAD-0C1A7B2B99E1}']
-    function BuildTextItem(ARenderer: TGridTextRenderer): ITextGridItemBuilder;
+    function BuildTextItem(ARenderer: TTextGridRenderer): ITextGridItemBuilder;
     function BuildControlItem: IControlGridItemBuilder;
-    function BuildHtmlTableItem(ARenderer: TGridHtmlTableRenderer): IHtmlTableGridItemBuilder;
+    function BuildHtmlTableItem(ARenderer: IHtmlGridRenderer): IHtmlGridItemBuilder;
   end;
 
   { TGridItemFactory }
 
   TGridItemFactory = class(TInterfacedObject, IGridItemFactory)
   public
-    function BuildTextItem(ARenderer: TGridTextRenderer): ITextGridItemBuilder;
+    function BuildTextItem(ARenderer: TTextGridRenderer): ITextGridItemBuilder;
     function BuildControlItem: IControlGridItemBuilder;
-    function BuildHtmlTableItem(ARenderer: TGridHtmlTableRenderer): IHtmlTableGridItemBuilder;
+    function BuildHtmlTableItem(ARenderer: IHtmlGridRenderer): IHtmlGridItemBuilder;
   end;
 
   { TControlGridItemBuilder }
@@ -66,31 +66,31 @@ type
     function AddWithFiller(AFiller: IGridFill): IControlGridItemBuilder;
   end;
 
-  { THtmlTableGridItemBuilder }
+  { THtmlGridItemBuilder }
 
-  THtmlTableGridItemBuilder = class(TInterfacedObject, IHtmlTableGridItemBuilder)
+  THtmlGridItemBuilder = class(TInterfacedObject, IHtmlGridItemBuilder)
   private
-    FRenderer: TGridHtmlTableRenderer;
-    FElement: THtmlTableVisualElement;
+    FRenderer: IHtmlGridRenderer;
+    FElement: THtmlVisualElement;
     FCellSettings: TGridCellSettings;
   protected
-    constructor Create(ARenderer: TGridHtmlTableRenderer);
+    constructor Create(ARenderer: IHtmlGridRenderer);
   public
-    function WithStrContent(AContent: string): IHtmlTableGridItemBuilder;
-    function WithCellSettings(ACellSettings: TGridCellSettings): IHtmlTableGridItemBuilder;
-    function AddToGrid(AGrid: TGridLayout): IHtmlTableGridItemBuilder;
-    function AddWithFiller(AFiller: IGridFill): IHtmlTableGridItemBuilder;
+    function WithStrContent(AContent: string): IHtmlGridItemBuilder;
+    function WithCellSettings(ACellSettings: TGridCellSettings): IHtmlGridItemBuilder;
+    function AddToGrid(AGrid: TGridLayout): IHtmlGridItemBuilder;
+    function AddWithFiller(AFiller: IGridFill): IHtmlGridItemBuilder;
   end;
 
   { TTextGridItemBuilder }
 
   TTextGridItemBuilder = class(TInterfacedObject, ITextGridItemBuilder)
   private
-    FRenderer: TGridTextRenderer;
+    FRenderer: TTextGridRenderer;
     FTextElement: TTextVisualElement;
     FCellSettings: TGridCellSettings;
   protected
-    constructor Create(ARenderer: TGridTextRenderer);
+    constructor Create(ARenderer: TTextGridRenderer);
   public
     function NewTextItem: ITextGridItemBuilder;
     function WithText(AText: string): ITextGridItemBuilder;
@@ -107,7 +107,7 @@ implementation
 
 { TTextGridItemBuilder }
 
-constructor TTextGridItemBuilder.Create(ARenderer: TGridTextRenderer);
+constructor TTextGridItemBuilder.Create(ARenderer: TTextGridRenderer);
 begin
   FRenderer := ARenderer;
   NewTextItem;
@@ -174,7 +174,7 @@ end;
 
 { TGridItemFactory }
 
-function TGridItemFactory.BuildTextItem(ARenderer: TGridTextRenderer
+function TGridItemFactory.BuildTextItem(ARenderer: TTextGridRenderer
   ): ITextGridItemBuilder;
 begin
   Result := TTextGridItemBuilder.Create(ARenderer);
@@ -185,10 +185,10 @@ begin
   Result := TControlGridItemBuilder.Create;
 end;
 
-function TGridItemFactory.BuildHtmlTableItem(ARenderer: TGridHtmlTableRenderer
-  ): IHtmlTableGridItemBuilder;
+function TGridItemFactory.BuildHtmlTableItem(ARenderer: IHtmlGridRenderer
+  ): IHtmlGridItemBuilder;
 begin
-  Result := THtmlTableGridItemBuilder.Create(ARenderer);
+  Result := THtmlGridItemBuilder.Create(ARenderer);
 end;
 
 { TControlGridItemBuilder }
@@ -231,45 +231,45 @@ begin
   );
 end;
 
-{ THtmlTableGridItemBuilder }
+{ THtmlGridItemBuilder }
 
-constructor THtmlTableGridItemBuilder.Create
-  (ARenderer: TGridHtmlTableRenderer);
+constructor THtmlGridItemBuilder.Create
+  (ARenderer: IHtmlGridRenderer);
 begin
-  FElement := THtmlTableVisualElement.Create(FRenderer);
+  FElement := THtmlVisualElement.Create(FRenderer);
   FCellSettings := nil;
 end;
 
-function THtmlTableGridItemBuilder.WithStrContent(AContent: string
-  ): IHtmlTableGridItemBuilder;
+function THtmlGridItemBuilder.WithStrContent(AContent: string
+  ): IHtmlGridItemBuilder;
 begin
   Result := Self;
   FElement.StrContent := AContent;
 end;
 
-function THtmlTableGridItemBuilder.WithCellSettings
-  (ACellSettings: TGridCellSettings): IHtmlTableGridItemBuilder;
+function THtmlGridItemBuilder.WithCellSettings
+  (ACellSettings: TGridCellSettings): IHtmlGridItemBuilder;
 begin
   Result := Self;
   FCellSettings := ACellSettings;
 end;
 
-function THtmlTableGridItemBuilder.AddToGrid(AGrid: TGridLayout
-  ): IHtmlTableGridItemBuilder;
+function THtmlGridItemBuilder.AddToGrid(AGrid: TGridLayout
+  ): IHtmlGridItemBuilder;
 begin
   Result := Self;
   AGrid.AddItem(
-    THtmlTableGridItem.Create(FElement),
+    THtmlGridItem.Create(FElement),
     FCellSettings
   );
 end;
 
-function THtmlTableGridItemBuilder.AddWithFiller(AFiller: IGridFill
-  ): IHtmlTableGridItemBuilder;
+function THtmlGridItemBuilder.AddWithFiller(AFiller: IGridFill
+  ): IHtmlGridItemBuilder;
 begin
   Result := Self;
   AFiller.PlaceItem(
-    THtmlTableGridItem.Create(FElement)
+    THtmlGridItem.Create(FElement)
   );
 end;
 

@@ -7,7 +7,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ULayout,
-  UGridText, UGridHtmlTable;
+  UGridText, ugridhtml;
 
 type
   TVendaItem = record
@@ -56,7 +56,7 @@ const
   COL_TOTAL = 3;
 var
   Grid: TGridLayout;
-  Renderer: TGridTextRenderer;
+  Renderer: TTextGridRenderer;
   I, Row: Integer;
   Item: TVendaItem;
   TextElement: TTextVisualElement;
@@ -120,7 +120,7 @@ begin
     Grid.VerticalSpacing[Length(Items)] := 1;  // ultimo item
     Grid.Margins.All := 1;
 
-    Renderer := TGridTextRenderer.Create(Grid);
+    Renderer := TTextGridRenderer.Create(Grid);
 
     AddHeaderCell('Descricao', COL_DESC);
     AddHeaderCell('Unidade', COL_UNID);
@@ -181,10 +181,10 @@ const
   COL_TOTAL = 3;
 var
   Grid: TGridLayout;
-  Renderer: TGridHtmlTableRenderer;
+  Renderer: IHtmlGridRenderer;
   I, Row: Integer;
   Item: TVendaItem;
-  Element: THtmlTableVisualElement;
+  Element: THtmlVisualElement;
   Items: array of TVendaItem;
   TotalGeral: Double;
 
@@ -195,7 +195,7 @@ var
       .WithStrContent(AText)
       .WithCellSettings(
         TGridCellSettings.Create(0, ACol)
-          .WithAlignment(laCenter, laCenter)
+          .WithAlignment(laCenter, laStart)
       )
       .AddToGrid(Grid);
   end;
@@ -245,13 +245,16 @@ begin
     Grid.ColumnWidth[COL_UNID] := 100;
     Grid.ColumnWidth[COL_VLR_UNIT] := 120;
     Grid.ColumnWidth[COL_TOTAL] := 120;
-    Grid.HorizontalSpacings := 1;
-    Grid.VerticalSpacings := 0;
-    Grid.VerticalSpacing[0] := 1;
-    Grid.VerticalSpacing[Length(Items)] := 1;  // ultimo item
+    Grid.HorizontalSpacings := 3;
+    Grid.VerticalSpacings := 5;
+    Grid.VerticalSpacing[0] := 10;
+    Grid.VerticalSpacing[Length(Items)] := 8;  // ultimo item
+
+    Grid.HorizontalSpacing[2] := 50;
+
     Grid.Margins.All := 5;
 
-    Renderer := TGridHtmlTableRenderer.Create(Grid);
+    Renderer := THtmlDivGridRenderer.Create(Grid);
 
     AddHeaderCell('Descricao', COL_DESC);
     AddHeaderCell('Unidade', COL_UNID);
@@ -272,20 +275,20 @@ begin
       AddItemCell(FormatFloat('0.00', Item.Total) + ' ', COL_TOTAL, laEnd);
     end;
 
-    Element := THtmlTableVisualElement.Create(Renderer);
+    Element := THtmlVisualElement.Create(Renderer);
     Element.StrContent := 'Total Geral  ';
     Grid.AddItem(
-      THtmlTableGridItem.Create(Element),
+      THtmlGridItem.Create(Element),
       TGridCellSettings.Create(Row+1, 0)
         .WithAlignment(laEnd, laCenter)
         .WithColumnSpan(3)
         .WithRowSpan(3)
     );
 
-    Element := THtmlTableVisualElement.Create(Renderer);
+    Element := THtmlVisualElement.Create(Renderer);
     Element.StrContent := FormatFloat('0.00', TotalGeral) + ' ';
     Grid.AddItem(
-      THtmlTableGridItem.Create(Element),
+      THtmlGridItem.Create(Element),
       TGridCellSettings.Create(Row+1, 3)
         .WithRowSpan(3)
         .WithAlignment(laEnd, laCenter)
@@ -295,18 +298,14 @@ begin
     Memo1.Text := Renderer.GetAsString;
 
   finally
-    Renderer.Free;
     Grid.Free;
   end;
 end;
-
-
 
 function TVendaItem.Total: Double;
 begin
   Result := Quantidade * ValorUnitario;
 end;
-
 
 procedure TFGridText.Button1Click(Sender: TObject);
 begin

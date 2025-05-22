@@ -137,14 +137,15 @@
         <UnitName Value="UGridItemFactory"/>
       </Unit>
       <Unit>
-        <Filename Value="ugridhtmltable.pas"/>
+        <Filename Value="ugridhtml.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="UGridHtmlTable"/>
+        <UnitName Value="UGridHtml"/>
       </Unit>
       <Unit>
         <Filename Value="ufgridhtmltable.pas"/>
         <IsPartOfProject Value="True"/>
         <ComponentName Value="FGridHtmlTable"/>
+        <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFGridHtmlTable"/>
       </Unit>

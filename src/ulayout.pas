@@ -9,6 +9,37 @@ uses
   Classes, SysUtils, Controls, Generics.Collections, Generics.Defaults;
 
 type
+
+  { TGriItemRenderContext }
+
+  TGriItemRenderContext = class
+  private
+    FHeight: Integer;
+    FLeft: Integer;
+    FTop: Integer;
+    FVisible: Boolean;
+    FWidth: Integer;
+    procedure SetHeight(AValue: Integer);
+    procedure SetLeft(AValue: Integer);
+    procedure SetTop(AValue: Integer);
+    procedure SetVisible(AValue: Boolean);
+    procedure SetWidth(AValue: Integer);
+  public
+    constructor Create;
+    function WithBounds(ALeft, ATop, AWidth, AHeight: Integer): TGriItemRenderContext;
+    function WithVisibility(AVisibility: Boolean): TGriItemRenderContext;
+    property Top: Integer read FTop write SetTop;
+    property Left: Integer read FLeft write SetLeft;
+    property Width: Integer read FWidth write SetWidth;
+    property Height: Integer read FHeight write SetHeight;
+    property Visible: Boolean read FVisible write SetVisible;
+  end;
+
+  IGridItemRenderer = interface
+    ['{D6739A9C-A12E-4D46-A25C-158F77799147}']
+    procedure RenderTo(AContext: TGriItemRenderContext);
+  end;
+
   IVisualElement = interface
     ['{02F693DD-5377-477F-9B17-05906737F1F1}']
     function GetVisible: Boolean;
@@ -20,6 +51,7 @@ type
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     function GetLeft: Integer;
     function GetTop: Integer;
+    procedure Redraw(AContext: TGriItemRenderContext);
   end;
 
   { TControlVisualElement }
@@ -40,12 +72,13 @@ type
     function GetTop: Integer;
     function IsControlOfType(AClass: TClass): Boolean;
     function GetControl: TControl;
+    procedure Redraw(AContext: TGriItemRenderContext);
   end;
 
   IGridItem = interface
     ['{7A972D12-00D4-4113-96C3-880C95E3FCD1}']
-    function GetElement: IVisualElement;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+    function GetVisualElement: IVisualElement;
+    function GetRenderer: IGridItemRenderer;
   end;
 
   { TControlGridItem }
@@ -56,8 +89,18 @@ type
     procedure AfterSetBounds; virtual;
   public
     constructor Create(AControl: TControl);
-    function GetElement: IVisualElement;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+    function GetVisualElement: IVisualElement;
+    function GetRenderer: IGridItemRenderer;
+  end;
+
+  { TControlGridItemRenderer }
+
+  TControlGridItemRenderer = class(TInterfacedObject, IGridItemRenderer)
+  private
+    FGridItem: IGridItem;
+  public
+    constructor Create(AGridItem: TControlGridItem);
+    procedure RenderTo(AContext: TGriItemRenderContext);
   end;
 
   TItemAlignment = (laStretch, laCenter, laStart, laEnd);
@@ -417,6 +460,77 @@ begin
   FVerticalAlignment := ASettings.VerticalAlignment;
 end;
 
+{ TGriItemRenderContext }
+
+procedure TGriItemRenderContext.SetHeight(AValue: Integer);
+begin
+  if FHeight = AValue then Exit;
+  FHeight := AValue;
+end;
+
+procedure TGriItemRenderContext.SetLeft(AValue: Integer);
+begin
+  if FLeft = AValue then Exit;
+  FLeft := AValue;
+end;
+
+procedure TGriItemRenderContext.SetTop(AValue: Integer);
+begin
+  if FTop = AValue then Exit;
+  FTop := AValue;
+end;
+
+procedure TGriItemRenderContext.SetVisible(AValue: Boolean);
+begin
+  if FVisible = AValue then Exit;
+  FVisible := AValue;
+end;
+
+procedure TGriItemRenderContext.SetWidth(AValue: Integer);
+begin
+  if FWidth = AValue then Exit;
+  FWidth := AValue;
+end;
+
+constructor TGriItemRenderContext.Create;
+begin
+
+end;
+
+function TGriItemRenderContext.WithBounds(ALeft, ATop, AWidth, AHeight: Integer
+  ): TGriItemRenderContext;
+begin
+  Result := Self;
+
+  FLeft := ALeft;
+  FTop := ATop;
+  FWidth := AWidth;
+  FHeight := AHeight;
+end;
+
+function TGriItemRenderContext.WithVisibility(AVisibility: Boolean
+  ): TGriItemRenderContext;
+begin
+  Self.Visible := AVisibility;
+end;
+
+{ TControlGridItemRenderer }
+
+constructor TControlGridItemRenderer.Create(AGridItem: TControlGridItem);
+begin
+  FGridItem := AGridItem;
+end;
+
+procedure TControlGridItemRenderer.RenderTo(AContext: TGriItemRenderContext);
+begin
+  FGridItem.GetVisualElement.SetBounds(
+    AContext.Left,
+    AContext.Top,
+    AContext.Width,
+    AContext.Height
+  );
+end;
+
 { TControlVisualElement }
 
 constructor TControlVisualElement.Create(AControl: TControl);
@@ -499,6 +613,11 @@ end;
 function TControlVisualElement.GetControl: TControl;
 begin
   Result := FControl;
+end;
+
+procedure TControlVisualElement.Redraw(AContext: TGriItemRenderContext);
+begin
+
 end;
 
 { TOptionalInt }
@@ -1240,7 +1359,7 @@ begin
     if not Assigned(Item) then
       Continue;
 
-    Element := Item.GetElement;
+    Element := Item.GetVisualElement;
     if not Assigned(Element) then
       Continue;
 
@@ -1290,11 +1409,15 @@ begin
         end;
     end;
 
-    Item.SetBounds(
-      FLeft + ALeft + X + Cell.OffsetX,
-      FTop + ATop + Y + Cell.OffsetY,
-      W,
-      H
+    Item.GetRenderer.RenderTo(
+      TGriItemRenderContext.Create
+        .WithBounds(
+          FLeft + ALeft + X + Cell.OffsetX,
+          FTop + ATop + Y + Cell.OffsetY,
+          W,
+          H
+        )
+        .WithVisibility(Item.GetVisualElement.GetVisible)
     );
   end;
 end;
@@ -1311,7 +1434,7 @@ begin
       if Assigned(Cell) then
         Item := Cell.Item;
       if Assigned(Item) then
-        Element := Item.GetElement;
+        Element := Item.GetVisualElement;
       if Assigned(Element) then
         Element.SetVisible(IsVisibleCell(Cell));
     end;
@@ -1596,16 +1719,21 @@ begin
   FControlElement := TControlVisualElement.Create(AControl);
 end;
 
-function TControlGridItem.GetElement: IVisualElement;
+function TControlGridItem.GetVisualElement: IVisualElement;
 begin
   Result := FControlElement;
 end;
 
-procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+function TControlGridItem.GetRenderer: IGridItemRenderer;
+begin
+  Result := TControlGridItemRenderer.Create(Self);
+end;
+
+{procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
 begin
   FControlElement.SetBounds(ALeft, ATop, AWidth, AHeight);
   AfterSetBounds;
-end;
+end;}
 
 { TSubGridItem }
 

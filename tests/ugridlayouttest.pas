@@ -2116,7 +2116,12 @@ begin
   SubGrid.AddItem(SubButton, TGridCellSettings.Create(0, 0));
 
   // Simula posicionamento do SubGrid no grid principal
-  SubItem.SetBounds(100, 200, 50, 20);
+  // SubItem.SetBounds(100, 200, 50, 20);
+
+  SubItem.GetRenderer.RenderTo(
+    TGriItemRenderContext.Create
+      .WithBounds(100, 200, 50, 20)
+  );
 
   // Checagens
   AssertEquals('SubButton.Left deve estar na posição virtual X', 100, SubButton.Left);

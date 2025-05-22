@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, LazHelpHTML,
-  IpHtml, SynHighlighterHTML, ULayout, UGridHtmlTable, UGridItemFactory;
+  IpHtml, SynHighlighterHTML, ULayout, ugridhtml, UGridItemFactory;
 
 type
 
@@ -34,7 +34,7 @@ implementation
 procedure TFGridHtmlTable.Button2Click(Sender: TObject);
 var
   Grid: TGridLayout;
-  Renderer: TGridHtmlTableRenderer;
+  Renderer: IHtmlGridRenderer;
 begin
   Grid := TGridLayout.Create;
 
@@ -55,7 +55,7 @@ begin
     Grid.Margins.Top := 15;
     Grid.Margins.Bottom := 10;
 
-    Renderer := TGridHtmlTableRenderer.Create(Grid);
+    Renderer := THtmlTableGridRenderer.Create(Grid);
 
     TGridItemFactory.Create
       .BuildHtmlTableItem(Renderer)
@@ -98,7 +98,6 @@ begin
 
     memo1.Text := Renderer.GetAsString;
   finally
-    Renderer.Free;
     Grid.Free;
   end;
 end;

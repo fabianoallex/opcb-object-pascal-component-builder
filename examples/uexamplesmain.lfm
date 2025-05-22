@@ -1,13 +1,14 @@
 object FExamplesMain: TFExamplesMain
-  Left = 0
+  Left = 294
   Height = 864
-  Top = 0
+  Top = 42
   Width = 1313
   Caption = 'FExamplesMain'
   ClientHeight = 864
   ClientWidth = 1313
   DesignTimePPI = 120
   Font.Height = -15
+  LCLVersion = '4.0.0.4'
   object PageControl: TPageControl
     Left = 408
     Height = 864

@@ -28,9 +28,9 @@ type
     property Width: Integer read FWidth;
   end;
 
-  { TGridTextRenderer }
+  { TTextGridRenderer }
 
-  TGridTextRenderer = class
+  TTextGridRenderer = class
   private
     FGrid: TGridLayout;
     FCharMatrix: TCharMatrix;
@@ -69,19 +69,19 @@ type
   { TTextVisualElement }
 
   TTextVisualElement = class(TInterfacedObject, IVisualElement)
-    FRenderer: TGridTextRenderer;
+    FRenderer: TTextGridRenderer;
     FLines: TStringList;
     FLeft, FTop, FWidth, FHeight: Integer;
     FVisible: Boolean;
-    procedure Redraw;
   private
     FHorizontalAlign: TTextAlignHorizontal;
     FVerticalAlign: TTextAlignVertical;
     procedure AdjustSize;
     function GetAlignedLines: specialize TArray<string>;
   public
-    constructor Create(const ARenderer: TGridTextRenderer);
+    constructor Create(const ARenderer: TTextGridRenderer);
     destructor Destroy; override;
+    procedure Redraw(AContext: TGriItemRenderContext);
     function GetHeight: Integer;
     function GetLeft: Integer;
     function GetTop: Integer;
@@ -95,18 +95,31 @@ type
     function GetTextLines: TStringList;
     property HorizontalAlign: TTextAlignHorizontal read FHorizontalAlign write FHorizontalAlign;
     property VerticalAlign: TTextAlignVertical read FVerticalAlign write FVerticalAlign;
+    property Renderer: TTextGridRenderer read FRenderer;
   end;
 
   { TTextGridItem }
 
   TTextGridItem = class(TInterfacedObject, IGridItem)
   protected
+    FGridRenderer: TTextGridRenderer;
     FElement: IVisualElement;
     procedure AfterSetBounds; virtual;
   public
     constructor Create(AElement: TTextVisualElement);
-    function GetElement: IVisualElement;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+    function GetVisualElement: IVisualElement;
+    function GetRenderer: IGridItemRenderer;
+  end;
+
+  { TTextGridItemRenderer }
+
+  TTextGridItemRenderer = class(TInterfacedObject, IGridItemRenderer)
+  private
+    FGridRenderer: TTextGridRenderer;
+    FGridItem: TTextGridItem;
+  public
+    constructor Create(AGridRenderer: TTextGridRenderer; AGridItem: TTextGridItem);
+    procedure RenderTo(AContext: TGriItemRenderContext);
   end;
 
 implementation
@@ -165,51 +178,51 @@ begin
   end;
 end;
 
-{ TGridTextRenderer }
+{ TTextGridRenderer }
 
-procedure TGridTextRenderer.SetHorizontaSpancingChar(AValue: Char);
+procedure TTextGridRenderer.SetHorizontaSpancingChar(AValue: Char);
 begin
   if FHorizontaSpancingChar = AValue then Exit;
   FHorizontaSpancingChar := AValue;
 end;
 
-procedure TGridTextRenderer.SetIntersectionSpacingChar(AValue: Char);
+procedure TTextGridRenderer.SetIntersectionSpacingChar(AValue: Char);
 begin
   if FIntersectionChar = AValue then Exit;
   FIntersectionChar := AValue;
 end;
 
-procedure TGridTextRenderer.SetMarginBottomChar(AValue: Char);
+procedure TTextGridRenderer.SetMarginBottomChar(AValue: Char);
 begin
   if FMarginBottomChar = AValue then Exit;
   FMarginBottomChar := AValue;
 end;
 
-procedure TGridTextRenderer.SetMarginLeftChar(AValue: Char);
+procedure TTextGridRenderer.SetMarginLeftChar(AValue: Char);
 begin
   if FMarginLeftChar = AValue then Exit;
   FMarginLeftChar := AValue;
 end;
 
-procedure TGridTextRenderer.SetMarginRightChar(AValue: Char);
+procedure TTextGridRenderer.SetMarginRightChar(AValue: Char);
 begin
   if FMarginRightChar = AValue then Exit;
   FMarginRightChar := AValue;
 end;
 
-procedure TGridTextRenderer.SetMarginTopChar(AValue: Char);
+procedure TTextGridRenderer.SetMarginTopChar(AValue: Char);
 begin
   if FMarginTopChar = AValue then Exit;
   FMarginTopChar := AValue;
 end;
 
-procedure TGridTextRenderer.SetVerticalSpacingChar(AValue: Char);
+procedure TTextGridRenderer.SetVerticalSpacingChar(AValue: Char);
 begin
   if FVerticalSpacingChar = AValue then Exit;
   FVerticalSpacingChar := AValue;
 end;
 
-constructor TGridTextRenderer.Create(AGrid: TGridLayout);
+constructor TTextGridRenderer.Create(AGrid: TGridLayout);
 begin
   inherited Create;
   FGrid := AGrid;
@@ -225,23 +238,23 @@ begin
   Clear;
 end;
 
-destructor TGridTextRenderer.Destroy;
+destructor TTextGridRenderer.Destroy;
 begin
   FCharMatrix.Free;
   inherited Destroy;
 end;
 
-procedure TGridTextRenderer.WriteTextAt(x, y: Integer; const AText: string);
+procedure TTextGridRenderer.WriteTextAt(x, y: Integer; const AText: string);
 begin
   FCharMatrix.WriteTextAt(x, y, AText);
 end;
 
-function TGridTextRenderer.GetAsString: string;
+function TTextGridRenderer.GetAsString: string;
 begin
   Result := FCharMatrix.GetAsString;
 end;
 
-procedure TGridTextRenderer.Clear;
+procedure TTextGridRenderer.Clear;
 var
   X, Y: Integer;
   IsVerticalSpacing: Boolean;
@@ -343,7 +356,7 @@ begin
   end;
 end;
 
-procedure TTextVisualElement.Redraw;
+procedure TTextVisualElement.Redraw(AContext: TGriItemRenderContext);
 var
   I: Integer;
   Str: string;
@@ -357,7 +370,7 @@ begin
     FRenderer.WriteTextAt(FLeft, FTop + I, AlignedLines[I]);
 end;
 
-constructor TTextVisualElement.Create(const ARenderer: TGridTextRenderer);
+constructor TTextVisualElement.Create(const ARenderer: TTextGridRenderer);
 begin
   inherited Create;
   FRenderer := ARenderer;
@@ -402,7 +415,6 @@ begin
   FTop := ATop;
   FWidth := AWidth;
   FHeight := AHeight;
-  Redraw;
 end;
 
 procedure TTextVisualElement.SetHeight(AValue: Integer);
@@ -454,18 +466,39 @@ end;
 constructor TTextGridItem.Create(AElement: TTextVisualElement);
 begin
   inherited Create;
+  FGridRenderer := AElement.Renderer;
   FElement := AElement;
 end;
 
-function TTextGridItem.GetElement: IVisualElement;
+function TTextGridItem.GetVisualElement: IVisualElement;
 begin
   Result := FElement;
 end;
 
-procedure TTextGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+function TTextGridItem.GetRenderer: IGridItemRenderer;
 begin
-  FElement.SetBounds(ALeft, ATop, AWidth, AHeight);
-  AfterSetBounds;
+  Result := TTextGridItemRenderer.Create(Self.FGridRenderer, Self);
+end;
+
+{ TTextGridItemRenderer }
+
+constructor TTextGridItemRenderer.Create(AGridRenderer: TTextGridRenderer;
+  AGridItem: TTextGridItem);
+begin
+  FGridRenderer := AGridRenderer;
+  FGridItem := AGridItem;
+end;
+
+procedure TTextGridItemRenderer.RenderTo(AContext: TGriItemRenderContext);
+begin
+  FGridItem.GetVisualElement.SetBounds(
+    AContext.Left,
+    AContext.Top,
+    AContext.Width,
+    AContext.Height
+  );
+
+  FGridItem.GetVisualElement.Redraw(AContext);
 end;
 
 end.
