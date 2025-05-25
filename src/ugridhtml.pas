@@ -25,7 +25,7 @@ type
 
   THtmlTableGridRenderer = class(TInterfacedObject, IHtmlGridRenderer)
   private
-    function CreateStyleElement(AGrid: TGridLayout): THTMLElement;
+    function CreateStyleElement: THTMLElement;
   public
     function GetAsString(AGrid: TGridLayout): string;
   end;
@@ -137,25 +137,22 @@ end;
 
 { IHtmlGridRenderer }
 
-function THtmlTableGridRenderer.CreateStyleElement(AGrid: TGridLayout
-  ): THTMLElement;
+function THtmlTableGridRenderer.CreateStyleElement: THTMLElement;
 var
-  StyleElement: THTMLElement;
   CssBuilder: TCSSBuilder;
 begin
   CSSBuilder := TCSSBuilder.Create;
-  StyleElement := THTMLElement.Create('style');
+  Result := THTMLElement.Create('style');
 
   try
-    CssBuilder.AddRule('td', 'paddging', '35px');
-    CssBuilder.AddRule(
-      'td',
-      'background-image',
-        'linear-gradient(to bottom, rgba(240, 255, 40, 1) 0%, rgba(240, 255, 40, 1) 100%), ' +
-        'linear-gradient(to bottom, rgba(240, 40, 40, 1) 0%, rgba(240, 40, 40, 1) 100%)'
-    );
-    CssBuilder.AddRule('td', 'background-clip', 'content-box, padding-box');
     CssBuilder
+      .UsingRule('td')
+        .Add('paddging', '35px')
+        .Add('background-image',
+          'linear-gradient(to bottom, rgba(240, 255, 40, 1) 0%, rgba(240, 255, 40, 1) 100%), ' +
+          'linear-gradient(to bottom, rgba(240, 40, 40, 1) 0%, rgba(240, 40, 40, 1) 100%)'
+        )
+        .Add('background-clip', 'content-box, padding-box')
       .UsingRule('.lt').Add('text-align', 'left').Add('vertical-align', 'top')
       .UsingRule('.ct').Add('text-align', 'center').Add('vertical-align', 'top')
       .UsingRule('.rt').Add('text-align', 'right').Add('vertical-align', 'top')
@@ -167,8 +164,7 @@ begin
       .UsingRule('.rb').Add('text-align', 'right').Add('vertical-align', 'bottom')
     ;
 
-    StyleElement.SetText(CssBuilder.GetCSS);
-    Result := StyleElement;
+    Result.SetText(CssBuilder.GetCSS);
   finally
     CssBuilder.Free;
   end;
@@ -185,28 +181,36 @@ var
   TdElement: THTMLElement;
   Padding: TPadding;
 
-  function CalcColumnWidth(AColumn: Integer): Integer;
+  function CalcColumnWidth(AColumn: Integer): string;
+  var
+    Width: Integer;
   begin
-    Result := AGrid.ColumnWidth[AColumn];
+    Width := AGrid.ColumnWidth[AColumn];
     if AColumn = 0 then
-      Result := Result + AGrid.Margins.Left;
+      Width := Width + AGrid.Margins.Left;
 
     if AColumn = AGrid.Columns-1 then
-      Result := Result + AGrid.Margins.Right
+      Width := Width + AGrid.Margins.Right
     else
-      Result := Result + AGrid.HorizontalSpacing[AColumn];
+      Width := Width + AGrid.HorizontalSpacing[AColumn];
+
+    Result := Width.ToString + 'px';
   end;
 
-  function CalcRowHeight(ARow: Integer): Integer;
+  function CalcRowHeight(ARow: Integer): string;
+  var
+    Height: Integer;
   begin
-    Result := AGrid.RowHeight[ARow];
+    Height := AGrid.RowHeight[ARow];
     if ARow = 0 then
-      Result := Result + AGrid.Margins.Top;
+      Height := Height + AGrid.Margins.Top;
 
     if ARow = AGrid.Rows - 1 then
-      Result := Result + AGrid.Margins.Bottom
+      Height := Height + AGrid.Margins.Bottom
     else
-      Result := Result + AGrid.VerticalSpacing[ARow];
+      Height := Height + AGrid.VerticalSpacing[ARow];
+
+    Result := Height.ToString + 'px';
   end;
 
   function CreateColGroupElement: THTMLElement;
@@ -218,7 +222,7 @@ var
     for C := 0 to AGrid.Columns - 1 do
     begin
       Element := Result.CreateChild('col');
-      Element.Attributes.SetAttribute('width', CalcColumnWidth(C).ToString + 'px');
+      Element.Attributes.SetAttribute('width', CalcColumnWidth(C));
     end;
   end;
 
@@ -227,13 +231,14 @@ var
     HAlignMap: array[TItemAlignment] of string = ('l', 'c', 'l', 'r');
     VAlignMap: array[TItemAlignment] of string = ('t', 'c', 't', 'b');
   begin
-    Result := HAlignMap[ACell.HorizontalAlignment]
-      + VAlignMap[ACell.VerticalAlignment];
+    Result :=
+      HAlignMap[ACell.HorizontalAlignment] +
+      VAlignMap[ACell.VerticalAlignment];
   end;
 
 begin
   TableElement := THTMLElement.Create('table');
-  StyleElement := CreateStyleElement(AGrid);
+  StyleElement := CreateStyleElement;
   try
     TableElement.Attributes.AddStyle('border', '0px');
     TableElement.AddChild(CreateColGroupElement);
@@ -241,7 +246,7 @@ begin
     for Row := 0 to AGrid.Rows - 1 do
     begin
       TrElement := TableElement.CreateChild('tr');
-      TrElement.Attributes.SetAttribute('height', CalcRowHeight(Row).ToString + 'px');
+      TrElement.Attributes.SetAttribute('height', CalcRowHeight(Row));
 
       for Col := 0 to AGrid.Columns - 1 do
       begin
@@ -383,9 +388,8 @@ function THtmlDivGridRenderer.CreateStyleElement(AGrid: TGridLayout): THTMLEleme
 
 var
   CssBuilder: TCSSBuilder;
-  StyleElement: THTMLElement;
 begin
-  StyleElement := THTMLElement.Create('style');
+  Result := THTMLElement.Create('style');
   CssBuilder := TCssBuilder.Create;
   try
     CssBuilder
@@ -423,8 +427,7 @@ begin
       .UsingRule('.cb').Add('text-align', 'center').Add('align-items', 'end')
       .UsingRule('.rb').Add('text-align', 'right').Add('align-items', 'end')
     ;
-    StyleElement.SetText(CssBuilder.GetCSS);
-    Result := StyleElement;
+    Result.SetText(CssBuilder.GetCSS);
   finally
     CssBuilder.Free;
   end;
