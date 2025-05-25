@@ -14,7 +14,7 @@ uses
   UGridaLayoutResizer, Forms, lazcontrols, UExamplesMain,
   UFColumnResizerGridLayout, UFRowResizerGridLayout, uffullresizergridlayout,
   UFColunaBotoes, UGridText, UFGridText, UGridItemFactory, UGridHtml,
-  UFGridHtmlTable;
+  HtmlBuilder;
 
 {$R *.res}
 
@@ -28,7 +28,6 @@ begin
   Application.CreateForm(TFFullResizerGridLayout, FFullResizerGridLayout);
   Application.CreateForm(TFColunaBotoes, FColunaBotoes);
   Application.CreateForm(TFGridText, FGridText);
-  Application.CreateForm(TFGridHtmlTable, FGridHtmlTable);
   Application.Run;
 end.
 

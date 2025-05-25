@@ -55,7 +55,7 @@ begin
     Grid.Margins.Top := 15;
     Grid.Margins.Bottom := 10;
 
-    Renderer := THtmlTableGridRenderer.Create(Grid);
+    Renderer := THtmlTableGridRenderer.Create;
 
     TGridItemFactory.Create
       .BuildHtmlTableItem(Renderer)
@@ -96,7 +96,7 @@ begin
         )
         .AddToGrid(Grid);
 
-    memo1.Text := Renderer.GetAsString;
+    memo1.Text := Renderer.GetAsString(Grid);
   finally
     Grid.Free;
   end;

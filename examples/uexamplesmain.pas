@@ -41,7 +41,6 @@ type
     Button32: TButton;
     Button33: TButton;
     Button34: TButton;
-    Button35: TButton;
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
@@ -152,7 +151,7 @@ implementation
 uses
   StrUtils, UGridLayoutFill, UGridaLayoutResizer, UFColumnResizerGridLayout,
   UFRowResizerGridLayout, UFFullResizerGridLayout, UFColunaBotoes, UFGridText,
-  UGridItemFactory, UFGridHtmlTable;
+  UGridItemFactory;
 
 procedure TFExamplesMain.Button1Click(Sender: TObject);
 begin
@@ -291,7 +290,7 @@ end;
 
 procedure TFExamplesMain.Button35Click(Sender: TObject);
 begin
-  FGridHtmlTable.ShowModal;
+
 end;
 
 procedure TFExamplesMain.Button3Click(Sender: TObject);

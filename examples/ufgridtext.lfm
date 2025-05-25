@@ -20,9 +20,8 @@ object FGridText: TFGridText
       'Memo1'
     )
     ParentFont = False
-    ScrollBars = ssBoth
+    ScrollBars = ssAutoVertical
     TabOrder = 0
-    WordWrap = False
   end
   object Button2: TButton
     Left = 848
@@ -38,8 +37,17 @@ object FGridText: TFGridText
     Height = 31
     Top = 72
     Width = 152
-    Caption = 'Gerar Html'
+    Caption = 'Gerar Html Div'
     TabOrder = 2
     OnClick = Button3Click
+  end
+  object Button4: TButton
+    Left = 848
+    Height = 31
+    Top = 112
+    Width = 152
+    Caption = 'Gerar Html Table'
+    TabOrder = 3
+    OnClick = Button4Click
   end
 end

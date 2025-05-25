@@ -23,13 +23,15 @@ type
   TFGridText = class(TForm)
     Button2: TButton;
     Button3: TButton;
+    Button4: TButton;
     Memo1: TMemo;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
+    procedure Button4Click(Sender: TObject);
   private
     procedure GerarRelatorioVenda;
-    procedure GerarRelatorioVendaHtml;
+    procedure GerarRelatorioVendaHtml(ARenderer: IHtmlGridRenderer);
 
   public
 
@@ -173,7 +175,7 @@ end;
 
 
 
-procedure TFGridText.GerarRelatorioVendaHtml;
+procedure TFGridText.GerarRelatorioVendaHtml(ARenderer: IHtmlGridRenderer);
 const
   COL_DESC = 0;
   COL_UNID = 1;
@@ -181,7 +183,6 @@ const
   COL_TOTAL = 3;
 var
   Grid: TGridLayout;
-  Renderer: IHtmlGridRenderer;
   I, Row: Integer;
   Item: TVendaItem;
   Element: THtmlVisualElement;
@@ -191,7 +192,7 @@ var
   procedure AddHeaderCell(const AText: string; ACol: Integer);
   begin
     TGridItemFactory.Create
-      .BuildHtmlTableItem(Renderer)
+      .BuildHtmlTableItem(ARenderer)
       .WithStrContent(AText)
       .WithCellSettings(
         TGridCellSettings.Create(0, ACol)
@@ -203,7 +204,7 @@ var
   procedure AddItemCell(const AText: string; ACol: Integer; Align: TItemAlignment = laStart);
   begin
     TGridItemFactory.Create
-      .BuildHtmlTableItem(Renderer)
+      .BuildHtmlTableItem(ARenderer)
       .WithStrContent(AText)
       .WithCellSettings(
         TGridCellSettings.Create(Row, ACol)
@@ -254,7 +255,7 @@ begin
 
     Grid.Margins.All := 5;
 
-    Renderer := THtmlDivGridRenderer.Create(Grid);
+    //GerarRelatorioVendaHtml(THtmlDivGridRenderer.Create);
 
     AddHeaderCell('Descricao', COL_DESC);
     AddHeaderCell('Unidade', COL_UNID);
@@ -275,7 +276,7 @@ begin
       AddItemCell(FormatFloat('0.00', Item.Total) + ' ', COL_TOTAL, laEnd);
     end;
 
-    Element := THtmlVisualElement.Create(Renderer);
+    Element := THtmlVisualElement.Create(ARenderer);
     Element.StrContent := 'Total Geral  ';
     Grid.AddItem(
       THtmlGridItem.Create(Element),
@@ -285,7 +286,7 @@ begin
         .WithRowSpan(3)
     );
 
-    Element := THtmlVisualElement.Create(Renderer);
+    Element := THtmlVisualElement.Create(ARenderer);
     Element.StrContent := FormatFloat('0.00', TotalGeral) + ' ';
     Grid.AddItem(
       THtmlGridItem.Create(Element),
@@ -295,7 +296,7 @@ begin
     );
 
     Grid.ArrangeItems;
-    Memo1.Text := Renderer.GetAsString;
+    Memo1.Text := ARenderer.GetAsString(Grid);
 
   finally
     Grid.Free;
@@ -319,7 +320,12 @@ end;
 
 procedure TFGridText.Button3Click(Sender: TObject);
 begin
-  GerarRelatorioVendaHtml;
+  GerarRelatorioVendaHtml(THtmlDivGridRenderer.Create);
+end;
+
+procedure TFGridText.Button4Click(Sender: TObject);
+begin
+  GerarRelatorioVendaHtml(THtmlTableGridRenderer.Create);
 end;
 
 

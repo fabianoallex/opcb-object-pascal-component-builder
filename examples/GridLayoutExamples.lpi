@@ -142,12 +142,9 @@
         <UnitName Value="UGridHtml"/>
       </Unit>
       <Unit>
-        <Filename Value="ufgridhtmltable.pas"/>
+        <Filename Value="htmlbuilder.pas"/>
         <IsPartOfProject Value="True"/>
-        <ComponentName Value="FGridHtmlTable"/>
-        <HasResources Value="True"/>
-        <ResourceBaseClass Value="Form"/>
-        <UnitName Value="UFGridHtmlTable"/>
+        <UnitName Value="HtmlBuilder"/>
       </Unit>
     </Units>
   </ProjectOptions>
