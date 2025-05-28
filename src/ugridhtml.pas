@@ -92,7 +92,7 @@ type
 
 implementation
 
-function CalcPaddingOfCell(AGrid: TGridLayout; ACell: TGridCell): TPadding;
+function CalcCellPadding(AGrid: TGridLayout; ACell: TGridCell): TPadding;
 var
   HCol, VRow: Integer;
 begin
@@ -258,7 +258,7 @@ begin
           begin
             TdElement := TrElement.CreateChild('td');
 
-            Padding := CalcPaddingOfCell(AGrid, Cell);
+            Padding := CalcCellPadding(AGrid, Cell);
             TdElement.Attributes.AddStyle('padding',
               Format(
                 '%dpx %dpx %dpx %dpx',
@@ -280,7 +280,7 @@ begin
         if Cell.ColSpan > 1 then
           TdElement.Attributes.SetAttribute('colspan', Cell.ColSpan.ToString);
 
-        Padding := CalcPaddingOfCell(AGrid, Cell);
+        Padding := CalcCellPadding(AGrid, Cell);
         TdElement.Attributes.AddStyle(
           'padding',
           Format(
@@ -312,7 +312,7 @@ function THtmlDivGridRenderer.CreateStyleElement(AGrid: TGridLayout): THTMLEleme
     Result := '';
     for C := 0 to AGrid.Columns - 1 do
     begin
-      Padding := CalcPaddingOfCell(AGrid, AGrid.GetCell(0, C));
+      Padding := CalcCellPadding(AGrid, AGrid.GetCell(0, C));
       Result := Result + ' '
         + ( AGrid.ColumnWidth[C]
             + Padding.Left
@@ -325,7 +325,7 @@ function THtmlDivGridRenderer.CreateStyleElement(AGrid: TGridLayout): THTMLEleme
   var
     Padding: TPadding;
   begin
-    Padding := CalcPaddingOfCell(AGrid, AGrid.GetCell(Row, 0));
+    Padding := CalcCellPadding(AGrid, AGrid.GetCell(Row, 0));
     Result := AGrid.RowHeight[Row]
       + Padding.Top
       + Padding.Bottom;
@@ -456,7 +456,7 @@ var
     Result.Attributes.AddClass('grid-item');
     Result.Attributes.AddClass(GetAlignmentClass(Acell));
 
-    Padding := CalcPaddingOfCell(AGrid, ACell);
+    Padding := CalcCellPadding(AGrid, ACell);
     Result.Attributes.AddStyle(
       'padding',
       Format(
