@@ -22,6 +22,7 @@ type
     procedure SetOnBeforePlaceItem(AValue: TGridFillBeforePlaceEvent); virtual; abstract;
     function GetGrid: TGridLayout; virtual; abstract;
     procedure PlaceItem(AItem: IGridItem); overload; virtual; abstract;
+    procedure PlaceItem(AItem: IGridItem; ASettings: TGridCellSettings); overload; virtual; abstract;
     procedure Skip(ACount: Integer = 1); virtual; abstract;
     procedure InitialPos(APos: IGridPosition); virtual; abstract;
     function NextPosition: IGridPosition; virtual; abstract;
@@ -49,6 +50,7 @@ type
     constructor Create(AGrid: TGridLayout); override; overload;
     function NextPosition: IGridPosition; override;
     procedure PlaceItem(AItem: IGridItem); override; overload;
+    procedure PlaceItem(AItem: IGridItem; ASettings: TGridCellSettings); overload; override;
     procedure Skip(ACount: Integer=1); override;
     procedure InitialPos(APos: IGridPosition); override;
     property Grid: TGridLayout read FGrid;
@@ -182,6 +184,20 @@ begin
     raise Exception.Create('Grid not assigned.');
 
   Pos := NextPosition;
+  Settings := TGridCellSettings.Create(Pos.Row, Pos.Column);
+  Self.PlaceItem(AItem, Settings);
+end;
+
+{
+var
+  Pos: IGridPosition;
+  Settings: TGridCellSettings;
+  Accept: Boolean;
+begin
+  if not Assigned(Grid) then
+    raise Exception.Create('Grid not assigned.');
+
+  Pos := NextPosition;
   Accept := True;
   Settings := TGridCellSettings.Create(Pos.Row, Pos.Column);
 
@@ -195,6 +211,38 @@ begin
     Exit;
 
   Grid.AddItem(AItem, Settings);
+
+  if Assigned(FOnAfterPlaceItem) then
+    FOnAfterPlaceItem(Self, Self.Grid, AItem, Pos);
+end;
+
+}
+
+procedure TGridFillRowFirst.PlaceItem(AItem: IGridItem;
+  ASettings: TGridCellSettings);
+var
+  Pos: IGridPosition;
+  Accept: Boolean;
+begin
+  if not Assigned(Grid) then
+    raise Exception.Create('Grid not assigned.');
+
+  Pos := NextPosition;
+  ASettings.WithRow(Pos.Row);
+  ASettings.WithColumn(Pos.Column);
+
+  Accept := True;
+
+  if Assigned(FOnBeforePlaceItem) then
+    FOnBeforePlaceItem(
+      Self, Self.Grid, AItem, Pos,
+      ASettings, Accept
+    );
+
+  if not Accept then
+    Exit;
+
+  Grid.AddItem(AItem, ASettings);
 
   if Assigned(FOnAfterPlaceItem) then
     FOnAfterPlaceItem(Self, Self.Grid, AItem, Pos);

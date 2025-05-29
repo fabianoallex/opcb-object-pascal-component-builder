@@ -195,7 +195,8 @@ type
     FRowSpan: Integer;
     FVerticalAlignment: TItemAlignment;
   public
-    constructor Create(ARow, AColumn: Integer); reintroduce;
+    constructor Create; overload; reintroduce;
+    constructor Create(ARow, AColumn: Integer); overload; reintroduce;
     function WithRow(ARow: Integer): TGridCellSettings;
     function WithColumn(AColum: Integer): TGridCellSettings;
     function WithRowSpan(ARowSpan: Integer): TGridCellSettings;
@@ -281,6 +282,7 @@ type
     procedure SetOnBeforePlaceItem(AValue: TGridFillBeforePlaceEvent);
     function GetGrid: TGridLayout;
     procedure PlaceItem(AItem: IGridItem); overload;
+    procedure PlaceItem(AItem: IGridItem; ASettings: TGridCellSettings); overload;
     procedure Skip(ACount: Integer=1);
     procedure InitialPos(APos: IGridPosition);
     function NextPosition: IGridPosition;
@@ -378,6 +380,10 @@ type
     procedure ClearRowAndColumnShifts;
     procedure ResetColumnWidthsToDefault;
     procedure ResetRowHeightsToDefault;
+    procedure ResetColumnShift;
+    procedure ResetRowShift;
+    procedure ResetVerticalSpacing;
+    procedure ResetHorizontalSpacing;
     function IsCellOccupied(ARow, ACol: Integer): Boolean;
     function IsCellSpan(ARow, ACol: Integer): Boolean;
     function IsColumnWidthCustomized(ACol: Integer): Boolean;
@@ -754,6 +760,11 @@ end;
 
 { TGridCellSettings }
 
+constructor TGridCellSettings.Create;
+begin
+  Create(0, 0);
+end;
+
 constructor TGridCellSettings.Create(ARow, AColumn: Integer);
 begin
   inherited Create;
@@ -951,6 +962,26 @@ end;
 procedure TGridLayout.ResetRowHeightsToDefault;
 begin
   FRowsInfo.ClearSizes;
+end;
+
+procedure TGridLayout.ResetColumnShift;
+begin
+  FColumnsInfo.ClearShifts;
+end;
+
+procedure TGridLayout.ResetRowShift;
+begin
+  FRowsInfo.ClearShifts;
+end;
+
+procedure TGridLayout.ResetVerticalSpacing;
+begin
+  FRowsInfo.ClearSpacings;
+end;
+
+procedure TGridLayout.ResetHorizontalSpacing;
+begin
+  FColumnsInfo.ClearSpacings;
 end;
 
 function TGridLayout.IsCellOccupied(ARow, ACol: Integer): Boolean;

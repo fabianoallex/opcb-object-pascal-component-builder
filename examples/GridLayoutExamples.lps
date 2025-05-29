@@ -20,8 +20,7 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UExamplesMain"/>
-        <TopLine Value="138"/>
-        <CursorPos X="19" Y="154"/>
+        <TopLine Value="145"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -66,7 +65,9 @@
         <Filename Value="..\src\ulayout.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
+        <TopLine Value="310"/>
         <UsageCount Value="212"/>
         <Loaded Value="True"/>
       </Unit>
@@ -162,11 +163,19 @@
         <Filename Value="..\src\ugridhtml.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridHtml"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
         <TopLine Value="62"/>
-        <CursorPos X="27" Y="95"/>
+        <CursorPos X="64" Y="72"/>
         <UsageCount Value="259"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="htmlbuilder.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="HtmlBuilder"/>
+        <EditorIndex Value="5"/>
+        <CursorPos X="17" Y="20"/>
+        <UsageCount Value="54"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -196,16 +205,6 @@
         <UsageCount Value="82"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="htmlbuilder.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="HtmlBuilder"/>
-        <EditorIndex Value="5"/>
-        <TopLine Value="80"/>
-        <CursorPos X="27" Y="107"/>
-        <UsageCount Value="54"/>
-        <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
@@ -243,10 +242,6 @@
       </Position>
       <Position>
         <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="143" Column="7" TopLine="202"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
         <Caret Line="28" Column="14" TopLine="12"/>
       </Position>
       <Position>
@@ -276,10 +271,6 @@
       <Position>
         <Filename Value="htmlbuilder.pas"/>
         <Caret Line="22" Column="21"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="490" Column="36" TopLine="591"/>
       </Position>
       <Position>
         <Filename Value="..\src\ugridhtml.pas"/>
@@ -326,6 +317,14 @@
       <Position>
         <Filename Value="..\src\ugridhtml.pas"/>
         <Caret Line="95" Column="25" TopLine="62"/>
+      </Position>
+      <Position>
+        <Filename Value="htmlbuilder.pas"/>
+        <Caret Line="87" Column="33" TopLine="65"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="154" Column="19" TopLine="51"/>
       </Position>
     </JumpHistory>
     <RunParams>

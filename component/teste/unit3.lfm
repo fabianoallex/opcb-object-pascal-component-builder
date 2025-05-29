@@ -1,0 +1,287 @@
+object Form3: TForm3
+  Left = 2650
+  Height = 552
+  Top = 250
+  Width = 587
+  Caption = 'Form3'
+  ClientHeight = 552
+  ClientWidth = 587
+  DesignTimePPI = 120
+  object SpeedButton1: TSpeedButton
+    Left = 15
+    Height = 50
+    Top = 103
+    Width = 105
+    Caption = '7'
+  end
+  object SpeedButton2: TSpeedButton
+    Left = 135
+    Height = 50
+    Top = 103
+    Width = 105
+    Caption = '8'
+  end
+  object SpeedButton3: TSpeedButton
+    Left = 255
+    Height = 50
+    Top = 103
+    Width = 105
+    Caption = '9'
+  end
+  object SpeedButton4: TSpeedButton
+    Left = 15
+    Height = 50
+    Top = 161
+    Width = 105
+    Caption = '4'
+  end
+  object SpeedButton5: TSpeedButton
+    Left = 135
+    Height = 50
+    Top = 161
+    Width = 105
+    Caption = '5'
+  end
+  object SpeedButton6: TSpeedButton
+    Left = 255
+    Height = 50
+    Top = 161
+    Width = 105
+    Caption = '6'
+  end
+  object SpeedButton7: TSpeedButton
+    Left = 375
+    Height = 50
+    Top = 161
+    Width = 105
+    Caption = '.'
+  end
+  object SpeedButton8: TSpeedButton
+    Left = 15
+    Height = 50
+    Top = 219
+    Width = 105
+    Caption = '1'
+  end
+  object SpeedButton9: TSpeedButton
+    Left = 135
+    Height = 50
+    Top = 219
+    Width = 105
+    Caption = '2'
+  end
+  object SpeedButton10: TSpeedButton
+    Left = 255
+    Height = 50
+    Top = 219
+    Width = 105
+    Caption = '3'
+  end
+  object SpeedButton11: TSpeedButton
+    Left = 15
+    Height = 80
+    Top = 15
+    Width = 105
+    Caption = 'N'
+  end
+  object SpeedButton12: TSpeedButton
+    Left = 135
+    Height = 80
+    Top = 15
+    Width = 105
+    Caption = '/'
+  end
+  object SpeedButton13: TSpeedButton
+    Left = 255
+    Height = 80
+    Top = 15
+    Width = 105
+    Caption = '*'
+  end
+  object SpeedButton14: TSpeedButton
+    Left = 375
+    Height = 80
+    Top = 15
+    Width = 105
+    Caption = '-'
+  end
+  object SpeedButton15: TSpeedButton
+    Left = 375
+    Height = 50
+    Top = 103
+    Width = 105
+    Caption = '+'
+  end
+  object SpeedButton16: TSpeedButton
+    Left = 375
+    Height = 108
+    Top = 219
+    Width = 105
+    Caption = 'Enter'
+  end
+  object SpeedButton17: TSpeedButton
+    Left = 15
+    Height = 50
+    Top = 277
+    Width = 225
+    Caption = '0'
+  end
+  object SpeedButton18: TSpeedButton
+    Left = 255
+    Height = 50
+    Top = 277
+    Width = 105
+    Caption = ','
+  end
+  object GridLayoutComponent1: TGridLayoutComponent
+    GridTop = 15
+    GridLeft = 15
+    ColumnWidth = 105
+    RowHeight = 50
+    Rows = 5
+    Columns = 4
+    Controls = <    
+      item
+        Control = SpeedButton11
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton12
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton13
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton14
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton1
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton2
+        Row = 0
+        Column = 1
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton3
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton15
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton4
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton5
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton6
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton7
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton8
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton9
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton10
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton16
+        Row = 0
+        Column = 0
+        RowSpan = 2
+        ColSpan = 0
+      end    
+      item
+        Control = SpeedButton17
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 2
+      end    
+      item
+        Control = SpeedButton18
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+      end>
+    AutoArrange = True
+    ColTracks = <>
+    RowTracks = <    
+      item
+        Index = 0
+        Size = 80
+        Spacing = 20
+        Shift = 0
+        EnableSize = True
+        EnableSpacing = False
+        EnableShift = True
+      end>
+    VerticalSpacing = 8
+    HorizontalSpacing = 15
+    Left = 96
+    Top = 368
+  end
+end
