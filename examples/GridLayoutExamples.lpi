@@ -142,7 +142,7 @@
         <UnitName Value="UGridHtml"/>
       </Unit>
       <Unit>
-        <Filename Value="htmlbuilder.pas"/>
+        <Filename Value="..\src\htmlbuilder.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="HtmlBuilder"/>
       </Unit>

@@ -1,0 +1,160 @@
+object Form4: TForm4
+  Left = 2650
+  Height = 501
+  Top = 250
+  Width = 975
+  Caption = 'Form4'
+  ClientHeight = 501
+  ClientWidth = 975
+  DesignTimePPI = 120
+  object Label1: TLabel
+    Left = 60
+    Height = 20
+    Top = 37
+    Width = 250
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'iss'
+  end
+  object Edit1: TEdit
+    Left = 320
+    Height = 28
+    Top = 33
+    Width = 350
+    TabOrder = 0
+    Text = 'Edit1'
+  end
+  object Label2: TLabel
+    Left = 60
+    Height = 20
+    Top = 77
+    Width = 250
+    Alignment = taRightJustify
+    AutoSize = False
+    Caption = 'Label2'
+  end
+  object Edit2: TEdit
+    Left = 320
+    Height = 28
+    Top = 73
+    Width = 350
+    TabOrder = 1
+    Text = 'Edit2'
+  end
+  object Button1: TButton
+    Left = 320
+    Height = 35
+    Top = 110
+    Width = 350
+    Caption = 'Button1'
+    TabOrder = 2
+  end
+  object MaskEdit1: TMaskEdit
+    Left = 400
+    Height = 28
+    Top = 272
+    Width = 100
+    EnableSets = False
+    MaxLength = 0
+    TabOrder = 3
+    Text = 'MaskEdit1'
+    SpaceChar = '_'
+  end
+  object CheckBox1: TCheckBox
+    Left = 138
+    Height = 24
+    Top = 115
+    Width = 93
+    Caption = 'CheckBox1'
+    TabOrder = 4
+  end
+  object GridLayoutComponent1: TGridLayoutComponent
+    GridTop = 20
+    GridLeft = 50
+    ColumnWidth = 250
+    RowHeight = 35
+    Rows = 5
+    Columns = 2
+    Controls = <    
+      item
+        Control = Label1
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laCenter
+      end    
+      item
+        Control = Edit1
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laCenter
+      end    
+      item
+        Control = Label2
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laCenter
+      end    
+      item
+        Control = Edit2
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laCenter
+      end    
+      item
+        Control = CheckBox1
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        ColSpan = 0
+        HorizontalAlignment = laCenter
+        VerticalAlignment = laCenter
+      end    
+      item
+        Control = Button1
+        Row = 0
+        Column = 0
+        RowSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
+      end    
+      item
+        Row = 0
+        Column = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
+      end>
+    AutoArrange = True
+    Margins.Left = 10
+    Margins.Top = 10
+    Margins.Right = 10
+    Margins.Bottom = 10
+    ColTracks = <    
+      item
+        Index = 1
+        Size = 350
+        Spacing = 0
+        Shift = 0
+        EnableSize = True
+        EnableSpacing = False
+        EnableShift = False
+      end>
+    RowTracks = <>
+    VerticalSpacing = 5
+    HorizontalSpacing = 10
+    FillerType = gftRowFirst
+    Left = 80
+    Top = 200
+  end
+end

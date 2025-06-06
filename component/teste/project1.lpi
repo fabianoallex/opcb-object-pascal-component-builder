@@ -26,6 +26,15 @@
     </RunParams>
     <RequiredPackages>
       <Item>
+        <PackageName Value="FCL"/>
+      </Item>
+      <Item>
+        <PackageName Value="RunTimeTypeInfoControls"/>
+      </Item>
+      <Item>
+        <PackageName Value="lazreport"/>
+      </Item>
+      <Item>
         <PackageName Value="pckgridlayout"/>
       </Item>
       <Item>
@@ -60,6 +69,14 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit3"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit4.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form4"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Unit4"/>
       </Unit>
     </Units>
   </ProjectOptions>

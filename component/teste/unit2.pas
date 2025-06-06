@@ -5,15 +5,19 @@ unit Unit2;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons,
-  GridLayoutComponent;
+  Classes, SysUtils, DB, Forms, Controls, Graphics, Dialogs, Buttons, ExtCtrls,
+  StdCtrls, DBCtrls, GridLayoutComponent;
 
 type
 
   { TForm2 }
 
   TForm2 = class(TForm)
+    DataSource1: TDataSource;
+    DBMemo1: TDBMemo;
     GridLayoutComponent1: TGridLayoutComponent;
+    ListBox1: TListBox;
+    Panel1: TPanel;
     SpeedButton1: TSpeedButton;
     SpeedButton10: TSpeedButton;
     SpeedButton11: TSpeedButton;

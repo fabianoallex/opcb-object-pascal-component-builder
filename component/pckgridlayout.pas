@@ -9,7 +9,7 @@ interface
 
 uses
   GridLayoutComponent, UGridLayoutFill, UGridLayoutFillerFactory, 
-  LazarusPackageIntf;
+  ControlPropertyEditor, LazarusPackageIntf;
 
 implementation
 

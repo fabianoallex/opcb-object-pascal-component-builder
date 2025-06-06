@@ -17,6 +17,7 @@ type
     BitBtn2: TBitBtn;
     BitBtn3: TBitBtn;
     BitBtn4: TBitBtn;
+    Button1: TButton;
     GridLayoutComponent1: TGridLayoutComponent;
     GroupBox1: TGroupBox;
     RadioGroup1: TRadioGroup;

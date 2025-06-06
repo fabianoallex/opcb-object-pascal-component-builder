@@ -41,6 +41,7 @@ type
     Button32: TButton;
     Button33: TButton;
     Button34: TButton;
+    Button35: TButton;
     Button4: TButton;
     Button5: TButton;
     Button6: TButton;
@@ -93,6 +94,8 @@ type
     procedure AddExample_BasicGridLayoutBuilder(AOwner: TForm;
       APageControl: TPageControl);
     procedure AddExample_ColumnShift(AOwner: TForm; APageControl: TPageControl);
+    procedure AddExample_CompositeGrid(AOwner: TForm; APageControl: TPageControl
+      );
     procedure AddExample_ControlPanel(AOwner: TForm; APageControl: TPageControl
       );
     procedure AddExample_CustomSpacing(AOwner: TForm; APageControl: TPageControl);
@@ -290,7 +293,7 @@ end;
 
 procedure TFExamplesMain.Button35Click(Sender: TObject);
 begin
-
+  AddExample_CompositeGrid(Self, PageControl);
 end;
 
 procedure TFExamplesMain.Button3Click(Sender: TObject);
@@ -554,6 +557,68 @@ begin
     Grid.ArrangeItems;
   finally
     Grid.Free;
+  end;
+end;
+
+procedure TFExamplesMain.AddExample_CompositeGrid(AOwner: TForm;
+  APageControl: TPageControl);
+var
+  Tab: TTabSheet;
+  Grid1: TGridLayout;
+  Grid2: TGridLayout;
+  CompositeGrid: TGridLayoutComposite;
+  Btn: TButton;
+  I: Integer;
+begin
+  Tab := TTabSheet.Create(PageControl);
+  Tab.PageControl := PageControl;
+  Tab.Caption := 'Composite';
+
+  Grid1 := TGridLayout.Create;
+  Grid2 := TGridLayout.Create;
+  CompositeGrid := TGridLayoutComposite.Create(gcoVertical);
+  try
+    Grid1.Rows := 3;
+    Grid1.Columns := 3;
+    Grid1.ColumnWidths := 60;
+    Grid1.RowHeights := 40;
+    Grid1.Margins.All := 10;
+    Grid1.HorizontalSpacings := 10;
+    Grid1.VerticalSpacings := 10;
+
+    for I := 0 to 8 do
+    begin
+      Btn := TButton.Create(Tab);
+      Btn.Parent := Tab;
+      Btn.Caption := 'Botão ' + IntToStr(I + 1);
+
+      Grid1.AddItem(Btn, TGridCellSettings.Create(I div 3, I mod 3));
+    end;
+
+    Grid2.Rows := 3;
+    Grid2.Columns := 3;
+    Grid2.ColumnWidths := 60;
+    Grid2.RowHeights := 40;
+    Grid2.Margins.All := 10;
+    Grid2.HorizontalSpacings := 10;
+    Grid2.VerticalSpacings := 10;
+
+    for I := 0 to 8 do
+    begin
+      Btn := TButton.Create(Tab);
+      Btn.Parent := Tab;
+      Btn.Caption := 'Botão ' + IntToStr(I + 1);
+
+      Grid2.AddItem(Btn, TGridCellSettings.Create(I div 3, I mod 3));
+    end;
+
+    CompositeGrid.AddGrid(Grid1);
+    CompositeGrid.AddGrid(Grid2);
+
+    Grid1.ArrangeItems;
+  finally
+    Grid1.Free;
+    Grid2.Free;
   end;
 end;
 

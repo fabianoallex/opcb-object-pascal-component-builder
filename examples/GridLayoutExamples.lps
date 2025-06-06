@@ -20,7 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UExamplesMain"/>
-        <TopLine Value="145"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="572"/>
+        <CursorPos X="59" Y="579"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -65,9 +67,9 @@
         <Filename Value="..\src\ulayout.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="7"/>
-        <TopLine Value="310"/>
+        <TopLine Value="1596"/>
+        <CursorPos X="29" Y="1618"/>
         <UsageCount Value="212"/>
         <Loaded Value="True"/>
       </Unit>
@@ -137,7 +139,7 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFGridText"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="224"/>
+        <TopLine Value="223"/>
         <CursorPos X="3" Y="217"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -170,12 +172,12 @@
         <Loaded Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="htmlbuilder.pas"/>
+        <Filename Value="..\src\htmlbuilder.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="HtmlBuilder"/>
         <EditorIndex Value="5"/>
-        <CursorPos X="17" Y="20"/>
-        <UsageCount Value="54"/>
+        <CursorPos X="76" Y="23"/>
+        <UsageCount Value="61"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -186,13 +188,13 @@
         <UnitName Value="UFGridHtmlTable"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="6"/>
-        <UsageCount Value="254"/>
+        <UsageCount Value="253"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\sysutils\syshelph.inc"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="11" Y="4"/>
-        <UsageCount Value="72"/>
+        <UsageCount Value="71"/>
       </Unit>
       <Unit>
         <Filename Value="ufullresizergridlayout.pas"/>
@@ -202,129 +204,131 @@
         <UnitName Value="UFullResizerGridLayout"/>
         <EditorIndex Value="6"/>
         <TopLine Value="49"/>
-        <UsageCount Value="82"/>
+        <UsageCount Value="85"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="35" Column="66" TopLine="19"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1624" TopLine="1602"/>
       </Position>
       <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="376" Column="3" TopLine="361"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1626" TopLine="1602"/>
       </Position>
       <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="35" Column="14" TopLine="18"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1629" TopLine="1602"/>
       </Position>
       <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="92" TopLine="82"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1631" TopLine="1602"/>
       </Position>
       <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="8" Column="42"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="481" Column="22" TopLine="455"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="469" Column="63" TopLine="449"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="28" Column="20" TopLine="18"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="28" Column="14" TopLine="12"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="327" Column="76" TopLine="308"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="623" TopLine="591"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="30" Column="21" TopLine="13"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="240" Column="46" TopLine="217"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="39" Column="14" TopLine="13"/>
-      </Position>
-      <Position>
-        <Filename Value="htmlbuilder.pas"/>
-        <Caret Line="15" Column="35"/>
-      </Position>
-      <Position>
-        <Filename Value="htmlbuilder.pas"/>
-        <Caret Line="22" Column="21"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="154" Column="7" TopLine="138"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="171" Column="40" TopLine="147"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="28" Column="25" TopLine="11"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="145" Column="3" TopLine="140"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="28" Column="32" TopLine="12"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="232" Column="37" TopLine="216"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="37" Column="16" TopLine="13"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="209" Column="44" TopLine="186"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="360" Column="75" TopLine="316"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ugridhtml.pas"/>
-        <Caret Line="95" Column="25" TopLine="62"/>
-      </Position>
-      <Position>
-        <Filename Value="htmlbuilder.pas"/>
-        <Caret Line="87" Column="33" TopLine="65"/>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1632" TopLine="1602"/>
       </Position>
       <Position>
         <Filename Value="uexamplesmain.pas"/>
-        <Caret Line="154" Column="19" TopLine="51"/>
+        <Caret Line="618" TopLine="587"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1556" TopLine="1534"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1557" TopLine="1534"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1448" TopLine="1432"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1449" TopLine="1432"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1450" TopLine="1432"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1451" TopLine="1432"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1452" TopLine="1432"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1454" TopLine="1438"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1456" TopLine="1438"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1458" TopLine="1438"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1459" TopLine="1438"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1524" TopLine="1496"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1525" TopLine="1496"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1526" TopLine="1496"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1527" TopLine="1496"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1524" TopLine="1492"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="382" Column="15" TopLine="360"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1447" TopLine="1440"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1518" TopLine="1497"/>
+      </Position>
+      <Position>
+        <Filename Value="uexamplesmain.pas"/>
+        <Caret Line="615" TopLine="587"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1152" Column="18" TopLine="1127"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="379" Column="15" TopLine="345"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="932" Column="3" TopLine="929"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="459" Column="22" TopLine="426"/>
       </Position>
     </JumpHistory>
     <RunParams>

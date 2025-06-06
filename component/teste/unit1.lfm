@@ -2,47 +2,47 @@ object Form1: TForm1
   Left = 150
   Height = 593
   Top = 250
-  Width = 714
+  Width = 748
   Caption = 'Form1'
   ClientHeight = 593
-  ClientWidth = 714
+  ClientWidth = 748
   DesignTimePPI = 120
   object BitBtn1: TBitBtn
     Left = 10
     Height = 71
     Top = 10
-    Width = 575
+    Width = 475
     Caption = 'BitBtn1'
     TabOrder = 0
   end
   object BitBtn2: TBitBtn
     Left = 10
     Height = 90
-    Top = 91
-    Width = 575
+    Top = 82
+    Width = 475
     Caption = 'BitBtn2'
     TabOrder = 1
   end
   object BitBtn3: TBitBtn
     Left = 10
     Height = 50
-    Top = 191
-    Width = 350
+    Top = 182
+    Width = 250
     Caption = 'BitBtn3'
     TabOrder = 2
   end
   object BitBtn4: TBitBtn
-    Left = 385
+    Left = 285
     Height = 50
-    Top = 191
+    Top = 182
     Width = 200
     Caption = 'BitBtn4'
     TabOrder = 3
   end
   object RadioGroup1: TRadioGroup
-    Left = 385
+    Left = 285
     Height = 50
-    Top = 242
+    Top = 233
     Width = 200
     AutoFill = True
     Caption = 'RadioGroup1'
@@ -58,12 +58,21 @@ object Form1: TForm1
   object GroupBox1: TGroupBox
     Left = 10
     Height = 50
-    Top = 242
-    Width = 350
+    Top = 233
+    Width = 250
     Caption = 'GroupBox1'
     TabOrder = 5
   end
+  object Button1: TButton
+    Left = 411
+    Height = 31
+    Top = 366
+    Width = 94
+    Caption = 'Button1'
+    TabOrder = 6
+  end
   object GridLayoutComponent1: TGridLayoutComponent
+    ControlScope = csParent
     GridTop = 0
     GridLeft = 0
     ColumnWidth = 200
@@ -77,6 +86,8 @@ object Form1: TForm1
         Column = 0
         RowSpan = 2
         ColSpan = 2
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = BitBtn2
@@ -84,6 +95,8 @@ object Form1: TForm1
         Column = 0
         RowSpan = 0
         ColSpan = 2
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = BitBtn3
@@ -91,6 +104,8 @@ object Form1: TForm1
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = BitBtn4
@@ -98,6 +113,8 @@ object Form1: TForm1
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = GroupBox1
@@ -105,6 +122,8 @@ object Form1: TForm1
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = RadioGroup1
@@ -112,6 +131,8 @@ object Form1: TForm1
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end>
     AutoArrange = True
     Margins.Left = 10
@@ -119,7 +140,7 @@ object Form1: TForm1
     ColTracks = <    
       item
         Index = 0
-        Size = 350
+        Size = 250
         Spacing = 25
         Shift = 15
         EnableSize = True
@@ -147,7 +168,8 @@ object Form1: TForm1
       end>
     VerticalSpacing = 1
     HorizontalSpacing = 0
-    Left = 528
-    Top = 32
+    FillerType = gftRowFirst
+    Left = 128
+    Top = 368
   end
 end

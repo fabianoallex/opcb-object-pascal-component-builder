@@ -26,10 +26,17 @@
         <Filename Value="..\src\ugridlayoutfillerfactory.pas"/>
         <UnitName Value="UGridLayoutFillerFactory"/>
       </Item>
+      <Item>
+        <Filename Value="controlpropertyeditor.pas"/>
+        <UnitName Value="ControlPropertyEditor"/>
+      </Item>
     </Files>
     <RequiredPkgs>
       <Item>
         <PackageName Value="LazControls"/>
+      </Item>
+      <Item>
+        <PackageName Value="IDEIntf"/>
       </Item>
       <Item>
         <PackageName Value="LazControlDsgn"/>

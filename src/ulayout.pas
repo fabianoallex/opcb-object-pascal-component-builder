@@ -255,6 +255,11 @@ type
   IGridFill = interface;
   TGridLayout = class;
 
+  IGridLayoutListener = interface
+    ['{16C54C27-A5F5-4651-8ACA-B804C36787E8}']
+    procedure LayoutFlowChanged(AGrid: TGridLayout);
+  end;
+
   TGridFillBeforePlaceEvent = procedure(
     AGridFill: IGridFill;
     AGrid: TGridLayout;
@@ -341,6 +346,7 @@ type
     FCells: TGridCellList;
     FRowsInfo: TGridTrackInfoDictionary;
     FColumnsInfo: TGridTrackInfoDictionary;
+    FListeners: TInterfaceList;
     function CalculateCellWidth(Cell: TGridCell): Integer;
     function CalculateCellHeight(Cell: TGridCell): Integer;
     function CalculateCellLeft(Cell: TGridCell): Integer;
@@ -398,6 +404,11 @@ type
     function IsInVerticalSpacing(X, Y: Integer): Boolean;
     function IsInHorizontalSpacing(X, Y: Integer): Boolean;
     function GetCell(ARow, AColumn: Integer): TGridCell;
+
+    procedure AddListener(const AListener: IGridLayoutListener);
+    procedure RemoveListener(const AListener: IGridLayoutListener);
+    procedure NotifyLayoutChangeRequiringPropagation;
+
     property Rows: Integer read FRows write FRows;
     property Columns: Integer read FColumns write FColumns;
     property VerticalSpacings: Integer read FVerticalSpacings write FVerticalSpacings;
@@ -417,6 +428,37 @@ type
     property ContentHeight: Integer read GetContentHeight;
     property Top: Integer read FTop write SetTop;
     property Left: Integer read FLeft write SetLeft;
+  end;
+
+  TGridLayoutCompositeOrientation = (gcoHorizontal, gcoVertical);
+
+  { TGridLayoutNode }
+
+  TGridLayoutNode = class
+  private
+    FGrid: TGridLayout;
+    FNext: TGridLayoutNode;
+    procedure SetGrid(AValue: TGridLayout);
+    procedure SetNext(AValue: TGridLayoutNode);
+  public
+    constructor Create(AGrid: TGridLayout);
+    property Grid: TGridLayout read FGrid write SetGrid;
+    property Next: TGridLayoutNode read FNext write SetNext;
+  end;
+
+  { TGridLayoutComposite }
+
+  TGridLayoutComposite = class(TInterfacedObject, IGridLayoutListener)
+  private
+    FOrientation: TGridLayoutCompositeOrientation;
+    FHead: TGridLayoutNode;
+    FTail: TGridLayoutNode;
+  public
+    constructor Create(AOrientation: TGridLayoutCompositeOrientation);
+    destructor Destroy; override;
+    procedure LayoutFlowChanged(AGrid: TGridLayout);
+    procedure AddGrid(AGrid: TGridLayout);
+    function GetNextGrid(AGrid: TGridLayout): TGridLayout;
   end;
 
   { TVirtualContainer }
@@ -856,6 +898,7 @@ end;
 
 constructor TGridLayout.Create;
 begin
+  FListeners := TInterfaceList.Create;
   FCells := TGridCellList.Create(True);
   FRowsInfo := TGridTrackInfoDictionary.Create;
   FColumnsInfo := TGridTrackInfoDictionary.Create;
@@ -870,6 +913,7 @@ end;
 
 destructor TGridLayout.Destroy;
 begin
+  FListeners.Free;
   FCells.Free;
   FRowsInfo.Free;
   FColumnsInfo.Free;
@@ -1164,6 +1208,25 @@ begin
   end;
 end;
 
+procedure TGridLayout.AddListener(const AListener: IGridLayoutListener);
+begin
+  if FListeners.IndexOf(AListener) = -1 then
+    FListeners.Add(AListener);
+end;
+
+procedure TGridLayout.RemoveListener(const AListener: IGridLayoutListener);
+begin
+  FListeners.Remove(AListener);
+end;
+
+procedure TGridLayout.NotifyLayoutChangeRequiringPropagation;
+var
+  I: Integer;
+begin
+  for I := 0 to FListeners.Count - 1 do
+    IGridLayoutListener(FListeners[I]).LayoutFlowChanged(Self);
+end;
+
 function TGridLayout.CalculateCellLeft(Cell: TGridCell): Integer;
 var
   I: Integer;
@@ -1451,6 +1514,8 @@ begin
         .WithVisibility(Item.GetVisualElement.GetVisible)
     );
   end;
+
+  NotifyLayoutChangeRequiringPropagation;
 end;
 
 procedure TGridLayout.ApplyCellsVisibility;
@@ -1480,6 +1545,102 @@ end;
 procedure TGridLayout.ArrangeItems;
 begin
   Self.ArrangeItems(0, 0);
+end;
+
+{ TGridLayoutNode }
+
+procedure TGridLayoutNode.SetGrid(AValue: TGridLayout);
+begin
+  if FGrid = AValue then Exit;
+  FGrid := AValue;
+end;
+
+procedure TGridLayoutNode.SetNext(AValue: TGridLayoutNode);
+begin
+  if FNext = AValue then Exit;
+  FNext := AValue;
+end;
+
+constructor TGridLayoutNode.Create(AGrid: TGridLayout);
+begin
+  FGrid := AGrid;
+end;
+
+{ TGridLayoutComposite }
+
+constructor TGridLayoutComposite.Create
+  (AOrientation: TGridLayoutCompositeOrientation);
+begin
+  FOrientation := AOrientation;
+  FHead := nil;
+  FTail := nil;
+end;
+
+destructor TGridLayoutComposite.Destroy;
+var
+  Node, Temp: TGridLayoutNode;
+begin
+  Node := FHead;
+  while Node <> nil do
+  begin
+    Temp := Node;
+    Node := Node.Next;
+    Temp.Free;
+  end;
+  inherited Destroy;
+end;
+
+procedure TGridLayoutComposite.LayoutFlowChanged(AGrid: TGridLayout);
+var
+  NextGrid: TGridLayout;
+begin
+  NextGrid := GetNextGrid(AGrid);
+
+  if not Assigned(NextGrid) then
+    Exit;
+
+  if FOrientation = gcoHorizontal then
+    NextGrid.Left := AGrid.Left + AGrid.ContentWidth;
+
+  if FOrientation = gcoVertical then
+    NextGrid.Top := AGrid.Top + AGrid.ContentHeight;
+
+  NextGrid.ArrangeItems;
+end;
+
+procedure TGridLayoutComposite.AddGrid(AGrid: TGridLayout);
+var
+  Node: TGridLayoutNode;
+begin
+  AGrid.AddListener(Self);
+
+  Node := TGridLayoutNode.Create(AGrid);
+
+  if FHead = nil then
+    FHead := Node
+  else
+    FTail.Next := Node;
+
+  FTail := Node;
+end;
+
+function TGridLayoutComposite.GetNextGrid(AGrid: TGridLayout): TGridLayout;
+var
+  Node: TGridLayoutNode;
+begin
+  Node := FHead;
+  while Node <> nil do
+  begin
+    if Node.Grid = AGrid then
+    begin
+      if Node.Next <> nil then
+        Exit(Node.Next.Grid)
+      else
+        Exit(nil);
+    end;
+    Node := Node.Next;
+  end;
+  Result := nil;
 end;
 
 { TIntegerKeyDictionary }

@@ -1,22 +1,22 @@
 object Form2: TForm2
   Left = 2650
-  Height = 420
+  Height = 666
   Top = 250
-  Width = 688
+  Width = 984
   Caption = 'Form2'
-  ClientHeight = 420
-  ClientWidth = 688
+  ClientHeight = 666
+  ClientWidth = 984
   DesignTimePPI = 120
   object SpeedButton1: TSpeedButton
-    Left = 0
+    Left = 15
     Height = 50
-    Top = 0
-    Width = 50
+    Top = 15
+    Width = 150
   end
   object SpeedButton2: TSpeedButton
-    Left = 50
-    Height = 50
-    Top = 0
+    Left = 174
+    Height = 168
+    Top = 15
     Width = 50
   end
   object SpeedButton3: TSpeedButton
@@ -76,86 +76,109 @@ object Form2: TForm2
   object SpeedButton12: TSpeedButton
     Left = 15
     Height = 50
-    Top = 184
+    Top = 192
     Width = 50
   end
   object SpeedButton13: TSpeedButton
     Left = 65
     Height = 50
-    Top = 184
+    Top = 192
     Width = 50
   end
   object SpeedButton14: TSpeedButton
     Left = 115
     Height = 50
-    Top = 184
+    Top = 192
     Width = 50
   end
   object SpeedButton15: TSpeedButton
     Left = 174
     Height = 50
-    Top = 184
+    Top = 192
     Width = 50
   end
   object SpeedButton16: TSpeedButton
     Left = 233
     Height = 50
-    Top = 184
+    Top = 192
     Width = 50
   end
   object SpeedButton17: TSpeedButton
     Left = 15
     Height = 50
-    Top = 243
+    Top = 251
     Width = 50
   end
   object SpeedButton18: TSpeedButton
     Left = 65
     Height = 50
-    Top = 243
+    Top = 251
     Width = 50
   end
   object SpeedButton19: TSpeedButton
     Left = 115
     Height = 50
-    Top = 243
+    Top = 251
     Width = 50
   end
   object SpeedButton20: TSpeedButton
     Left = 174
     Height = 50
-    Top = 243
+    Top = 251
     Width = 50
   end
   object SpeedButton21: TSpeedButton
     Left = 233
     Height = 109
-    Top = 243
+    Top = 251
     Width = 50
   end
   object SpeedButton22: TSpeedButton
     Left = 15
     Height = 50
-    Top = 302
+    Top = 310
     Width = 50
   end
   object SpeedButton23: TSpeedButton
     Left = 65
     Height = 50
-    Top = 302
+    Top = 310
     Width = 50
   end
   object SpeedButton24: TSpeedButton
     Left = 115
     Height = 50
-    Top = 302
+    Top = 310
     Width = 50
   end
   object SpeedButton25: TSpeedButton
     Left = 174
     Height = 50
-    Top = 302
+    Top = 310
     Width = 50
+  end
+  object Panel1: TPanel
+    Left = 368
+    Height = 199
+    Top = 200
+    Width = 213
+    Caption = 'Panel1'
+    TabOrder = 0
+  end
+  object ListBox1: TListBox
+    Left = 632
+    Height = 196
+    Top = 23
+    Width = 180
+    ItemHeight = 0
+    TabOrder = 1
+  end
+  object DBMemo1: TDBMemo
+    Left = 373
+    Height = 113
+    Top = 467
+    Width = 188
+    TabOrder = 2
   end
   object GridLayoutComponent1: TGridLayoutComponent
     GridTop = 15
@@ -171,6 +194,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 3
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton2
@@ -178,6 +203,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 3
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton3
@@ -185,6 +212,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton4
@@ -192,6 +221,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton5
@@ -199,6 +230,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton6
@@ -206,6 +239,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton7
@@ -213,6 +248,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton8
@@ -220,6 +257,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton9
@@ -227,6 +266,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton10
@@ -234,6 +275,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton11
@@ -241,6 +284,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton12
@@ -248,6 +293,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton13
@@ -255,6 +302,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton14
@@ -262,6 +311,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton15
@@ -269,6 +320,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton16
@@ -276,6 +329,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton17
@@ -283,6 +338,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton18
@@ -290,6 +347,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton19
@@ -297,6 +356,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton20
@@ -304,6 +365,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton21
@@ -311,6 +374,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 2
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton22
@@ -318,6 +383,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton23
@@ -325,6 +392,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton24
@@ -332,6 +401,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end    
       item
         Control = SpeedButton25
@@ -339,6 +410,8 @@ object Form2: TForm2
         Column = 0
         RowSpan = 0
         ColSpan = 0
+        HorizontalAlignment = laStretch
+        VerticalAlignment = laStretch
       end>
     AutoArrange = True
     ColTracks = <    
@@ -372,7 +445,12 @@ object Form2: TForm2
       end>
     VerticalSpacing = 9
     HorizontalSpacing = 9
-    Left = 440
-    Top = 72
+    FillerType = gftRowFirst
+    Left = 408
+    Top = 112
+  end
+  object DataSource1: TDataSource
+    Left = 668
+    Top = 339
   end
 end
