@@ -9,7 +9,9 @@ interface
 
 uses
   GridLayoutComponent, UGridLayoutFill, UGridLayoutFillerFactory, 
-  ControlPropertyEditor, LazarusPackageIntf;
+  ControlPropertyEditor, HtmlBuilder, UGridaLayoutResizer, UGridHtml, 
+  UGridItemFactory, UGridLayoutBuilder, UGridText, ulayout.controls, ULayout, 
+  LazarusPackageIntf;
 
 implementation
 

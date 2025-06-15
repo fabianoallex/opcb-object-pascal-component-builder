@@ -15,9 +15,6 @@ type
 
   TGridLayoutBuilder = class
   private
-    FParentBuilder: TGridLayoutBuilder;
-    FSettingsToApply: TGridCellSettings;
-
     FCurrentItem: IGridItem;
     FGridLayout: TGridLayout;
     FFiller: IGridFill;
@@ -30,8 +27,10 @@ type
     function DisableAutoFreeOnDone: TGridLayoutBuilder;
     function WithDimensions(ARows, AColumns: Integer): TGridLayoutBuilder;
     function WithTopLeft(ATop, ALeft: Integer): TGridLayoutBuilder;
-    function WithColumnsWidth(AWidth: Integer): TGridLayoutBuilder;
-    function WithRowsHeight(AHight: Integer): TGridLayoutBuilder; overload;
+    function WithColumnsWidth(AWidth: Integer): TGridLayoutBuilder; overload;
+    function WithColumnsWidth(AColsIndex: array of Integer; AWidth: Integer): TGridLayoutBuilder; overload;
+    function WithRowAndColSizes(AHeight, AWidth: Integer): TGridLayoutBuilder;
+    function WithRowsHeight(AHeight: Integer): TGridLayoutBuilder; overload;
     function WithRowsHeight(ARowsIndex: array of Integer; AHeight: Integer): TGridLayoutBuilder; overload;
     function WithRowAndColumnSizes(AHight, AWidth: Integer): TGridLayoutBuilder;
     function WithHorizontalSpacings(ASpacing: Integer): TGridLayoutBuilder;
@@ -46,11 +45,7 @@ type
     function AddItem(AItem: IGridItem): TGridLayoutBuilder; overload;
     function FillItems(AControls: array of TControl;
       AInitialPosition: IGridPosition=nil): TGridLayoutBuilder;
-
-    function BeginSubGrid(ASettings: TGridCellSettings): TGridLayoutBuilder;
-    function EndSubGrid: TGridLayoutBuilder;
-
-    function Done: TGridLayout;
+    function Build: TGridLayout;
   end;
 
 
@@ -116,11 +111,29 @@ begin
   FGridLayout.ColumnWidths := AWidth;
 end;
 
-function TGridLayoutBuilder.WithRowsHeight(AHight: Integer
+function TGridLayoutBuilder.WithColumnsWidth(AColsIndex: array of Integer;
+  AWidth: Integer): TGridLayoutBuilder;
+var
+  I: Integer;
+begin
+  Result := Self;
+  for I := Low(AColsIndex) to High(AColsIndex) do
+    FGridLayout.ColumnWidth[AColsIndex[I]] := AWidth;
+end;
+
+function TGridLayoutBuilder.WithRowAndColSizes(AHeight, AWidth: Integer
   ): TGridLayoutBuilder;
 begin
   Result := Self;
-  FGridLayout.RowHeights := AHight;
+  FGridLayout.RowHeights := AHeight;
+  FGridLayout.ColumnWidths := AWidth;
+end;
+
+function TGridLayoutBuilder.WithRowsHeight(AHeight: Integer
+  ): TGridLayoutBuilder;
+begin
+  Result := Self;
+  FGridLayout.RowHeights := AHeight;
 end;
 
 function TGridLayoutBuilder.WithRowsHeight(ARowsIndex: array of Integer;
@@ -231,7 +244,7 @@ begin
 
     if Assigned(Control) then
        TGridItemFactory.Create
-         .BuildControlItem
+         .ControlItemBuilder
          .WithControl(Control)
          .AddWithFiller(FFiller)  //FFiller.PlaceItem(Control)
     else
@@ -239,31 +252,7 @@ begin
   end;
 end;
 
-function TGridLayoutBuilder.BeginSubGrid(ASettings: TGridCellSettings
-  ): TGridLayoutBuilder;
-var
-  SubBuilder: TGridLayoutBuilder;
-begin
-  SubBuilder := TGridLayoutBuilder.Create;
-  SubBuilder.FParentBuilder := Self;
-  SubBuilder.FSettingsToApply := ASettings;
-  Result := SubBuilder;
-end;
-
-function TGridLayoutBuilder.EndSubGrid: TGridLayoutBuilder;
-var
-  SubGridItem: TSubGridItem;
-begin
-  Result := FParentBuilder;
-  SubGridItem := TSubGridItem.Create(FGridLayout);
-  Result.AddItem(SubGridItem, FSettingsToApply);
-  SubGridItem.Container.Height := FGridLayout.ContentHeight;
-  SubGridItem.Container.Width := FGridLayout.ContentWidth;
-
-  Self.Done;  //auto destroy. sempre chamar no final
-end;
-
-function TGridLayoutBuilder.Done: TGridLayout;
+function TGridLayoutBuilder.Build: TGridLayout;
 begin
   Result := FGridLayout;
   if FFreeOnDone then

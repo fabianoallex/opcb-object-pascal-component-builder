@@ -257,7 +257,7 @@ type
 
   IGridLayoutListener = interface
     ['{16C54C27-A5F5-4651-8ACA-B804C36787E8}']
-    procedure LayoutFlowChanged(AGrid: TGridLayout);
+    procedure LayoutChanged(AGrid: TGridLayout);
   end;
 
   TGridFillBeforePlaceEvent = procedure(
@@ -404,11 +404,9 @@ type
     function IsInVerticalSpacing(X, Y: Integer): Boolean;
     function IsInHorizontalSpacing(X, Y: Integer): Boolean;
     function GetCell(ARow, AColumn: Integer): TGridCell;
-
     procedure AddListener(const AListener: IGridLayoutListener);
     procedure RemoveListener(const AListener: IGridLayoutListener);
-    procedure NotifyLayoutChangeRequiringPropagation;
-
+    procedure NotifyLayoutChange;
     property Rows: Integer read FRows write FRows;
     property Columns: Integer read FColumns write FColumns;
     property VerticalSpacings: Integer read FVerticalSpacings write FVerticalSpacings;
@@ -446,19 +444,39 @@ type
     property Next: TGridLayoutNode read FNext write SetNext;
   end;
 
+  TIntIntDictionary = specialize TDictionary<Integer, Integer>;
+
   { TGridLayoutComposite }
 
   TGridLayoutComposite = class(TInterfacedObject, IGridLayoutListener)
   private
     FOrientation: TGridLayoutCompositeOrientation;
     FHead: TGridLayoutNode;
+    FDefaultSpacing: Integer;
+    FSpacing: TIntIntDictionary;
     FTail: TGridLayoutNode;
+    function ContainsGrid(AGrid: TGridLayout): Boolean;
+    function GetContentHeight: Integer;
+    function GetContentWidth: Integer;
+    function GetSpacing(AIndex: Integer): Integer;
+    procedure SetSpacing(AIndex: Integer; AValue: Integer);
+    procedure SetDefaultSpacing(AValue: Integer);
   public
     constructor Create(AOrientation: TGridLayoutCompositeOrientation);
     destructor Destroy; override;
-    procedure LayoutFlowChanged(AGrid: TGridLayout);
+    procedure LayoutChanged(AGrid: TGridLayout);
+    procedure AddGrids(AGrids: array of TGridLayout);
     procedure AddGrid(AGrid: TGridLayout);
+    procedure AddGridAtBegin(AGrid: TGridLayout);
+    procedure AddGridAfter(AGrid, AGridReference: TGridLayout);
+    procedure AddGridBefore(AGrid, AGridReference: TGridLayout);
+    procedure ArrangeGrids(ATop: Integer; ALeft: Integer);
     function GetNextGrid(AGrid: TGridLayout): TGridLayout;
+    function GetGridIndex(AGrid: TGridLayout): Integer;
+    property DefaultSpacing: Integer read FDefaultSpacing write SetDefaultSpacing;
+    property Spacing[Index: Integer]: Integer read GetSpacing write SetSpacing;
+    property ContentWidth: Integer read GetContentWidth;
+    property ContentHeight: Integer read GetContentHeight;
   end;
 
   { TVirtualContainer }
@@ -1219,12 +1237,12 @@ begin
   FListeners.Remove(AListener);
 end;
 
-procedure TGridLayout.NotifyLayoutChangeRequiringPropagation;
+procedure TGridLayout.NotifyLayoutChange;
 var
   I: Integer;
 begin
   for I := 0 to FListeners.Count - 1 do
-    IGridLayoutListener(FListeners[I]).LayoutFlowChanged(Self);
+    IGridLayoutListener(FListeners[I]).LayoutChanged(Self);
 end;
 
 function TGridLayout.CalculateCellLeft(Cell: TGridCell): Integer;
@@ -1240,6 +1258,7 @@ begin
 end;
 
 function TGridLayout.CalculateCellHeight(Cell: TGridCell): Integer;
+
   function GetLastVisibleRow: Integer;
   var
     I: Integer;
@@ -1352,7 +1371,10 @@ end;
 
 function TGridLayout.IsInTopMargin(Y: Integer): Boolean;
 begin
-  Result := (Y >= Top) and (Y < Top + Margins.Top);
+  Result :=
+    (Y >= Top)
+    and
+    (Y < Top + Margins.Top);
 end;
 
 function TGridLayout.IsInBottomMargin(Y: Integer): Boolean;
@@ -1360,12 +1382,18 @@ var
   BottomStart: Integer;
 begin
   BottomStart := Top + GetContentHeight - Margins.Bottom;
-  Result := (Y >= BottomStart) and (Y < Top + GetContentHeight);
+  Result :=
+    (Y >= BottomStart)
+    and
+    (Y < Top + GetContentHeight);
 end;
 
 function TGridLayout.IsInLeftMargin(X: Integer): Boolean;
 begin
-  Result := (X >= Left) and (X < Left + Margins.Left);
+  Result :=
+    (X >= Left)
+    and
+    (X < Left + Margins.Left);
 end;
 
 function TGridLayout.IsInRightMargin(X: Integer): Boolean;
@@ -1388,7 +1416,6 @@ begin
     if not VisibleRow[RowIndex] then
       Continue;
 
-    // Avança a altura da linha visível
     CurrentY := CurrentY + GetRowHeight(RowIndex);
 
     // Verifica espaçamento, exceto após a última linha
@@ -1401,7 +1428,6 @@ begin
         Exit;
       end;
 
-      // Avança pelo espaçamento
       CurrentY := CurrentY + SpacingHeight;
     end;
   end;
@@ -1419,7 +1445,6 @@ begin
     if not VisibleColumn[ColIndex] then
       Continue;
 
-    // Avança a largura da coluna visível
     CurrentX := CurrentX + GetColumnWidth(ColIndex);
 
     // Verifica espaçamento, exceto após a última coluna
@@ -1432,7 +1457,6 @@ begin
         Exit;
       end;
 
-      // Avança pelo espaçamento
       CurrentX := CurrentX + SpacingWidth;
     end;
   end;
@@ -1515,7 +1539,7 @@ begin
     );
   end;
 
-  NotifyLayoutChangeRequiringPropagation;
+  NotifyLayoutChange;
 end;
 
 procedure TGridLayout.ApplyCellsVisibility;
@@ -1526,14 +1550,12 @@ var
 begin
   for Cell in FCells do
   begin
-    begin
-      if Assigned(Cell) then
-        Item := Cell.Item;
-      if Assigned(Item) then
-        Element := Item.GetVisualElement;
-      if Assigned(Element) then
-        Element.SetVisible(IsVisibleCell(Cell));
-    end;
+    if Assigned(Cell) then
+      Item := Cell.Item;
+    if Assigned(Item) then
+      Element := Item.GetVisualElement;
+    if Assigned(Element) then
+      Element.SetVisible(IsVisibleCell(Cell));
   end;
 end;
 
@@ -1551,13 +1573,15 @@ end;
 
 procedure TGridLayoutNode.SetGrid(AValue: TGridLayout);
 begin
-  if FGrid = AValue then Exit;
+  if FGrid = AValue then
+    Exit;
   FGrid := AValue;
 end;
 
 procedure TGridLayoutNode.SetNext(AValue: TGridLayoutNode);
 begin
-  if FNext = AValue then Exit;
+  if FNext = AValue then
+    Exit;
   FNext := AValue;
 end;
 
@@ -1572,6 +1596,8 @@ constructor TGridLayoutComposite.Create
   (AOrientation: TGridLayoutCompositeOrientation);
 begin
   FOrientation := AOrientation;
+  FDefaultSpacing := 0;
+  FSpacing := TIntIntDictionary.Create;
   FHead := nil;
   FTail := nil;
 end;
@@ -1580,6 +1606,8 @@ destructor TGridLayoutComposite.Destroy;
 var
   Node, Temp: TGridLayoutNode;
 begin
+  FSpacing.Free;
+
   Node := FHead;
   while Node <> nil do
   begin
@@ -1590,28 +1618,135 @@ begin
   inherited Destroy;
 end;
 
-procedure TGridLayoutComposite.LayoutFlowChanged(AGrid: TGridLayout);
+procedure TGridLayoutComposite.LayoutChanged(AGrid: TGridLayout);
 var
   NextGrid: TGridLayout;
+  Index: Integer;
 begin
   NextGrid := GetNextGrid(AGrid);
+  Index := GetGridIndex(AGrid);
 
   if not Assigned(NextGrid) then
     Exit;
 
   if FOrientation = gcoHorizontal then
-    NextGrid.Left := AGrid.Left + AGrid.ContentWidth;
+  begin
+    NextGrid.Top := AGrid.Top;
+    NextGrid.Left := AGrid.Left + AGrid.ContentWidth + Spacing[Index];
+  end;
 
   if FOrientation = gcoVertical then
-    NextGrid.Top := AGrid.Top + AGrid.ContentHeight;
+  begin
+    NextGrid.Top := AGrid.Top + AGrid.ContentHeight + Spacing[Index];
+    NextGrid.Left := AGrid.Left;
+  end;
 
   NextGrid.ArrangeItems;
+end;
+
+procedure TGridLayoutComposite.AddGrids(AGrids: array of TGridLayout);
+var
+  I: Integer;
+begin
+  for I:=0 to High(AGrids) do
+    AddGrid(AGrids[I]);
+end;
+
+function TGridLayoutComposite.ContainsGrid(AGrid: TGridLayout): Boolean;
+// foi usado um algoritmo de verificação O(n) pois geralmente são poucos grids.
+// pode ser substituido por dictionary caso necessário.
+var
+  Node: TGridLayoutNode;
+begin
+  Node := FHead;
+  while Node <> nil do
+  begin
+    if Node.Grid = AGrid then
+      Exit(True);
+    Node := Node.Next;
+  end;
+  Result := False;
+end;
+
+function TGridLayoutComposite.GetContentHeight: Integer;
+var
+  Node: TGridLayoutNode;
+  Index: Integer;
+
+  function CalcSpacing: Integer;
+  begin
+    Result := 0;
+    if Node.Next <> nil then       // o ultimo espaço não conta
+      Result := GetSpacing(Index)
+  end;
+
+begin
+  Result := 0;
+  Node := FHead;
+  Index := 0;
+  while Node <> nil do
+  begin
+    if FOrientation = gcoVertical then
+      Result := Result + Node.Grid.ContentHeight + CalcSpacing
+    else
+      Result := Max(Result, Node.Grid.ContentHeight);
+
+    Inc(Index);
+    Node := Node.Next;
+  end;
+end;
+
+function TGridLayoutComposite.GetContentWidth: Integer;
+var
+  Node: TGridLayoutNode;
+  Index: Integer;
+
+  function CalcSpacing: Integer;
+  begin
+    Result := 0;
+    if Node.Next <> nil then       // o ultimo espaço não conta
+      Result := GetSpacing(Index)
+  end;
+
+begin
+  Result := 0;
+  Node := FHead;
+  while Node <> nil do
+  begin
+    if FOrientation = gcoHorizontal then
+      Result := Result + Node.Grid.ContentWidth + CalcSpacing
+    else
+      Result := Max(Result, Node.Grid.ContentWidth);
+
+    Inc(Index);
+    Node := Node.Next;
+  end;
+end;
+
+function TGridLayoutComposite.GetSpacing(AIndex: Integer): Integer;
+begin
+  if not FSpacing.TryGetValue(AIndex, Result) then
+    Result := FDefaultSpacing;
+end;
+
+procedure TGridLayoutComposite.SetSpacing(AIndex: Integer; AValue: Integer);
+begin
+  FSpacing.AddOrSetValue(AIndex, AValue);
+end;
+
+procedure TGridLayoutComposite.SetDefaultSpacing(AValue: Integer);
+begin
+  if FDefaultSpacing = AValue then Exit;
+  FDefaultSpacing := AValue;
 end;
 
 procedure TGridLayoutComposite.AddGrid(AGrid: TGridLayout);
 var
   Node: TGridLayoutNode;
 begin
+  if ContainsGrid(AGrid) then
+    Exit;
+
   AGrid.AddListener(Self);
 
   Node := TGridLayoutNode.Create(AGrid);
@@ -1624,7 +1759,92 @@ begin
   FTail := Node;
 end;
 
+procedure TGridLayoutComposite.AddGridAtBegin(AGrid: TGridLayout);
+var
+  NewNode: TGridLayoutNode;
+begin
+  if ContainsGrid(AGrid) then
+    Exit;
+
+  NewNode := TGridLayoutNode.Create(AGrid);
+  AGrid.AddListener(Self);
+
+  NewNode.Next := FHead;
+  FHead := NewNode;
+
+  if FTail = nil then
+    FTail := NewNode;
+end;
+
+procedure TGridLayoutComposite.AddGridAfter(AGrid, AGridReference: TGridLayout);
+var
+  Current: TGridLayoutNode;
+  NewNode: TGridLayoutNode;
+begin
+  if ContainsGrid(AGrid) then
+    Exit;
+
+  Current := FHead;
+  while (Current <> nil) and (Current.Grid <> AGridReference) do
+    Current := Current.Next;
+
+  if Current = nil then
+    Exit;
+
+  NewNode := TGridLayoutNode.Create(AGrid);
+  AGrid.AddListener(Self);
+
+  NewNode.Next := Current.Next;
+  Current.Next := NewNode;
+
+  if Current = FTail then
+    FTail := NewNode;
+end;
+
+procedure TGridLayoutComposite.AddGridBefore(AGrid, AGridReference: TGridLayout);
+var
+  Current, Prev: TGridLayoutNode;
+  NewNode: TGridLayoutNode;
+begin
+  if ContainsGrid(AGrid) then
+    Exit;
+
+  Current := FHead;
+  Prev := nil;
+
+  while (Current <> nil) and (Current.Grid <> AGridReference) do
+  begin
+    Prev := Current;
+    Current := Current.Next;
+  end;
+
+  if Current = nil then
+    Exit;
+
+  NewNode := TGridLayoutNode.Create(AGrid);
+  AGrid.AddListener(Self);
+
+  NewNode.Next := Current;
+
+  if Prev = nil then
+    FHead := NewNode
+  else
+    Prev.Next := NewNode;
+end;
+
+procedure TGridLayoutComposite.ArrangeGrids(ATop: Integer; ALeft: Integer);
+begin
+  if not Assigned(FHead.Grid) then
+    Exit;
+
+  FHead.Grid.Top := ATop;
+  FHead.Grid.Left := ALeft;
+  FHead.Grid.ArrangeItems;
+end;
+
 function TGridLayoutComposite.GetNextGrid(AGrid: TGridLayout): TGridLayout;
+// foi usado um algoritmo de verificação O(n) pois geralmente são poucos grids.
+// pode ser substituido por dictionary caso necessário.
 var
   Node: TGridLayoutNode;
 begin
@@ -1643,14 +1863,31 @@ begin
   Result := nil;
 end;
 
+function TGridLayoutComposite.GetGridIndex(AGrid: TGridLayout): Integer;
+// foi usado um algoritmo de verificação O(n) pois geralmente são poucos grids.
+// pode ser substituido por dictionary caso necessário.
+var
+  Node: TGridLayoutNode;
+begin
+  Result := -1;
+  Node := FHead;
+  while Node <> nil do
+  begin
+    Inc(Result);
+    if Node.Grid = AGrid then
+      Exit;
+    Node := Node.Next;
+  end;
+end;
+
 { TIntegerKeyDictionary }
 
 procedure TIntegerKeyDictionary.MoveKey(const FromIndex, ToIndex: Integer);
-type
-  TKeyList = specialize TList<Integer>;
+// type
+//  TKeyList = specialize TList<Integer>;
 var
   MovedValue: T;
-  KeysToShift: TKeyList;
+  KeysToShift: specialize TList<Integer>;
   Key: Integer;
   Direction: Integer;
   ExistFrom: Boolean;
@@ -1660,7 +1897,7 @@ begin
 
   ExistFrom := Self.TryGetValue(FromIndex, MovedValue);
 
-  KeysToShift := TKeyList.Create;
+  KeysToShift := specialize TList<Integer>.Create;
   try
     // Determine direção
     if FromIndex < ToIndex then
@@ -1700,14 +1937,12 @@ begin
 end;
 
 procedure TIntegerKeyDictionary.AddWithShiftAt(AIndex: Integer; const AValue: T);
-type
-  TKeyToShift = specialize TList<Integer>;
 var
-  KeysToShift: TKeyToShift;
+  KeysToShift: specialize TList<Integer>;
   Key: Integer;
   Obj: T;
 begin
-  KeysToShift := TKeyToShift.Create;
+  KeysToShift := specialize TList<Integer>.Create;
   try
     for Key in Self.Keys do
       if Key >= AIndex then

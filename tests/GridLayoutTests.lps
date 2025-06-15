@@ -8,7 +8,7 @@
       <Unit>
         <Filename Value="GridLayoutTests.lpr"/>
         <IsPartOfProject Value="True"/>
-        <CursorPos X="28" Y="16"/>
+        <CursorPos X="5" Y="16"/>
         <UsageCount Value="203"/>
         <Loaded Value="True"/>
       </Unit>
@@ -17,7 +17,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutTest"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="3" Y="11"/>
+        <TopLine Value="82"/>
+        <CursorPos X="39" Y="87"/>
         <UsageCount Value="213"/>
         <Loaded Value="True"/>
       </Unit>
@@ -25,11 +26,10 @@
         <Filename Value="..\src\ulayout.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="ULayout"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="407"/>
-        <CursorPos X="43" Y="418"/>
-        <UsageCount Value="147"/>
+        <TopLine Value="442"/>
+        <CursorPos X="42" Y="456"/>
+        <UsageCount Value="223"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -38,14 +38,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="58"/>
         <CursorPos X="61" Y="110"/>
-        <UsageCount Value="144"/>
+        <UsageCount Value="136"/>
       </Unit>
       <Unit>
         <Filename Value="test\ukeytest.pas"/>
         <UnitName Value="UKeyTest"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="71" Y="27"/>
-        <UsageCount Value="191"/>
+        <UsageCount Value="183"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyboardclasses.pas"/>
@@ -53,7 +53,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="59"/>
         <CursorPos X="69" Y="59"/>
-        <UsageCount Value="191"/>
+        <UsageCount Value="183"/>
       </Unit>
       <Unit>
         <Filename Value="unit1.pas"/>
@@ -61,7 +61,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
         <CursorPos X="3" Y="28"/>
-        <UsageCount Value="190"/>
+        <UsageCount Value="182"/>
       </Unit>
       <Unit>
         <Filename Value="unit2.pas"/>
@@ -69,7 +69,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="29"/>
         <CursorPos X="3" Y="46"/>
-        <UsageCount Value="190"/>
+        <UsageCount Value="182"/>
       </Unit>
       <Unit>
         <Filename Value="unit3.pas"/>
@@ -77,7 +77,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
         <CursorPos X="13" Y="29"/>
-        <UsageCount Value="222"/>
+        <UsageCount Value="214"/>
       </Unit>
       <Unit>
         <Filename Value="unit4.pas"/>
@@ -85,27 +85,27 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
         <CursorPos X="3" Y="28"/>
-        <UsageCount Value="222"/>
+        <UsageCount Value="214"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
         <UnitName Value="UVirtualKeyBlockGridLayoutTest"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="33" Y="21"/>
-        <UsageCount Value="145"/>
+        <UsageCount Value="137"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyblocklayouts.pas"/>
         <UnitName Value="UVirtualKeyBlockLayouts"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="144"/>
+        <UsageCount Value="136"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\fgl.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
         <CursorPos X="72" Y="316"/>
-        <UsageCount Value="87"/>
+        <UsageCount Value="79"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyregistry.pas"/>
@@ -113,14 +113,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="125"/>
         <CursorPos Y="41"/>
-        <UsageCount Value="91"/>
+        <UsageCount Value="83"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\include\control.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1544"/>
         <CursorPos X="31" Y="1625"/>
-        <UsageCount Value="91"/>
+        <UsageCount Value="83"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\lcltype.pp"/>
@@ -128,151 +128,155 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="53"/>
         <CursorPos X="3" Y="508"/>
-        <UsageCount Value="102"/>
+        <UsageCount Value="94"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
         <UnitName Value="Generics.Collections"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="1457"/>
         <CursorPos Y="1469"/>
-        <UsageCount Value="65"/>
-        <Loaded Value="True"/>
+        <UsageCount Value="75"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\inc\generics.dictionariesh.inc"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="23"/>
-        <CursorPos X="55" Y="42"/>
-        <UsageCount Value="61"/>
-        <Loaded Value="True"/>
+        <CursorPos Y="42"/>
+        <UsageCount Value="71"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\objpas.pp"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="8" Y="35"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="5"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <UnitName Value="UGridLayoutBuilder"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="3"/>
+        <CursorPos X="45" Y="19"/>
+        <UsageCount Value="34"/>
+        <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
+    <JumpHistory HistoryIndex="28">
       <Position>
         <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1448" Column="3" TopLine="1446"/>
+        <Caret Line="1725" Column="3" TopLine="1720"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="470" Column="15" TopLine="449"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1750" Column="3" TopLine="1745"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="466" Column="15" TopLine="450"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1647" Column="3" TopLine="1643"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="467" Column="15" TopLine="446"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1688" Column="3" TopLine="1684"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="468" Column="15" TopLine="447"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1707" Column="3" TopLine="1703"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="469" Column="15" TopLine="448"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1725" Column="3" TopLine="1720"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="469" Column="15" TopLine="449"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1725" Column="3" TopLine="1720"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="470" Column="15" TopLine="449"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1750" Column="3" TopLine="1745"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="471" Column="15" TopLine="450"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="1778" Column="3" TopLine="1776"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2111" Column="30" TopLine="2096"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1061" Column="3" TopLine="1061"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="316" Column="15" TopLine="301"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1157" Column="39" TopLine="1143"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="485" Column="8" TopLine="472"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="557" Column="27" TopLine="547"/>
+        <Caret Line="2313" Column="21" TopLine="2291"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2121" TopLine="2106"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1710" TopLine="1696"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1711" TopLine="1696"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1712" TopLine="1696"/>
+        <Caret Line="76" Column="54" TopLine="58"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2123" TopLine="2106"/>
+        <Caret Line="2301" Column="3" TopLine="2297"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2122" TopLine="2106"/>
+        <Caret Line="75" Column="42" TopLine="58"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2123" TopLine="2106"/>
+        <Caret Line="2314" Column="23" TopLine="2296"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2124" TopLine="2106"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="487" TopLine="473"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="488" TopLine="473"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="490" TopLine="473"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="491" TopLine="473"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="492" TopLine="473"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="493" TopLine="473"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="494" TopLine="473"/>
+        <Caret Line="76" Column="52" TopLine="58"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2121" TopLine="2106"/>
+        <Caret Line="2366" Column="8" TopLine="2338"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2122" Column="33" TopLine="2106"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="87" Column="14" TopLine="74"/>
-      </Position>
-      <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1711" Column="3" TopLine="1709"/>
+        <Caret Line="77" Column="36" TopLine="58"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2122" Column="33" TopLine="2106"/>
+        <Caret Line="2435" Column="9" TopLine="2404"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="2094" Column="3" TopLine="2080"/>
+        <Caret Line="78" Column="46" TopLine="59"/>
       </Position>
       <Position>
         <Filename Value="ugridlayouttest.pas"/>
-        <Caret Line="11" Column="3"/>
+        <Caret Line="2508" Column="41" TopLine="2479"/>
+      </Position>
+      <Position>
+        <Filename Value="ugridlayouttest.pas"/>
+        <Caret Line="2525" Column="42" TopLine="2506"/>
       </Position>
     </JumpHistory>
     <RunParams>

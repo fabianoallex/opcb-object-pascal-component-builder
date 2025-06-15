@@ -334,7 +334,7 @@ object FExamplesMain: TFExamplesMain
     object Button35: TButton
       Left = 208
       Height = 31
-      Top = 530
+      Top = 528
       Width = 184
       Caption = 'Composite'
       TabOrder = 34

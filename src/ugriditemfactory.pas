@@ -37,18 +37,18 @@ type
 
   IGridItemFactory = interface
     ['{BE27E7F4-BFD1-4BD8-8CAD-0C1A7B2B99E1}']
-    function BuildTextItem(ARenderer: TTextGridRenderer): ITextGridItemBuilder;
-    function BuildControlItem: IControlGridItemBuilder;
-    function BuildHtmlTableItem(ARenderer: IHtmlGridRenderer): IHtmlGridItemBuilder;
+    function TextItemBuilder(ARenderer: TTextGridRenderer): ITextGridItemBuilder;
+    function ControlItemBuilder: IControlGridItemBuilder;
+    function HtmlTableItemBuilder(ARenderer: IHtmlGridRenderer): IHtmlGridItemBuilder;
   end;
 
   { TGridItemFactory }
 
   TGridItemFactory = class(TInterfacedObject, IGridItemFactory)
   public
-    function BuildTextItem(ARenderer: TTextGridRenderer): ITextGridItemBuilder;
-    function BuildControlItem: IControlGridItemBuilder;
-    function BuildHtmlTableItem(ARenderer: IHtmlGridRenderer): IHtmlGridItemBuilder;
+    function TextItemBuilder(ARenderer: TTextGridRenderer): ITextGridItemBuilder;
+    function ControlItemBuilder: IControlGridItemBuilder;
+    function HtmlTableItemBuilder(ARenderer: IHtmlGridRenderer): IHtmlGridItemBuilder;
   end;
 
   { TControlGridItemBuilder }
@@ -174,18 +174,18 @@ end;
 
 { TGridItemFactory }
 
-function TGridItemFactory.BuildTextItem(ARenderer: TTextGridRenderer
+function TGridItemFactory.TextItemBuilder(ARenderer: TTextGridRenderer
   ): ITextGridItemBuilder;
 begin
   Result := TTextGridItemBuilder.Create(ARenderer);
 end;
 
-function TGridItemFactory.BuildControlItem: IControlGridItemBuilder;
+function TGridItemFactory.ControlItemBuilder: IControlGridItemBuilder;
 begin
   Result := TControlGridItemBuilder.Create;
 end;
 
-function TGridItemFactory.BuildHtmlTableItem(ARenderer: IHtmlGridRenderer
+function TGridItemFactory.HtmlTableItemBuilder(ARenderer: IHtmlGridRenderer
   ): IHtmlGridItemBuilder;
 begin
   Result := THtmlGridItemBuilder.Create(ARenderer);

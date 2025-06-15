@@ -71,6 +71,11 @@ type
     procedure TestMoveKey_From1To3;
     procedure TestMoveKey_From3To1;
     procedure TestMoveKey_From3To1_DontExistFrom;
+
+    procedure TestCompositeGrid_Horizontal;
+    procedure TestCompositeGrid_HorizontalWithSpacing;
+    procedure TestCompositeGrid_Vertical;
+    procedure TestCompositeGrid_VerticalWithSpacing;
   end;
 
 implementation
@@ -2221,6 +2226,280 @@ begin
     AssertTrue(Dict[6] = 60);
   finally
     Dict.Free;
+  end;
+end;
+
+procedure TGridLayoutTest.TestCompositeGrid_Horizontal;
+var
+  Grid1: TGridLayout;
+  Grid2: TGridLayout;
+  Composite: TGridLayoutComposite;
+  Btn1: TButton;
+  Btn2: TButton;
+begin
+  Grid1 := TGridLayout.Create;
+  Grid2 := TGridLayout.Create;
+  Composite := TGridLayoutComposite.Create(gcoHorizontal);
+  Btn1 := TButton.Create(nil);
+  Btn2 := TButton.Create(nil);
+  try
+    Grid1.Rows := 3;
+    Grid1.Columns := 4;
+    Grid1.RowHeights := 10;
+    Grid1.ColumnWidths := 15;
+
+    Grid1.AddItem(
+      TControlGridItem.Create(Btn1),
+      TGridCellSettings.Create(0, 0)
+    );
+
+    Grid2.Rows := 4;
+    Grid2.Columns := 3;
+    Grid2.RowHeights := 8;
+    Grid2.ColumnWidths := 12;
+
+    Grid2.AddItem(
+      TControlGridItem.Create(Btn2),
+      TGridCellSettings.Create(0, 0)
+    );
+
+    Composite.AddGrids([Grid1, Grid2]);
+    Composite.ArrangeGrids(0, 0);
+
+    AssertEquals(
+      'propriedade Top diferente do esperado para Btn1',
+      0,
+      Btn1.Top
+    );
+
+    AssertEquals(
+      'propriedade Left diferente do esperado para Btn1',
+      0,
+      Btn1.Left
+    );
+
+    AssertEquals(
+      'propriedade Top diferente do esperado para Btn2',
+      0,
+      Btn2.Top
+    );
+
+    AssertEquals(
+      'propriedade Left diferente do esperado para Btn2',
+      60, // 4 Colunas do grid 1 x tamanho 15 de cada coluna. 4x15 = 60
+      Btn2.Left
+    );
+  finally
+    Btn1.Free;
+    Btn2.Free;
+    Grid1.Free;
+    Grid2.Free;
+  end;
+end;
+
+procedure TGridLayoutTest.TestCompositeGrid_HorizontalWithSpacing;
+var
+  Grid1: TGridLayout;
+  Grid2: TGridLayout;
+  Composite: TGridLayoutComposite;
+  Btn1: TButton;
+  Btn2: TButton;
+begin
+  Grid1 := TGridLayout.Create;
+  Grid2 := TGridLayout.Create;
+  Composite := TGridLayoutComposite.Create(gcoHorizontal);
+  Btn1 := TButton.Create(nil);
+  Btn2 := TButton.Create(nil);
+  try
+    Grid1.Rows := 3;
+    Grid1.Columns := 4;
+    Grid1.RowHeights := 10;
+    Grid1.ColumnWidths := 15;
+
+    Grid1.AddItem(
+      TControlGridItem.Create(Btn1),
+      TGridCellSettings.Create(0, 0)
+    );
+
+    Grid2.Rows := 4;
+    Grid2.Columns := 3;
+    Grid2.RowHeights := 8;
+    Grid2.ColumnWidths := 12;
+
+    Grid2.AddItem(
+      TControlGridItem.Create(Btn2),
+      TGridCellSettings.Create(0, 0)
+    );
+
+    Composite.DefaultSpacing := 13;
+    Composite.AddGrids([Grid1, Grid2]);
+    Composite.ArrangeGrids(0, 0);
+
+    AssertEquals(
+      'propriedade Top diferente do esperado para Btn1',
+      0,
+      Btn1.Top
+    );
+
+    AssertEquals(
+      'propriedade Left diferente do esperado para Btn1',
+      0,
+      Btn1.Left
+    );
+
+    AssertEquals(
+      'propriedade Top diferente do esperado para Btn2',
+      0,
+      Btn2.Top
+    );
+
+    AssertEquals(
+      'propriedade Left diferente do esperado para Btn2',
+      73, // 4 Colunas do grid 1 x tamanho 15 de cada coluna + espaçamento 13. 4x15 + 13 = 73
+      Btn2.Left
+    );
+  finally
+    Btn1.Free;
+    Btn2.Free;
+    Grid1.Free;
+    Grid2.Free;
+  end;
+end;
+
+procedure TGridLayoutTest.TestCompositeGrid_Vertical;
+var
+  Grid1: TGridLayout;
+  Grid2: TGridLayout;
+  Composite: TGridLayoutComposite;
+  Btn1: TButton;
+  Btn2: TButton;
+begin
+  Grid1 := TGridLayout.Create;
+  Grid2 := TGridLayout.Create;
+  Composite := TGridLayoutComposite.Create(gcoVertical);
+  Btn1 := TButton.Create(nil);
+  Btn2 := TButton.Create(nil);
+  try
+    Grid1.Rows := 3;
+    Grid1.Columns := 4;
+    Grid1.RowHeights := 10;
+    Grid1.ColumnWidths := 15;
+
+    Grid1.AddItem(
+      TControlGridItem.Create(Btn1),
+      TGridCellSettings.Create(0, 0)
+    );
+
+    Grid2.Rows := 4;
+    Grid2.Columns := 3;
+    Grid2.RowHeights := 8;
+    Grid2.ColumnWidths := 12;
+
+    Grid2.AddItem(
+      TControlGridItem.Create(Btn2),
+      TGridCellSettings.Create(0, 0)
+    );
+
+    Composite.AddGrids([Grid1, Grid2]);
+    Composite.ArrangeGrids(0, 0);
+
+    AssertEquals(
+      'propriedade Top diferente do esperado para Btn1',
+      0,
+      Btn1.Top
+    );
+
+    AssertEquals(
+      'propriedade Left diferente do esperado para Btn1',
+      0,
+      Btn1.Left
+    );
+
+    AssertEquals(
+      'propriedade Top diferente do esperado para Btn2',
+      30, // 3 Linhas do grid1 x tamanho 10 de cada coluna. 3 x 10 = 30
+      Btn2.Top
+    );
+
+    AssertEquals(
+      'propriedade Left diferente do esperado para Btn2',
+      0,
+      Btn2.Left
+    );
+  finally
+    Btn1.Free;
+    Btn2.Free;
+    Grid1.Free;
+    Grid2.Free;
+  end;
+end;
+
+procedure TGridLayoutTest.TestCompositeGrid_VerticalWithSpacing;
+var
+  Grid1: TGridLayout;
+  Grid2: TGridLayout;
+  Composite: TGridLayoutComposite;
+  Btn1: TButton;
+  Btn2: TButton;
+begin
+  Grid1 := TGridLayout.Create;
+  Grid2 := TGridLayout.Create;
+  Composite := TGridLayoutComposite.Create(gcoVertical);
+  Btn1 := TButton.Create(nil);
+  Btn2 := TButton.Create(nil);
+  try
+    Grid1.Rows := 3;
+    Grid1.Columns := 4;
+    Grid1.RowHeights := 10;
+    Grid1.ColumnWidths := 15;
+
+    Grid1.AddItem(
+      TControlGridItem.Create(Btn1),
+      TGridCellSettings.Create(0, 0)
+    );
+
+    Grid2.Rows := 4;
+    Grid2.Columns := 3;
+    Grid2.RowHeights := 8;
+    Grid2.ColumnWidths := 12;
+
+    Grid2.AddItem(
+      TControlGridItem.Create(Btn2),
+      TGridCellSettings.Create(0, 0)
+    );
+
+    Composite.DefaultSpacing := 11;
+    Composite.AddGrids([Grid1, Grid2]);
+    Composite.ArrangeGrids(0, 0);
+
+    AssertEquals(
+      'propriedade Top diferente do esperado para Btn1',
+      0,
+      Btn1.Top
+    );
+
+    AssertEquals(
+      'propriedade Left diferente do esperado para Btn1',
+      0,
+      Btn1.Left
+    );
+
+    AssertEquals(
+      'propriedade Top diferente do esperado para Btn2',
+      41, // 3 Linhas do grid1 x tamanho 10 de cada coluna + 11 espaçamento. 3x10 + 11 = 41
+      Btn2.Top
+    );
+
+    AssertEquals(
+      'propriedade Left diferente do esperado para Btn2',
+      0,
+      Btn2.Left
+    );
+  finally
+    Btn1.Free;
+    Btn2.Free;
+    Grid1.Free;
+    Grid2.Free;
   end;
 end;
 

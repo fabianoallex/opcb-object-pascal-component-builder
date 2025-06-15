@@ -146,6 +146,10 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="HtmlBuilder"/>
       </Unit>
+      <Unit>
+        <Filename Value="ulayout.controls.pas"/>
+        <IsPartOfProject Value="True"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

@@ -24,11 +24,13 @@ type
     Button2: TButton;
     Button3: TButton;
     Button4: TButton;
+    Button5: TButton;
     Memo1: TMemo;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
     procedure Button4Click(Sender: TObject);
+    procedure Button5Click(Sender: TObject);
   private
     procedure GerarRelatorioVenda;
     procedure GerarRelatorioVendaHtml(ARenderer: IHtmlGridRenderer);
@@ -58,6 +60,8 @@ const
   COL_TOTAL = 3;
 var
   Grid: TGridLayout;
+  Grid2: TGridLayout;
+
   Renderer: TTextGridRenderer;
   I, Row: Integer;
   Item: TVendaItem;
@@ -65,10 +69,12 @@ var
   Items: array of TVendaItem;
   TotalGeral: Double;
 
+  Composite: TGridLayoutComposite;
+
   procedure AddHeaderCell(const AText: string; ACol: Integer);
   begin
     TGridItemFactory.Create
-      .BuildTextItem(Renderer)
+      .TextItemBuilder(Renderer)
       .WithText(AText)
       .WithAlignment(tahCenter, tavMiddle)
       .AddToGrid(Grid, 0, ACol);
@@ -77,7 +83,7 @@ var
   procedure AddItemCell(const AText: string; ACol: Integer; Align: TTextAlignHorizontal = tahLeft);
   begin
     TGridItemFactory.Create
-      .BuildTextItem(Renderer)
+      .TextItemBuilder(Renderer)
       .WithText(AText)
       .WithAlignment(Align, tavMiddle)
       .AddToGrid(Grid, Row, ACol);
@@ -106,8 +112,15 @@ begin
   Items[3].ValorUnitario := 10.90;
   Items[3].Quantidade := 1;
 
+
+  Renderer := TTextGridRenderer.Create; // (Grid);
+  Composite := TGridLayoutComposite.Create(gcoVertical);
   Grid := TGridLayout.Create;
+  Grid2 := TGridLayout.Create;
+
   try
+    Grid.Top := 2;
+    Grid.Left := 2;
     Grid.Columns := 4;
     Grid.Rows := Length(Items) + 4; // +1 para cabeçalho, +3 para total
     Grid.RowHeights := 1;
@@ -121,8 +134,6 @@ begin
     Grid.VerticalSpacing[0] := 1;
     Grid.VerticalSpacing[Length(Items)] := 1;  // ultimo item
     Grid.Margins.All := 1;
-
-    Renderer := TTextGridRenderer.Create(Grid);
 
     AddHeaderCell('Descricao', COL_DESC);
     AddHeaderCell('Unidade', COL_UNID);
@@ -164,16 +175,52 @@ begin
         .WithRowSpan(3)
     );
 
-    Grid.ArrangeItems;
-    Memo1.Text := Renderer.GetAsString;
+    Grid2.Columns := 2;
+    Grid2.Rows := 2;
+    Grid2.RowHeight[0] := 1;
+    Grid2.RowHeights := 4;
+    Grid2.ColumnWidths := 33;
+    Grid2.HorizontalSpacings := 1;
+    Grid2.VerticalSpacings := 1;
+    Grid2.Margins.All := 1;
 
+    TGridItemFactory.Create
+      .TextItemBuilder(Renderer)
+      .WithText('ABC')
+      .WithAlignment(tahCenter, tavMiddle)
+      .AddToGrid(Grid2, 0, 0);
+
+    TGridItemFactory.Create
+      .TextItemBuilder(Renderer)
+      .WithText('DEF')
+      .WithAlignment(tahCenter, tavMiddle)
+      .AddToGrid(Grid2, 0, 1);
+
+    TGridItemFactory.Create
+      .TextItemBuilder(Renderer)
+      .WithText('Teste abc'#13'66666')
+      .WithAlignment(tahLeft, tavMiddle)
+      .AddToGrid(Grid2, 1, 0);
+
+    TGridItemFactory.Create
+      .TextItemBuilder(Renderer)
+      .WithText('Isso eh um'#13'teste'#13'de impressao'#13'Grid')
+      .WithAlignment(tahCenter, tavMiddle)
+      .AddToGrid(Grid2, 1, 1);
+
+    Composite.DefaultSpacing := 1;
+    Composite.AddGrids([Grid, Grid2]);
+    Composite.ArrangeGrids(5, 5);
+
+    Renderer.DrawMarginsAndSpacings(Grid);
+    Renderer.DrawMarginsAndSpacings(Grid2);
+    Memo1.Text := Renderer.GetAsString;
   finally
     Renderer.Free;
     Grid.Free;
+    Grid2.Free;
   end;
 end;
-
-
 
 procedure TFGridText.GerarRelatorioVendaHtml(ARenderer: IHtmlGridRenderer);
 const
@@ -192,7 +239,7 @@ var
   procedure AddHeaderCell(const AText: string; ACol: Integer);
   begin
     TGridItemFactory.Create
-      .BuildHtmlTableItem(ARenderer)
+      .HtmlTableItemBuilder(ARenderer)
       .WithStrContent(AText)
       .WithCellSettings(
         TGridCellSettings.Create(0, ACol)
@@ -204,7 +251,7 @@ var
   procedure AddItemCell(const AText: string; ACol: Integer; Align: TItemAlignment = laStart);
   begin
     TGridItemFactory.Create
-      .BuildHtmlTableItem(ARenderer)
+      .HtmlTableItemBuilder(ARenderer)
       .WithStrContent(AText)
       .WithCellSettings(
         TGridCellSettings.Create(Row, ACol)
@@ -326,6 +373,19 @@ end;
 procedure TFGridText.Button4Click(Sender: TObject);
 begin
   GerarRelatorioVendaHtml(THtmlTableGridRenderer.Create);
+end;
+
+procedure TFGridText.Button5Click(Sender: TObject);
+var
+  CharMatrix: TCharMatrix;
+begin
+  CharMatrix := TCharMatrix.Create;
+
+  CharMatrix.WriteTextAt(3, 3, 'Teste1');
+  CharMatrix.WriteTextAt(8, 4, 'Teste2');
+  CharMatrix.WriteTextAt(10, 2, 'Teste3');
+  CharMatrix.WriteTextAt(1, 3, 'Teste4');
+  Memo1.Text := CharMatrix.GetAsString;
 end;
 
 

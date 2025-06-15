@@ -508,7 +508,7 @@ begin
     .AddItem(Btn2, TGridCellSettings.Create(1, 2).WithRowSpan(2).WithAlignment(laStretch, laStretch))
     .AddItem(Btn3, TGridCellSettings.Create(0, 2))
     .AddItem(Btn4, TGridCellSettings.Create(2, 0))
-    .Done;
+    .Build;
 
   try
     Grid.ArrangeItems;
@@ -566,6 +566,7 @@ var
   Tab: TTabSheet;
   Grid1: TGridLayout;
   Grid2: TGridLayout;
+  Grid3: TGridLayout;
   CompositeGrid: TGridLayoutComposite;
   Btn: TButton;
   I: Integer;
@@ -576,7 +577,8 @@ begin
 
   Grid1 := TGridLayout.Create;
   Grid2 := TGridLayout.Create;
-  CompositeGrid := TGridLayoutComposite.Create(gcoVertical);
+  Grid3 := TGridLayout.Create;
+  CompositeGrid := TGridLayoutComposite.Create(gcoHorizontal);
   try
     Grid1.Rows := 3;
     Grid1.Columns := 3;
@@ -590,7 +592,7 @@ begin
     begin
       Btn := TButton.Create(Tab);
       Btn.Parent := Tab;
-      Btn.Caption := 'Botão ' + IntToStr(I + 1);
+      Btn.Caption := 'G1 - ' + IntToStr(I + 1);
 
       Grid1.AddItem(Btn, TGridCellSettings.Create(I div 3, I mod 3));
     end;
@@ -598,7 +600,7 @@ begin
     Grid2.Rows := 3;
     Grid2.Columns := 3;
     Grid2.ColumnWidths := 60;
-    Grid2.RowHeights := 40;
+    Grid2.RowHeights := 60;
     Grid2.Margins.All := 10;
     Grid2.HorizontalSpacings := 10;
     Grid2.VerticalSpacings := 10;
@@ -607,18 +609,58 @@ begin
     begin
       Btn := TButton.Create(Tab);
       Btn.Parent := Tab;
-      Btn.Caption := 'Botão ' + IntToStr(I + 1);
+      Btn.Caption := 'G2 - ' + IntToStr(I + 1);
 
       Grid2.AddItem(Btn, TGridCellSettings.Create(I div 3, I mod 3));
     end;
 
+    Grid3.Rows := 3;
+    Grid3.Columns := 3;
+    Grid3.ColumnWidths := 90;
+    Grid3.RowHeights := 40;
+    Grid3.Margins.All := 10;
+    Grid3.HorizontalSpacings := 10;
+    Grid3.VerticalSpacings := 10;
+
+    for I := 0 to 8 do
+    begin
+      Btn := TButton.Create(Tab);
+      Btn.Parent := Tab;
+      Btn.Caption := 'G3 - ' + IntToStr(I + 1);
+
+      Grid3.AddItem(Btn, TGridCellSettings.Create(I div 3, I mod 3));
+    end;
+
+    {
     CompositeGrid.AddGrid(Grid1);
     CompositeGrid.AddGrid(Grid2);
+    CompositeGrid.AddGrid(Grid3);
+    }
+
+    CompositeGrid.AddGrid(Grid1);
+    CompositeGrid.AddGrid(Grid3);
+    CompositeGrid.AddGridBefore(Grid2, Grid3);
+
+    {
+    CompositeGrid.AddGrid(Grid1);
+    CompositeGrid.AddGrid(Grid3);
+    CompositeGrid.AddGridAfter(Grid2, Grid1);
+    }
+    {
+    CompositeGrid.AddGrid(Grid2);
+    CompositeGrid.AddGrid(Grid3);
+    CompositeGrid.AddGridAtBegin(Grid1);
+    }
+    Grid1.Left := 200;
+    Grid1.Top := 50;
+
+    CompositeGrid.Spacing[1] := 150;
 
     Grid1.ArrangeItems;
   finally
     Grid1.Free;
     Grid2.Free;
+    Grid3.Free;
   end;
 end;
 
@@ -912,7 +954,7 @@ begin
         GridFill.Skip(2);
 
       TGridItemFactory.Create
-        .BuildControlItem
+        .ControlItemBuilder
         .WithControl(Btn)
         .AddWithFiller(GridFill);
     end;
@@ -972,7 +1014,7 @@ begin
     .WithMargins(10)
     .UsingFiller(ftColumnFirst)
     .FillItems(Btns)
-    .Done do
+    .Build do
   begin
     ArrangeItems;
     Free;
@@ -1014,7 +1056,7 @@ begin
     .AddItem(Btn, TGridCellSettings.Create(0, 1).WithColumnSpan(2)) // adiciona manualmente
     .UsingFiller(ftColumnFirst) // define um preechedor
     .FillItems(Btns, TGridPosition.Create(0, 3))            // preenche o array de botões
-    .Done do
+    .Build do
   begin
     ArrangeItems;
     Free;
@@ -1057,7 +1099,7 @@ begin
 
       TGridItemFactory
         .Create
-          .BuildControlItem
+          .ControlItemBuilder
             .WithControl(Btn)
             .AddWithFiller(GridFill);
 
@@ -1105,7 +1147,7 @@ begin
 
       TGridItemFactory
         .Create
-          .BuildControlItem
+          .ControlItemBuilder
             .WithControl(Btn)
             .AddWithFiller(Fill);
 
@@ -1159,7 +1201,7 @@ begin
       Btn.Caption := Row0[I];
 
       TGridItemFactory.Create
-        .BuildControlItem
+        .ControlItemBuilder
           .WithControl(Btn)
           .AddWithFiller(Fill);
     end;
@@ -1171,7 +1213,7 @@ begin
       Btn.Caption := Row1[I];
 
       TGridItemFactory.Create
-        .BuildControlItem
+        .ControlItemBuilder
           .WithControl(Btn)
           .AddWithFiller(Fill);
     end;
@@ -1183,7 +1225,7 @@ begin
       Btn.Caption := Row2[I];
 
       TGridItemFactory.Create
-        .BuildControlItem
+        .ControlItemBuilder
           .WithControl(Btn)
           .AddWithFiller(Fill);
     end;
@@ -1198,7 +1240,7 @@ begin
       // Fill.PlaceItem(Btn);
 
       TGridItemFactory.Create
-        .BuildControlItem
+        .ControlItemBuilder
           .WithControl(Btn)
           .AddWithFiller(Fill);
     end;
@@ -1595,7 +1637,7 @@ begin
     .EndSubGrid
     .UsingFiller(ftRowFirst)
     .FillItems(Btns)
-    .Done do
+    .Build do
   begin
     ArrangeItems;
     Free;
@@ -2189,7 +2231,7 @@ begin
     .WithHorizontalSpacings(10)
     .WithVerticalSpacings(10)
     .WithMargins(10)
-    .Done;
+    .Build;
 
   for I := 0 to 8 do
   begin

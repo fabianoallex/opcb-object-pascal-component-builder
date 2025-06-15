@@ -177,14 +177,13 @@ end;
 
 procedure TGridFillRowFirst.PlaceItem(AItem: IGridItem);
 var
-  Pos: IGridPosition;
   Settings: TGridCellSettings;
 begin
   if not Assigned(Grid) then
     raise Exception.Create('Grid not assigned.');
 
-  Pos := NextPosition;
-  Settings := TGridCellSettings.Create(Pos.Row, Pos.Column);
+  // posição será redefinida na chamada de PlaceItem abaixo
+  Settings := TGridCellSettings.Create(0, 0);
   Self.PlaceItem(AItem, Settings);
 end;
 

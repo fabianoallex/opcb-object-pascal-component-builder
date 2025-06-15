@@ -16,12 +16,14 @@ type
     FBuffer: array of array of Char;
     FEmptyChar: Char;
     FWidth, FHeight: Integer;
+    procedure EnsureSize(AMinWidth, AMinHeight: Integer);
     procedure SetEmptyChar(AValue: Char);
   public
-    constructor Create(AWidth, AHeight: Integer);
+    constructor Create;
     procedure Clear;
     procedure WriteTextAt(x, y: Integer; const AText: string);
     procedure WriteCharAt(x, y: Integer; ch: Char);
+    function GetCharAt(x, y: Integer): Char;
     function GetAsString: string;
     property EmptyChar: Char read FEmptyChar write SetEmptyChar;
     property Height: Integer read FHeight;
@@ -32,7 +34,6 @@ type
 
   TTextGridRenderer = class
   private
-    FGrid: TGridLayout;
     FCharMatrix: TCharMatrix;
     FHorizontaSpancingChar: Char;
     FIntersectionChar: Char;
@@ -49,11 +50,11 @@ type
     procedure SetMarginTopChar(AValue: Char);
     procedure SetVerticalSpacingChar(AValue: Char);
   public
-    constructor Create(AGrid: TGridLayout);
+    constructor Create;
     destructor Destroy; override;
     procedure WriteTextAt(x, y: Integer; const AText: string);
     function GetAsString: string;
-    procedure Clear;
+    procedure DrawMarginsAndSpacings(AGrid: TGridLayout);
     property MarginTopChar: Char read FMarginTopChar write SetMarginTopChar;
     property MarginBottomChar: Char read FMarginBottomChar write SetMarginBottomChar;
     property MarginLeftChar: Char read FMarginLeftChar write SetMarginLeftChar;
@@ -132,14 +133,32 @@ begin
   FEmptyChar := AValue;
 end;
 
-constructor TCharMatrix.Create(AWidth, AHeight: Integer);
+constructor TCharMatrix.Create;
 begin
   inherited Create;
   FEmptyChar := ' ';
-  FWidth := AWidth;
-  FHeight := AHeight;
-  SetLength(FBuffer, FHeight, FWidth);
-  Clear;
+  FWidth := 0;
+  FHeight := 0;
+end;
+
+procedure TCharMatrix.EnsureSize(AMinWidth, AMinHeight: Integer);
+var
+  y: Integer;
+begin
+  if AMinHeight > FHeight then
+  begin
+    SetLength(FBuffer, AMinHeight);
+    for y := FHeight to AMinHeight - 1 do
+      SetLength(FBuffer[y], FWidth); // colunas existentes ou nenhuma
+    FHeight := AMinHeight;
+  end;
+
+  if AMinWidth > FWidth then
+  begin
+    for y := 0 to FHeight - 1 do
+      SetLength(FBuffer[y], AMinWidth);
+    FWidth := AMinWidth;
+  end;
 end;
 
 procedure TCharMatrix.Clear;
@@ -155,25 +174,50 @@ procedure TCharMatrix.WriteTextAt(x, y: Integer; const AText: string);
 var
   i: Integer;
 begin
+  if (x < 0) or (y < 0) then
+    Exit;
+
+  EnsureSize(x + Length(AText), y + 1);
+
   for i := 1 to Length(AText) do
     WriteCharAt(x + i - 1, y, AText[i]);
 end;
 
 procedure TCharMatrix.WriteCharAt(x, y: Integer; ch: Char);
 begin
-  if (x >= 0) and (x < FWidth) and (y >= 0) and (y < FHeight) then
-    FBuffer[y][x] := ch;
+  if (x < 0) or (y < 0) then
+    Exit;
+
+  EnsureSize(x + 1, y + 1);
+  FBuffer[y][x] := ch;
+end;
+
+function TCharMatrix.GetCharAt(x, y: Integer): Char;
+begin
+  Result := #0;
+  if (y >= FHeight) or (x >= FWidth) then
+    Exit;
+  Result := FBuffer[y][x];
 end;
 
 function TCharMatrix.GetAsString: string;
 var
   y, x: Integer;
+
+  function ValidateChar(C: Char): string;
+  begin
+    if C = #0 then
+      Result := string(FEmptyChar)
+    else
+      Result := string(C);
+  end;
+
 begin
   Result := '';
   for y := 0 to FHeight - 1 do
   begin
     for x := 0 to FWidth - 1 do
-      Result := Result + string(FBuffer[y][x]);
+      Result := Result + ValidateChar(FBuffer[y][x]);
     Result := Result + sLineBreak;
   end;
 end;
@@ -222,11 +266,10 @@ begin
   FVerticalSpacingChar := AValue;
 end;
 
-constructor TTextGridRenderer.Create(AGrid: TGridLayout);
+constructor TTextGridRenderer.Create;
 begin
   inherited Create;
-  FGrid := AGrid;
-  FCharMatrix := TCharMatrix.Create(AGrid.ContentWidth, AGrid.ContentHeight);
+  FCharMatrix := TCharMatrix.Create;
   FCharMatrix.FEmptyChar := ' ';
   MarginTopChar := '-';
   MarginBottomChar := '-';
@@ -235,7 +278,6 @@ begin
   VerticalSpacingChar := '-';
   HorizontaSpancingChar := '|';
   IntersectionChar := '+';
-  Clear;
 end;
 
 destructor TTextGridRenderer.Destroy;
@@ -254,9 +296,9 @@ begin
   Result := FCharMatrix.GetAsString;
 end;
 
-procedure TTextGridRenderer.Clear;
+procedure TTextGridRenderer.DrawMarginsAndSpacings(AGrid: TGridLayout);
 var
-  X, Y: Integer;
+  X, Y, W, H: Integer;
   IsVerticalSpacing: Boolean;
   IsHorizontalSpacing: Boolean;
   IsTopMargin: Boolean;
@@ -280,17 +322,21 @@ var
   end;
 
 begin
-  FCharMatrix.Clear;
+  W := AGrid.ContentWidth + AGrid.Left;
+  H := AGrid.ContentHeight + AGrid.Top;
 
-  for X:=0 to FCharMatrix.FWidth-1 do
-    for Y:=0 to FCharMatrix.FHeight-1 do
+  for X:=AGrid.Left to W-1 do
+    for Y:=AGrid.Top to H-1 do
     begin
-      IsVerticalSpacing := FGrid.IsInVerticalSpacing(X, Y);
-      IsHorizontalSpacing := FGrid.IsInHorizontalSpacing(X, Y);
-      IsTopMargin := FGrid.IsInTopMargin(Y);
-      IsBottomMargin := FGrid.IsInBottomMargin(Y);
-      IsLeftMargin := FGrid.IsInLeftMargin(X);
-      IsRightMargin := FGrid.IsInRightMargin(X);
+      if FCharMatrix.GetCharAt(X, Y) <> #0 then
+        Continue;
+
+      IsVerticalSpacing := AGrid.IsInVerticalSpacing(X, Y);
+      IsHorizontalSpacing := AGrid.IsInHorizontalSpacing(X, Y);
+      IsTopMargin := AGrid.IsInTopMargin(Y);
+      IsBottomMargin := AGrid.IsInBottomMargin(Y);
+      IsLeftMargin := AGrid.IsInLeftMargin(X);
+      IsRightMargin := AGrid.IsInRightMargin(X);
 
       if IsIntersection then
         FCharMatrix.WriteCharAt(X, Y, FIntersectionChar)
@@ -313,10 +359,11 @@ end;
 
 function TTextVisualElement.GetAlignedLines: specialize TArray<string>;
 var
-  I, PadTop, LineIndex: Integer;
+  I, PadTop: Integer;
   Line: string;
   LeftPad, RightPad: Integer;
 begin
+  Result := nil;
   SetLength(Result, FHeight);
 
   // Calcular padding superior (vertical alignment)
@@ -359,7 +406,6 @@ end;
 procedure TTextVisualElement.Redraw(AContext: TGriItemRenderContext);
 var
   I: Integer;
-  Str: string;
   AlignedLines: specialize TArray<string>;
 begin
   if (not Assigned(FRenderer)) or (not FVisible) then

@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="GridLayoutExamples2.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="1"/>
+        <CursorPos Y="24"/>
+        <UsageCount Value="77"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="unit1.pas"/>
+        <IsPartOfProject Value="True"/>
+        <ComponentName Value="Form1"/>
+        <HasResources Value="True"/>
+        <ResourceBaseClass Value="Form"/>
+        <UnitName Value="Unit1"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="222"/>
+        <CursorPos X="60" Y="242"/>
+        <UsageCount Value="77"/>
+        <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ugridalayoutresizer.pas"/>
+        <UnitName Value="UGridaLayoutResizer"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="115"/>
+        <UsageCount Value="39"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ulayout.pas"/>
+        <UnitName Value="ULayout"/>
+        <EditorIndex Value="3"/>
+        <TopLine Value="420"/>
+        <CursorPos X="64" Y="447"/>
+        <UsageCount Value="39"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <UnitName Value="UGridLayoutBuilder"/>
+        <EditorIndex Value="5"/>
+        <TopLine Value="40"/>
+        <CursorPos X="31" Y="65"/>
+        <UsageCount Value="39"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
+        <UnitName Value="Controls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1654"/>
+        <CursorPos X="14" Y="1814"/>
+        <UsageCount Value="15"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\lcl\stdctrls.pp"/>
+        <UnitName Value="StdCtrls"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="1581"/>
+        <CursorPos X="14" Y="1599"/>
+        <UsageCount Value="15"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ulayout.controls.pas"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="73"/>
+        <CursorPos X="14" Y="92"/>
+        <UsageCount Value="49"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.defaults.pas"/>
+        <UnitName Value="Generics.Defaults"/>
+        <EditorIndex Value="6"/>
+        <TopLine Value="7"/>
+        <CursorPos Y="29"/>
+        <UsageCount Value="39"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\component\pckgridlayout.pas"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="54" Y="21"/>
+        <UsageCount Value="4"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ulayout.controls.pas"/>
+        <EditorIndex Value="-1"/>
+        <UsageCount Value="4"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
+        <UnitName Value="Generics.Collections"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="220"/>
+        <CursorPos X="3" Y="225"/>
+        <UsageCount Value="14"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\lcl\graphics.pp"/>
+        <UnitName Value="Graphics"/>
+        <EditorIndex Value="-1"/>
+        <CursorPos X="14" Y="17"/>
+        <UsageCount Value="14"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\src\ugridlayoutfill.pas"/>
+        <UnitName Value="UGridLayoutFill"/>
+        <EditorIndex Value="4"/>
+        <TopLine Value="72"/>
+        <CursorPos X="14" Y="38"/>
+        <UsageCount Value="29"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="29">
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="137" Column="8" TopLine="110"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <Caret Line="53" Column="20" TopLine="27"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <Caret Line="286" Column="3" TopLine="255"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <Caret Line="51" Column="20" TopLine="22"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <Caret Line="259" TopLine="231"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="154" Column="63" TopLine="117"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="156" Column="63" TopLine="120"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="225" Column="30" TopLine="192"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="226" Column="30" TopLine="193"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="225" Column="30" TopLine="192"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="220" Column="27" TopLine="199"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="243" Column="76" TopLine="226"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="245" Column="76" TopLine="228"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="316" Column="5" TopLine="280"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="295" TopLine="277"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="246" Column="32" TopLine="212"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="259" TopLine="234"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.controls.pas"/>
+        <Caret Line="92" Column="62" TopLine="64"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="232" Column="5" TopLine="222"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.controls.pas"/>
+        <Caret Line="332" Column="9" TopLine="299"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="230" Column="20" TopLine="206"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="44" Column="3" TopLine="19"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="8" Column="21"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="231" TopLine="212"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.controls.pas"/>
+        <Caret Line="91" Column="9" TopLine="72"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.controls.pas"/>
+        <Caret Line="92" Column="30" TopLine="72"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.controls.pas"/>
+        <Caret Line="333" Column="3" TopLine="300"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.controls.pas"/>
+        <Caret Line="92" Column="14" TopLine="73"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="231" Column="22" TopLine="212"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.controls.pas"/>
+        <Caret Line="333" Column="3" TopLine="300"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+</CONFIG>
