@@ -1,9 +1,9 @@
-unit ulayout.controls;
+﻿unit ulayout.controls;
 
+{$IFDEF FPC}
 {$mode objfpc}{$H+}
 {$LONGSTRINGS ON}{$MODESWITCH TYPEHELPERS}{$MODESWITCH ADVANCEDRECORDS}
-
-
+{$ENDIF}
 
 interface
 
@@ -26,7 +26,7 @@ type
     class function Create(AClass: TControlClass; const AName: string): TControlInfo; static;
   end;
 
-  TStrControlDictionary = specialize TDictionary<string, TControl>;
+  TStrControlDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControl>;
 
   { TControlGridPopulator }
 
@@ -34,19 +34,21 @@ type
   private
     FGrid: TGridLayout;
     FFiller: IGridFill;
+    FFillerType: TFillerType;
     FOwner: TComponent;
     FParent: TWinControl;
-    FControls: specialize TList<TControl>;
+    FControls: {$IFDEF FPC}specialize{$ENDIF} TList<TControl>;
     FNamedControls: TStrControlDictionary;
     FOnControlCreate: TControlCreateProc;
     function GetNamedControl(const AName: string): TControl;
-    procedure SetControls(AValue: specialize TList<TControl>);
+    procedure SetControls(AValue: {$IFDEF FPC}specialize{$ENDIF} TList<TControl>);
     procedure ConfigControl(AControl: TControl);
   public
-    constructor Create(AGrid: TGridLayout);
+    constructor Create;
     destructor Destroy; override;
     function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl
       ): TControlGridPopulator;
+    procedure SetGrid(AGrid: TGridLayout);
     function UsingFiller(AFillerType: TFillerType; ARow: Integer=0;
       AColumn: Integer=0): TControlGridPopulator;
     function FillerSkip(ACount: Integer=1): TControlGridPopulator;
@@ -72,8 +74,11 @@ type
       AControlCreateInfos: array of TControlInfo;
       AProc: TControlCreateProc=nil): TControlGridPopulator; overload;
 
+    function CreateControls(AControlCreateInfos: array of TControlInfo;
+      AProc: TControlCreateProc=nil): TControlGridPopulator; overload;
+
     function OnControlCreate(AProc: TControlCreateProc): TControlGridPopulator;
-    property Controls: specialize TList<TControl> read FControls write SetControls;
+    property Controls: {$IFDEF FPC}specialize{$ENDIF} TList<TControl> read FControls write SetControls;
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property Grid: TGridLayout read FGrid;
   end;
@@ -90,7 +95,7 @@ type
   TGridLayoutBuilderHelper = class helper for TGridLayoutBuilder
   public
     function BuildAndPopulate(var AGrid: TGridLayout;
-      var APopulator: TControlGridPopulator): TControlGridPopulator;
+      APopulator: TControlGridPopulator): TControlGridPopulator;
   end;
 
 implementation
@@ -109,7 +114,7 @@ end;
 
 { TControlGridPopulator }
 
-procedure TControlGridPopulator.SetControls(AValue: specialize TList<TControl
+procedure TControlGridPopulator.SetControls(AValue: {$IFDEF FPC}specialize{$ENDIF} TList<TControl
   >);
 begin
   if FControls = AValue then Exit;
@@ -134,7 +139,9 @@ begin
   if AControl is TCheckBox then
     with (AControl as TCheckBox) do
     begin
+      {$IFDEF FPC}
       AutoSize := False;
+      {$ENDIF}
     end;
 
   if AControl is TEdit then
@@ -144,12 +151,12 @@ begin
     end;
 end;
 
-constructor TControlGridPopulator.Create(AGrid: TGridLayout);
+constructor TControlGridPopulator.Create;
 begin
-  FGrid := AGrid;
-  FControls := specialize TList<TControl>.Create;
+  FGrid := nil;
+  FFiller := nil;
+  FControls := {$IFDEF FPC}specialize{$ENDIF} TList<TControl>.Create;
   FNamedControls := TStrControlDictionary.Create;
-  UsingFiller(ftRowFirst);
 end;
 
 destructor TControlGridPopulator.Destroy;
@@ -163,6 +170,7 @@ function TControlGridPopulator.UsingFiller(AFillerType: TFillerType;
   ARow: Integer; AColumn: Integer): TControlGridPopulator;
 begin
   Result := Self;
+  FFillerType := AFillerType;
   FFiller := TGridLayoutFillerFactory.CreateFiller(AFillerType, FGrid);
   FillerSetPosition(ARow, AColumn);
 end;
@@ -211,7 +219,6 @@ begin
   Control := AControlInfo.ControlClass.Create(FOwner);
   Control.Parent := FParent;
 
-  // ConfigControl(Control);
   FControls.Add(Control);
 
   if not AControlInfo.ControlName.IsEmpty then
@@ -223,12 +230,16 @@ begin
   ControlGridItem := TControlGridItem.Create(Control);
   Settings := TGridCellSettings.Create(0, 0);
 
-  if Assigned(FOnControlCreate) then
-    FOnControlCreate(Control, FControls.Count-1, Settings);
-  if Assigned(AProc) then
-    AProc(Control, FControls.Count-1, Settings);
+  try
+    if Assigned(FOnControlCreate) then
+      FOnControlCreate(Control, FControls.Count-1, Settings);
+    if Assigned(AProc) then
+      AProc(Control, FControls.Count-1, Settings);
 
-  FFiller.PlaceItem(ControlGridItem, Settings);
+    FFiller.PlaceItem(ControlGridItem, Settings);
+  finally
+    Settings.Free;
+  end;
 end;
 
 function TControlGridPopulator.CreateControl(AControlClass: TControlClass;
@@ -293,6 +304,13 @@ begin
   end;
 end;
 
+function TControlGridPopulator.CreateControls
+  (AControlCreateInfos: array of TControlInfo; AProc: TControlCreateProc
+  ): TControlGridPopulator;
+begin
+  Result := CreateControls(Length(AControlCreateInfos), AControlCreateInfos, AProc);
+end;
+
 function TControlGridPopulator.OnControlCreate(AProc: TControlCreateProc
   ): TControlGridPopulator;
 begin
@@ -306,6 +324,12 @@ begin
   Result := Self;
   FOwner := AOwner;
   FParent := AParent;
+end;
+
+procedure TControlGridPopulator.SetGrid(AGrid: TGridLayout);
+begin
+  FGrid := AGrid;
+  UsingFiller(ftRowFirst);
 end;
 
 { TGridLayoutHelper }
@@ -329,10 +353,10 @@ end;
 { TGridLayoutBuilderHelper }
 
 function TGridLayoutBuilderHelper.BuildAndPopulate(var AGrid: TGridLayout;
-  var APopulator: TControlGridPopulator): TControlGridPopulator;
+  APopulator: TControlGridPopulator): TControlGridPopulator;
 begin
   AGrid := Self.Build;
-  APopulator := TControlGridPopulator.Create(AGrid);
+  APopulator.SetGrid(AGrid);
   Result := APopulator;
 end;
 

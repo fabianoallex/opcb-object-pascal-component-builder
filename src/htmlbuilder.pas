@@ -1,6 +1,8 @@
 unit HtmlBuilder;
 
+{$IFDEF FPC}
 {$mode ObjFPC}{$H+}
+{$ENDIF}
 
 interface
 

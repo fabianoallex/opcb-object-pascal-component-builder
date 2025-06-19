@@ -1563,85 +1563,8 @@ end;
 
 procedure TFExamplesMain.AddExample_NestedGridNoContainerSubGridBuilder
   (AOwner: TForm; APageControl: TPageControl);
-var
-  Tab: TTabSheet;
-  I: Integer;
-  Btns: array of TControl;
-  Btn: TButton;
-  Btn1, Btn2, Btn3: TButton;
-const
-  Rows = 3;
-  Columns = 5;
-  CWidht = 70;
-  Spacing = 3;
-  RHeight = 40;
-
-  SubGridRow = 0;
-  SubGridRows = 1;
-  SubGridColumns = 3;
-  SubGridSpacing = 10;
-  SubGridRHeight = RHeight * 2;
 begin
-  Tab := TTabSheet.Create(APageControl);
-  Tab.PageControl := APageControl;
-  Tab.Caption := 'GridFill';
 
-  SetLength(Btns, 10);
-  for I := Low(Btns) to High(Btns) do
-  begin
-    Btn := TButton.Create(Tab);
-    Btn.Parent := Tab;
-    Btn.Caption := Format('Btn %d', [I + 1]);
-    Btn.Tag := I;
-    Btns[I] := Btn;
-  end;
-
-  Btn1 := TButton.Create(Tab);
-  Btn1.Parent := Tab;
-  Btn1.Caption := ' SUB-GRID A ';
-
-  Btn2 := TButton.Create(Tab);
-  Btn2.Parent := Tab;
-  Btn2.Caption := ' SUB-GRID B ';
-
-  Btn3 := TButton.Create(Tab);
-  Btn3.Parent := Tab;
-  Btn3.Caption := ' SUB-GRID C ';
-
-  with TGridLayoutBuilder.Create
-    .WithDimensions(Rows, Columns)
-    .WithRowsHeight(RHeight)
-    .WithColumnsWidth(CWidht)
-    .WithSpacings(Spacing)
-    .WithMargins(10)
-    .WithRowsHeight(
-      [SubGridRow],
-      SubGridRows*SubGridRHeight
-      + (SubGridRows-1)*SubGridSpacing
-    )
-    .BeginSubGrid(
-      TGridCellSettings.Create(SubGridRow, 0)
-        .WithColumnSpan(Columns)
-    )
-      .WithDimensions(SubGridRows, SubGridColumns)
-      .WithSpacings(SubGridSpacing)
-      .WithRowsHeight(SubGridRHeight)
-      .WithColumnsWidth((
-        CWidht*Columns
-          + Spacing*(Columns-1)
-          - SubGridSpacing*(SubGridColumns-1)
-        ) div SubGridColumns
-      )
-      .UsingFiller(ftColumnFirst)
-      .FillItems([Btn1, Btn2, Btn3])
-    .EndSubGrid
-    .UsingFiller(ftRowFirst)
-    .FillItems(Btns)
-    .Build do
-  begin
-    ArrangeItems;
-    Free;
-  end;
 end;
 
 procedure TFExamplesMain.AddExample_Dashboard(AOwner: TForm;

@@ -1,6 +1,8 @@
 unit UGridText;
 
+{$IFDEF FPC}
 {$mode ObjFPC}{$H+}
+{$ENDIF}
 
 interface
 
@@ -78,7 +80,7 @@ type
     FHorizontalAlign: TTextAlignHorizontal;
     FVerticalAlign: TTextAlignVertical;
     procedure AdjustSize;
-    function GetAlignedLines: specialize TArray<string>;
+    function GetAlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
   public
     constructor Create(const ARenderer: TTextGridRenderer);
     destructor Destroy; override;
@@ -357,7 +359,7 @@ end;
 
 { TTextVisualElement }
 
-function TTextVisualElement.GetAlignedLines: specialize TArray<string>;
+function TTextVisualElement.GetAlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
 var
   I, PadTop: Integer;
   Line: string;
@@ -406,7 +408,7 @@ end;
 procedure TTextVisualElement.Redraw(AContext: TGriItemRenderContext);
 var
   I: Integer;
-  AlignedLines: specialize TArray<string>;
+  AlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
 begin
   if (not Assigned(FRenderer)) or (not FVisible) then
     Exit;

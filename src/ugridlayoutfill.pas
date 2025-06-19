@@ -1,6 +1,8 @@
 unit UGridLayoutFill;
 
+{$IFDEF FPC}
 {$mode ObjFPC}{$H+}
+{$ENDIF}
 
 interface
 
@@ -47,9 +49,9 @@ type
     procedure SetOnAfterPlaceItem(AValue: TGridFillAfterPlaceEvent); override;
     procedure SetOnBeforePlaceItem(AValue: TGridFillBeforePlaceEvent); override;
   public
-    constructor Create(AGrid: TGridLayout); override; overload;
+    constructor Create(AGrid: TGridLayout); override;
     function NextPosition: IGridPosition; override;
-    procedure PlaceItem(AItem: IGridItem); override; overload;
+    procedure PlaceItem(AItem: IGridItem); overload; override;
     procedure PlaceItem(AItem: IGridItem; ASettings: TGridCellSettings); overload; override;
     procedure Skip(ACount: Integer=1); override;
     procedure InitialPos(APos: IGridPosition); override;
@@ -150,22 +152,22 @@ end;
 
 function TGridFillRowFirst.NextPosition: IGridPosition;
 begin
+  {$IFDEF FPC}
   Result := SafeFindNextPosition(@SafeNextPosition);
+  {$ELSE}
+  Result := SafeFindNextPosition(SafeNextPosition);
+  {$ENDIF}
 end;
 
 procedure TGridFillRowFirst.SetOnAfterPlaceItem(AValue: TGridFillAfterPlaceEvent
   );
 begin
-  if FOnAfterPlaceItem = AValue then
-    Exit;
   FOnAfterPlaceItem := AValue;
 end;
 
 procedure TGridFillRowFirst.SetOnBeforePlaceItem(
   AValue: TGridFillBeforePlaceEvent);
 begin
-  if FOnBeforePlaceItem = AValue then
-    Exit;
   FOnBeforePlaceItem := AValue;
 end;
 
@@ -254,13 +256,11 @@ end;
 
 procedure TGridFillColumnFirst.SetOnAfterPlaceItem(AValue: TGridFillAfterPlaceEvent);
 begin
-  if FOnAfterPlaceItem = AValue then Exit;
   FOnAfterPlaceItem := AValue;
 end;
 
 procedure TGridFillColumnFirst.SetOnBeforePlaceItem(AValue: TGridFillBeforePlaceEvent);
 begin
-  if FOnBeforePlaceItem = AValue then Exit;
   FOnBeforePlaceItem := AValue;
 end;
 
@@ -285,7 +285,11 @@ end;
 
 function TGridFillColumnFirst.NextPosition: IGridPosition;
 begin
+  {$IFDEF FPC}
   Result := SafeFindNextPosition(@SafeNextPosition);
+  {$ELSE}
+  Result := SafeFindNextPosition(SafeNextPosition);
+  {$ENDIF}
 end;
 
 procedure TGridFillColumnFirst.PlaceItem(AItem: IGridItem);

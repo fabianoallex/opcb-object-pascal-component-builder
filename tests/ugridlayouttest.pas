@@ -8,9 +8,6 @@ uses
   Classes, SysUtils, fpcunit, testregistry, ULayout;
 
 type
-  TSubGridItemTest = class (TSubGridItem)
-  end;
-
   { TGridLayoutTest }
 
   TGridLayoutTest= class(TTestCase)
@@ -63,9 +60,6 @@ type
 
     procedure TestExtraSize_NoEffectOnNonStretch;
     procedure TestExtraSize_WithOffset_StretchOnly;
-
-    procedure TestNestedGrid_PositionAndSize;
-    procedure TestSubGrid_WithVirtualContainer_PositionedCorrectly;
 
     procedure TestInsertAt_TGridTrackInfoDictionaryHelper;
     procedure TestMoveKey_From1To3;
@@ -2033,111 +2027,6 @@ begin
 
   Btn.Free;
   Grid.Free;
-end;
-
-procedure TGridLayoutTest.TestNestedGrid_PositionAndSize;
-var
-  MainGrid, SubGrid: TGridLayout;
-  MainContainer,
-  SubContainer: TWinControl;
-  SubItem: TSubGridItem;
-  Btn: TSpeedButton;
-begin
-  MainContainer := TPanel.Create(nil); // ou TPanel
-  SubContainer := TGroupBox.Create(nil);
-  try
-    MainGrid := TGridLayout.Create;
-    MainGrid.Rows := 2;
-    MainGrid.Columns := 2;
-    MainGrid.ColumnWidths := 200;
-    MainGrid.RowHeights := 100;
-
-    SubGrid := TGridLayout.Create;
-    SubGrid.Rows := 2;
-    SubGrid.Columns := 2;
-    SubGrid.ColumnWidths := 80;
-    SubGrid.RowHeights := 30;
-
-    // Criar botão dentro do subgrid
-    Btn := TSpeedButton.Create(SubContainer);
-    Btn.Parent := SubContainer;
-    Btn.Caption := 'A';
-    SubGrid.AddItem(Btn, TGridCellSettings.Create(1, 1));
-
-    SubGrid.ArrangeItems;
-
-    SubItem := TSubGridItem.CreateWithContainerClass(SubGrid, MainContainer, TGroupBox);
-    SubItem.Container.Parent := MainContainer;
-    TGroupBox(SubItem.Container).Caption := 'SubGrid';
-
-    SubItem.Container.Width := SubGrid.ContentWidth + 20;
-    SubItem.Container.Height := SubGrid.ContentHeight + 20;
-
-    MainGrid.AddItem(SubItem, TGridCellSettings.Create(1, 1));
-    MainGrid.ArrangeItems;
-
-    AssertEquals('SubContainer X', 200, SubItem.Container.Left);
-    AssertEquals('SubContainer Y', 100, SubItem.Container.Top);
-    AssertTrue('SubContainer Width > 0', SubItem.Container.Width > 0);
-    AssertTrue('SubContainer Height > 0', SubItem.Container.Height > 0);
-    AssertEquals('Button position X', 80, Btn.Left);
-    AssertEquals('Button position Y', 30, Btn.Top);
-
-    // Liberação
-    Btn.Free;
-    SubGrid.Free;
-    MainGrid.Free;
-  finally
-    SubContainer.Free;
-    MainContainer.Free;
-  end;
-end;
-
-procedure TGridLayoutTest.TestSubGrid_WithVirtualContainer_PositionedCorrectly;
-var
-  MainGrid, SubGrid: TGridLayout;
-  SubItem: TSubGridItemTest;
-  Virtual: TVirtualContainer;
-  SubButton: TSpeedButton;
-begin
-  // SubGrid aninhado
-  SubGrid := TGridLayout.Create;
-  SubGrid.Rows := 1;
-  SubGrid.Columns := 1;
-  SubGrid.RowHeights := 20;
-  SubGrid.ColumnWidths := 50;
-
-  // Virtual container
-  Virtual := TVirtualContainer.Create(nil);
-  Virtual.SetBounds(100, 200, 0, 0); // posição esperada do subgrid
-
-  // SubItem com container virtual
-  SubItem := TSubGridItemTest.Create(SubGrid);
-  SubItem.FControlElement := TControlVisualElement.Create(Virtual); // simulando uso interno
-  SubItem.FContainer := Virtual;
-
-  // Adiciona botão ao subgrid
-  SubButton := TSpeedButton.Create(nil);
-  SubGrid.AddItem(SubButton, TGridCellSettings.Create(0, 0));
-
-  // Simula posicionamento do SubGrid no grid principal
-  // SubItem.SetBounds(100, 200, 50, 20);
-
-  SubItem.GetRenderer.RenderTo(
-    TGriItemRenderContext.Create
-      .WithBounds(100, 200, 50, 20)
-  );
-
-  // Checagens
-  AssertEquals('SubButton.Left deve estar na posição virtual X', 100, SubButton.Left);
-  AssertEquals('SubButton.Top deve estar na posição virtual Y', 200, SubButton.Top);
-  AssertEquals('SubButton.Width deve refletir o tamanho do SubGrid', 50, SubButton.Width);
-  AssertEquals('SubButton.Height deve refletir o tamanho do SubGrid', 20, SubButton.Height);
-
-  // Cleanup
-  SubButton.Free;
-  SubItem.Free;
-  SubGrid.Free;
 end;
 
 procedure TGridLayoutTest.TestMoveKey_From1To3;

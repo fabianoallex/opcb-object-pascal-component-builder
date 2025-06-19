@@ -1,6 +1,8 @@
 unit UGridaLayoutResizer;
 
+{$IFDEF FPC}
 {$mode ObjFPC}{$H+}
+{$ENDIF}
 
 interface
 
@@ -8,8 +10,8 @@ uses
   Classes, SysUtils, ULayout, Generics.Collections;
 
 type
-  TIntList = specialize TList<Integer>;
-  TIntIntDictionary = specialize TDictionary<Integer, Integer>;
+  TIntList = {$IFDEF FPC}specialize{$ENDIF} TList<Integer>;
+  TIntIntDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<Integer, Integer>;
 
   { TValueRange }
 
@@ -31,7 +33,7 @@ type
     property Mode: TValueRangeMode read FMode;
   end;
 
-  TIntTValueRangeDictionary = specialize TDictionary<Integer, TValueRange>;
+  TIntTValueRangeDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<Integer, TValueRange>;
 
   IGridResizer = interface
     ['{CDDFEEED-72B4-4699-99AA-23714658C2DE}']
@@ -205,8 +207,8 @@ type
     function GetGridHeight: Integer;
     function WithGridHeight(ANewHeight: Integer): IGridFullResizer; reintroduce;
     function WithFixedRows(const AFixedRows: array of Integer): IGridFullResizer; reintroduce;
-    function DisableFixedRow(ARowIndex: Integer): IGridFullResizer; overload; reintroduce;
-    function EnableFixedRow(ARowIndex: Integer): IGridFullResizer; overload; reintroduce;
+    function DisableFixedRow(ARowIndex: Integer): IGridFullResizer; reintroduce; overload;
+    function EnableFixedRow(ARowIndex: Integer): IGridFullResizer; reintroduce; overload;
     function DisableFixedRow(const AFixedRows: array of Integer): IGridFullResizer; reintroduce; overload;
     function EnableFixedRow(const AFixedRows: array of Integer): IGridFullResizer; reintroduce; overload;
     function WithMaxRowHeight(ARowIndex, AMax: Integer): IGridFullResizer; reintroduce;
@@ -219,8 +221,8 @@ type
     function GetGridWidth: Integer;
     function WithGridWidth(ANewWidth: Integer): IGridFullResizer; reintroduce;
     function WithFixedColumns(const AFixedColumns: array of Integer): IGridFullResizer; reintroduce;
-    function DisableFixedColumn(AColIndex: Integer): IGridFullResizer; overload; reintroduce;
-    function EnableFixedColumn(AColIndex: Integer): IGridFullResizer; overload; reintroduce;
+    function DisableFixedColumn(AColIndex: Integer): IGridFullResizer; reintroduce; overload;
+    function EnableFixedColumn(AColIndex: Integer): IGridFullResizer; reintroduce; overload;
     function DisableFixedColumn(const AFixedColumns: array of Integer): IGridFullResizer; reintroduce; overload;
     function EnableFixedColumn(const AFixedColumns: array of Integer): IGridFullResizer; reintroduce; overload;
     function WithMaxColumnWidth(AColIndex, AMax: Integer): IGridFullResizer; reintroduce;
@@ -398,7 +400,7 @@ end;
 
 destructor TGridResizerBase.Destroy;
 var
-  Pair: specialize TPair<Integer, TValueRange>;
+  Pair: {$IFDEF FPC}specialize{$ENDIF} TPair<Integer, TValueRange>;
 begin
   FMaxSizes.Free;
   FMinSizes.Free;

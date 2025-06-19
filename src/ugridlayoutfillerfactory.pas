@@ -1,6 +1,8 @@
 unit UGridLayoutFillerFactory;
 
+{$IFDEF FPC}
 {$mode ObjFPC}{$H+}
+{$ENDIF}
 
 interface
 

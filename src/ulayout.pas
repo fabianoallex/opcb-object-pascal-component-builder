@@ -1,8 +1,9 @@
-unit ULayout;
+﻿unit ULayout;
 
+{$IFDEF FPC}
 {$mode ObjFPC}{$H+}
 {$MODESWITCH ADVANCEDRECORDS}
-
+{$ENDIF}
 interface
 
 uses
@@ -110,7 +111,11 @@ type
   TOptionalInt = record
     HasValue: Boolean;
     Value: Integer;
+    {$IFDEF FPC}
     class operator :=(AValue: Integer): TOptionalInt;
+    {$ELSE}
+    class operator Implicit(AValue: Integer): TOptionalInt;
+    {$ENDIF}
     class function Some(AValue: Integer): TOptionalInt; static;
     class function None: TOptionalInt; static;
   end;
@@ -195,8 +200,8 @@ type
     FRowSpan: Integer;
     FVerticalAlignment: TItemAlignment;
   public
-    constructor Create; overload; reintroduce;
-    constructor Create(ARow, AColumn: Integer); overload; reintroduce;
+    constructor Create; overload;
+    constructor Create(ARow, AColumn: Integer); overload;
     function WithRow(ARow: Integer): TGridCellSettings;
     function WithColumn(AColum: Integer): TGridCellSettings;
     function WithRowSpan(ARowSpan: Integer): TGridCellSettings;
@@ -297,21 +302,25 @@ type
     property Position: IGridPosition read GetPosition;
   end;
 
-  TGridCellList = specialize TObjectList<TGridCell>;
+  TGridCellList = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TGridCell>;
 
-  TIntList = specialize TList<Integer>;
+  TIntList = {$IFDEF FPC}specialize{$ENDIF} TList<Integer>;
 
   { TIntegerKeyDictionary }
 
+{$IFDEF FPC}
   generic TIntegerKeyDictionary<T> = class(specialize TDictionary<Integer, T>)
+{$ELSE}
+  TIntegerKeyDictionary<T> = class(TDictionary<Integer, T>)
+{$ENDIF}
   public
-    procedure AddWithShiftAt(AIndex: Integer; const AValue: T);
     procedure MoveKey(const FromIndex, ToIndex: Integer);
+    procedure AddWithShiftAt(AIndex: Integer; const AValue: T);
   end;
 
   { TGridTrackInfoDictionary }
 
-  TGridTrackInfoDictionary = class(specialize TIntegerKeyDictionary<TGridTrackInfo>)
+  TGridTrackInfoDictionary = class({$IFDEF FPC}specialize{$ENDIF} TIntegerKeyDictionary<TGridTrackInfo>)
     function GetSizeOrDefault(Index: Integer; const ADefault: Integer): Integer;
     procedure SetSize(AIndex: Integer; ASize: Integer);
     function IsSizeDefined(AIndex: Integer): Boolean;
@@ -377,7 +386,6 @@ type
     destructor Destroy; override;
     procedure AddItem(AItem: IGridItem; ASettings: TGridCellSettings); overload;
     procedure AddItem(AItem: TControl; ASettings: TGridCellSettings); overload;
-    procedure AddItem(AItem: TGridLayout; ASettings: TGridCellSettings); overload;
     procedure ArrangeItems; overload;
     procedure ArrangeItems(ALeft, ATop: Integer); overload;
     procedure ApplyCellsVisibility;
@@ -444,7 +452,7 @@ type
     property Next: TGridLayoutNode read FNext write SetNext;
   end;
 
-  TIntIntDictionary = specialize TDictionary<Integer, Integer>;
+  TIntIntDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<Integer, Integer>;
 
   { TGridLayoutComposite }
 
@@ -482,24 +490,6 @@ type
   { TVirtualContainer }
 
   TVirtualContainer = class(TWinControl)
-  end;
-
-  { TSubGridItem }
-
-  TSubGridItem = class(TControlGridItem)
-  private
-    FLayout: TGridLayout;
-    procedure ContainerResize(Sender: TObject);
-  protected
-    FContainer: TWinControl;
-    procedure AfterSetBounds; override;
-  public
-    constructor Create(ALayout: TGridLayout);
-    constructor CreateWithContainerClass(ALayout: TGridLayout;
-      AOwner: TWinControl; AContainerClass: TWinControlClass);
-    destructor Destroy; override;
-    property Layout: TGridLayout read FLayout;
-    property Container: TWinControl read FContainer;
   end;
 
 implementation
@@ -560,7 +550,10 @@ end;
 
 constructor TGriItemRenderContext.Create;
 begin
-
+  FHeight := 0;
+  FWidth := 0;
+  FTop := 0;
+  FLeft := 0;
 end;
 
 function TGriItemRenderContext.WithBounds(ALeft, ATop, AWidth, AHeight: Integer
@@ -568,10 +561,10 @@ function TGriItemRenderContext.WithBounds(ALeft, ATop, AWidth, AHeight: Integer
 begin
   Result := Self;
 
-  FLeft := ALeft;
-  FTop := ATop;
-  FWidth := AWidth;
-  FHeight := AHeight;
+  Self.FLeft := ALeft;
+  Self.FTop := ATop;
+  Self.FWidth := AWidth;
+  Self.FHeight := AHeight;
 end;
 
 function TGriItemRenderContext.WithVisibility(AVisibility: Boolean
@@ -687,8 +680,11 @@ begin
 end;
 
 { TOptionalInt }
-
+{$IFDEF FPC}
 class operator TOptionalInt.:=(AValue: Integer): TOptionalInt;
+{$ELSE}
+class operator TOptionalInt.Implicit(AValue: Integer): TOptionalInt;
+{$ENDIF}
 begin
   Result := TOptionalInt.Some(AValue);
 end;
@@ -747,8 +743,6 @@ end;
 
 procedure TMargins.SetOnChange(AValue: TNotifyEvent);
 begin
-  if FOnChange = AValue then
-    Exit;
   FOnChange := AValue;
 end;
 
@@ -948,11 +942,6 @@ end;
 procedure TGridLayout.AddItem(AItem: TControl; ASettings: TGridCellSettings);
 begin
   Self.AddItem(TControlGridItem.Create(AItem), ASettings);
-end;
-
-procedure TGridLayout.AddItem(AItem: TGridLayout; ASettings: TGridCellSettings);
-begin
-  Self.AddItem(TSubGridItem.Create(AItem), ASettings);
 end;
 
 function TGridLayout.CreateDefaultSettings(ARow, AColumn: Integer): TGridCellSettings;
@@ -1468,6 +1457,7 @@ var
   Item: IGridItem;
   X, Y, W, H: Integer;
   Element: IVisualElement;
+  Context: TGriItemRenderContext;
 begin
   ApplyCellsVisibility;
 
@@ -1527,16 +1517,21 @@ begin
         end;
     end;
 
-    Item.GetRenderer.RenderTo(
-      TGriItemRenderContext.Create
+    Context := TGriItemRenderContext.Create;
+    try
+      Context
         .WithBounds(
           FLeft + ALeft + X + Cell.OffsetX,
           FTop + ATop + Y + Cell.OffsetY,
           W,
           H
         )
-        .WithVisibility(Item.GetVisualElement.GetVisible)
-    );
+        .WithVisibility(Item.GetVisualElement.GetVisible);
+
+      Item.GetRenderer.RenderTo(Context);
+    finally
+      Context.Free;
+    end;
   end;
 
   NotifyLayoutChange;
@@ -1882,12 +1877,14 @@ end;
 
 { TIntegerKeyDictionary }
 
+{$IFDEF FPC}
 procedure TIntegerKeyDictionary.MoveKey(const FromIndex, ToIndex: Integer);
-// type
-//  TKeyList = specialize TList<Integer>;
+{$ELSE}
+procedure TIntegerKeyDictionary<T>.MoveKey(const FromIndex, ToIndex: Integer);
+{$ENDIF}
 var
   MovedValue: T;
-  KeysToShift: specialize TList<Integer>;
+  KeysToShift: {$IFDEF FPC}specialize{$ENDIF} TList<Integer>;
   Key: Integer;
   Direction: Integer;
   ExistFrom: Boolean;
@@ -1897,7 +1894,7 @@ begin
 
   ExistFrom := Self.TryGetValue(FromIndex, MovedValue);
 
-  KeysToShift := specialize TList<Integer>.Create;
+  KeysToShift := {$IFDEF FPC}specialize{$ENDIF} TList<Integer>.Create;
   try
     // Determine direção
     if FromIndex < ToIndex then
@@ -1936,13 +1933,17 @@ begin
   end;
 end;
 
+{$IFDEF FPC}
 procedure TIntegerKeyDictionary.AddWithShiftAt(AIndex: Integer; const AValue: T);
+{$ELSE}
+procedure TIntegerKeyDictionary<T>.AddWithShiftAt(AIndex: Integer; const AValue: T);
+{$ENDIF}
 var
-  KeysToShift: specialize TList<Integer>;
+  KeysToShift: {$IFDEF FPC}specialize{$ENDIF} TList<Integer>;
   Key: Integer;
   Obj: T;
 begin
-  KeysToShift := specialize TList<Integer>.Create;
+  KeysToShift := {$IFDEF FPC}specialize{$ENDIF} TList<Integer>.Create;
   try
     for Key in Self.Keys do
       if Key >= AIndex then
@@ -2154,70 +2155,6 @@ end;
 function TControlGridItem.GetRenderer: IGridItemRenderer;
 begin
   Result := TControlGridItemRenderer.Create(Self);
-end;
-
-{procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-begin
-  FControlElement.SetBounds(ALeft, ATop, AWidth, AHeight);
-  AfterSetBounds;
-end;}
-
-{ TSubGridItem }
-
-procedure TSubGridItem.AfterSetBounds;
-var
-  IsVirtual: Boolean;
-begin
-  IsVirtual :=
-    (Self.FControlElement is TControlVisualElement)
-    and
-    TControlVisualElement(Self.FControlElement).IsControlOfType(TVirtualContainer);
-
-  if Assigned(FLayout) then
-    if IsVirtual then
-      FLayout.ArrangeItems(Self.FContainer.Left, Self.FContainer.Top)
-    else
-      FLayout.ArrangeItems;
-end;
-
-procedure TSubGridItem.ContainerResize(Sender: TObject);
-begin
-  FLayout.RowHeights := TVirtualContainer(Sender).Height div FLayout.Rows;
-  FLayout.ColumnWidths := TVirtualContainer(Sender).Width div FLayout.Columns;
-end;
-
-constructor TSubGridItem.Create(ALayout: TGridLayout);
-begin
-  inherited Create(nil);
-  FContainer := TVirtualContainer.Create(nil);
-  FLayout := ALayout;
-  FControlElement := TControlVisualElement.Create(FContainer);
-
-  FContainer.OnResize := @ContainerResize;
-end;
-
-constructor TSubGridItem.CreateWithContainerClass(ALayout: TGridLayout;
-  AOwner: TWinControl; AContainerClass: TWinControlClass);
-begin
-  inherited Create(nil); // Nenhum controle visível é passado diretamente
-
-  FLayout := ALayout;
-
-  FContainer := AContainerClass.Create(AOwner);
-  FContainer.Parent := AOwner;
-  FContainer.Align := alNone;
-  FContainer.Caption := '';
-  FContainer.Visible := True;
-
-  // Define o item de layout como sendo o container
-  FControlElement := TControlVisualElement.Create(FContainer);
-end;
-
-destructor TSubGridItem.Destroy;
-begin
-  // if FControlElement.IsOfType(TVirtualContainer) then
-  //  FControlElement.Free;
-  inherited Destroy;
 end;
 
 end.

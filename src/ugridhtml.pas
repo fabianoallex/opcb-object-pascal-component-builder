@@ -1,6 +1,8 @@
 unit UGridHtml;
 
+{$IFDEF FPC}
 {$mode ObjFPC}{$H+}
+{$ENDIF}
 
 interface
 

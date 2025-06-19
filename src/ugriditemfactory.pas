@@ -1,6 +1,8 @@
 unit UGridItemFactory;
 
+{$IFDEF FPC}
 {$mode ObjFPC}{$H+}
+{$ENDIF}
 
 interface
 
