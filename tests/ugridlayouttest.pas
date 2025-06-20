@@ -5,7 +5,7 @@ unit UGridLayoutTest;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, ULayout;
+  Classes, SysUtils, fpcunit, testregistry, ULayout, ULayout.controls;
 
 type
   { TGridLayoutTest }

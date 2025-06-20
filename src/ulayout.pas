@@ -7,7 +7,7 @@
 interface
 
 uses
-  Classes, SysUtils, Controls, Generics.Collections, Generics.Defaults;
+  Classes, SysUtils, Generics.Collections, Generics.Defaults;
 
 type
 
@@ -55,53 +55,10 @@ type
     procedure Redraw(AContext: TGriItemRenderContext);
   end;
 
-  { TControlVisualElement }
-
-  TControlVisualElement = class(TInterfacedObject, IVisualElement)
-  private
-    FControl: TControl;
-  public
-    constructor Create(AControl: TControl);
-    function GetVisible: Boolean;
-    procedure SetVisible(AValue: Boolean);
-    function GetWidth: Integer;
-    procedure SetWidth(AValue: Integer);
-    function GetHeight: Integer;
-    procedure SetHeight(AValue: Integer);
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-    function GetLeft: Integer;
-    function GetTop: Integer;
-    function IsControlOfType(AClass: TClass): Boolean;
-    function GetControl: TControl;
-    procedure Redraw(AContext: TGriItemRenderContext);
-  end;
-
   IGridItem = interface
     ['{7A972D12-00D4-4113-96C3-880C95E3FCD1}']
     function GetVisualElement: IVisualElement;
     function GetRenderer: IGridItemRenderer;
-  end;
-
-  { TControlGridItem }
-
-  TControlGridItem = class(TInterfacedObject, IGridItem)
-  protected
-    FControlElement: IVisualElement;
-    procedure AfterSetBounds; virtual;
-  public
-    constructor Create(AControl: TControl);
-    function GetVisualElement: IVisualElement;
-    function GetRenderer: IGridItemRenderer;
-  end;
-
-  { TControlGridItemRenderer }
-
-  TControlGridItemRenderer = class(TInterfacedObject, IGridItemRenderer)
-  private
-    FGridItem: IGridItem;
-  public
-    constructor Create(AGridItem: TControlGridItem);
-    procedure RenderTo(AContext: TGriItemRenderContext);
   end;
 
   TItemAlignment = (laStretch, laCenter, laStart, laEnd);
@@ -308,11 +265,11 @@ type
 
   { TIntegerKeyDictionary }
 
-{$IFDEF FPC}
+  {$IFDEF FPC}
   generic TIntegerKeyDictionary<T> = class(specialize TDictionary<Integer, T>)
-{$ELSE}
+  {$ELSE}
   TIntegerKeyDictionary<T> = class(TDictionary<Integer, T>)
-{$ENDIF}
+  {$ENDIF}
   public
     procedure MoveKey(const FromIndex, ToIndex: Integer);
     procedure AddWithShiftAt(AIndex: Integer; const AValue: T);
@@ -385,7 +342,6 @@ type
     constructor Create;
     destructor Destroy; override;
     procedure AddItem(AItem: IGridItem; ASettings: TGridCellSettings); overload;
-    procedure AddItem(AItem: TControl; ASettings: TGridCellSettings); overload;
     procedure ArrangeItems; overload;
     procedure ArrangeItems(ALeft, ATop: Integer); overload;
     procedure ApplyCellsVisibility;
@@ -487,11 +443,6 @@ type
     property ContentHeight: Integer read GetContentHeight;
   end;
 
-  { TVirtualContainer }
-
-  TVirtualContainer = class(TWinControl)
-  end;
-
 implementation
 
 uses
@@ -573,111 +524,6 @@ begin
   Self.Visible := AVisibility;
 end;
 
-{ TControlGridItemRenderer }
-
-constructor TControlGridItemRenderer.Create(AGridItem: TControlGridItem);
-begin
-  FGridItem := AGridItem;
-end;
-
-procedure TControlGridItemRenderer.RenderTo(AContext: TGriItemRenderContext);
-begin
-  FGridItem.GetVisualElement.SetBounds(
-    AContext.Left,
-    AContext.Top,
-    AContext.Width,
-    AContext.Height
-  );
-end;
-
-{ TControlVisualElement }
-
-constructor TControlVisualElement.Create(AControl: TControl);
-begin
-  inherited Create;
-  FControl := AControl;
-end;
-
-function TControlVisualElement.GetVisible: Boolean;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  Result := FControl.Visible;
-end;
-
-procedure TControlVisualElement.SetVisible(AValue: Boolean);
-begin
-  if not Assigned(FControl) then
-    Exit;
-  FControl.Visible := AValue;
-end;
-
-function TControlVisualElement.GetWidth: Integer;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  Result := FControl.Width;
-end;
-
-procedure TControlVisualElement.SetWidth(AValue: Integer);
-begin
-  if not Assigned(FControl) then
-    Exit;
-  FControl.Width := AValue;
-end;
-
-function TControlVisualElement.GetHeight: Integer;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  Result := FControl.Height;
-end;
-
-procedure TControlVisualElement.SetHeight(AValue: Integer);
-begin
-  if not Assigned(FControl) then
-    Exit;
-  FControl.Height := AValue;
-end;
-
-procedure TControlVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight: Integer
-  );
-begin
-  if not Assigned(FControl) then
-    Exit;
-  FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
-end;
-
-function TControlVisualElement.GetLeft: Integer;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  Result := FControl.Left;
-end;
-
-function TControlVisualElement.GetTop: Integer;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  Result := FControl.Top;
-end;
-
-function TControlVisualElement.IsControlOfType(AClass: TClass): Boolean;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  Result := FControl is AClass;
-end;
-
-function TControlVisualElement.GetControl: TControl;
-begin
-  Result := FControl;
-end;
-
-procedure TControlVisualElement.Redraw(AContext: TGriItemRenderContext);
-begin
-
-end;
 
 { TOptionalInt }
 {$IFDEF FPC}
@@ -937,11 +783,6 @@ procedure TGridLayout.AddItem(AItem: IGridItem; ASettings: TGridCellSettings);
 begin
   Assert(ASettings <> nil, 'Settings cannot be nil');
   FCells.Add(TGridCell.Create(AItem, ASettings));
-end;
-
-procedure TGridLayout.AddItem(AItem: TControl; ASettings: TGridCellSettings);
-begin
-  Self.AddItem(TControlGridItem.Create(AItem), ASettings);
 end;
 
 function TGridLayout.CreateDefaultSettings(ARow, AColumn: Integer): TGridCellSettings;
@@ -1281,6 +1122,7 @@ function TGridLayout.CalculateCellHeight(Cell: TGridCell): Integer;
       else
         Result := Result + GetRowHeight(I);
   end;
+
 begin
   Result := 0;
 
@@ -2134,28 +1976,4 @@ begin
   Self.MoveKey(AFrom, ATo);
 end;
 
-{ TControlGridItem }
-
-procedure TControlGridItem.AfterSetBounds;
-begin
-  // Nessa classe não faz nada
-end;
-
-constructor TControlGridItem.Create(AControl: TControl);
-begin
-  inherited Create;
-  FControlElement := TControlVisualElement.Create(AControl);
-end;
-
-function TControlGridItem.GetVisualElement: IVisualElement;
-begin
-  Result := FControlElement;
-end;
-
-function TControlGridItem.GetRenderer: IGridItemRenderer;
-begin
-  Result := TControlGridItemRenderer.Create(Self);
-end;
-
 end.
-

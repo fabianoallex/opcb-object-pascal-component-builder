@@ -7,11 +7,10 @@ unit UGridLayoutBuilder;
 interface
 
 uses
-  ULayout, Controls, UGridLayoutFillerFactory;
+  ULayout, UGridLayoutFillerFactory;
 
 type
   TGridFillClass = class of TInterfacedObject;
-  TItemBuilderProc = function(AGridPos: IGridPosition; AOwner: TWinControl): IGridItem of object;
 
   { TGridLayoutBuilder }
 
@@ -42,14 +41,11 @@ type
     function WithMargins(ATop, ARight, ABottom, ALeft: Integer): TGridLayoutBuilder; overload;
     function WithMargins(AAll: Integer): TGridLayoutBuilder; overload;
     function AddItem(AItem: IGridItem; ASettings: TGridCellSettings): TGridLayoutBuilder; overload;
-    function AddItem(AItem: TControl; ASettings: TGridCellSettings): TGridLayoutBuilder; overload;
     function UsingFiller(AFillerType: TFillerType): TGridLayoutBuilder; overload;
     function AddItem(AItem: IGridItem): TGridLayoutBuilder; overload;
-    function FillItems(AControls: array of TControl;
-      AInitialPosition: IGridPosition=nil): TGridLayoutBuilder;
     function Build: TGridLayout;
+    property Filler: IGridFill read FFiller;
   end;
-
 
 implementation
 
@@ -208,14 +204,6 @@ begin
   Result := Self;
 end;
 
-function TGridLayoutBuilder.AddItem(AItem: TControl;
-  ASettings: TGridCellSettings): TGridLayoutBuilder;
-begin
-  FCurrentItem := TControlGridItem.Create(AItem);
-  FGridLayout.AddItem(FCurrentItem, ASettings);
-  Result := Self;
-end;
-
 function TGridLayoutBuilder.UsingFiller(AFillerType: TFillerType): TGridLayoutBuilder;
 begin
   Result := Self;
@@ -229,39 +217,12 @@ begin
     FFiller.PlaceItem(AItem);
 end;
 
-function TGridLayoutBuilder.FillItems(AControls: array of TControl;
-  AInitialPosition: IGridPosition): TGridLayoutBuilder;
-var
-  I: Integer;
-  Control: TControl;
-begin
-  Result := Self;
-
-  if Assigned(AInitialPosition) then
-    FFiller.InitialPos(AInitialPosition);
-
-  for I := Low(AControls) to High(AControls) do
-  begin
-    Control := AControls[I];
-
-    if Assigned(Control) then
-       TGridItemFactory.Create
-         .ControlItemBuilder
-         .WithControl(Control)
-         .AddWithFiller(FFiller)  //FFiller.PlaceItem(Control)
-    else
-      FFiller.Skip;
-  end;
-end;
-
 function TGridLayoutBuilder.Build: TGridLayout;
 begin
   Result := FGridLayout;
   if FFreeOnDone then
     Free;
 end;
-
-
 
 end.
 

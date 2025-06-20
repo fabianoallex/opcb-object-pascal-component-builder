@@ -107,6 +107,9 @@ type
 
 implementation
 
+uses
+  ulayout.controls;
+
 { TTextGridItemBuilder }
 
 constructor TTextGridItemBuilder.Create(ARenderer: TTextGridRenderer);
