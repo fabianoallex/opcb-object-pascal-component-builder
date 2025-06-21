@@ -1,4 +1,4 @@
-unit UGridLayoutFill;
+﻿unit UGridLayoutFill;
 
 {$IFDEF FPC}
 {$mode ObjFPC}{$H+}
@@ -7,7 +7,7 @@ unit UGridLayoutFill;
 interface
 
 uses
-  Classes, SysUtils, ULayout, Controls;
+  Classes, SysUtils, ULayout;
 
 type
   TNextPositionFunc = function : IGridPosition of object;

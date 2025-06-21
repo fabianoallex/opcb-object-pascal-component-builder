@@ -7,7 +7,9 @@ unit UGridItemFactory;
 interface
 
 uses
-  Classes, SysUtils, ULayout, Controls, UGridText, UGridHtml;
+  {$IFDEF FPC}Controls,
+  {$ELSE}Vcl.Controls,
+  {$ENDIF}Classes, SysUtils, ULayout, UGridText, UGridHtml;
 
 type
   IHtmlGridItemBuilder = interface
@@ -103,7 +105,6 @@ type
     function AddToGrid(AGrid: TGridLayout): ITextGridItemBuilder; overload;
     function AddToGrid(AGrid: TGridLayout; ARow, AColumn: Integer): ITextGridItemBuilder; overload;
   end;
-
 
 implementation
 

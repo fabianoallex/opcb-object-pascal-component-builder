@@ -50,7 +50,7 @@ type
 implementation
 
 uses
-  Classes, SysUtils, ExtCtrls, UGridItemFactory;
+  Classes, SysUtils, UGridItemFactory;
 
 { TGridLayoutBuilder }
 

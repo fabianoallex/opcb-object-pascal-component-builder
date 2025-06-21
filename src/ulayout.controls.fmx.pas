@@ -1,18 +1,10 @@
-﻿unit ulayout.controls;
-
-{$IFDEF FPC}
-{$mode objfpc}{$H+}
-{$LONGSTRINGS ON}{$MODESWITCH TYPEHELPERS}{$MODESWITCH ADVANCEDRECORDS}
-{$ENDIF}
+﻿unit ulayout.controls.fmx;
 
 interface
 
 uses
-  {$IFDEF FPC}Controls, StdCtrls,
-  {$ELSE}Vcl.Controls, Vcl.StdCtrls,
-  {$ENDIF}
-  Classes, SysUtils, ULayout, UGridLayoutBuilder,
-  UGridLayoutFillerFactory, Generics.Collections, Generics.Defaults;
+  Classes, SysUtils, ULayout, UGridLayoutBuilder, UGridLayoutFillerFactory,
+  Generics.Collections, Generics.Defaults, FMX.Controls, FMX.Types, FMX.StdCtrls;
 
 type
   TControlClass = class of TControl;
@@ -71,7 +63,7 @@ type
     class function Create(AClass: TControlClass; const AName: string): TControlInfo; static;
   end;
 
-  TStrControlDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControl>;
+  TStrControlDictionary = TDictionary<string, TControl>;
 
   { TControlGridPopulator }
 
@@ -81,17 +73,17 @@ type
     FFiller: IGridFill;
     FFillerType: TFillerType;
     FOwner: TComponent;
-    FParent: TWinControl;
-    FControls: {$IFDEF FPC}specialize{$ENDIF} TList<TControl>;
+    FParent: TFmxObject;
+    FControls: TList<TControl>;
     FNamedControls: TStrControlDictionary;
     FOnControlPopulate: TControlPopulateProc;
     function GetNamedControl(const AName: string): TControl;
-    procedure SetControls(AValue: {$IFDEF FPC}specialize{$ENDIF} TList<TControl>);
+    procedure SetControls(AValue: TList<TControl>);
     procedure ConfigControl(AControl: TControl);
   public
     constructor Create;
     destructor Destroy; override;
-    function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl
+    function WithOwnerAndParentControl(AOwner: TComponent; AParent: TFmxObject //TWinControl
       ): TControlGridPopulator;
     procedure SetGrid(AGrid: TGridLayout);
     function UsingFiller(AFillerType: TFillerType; ARow: Integer=0;
@@ -129,7 +121,7 @@ type
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
 
     function OnControlCreate(AProc: TControlPopulateProc): TControlGridPopulator;
-    property Controls: {$IFDEF FPC}specialize{$ENDIF} TList<TControl> read FControls write SetControls;
+    property Controls: TList<TControl> read FControls write SetControls;
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property Grid: TGridLayout read FGrid;
   end;
@@ -157,9 +149,7 @@ type
 implementation
 
 uses
-  {$IFDEF FPC}Graphics,
-  {$ELSE}Vcl.Graphics,
-  {$ENDIF} UGridItemFactory;
+  FMX.Graphics{, UGridItemFactory};
 
 { TControlVisualElement }
 
@@ -187,7 +177,7 @@ function TControlVisualElement.GetWidth: Integer;
 begin
   if not Assigned(FControl) then
     Exit;
-  Result := FControl.Width;
+  Result := Trunc(FControl.Width);
 end;
 
 procedure TControlVisualElement.SetWidth(AValue: Integer);
@@ -201,7 +191,7 @@ function TControlVisualElement.GetHeight: Integer;
 begin
   if not Assigned(FControl) then
     Exit;
-  Result := FControl.Height;
+  Result := Trunc(FControl.Height);
 end;
 
 procedure TControlVisualElement.SetHeight(AValue: Integer);
@@ -223,14 +213,14 @@ function TControlVisualElement.GetLeft: Integer;
 begin
   if not Assigned(FControl) then
     Exit;
-  Result := FControl.Left;
+  Result := Trunc(FControl.Position.X);
 end;
 
 function TControlVisualElement.GetTop: Integer;
 begin
   if not Assigned(FControl) then
     Exit;
-  Result := FControl.Top;
+  Result := Trunc(FControl.Position.Y);
 end;
 
 function TControlVisualElement.IsControlOfType(AClass: TClass): Boolean;
@@ -302,7 +292,7 @@ end;
 { TControlGridPopulator }
 
 procedure TControlGridPopulator.SetControls(
-  AValue: {$IFDEF FPC}specialize{$ENDIF} TList<TControl>);
+  AValue: TList<TControl>);
 begin
   if FControls = AValue then Exit;
   FControls := AValue;
@@ -328,21 +318,6 @@ begin
   if AControl is TLabel then
     with (AControl as TLabel) do
     begin
-      Layout := tlCenter;
-      AutoSize := False;
-    end;
-
-  if AControl is TCheckBox then
-    with (AControl as TCheckBox) do
-    begin
-      {$IFDEF FPC}
-      AutoSize := False;
-      {$ENDIF}
-    end;
-
-  if AControl is TEdit then
-    with (AControl as TEdit) do
-    begin
       AutoSize := False;
     end;
 end;
@@ -351,7 +326,7 @@ constructor TControlGridPopulator.Create;
 begin
   FGrid := nil;
   FFiller := nil;
-  FControls := {$IFDEF FPC}specialize{$ENDIF} TList<TControl>.Create;
+  FControls := TList<TControl>.Create;
   FNamedControls := TStrControlDictionary.Create;
 end;
 
@@ -528,7 +503,7 @@ begin
 end;
 
 function TControlGridPopulator.WithOwnerAndParentControl
-  (AOwner: TComponent; AParent: TWinControl): TControlGridPopulator;
+  (AOwner: TComponent; AParent: TFmxObject): TControlGridPopulator;
 begin
   Result := Self;
   FOwner := AOwner;
@@ -601,12 +576,20 @@ begin
     Control := AControls[I];
 
     if Assigned(Control) then
+      Filler.PlaceItem(
+        TControlGridItem.Create(Control)
+      )
+    else
+      Filler.Skip;
+
+    {
+    if Assigned(Control) then
       TGridItemFactory.Create
         .ControlItemBuilder
         .WithControl(Control)
         .AddWithFiller(Filler)
     else
-      Filler.Skip;
+      Filler.Skip;  }
   end;
 end;
 
