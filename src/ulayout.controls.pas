@@ -9,12 +9,23 @@ interface
 
 uses
   {$IFDEF FPC}Controls, StdCtrls,
-  {$ELSE}Vcl.Controls, Vcl.StdCtrls,
+  {$ELSE}
+    {$IFDEF FRAMEWORK_FMX}
+    FMX.Controls, FMX.StdCtrls, Fmx.Types,
+    {$ELSE}
+    Vcl.Controls, Vcl.StdCtrls,
+    {$ENDIF}
   {$ENDIF}
   Classes, SysUtils, ULayout, UGridLayoutBuilder,
   UGridLayoutFillerFactory, Generics.Collections, Generics.Defaults;
 
 type
+  {$IFNDEF FPC}
+    {$IFDEF FRAMEWORK_FMX}
+    TWinControl = TFmxObject;
+    {$ENDIF}
+  {$ENDIF}
+
   TControlClass = class of TControl;
   TControlPopulateProc = procedure(AControl: TControl; AIndex: Integer;
     ASettings: TGridCellSettings) of object;
@@ -91,8 +102,13 @@ type
   public
     constructor Create;
     destructor Destroy; override;
+    {$IFDEF FRAMEWORK_FMX}
     function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl
       ): TControlGridPopulator;
+    {$ELSE}
+    function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl
+      ): TControlGridPopulator;
+    {$ENDIF}
     procedure SetGrid(AGrid: TGridLayout);
     function UsingFiller(AFillerType: TFillerType; ARow: Integer=0;
       AColumn: Integer=0): TControlGridPopulator;
@@ -158,7 +174,10 @@ implementation
 
 uses
   {$IFDEF FPC}Graphics,
-  {$ELSE}Vcl.Graphics,
+  {$ELSE}
+    {$IFDEF ANDROID} Fmx.Graphics,
+    {$ELSE} Vcl.Graphics,
+    {$ENDIF}
   {$ENDIF} UGridItemFactory;
 
 { TControlVisualElement }
@@ -187,7 +206,15 @@ function TControlVisualElement.GetWidth: Integer;
 begin
   if not Assigned(FControl) then
     Exit;
+  {$IFDEF FPC}
   Result := FControl.Width;
+  {$ELSE}
+    {$IFDEF FRAMEWORK_FMX}
+    Result := Trunc(FControl.Width);
+    {$ELSE}
+    Result := FControl.Width;
+    {$ENDIF}
+  {$ENDIF}
 end;
 
 procedure TControlVisualElement.SetWidth(AValue: Integer);
@@ -201,7 +228,15 @@ function TControlVisualElement.GetHeight: Integer;
 begin
   if not Assigned(FControl) then
     Exit;
+  {$IFDEF FPC}
   Result := FControl.Height;
+  {$ELSE}
+    {$IFDEF FRAMEWORK_FMX}
+    Result := Trunc(FControl.Height);
+    {$ELSE}
+    Result := FControl.Height;
+    {$ENDIF}
+  {$ENDIF}
 end;
 
 procedure TControlVisualElement.SetHeight(AValue: Integer);
@@ -223,14 +258,30 @@ function TControlVisualElement.GetLeft: Integer;
 begin
   if not Assigned(FControl) then
     Exit;
+  {$IFDEF FPC}
   Result := FControl.Left;
+  {$ELSE}
+    {$IFDEF FRAMEWORK_FMX}
+    Result := Trunc(FControl.Position.X);
+    {$ELSE}
+    Result := FControl.Left;
+    {$ENDIF}
+  {$ENDIF}
 end;
 
 function TControlVisualElement.GetTop: Integer;
 begin
   if not Assigned(FControl) then
     Exit;
-  Result := FControl.Top;
+  {$IFDEF FPC}
+    Result := FControl.Top;
+  {$ELSE}
+    {$IFDEF FRAMEWORK_FMX}
+    Result := Trunc(FControl.Position.Y);
+    {$ELSE}
+    Result := FControl.Top;
+    {$ENDIF}
+  {$ENDIF}
 end;
 
 function TControlVisualElement.IsControlOfType(AClass: TClass): Boolean;
@@ -328,7 +379,9 @@ begin
   if AControl is TLabel then
     with (AControl as TLabel) do
     begin
+      {$IFNDEF FRAMEWORK_FMX}
       Layout := tlCenter;
+      {$ENDIF}
       AutoSize := False;
     end;
 
@@ -340,11 +393,13 @@ begin
       {$ENDIF}
     end;
 
+  {$IFNDEF FRAMEWORK_FMX}
   if AControl is TEdit then
     with (AControl as TEdit) do
     begin
       AutoSize := False;
     end;
+  {$ENDIF}
 end;
 
 constructor TControlGridPopulator.Create;
@@ -601,10 +656,9 @@ begin
     Control := AControls[I];
 
     if Assigned(Control) then
-      TGridItemFactory.Create
-        .ControlItemBuilder
-        .WithControl(Control)
-        .AddWithFiller(Filler)
+      Filler.PlaceItem(
+        TControlGridItem.Create(Control)
+      )
     else
       Filler.Skip;
   end;

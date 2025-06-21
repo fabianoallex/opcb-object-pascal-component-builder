@@ -8,7 +8,10 @@ interface
 
 uses
   {$IFDEF FPC}Controls,
-  {$ELSE}Vcl.Controls,
+  {$ELSE}
+    {$IFDEF FRAMEWORK_FMX} FMX.Controls,
+    {$ELSE} Vcl.Controls,
+    {$ENDIF}
   {$ENDIF}Classes, SysUtils, ULayout, UGridText, UGridHtml;
 
 type
