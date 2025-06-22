@@ -4,6 +4,7 @@
 {$mode ObjFPC}{$H+}
 {$MODESWITCH ADVANCEDRECORDS}
 {$ENDIF}
+
 interface
 
 uses

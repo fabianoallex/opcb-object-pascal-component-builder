@@ -102,13 +102,8 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    {$IFDEF FRAMEWORK_FMX}
     function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl
       ): TControlGridPopulator;
-    {$ELSE}
-    function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl
-      ): TControlGridPopulator;
-    {$ENDIF}
     procedure SetGrid(AGrid: TGridLayout);
     function UsingFiller(AFillerType: TFillerType; ARow: Integer=0;
       AColumn: Integer=0): TControlGridPopulator;
@@ -168,17 +163,19 @@ type
       AInitialPosition: IGridPosition=nil): TGridLayoutBuilder;
     function BuildAndPopulate(var AGrid: TGridLayout;
       APopulator: TControlGridPopulator): TControlGridPopulator;
+    function Build(var AGrid: TGridLayout): TGridLayoutBuilder; overload;
+    function UsePopulator(APopulator: TControlGridPopulator): TControlGridPopulator;
   end;
 
 implementation
 
 uses
-  {$IFDEF FPC}Graphics,
+  {$IFDEF FPC}Graphics
   {$ELSE}
-    {$IFDEF ANDROID} Fmx.Graphics,
-    {$ELSE} Vcl.Graphics,
+    {$IFDEF FRAMEWORK_FMX} Fmx.Graphics
+    {$ELSE} Vcl.Graphics
     {$ENDIF}
-  {$ENDIF} UGridItemFactory;
+  {$ENDIF} ;
 
 { TControlVisualElement }
 
@@ -632,6 +629,13 @@ begin
   Result := Self;
 end;
 
+function TGridLayoutBuilderHelper.Build(
+  var AGrid: TGridLayout): TGridLayoutBuilder;
+begin
+  Result := Self;
+  AGrid := Self.Build;
+end;
+
 function TGridLayoutBuilderHelper.BuildAndPopulate(var AGrid: TGridLayout;
   APopulator: TControlGridPopulator): TControlGridPopulator;
 begin
@@ -656,12 +660,17 @@ begin
     Control := AControls[I];
 
     if Assigned(Control) then
-      Filler.PlaceItem(
-        TControlGridItem.Create(Control)
-      )
+      Filler.PlaceItem(TControlGridItem.Create(Control))
     else
       Filler.Skip;
   end;
+end;
+
+function TGridLayoutBuilderHelper.UsePopulator(
+  APopulator: TControlGridPopulator): TControlGridPopulator;
+begin
+  APopulator.SetGrid(Self.GridLayout);
+  Result := APopulator;
 end;
 
 end.

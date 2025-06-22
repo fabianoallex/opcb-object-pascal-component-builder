@@ -45,6 +45,7 @@ type
     function AddItem(AItem: IGridItem): TGridLayoutBuilder; overload;
     function Build: TGridLayout;
     property Filler: IGridFill read FFiller;
+    property GridLayout: TGridLayout read FGridLayout;
   end;
 
 implementation
