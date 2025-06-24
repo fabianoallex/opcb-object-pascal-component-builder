@@ -30,38 +30,28 @@ type
   TControlPopulateProc = procedure(AControl: TControl; AIndex: Integer;
     ASettings: TGridCellSettings) of object;
 
-  { TControlVisualElement }
+  { TControlGridItem }
 
-  TControlVisualElement = class(TInterfacedObject, IVisualElement)
+  TControlGridItem = class(TInterfacedObject, IGridItem)
   private
     FControl: TControl;
+  protected
+    procedure AfterSetBounds; virtual;
   public
     constructor Create(AControl: TControl);
+    function GetRenderer: IGridItemRenderer;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     function GetVisible: Boolean;
     procedure SetVisible(AValue: Boolean);
     function GetWidth: Integer;
     procedure SetWidth(AValue: Integer);
     function GetHeight: Integer;
     procedure SetHeight(AValue: Integer);
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     function GetLeft: Integer;
     function GetTop: Integer;
     function IsControlOfType(AClass: TClass): Boolean;
     function GetControl: TControl;
     procedure Redraw;
-  end;
-
-  { TControlGridItem }
-
-  TControlGridItem = class(TInterfacedObject, IGridItem)
-  protected
-    FControlElement: IVisualElement;
-    procedure AfterSetBounds; virtual;
-  public
-    constructor Create(AControl: TControl);
-    function GetVisualElement: IVisualElement;
-    function GetRenderer: IGridItemRenderer;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
   { TControlGridItemRenderer }
@@ -79,11 +69,12 @@ type
   TControlInfo = record
     ControlClass: TControlClass;
     ControlName: string;
-
-    class function Create(AClass: TControlClass; const AName: string): TControlInfo; static;
+    class function Create(AClass: TControlClass; const AName: string):
+      TControlInfo; static;
   end;
 
-  TStrControlDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControl>;
+  TStrControlDictionary =
+    {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControl>;
 
   { TControlGridPopulator }
 
@@ -98,7 +89,8 @@ type
     FNamedControls: TStrControlDictionary;
     FOnControlPopulate: TControlPopulateProc;
     function GetNamedControl(const AName: string): TControl;
-    procedure SetControls(AValue: {$IFDEF FPC}specialize{$ENDIF} TList<TControl>);
+    procedure SetControls(
+      AValue: {$IFDEF FPC}specialize{$ENDIF} TList<TControl>);
     procedure ConfigControl(AControl: TControl);
   public
     constructor Create;
@@ -178,127 +170,6 @@ uses
     {$ENDIF}
   {$ENDIF} ;
 
-{ TControlVisualElement }
-
-constructor TControlVisualElement.Create(AControl: TControl);
-begin
-  inherited Create;
-  FControl := AControl;
-end;
-
-function TControlVisualElement.GetVisible: Boolean;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  Result := FControl.Visible;
-end;
-
-procedure TControlVisualElement.SetVisible(AValue: Boolean);
-begin
-  if not Assigned(FControl) then
-    Exit;
-  FControl.Visible := AValue;
-end;
-
-function TControlVisualElement.GetWidth: Integer;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  {$IFDEF FPC}
-  Result := FControl.Width;
-  {$ELSE}
-    {$IFDEF FRAMEWORK_FMX}
-    Result := Trunc(FControl.Width);
-    {$ELSE}
-    Result := FControl.Width;
-    {$ENDIF}
-  {$ENDIF}
-end;
-
-procedure TControlVisualElement.SetWidth(AValue: Integer);
-begin
-  if not Assigned(FControl) then
-    Exit;
-  FControl.Width := AValue;
-end;
-
-function TControlVisualElement.GetHeight: Integer;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  {$IFDEF FPC}
-  Result := FControl.Height;
-  {$ELSE}
-    {$IFDEF FRAMEWORK_FMX}
-    Result := Trunc(FControl.Height);
-    {$ELSE}
-    Result := FControl.Height;
-    {$ENDIF}
-  {$ENDIF}
-end;
-
-procedure TControlVisualElement.SetHeight(AValue: Integer);
-begin
-  if not Assigned(FControl) then
-    Exit;
-  FControl.Height := AValue;
-end;
-
-procedure TControlVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight: Integer
-  );
-begin
-  if not Assigned(FControl) then
-    Exit;
-  FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
-end;
-
-function TControlVisualElement.GetLeft: Integer;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  {$IFDEF FPC}
-  Result := FControl.Left;
-  {$ELSE}
-    {$IFDEF FRAMEWORK_FMX}
-    Result := Trunc(FControl.Position.X);
-    {$ELSE}
-    Result := FControl.Left;
-    {$ENDIF}
-  {$ENDIF}
-end;
-
-function TControlVisualElement.GetTop: Integer;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  {$IFDEF FPC}
-    Result := FControl.Top;
-  {$ELSE}
-    {$IFDEF FRAMEWORK_FMX}
-    Result := Trunc(FControl.Position.Y);
-    {$ELSE}
-    Result := FControl.Top;
-    {$ENDIF}
-  {$ENDIF}
-end;
-
-function TControlVisualElement.IsControlOfType(AClass: TClass): Boolean;
-begin
-  if not Assigned(FControl) then
-    Exit;
-  Result := FControl is AClass;
-end;
-
-function TControlVisualElement.GetControl: TControl;
-begin
-  Result := FControl;
-end;
-
-procedure TControlVisualElement.Redraw;
-begin
-
-end;
-
 { TControlGridItemRenderer }
 
 constructor TControlGridItemRenderer.Create(AGridItem: TControlGridItem);
@@ -308,12 +179,7 @@ end;
 
 procedure TControlGridItemRenderer.Render;
 begin
-  {FGridItem.GetVisualElement.SetBounds(
-    AContext.Left,
-    AContext.Top,
-    AContext.Width,
-    AContext.Height
-  );}
+
 end;
 
 { TControlGridItem }
@@ -326,23 +192,91 @@ end;
 constructor TControlGridItem.Create(AControl: TControl);
 begin
   inherited Create;
-  FControlElement := TControlVisualElement.Create(AControl);
-end;
-
-function TControlGridItem.GetVisualElement: IVisualElement;
-begin
-  Result := FControlElement;
+  FControl := AControl;
 end;
 
 procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
 begin
-  GetVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight);
+  FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
   GetRenderer.Render;
+end;
+
+function TControlGridItem.GetControl: TControl;
+begin
+  Result := FControl;
+end;
+
+function TControlGridItem.GetHeight: Integer;
+begin
+  {$IFDEF FRAMEWORK_FMX}
+  Result := Trunc(FControl.Height);
+  {$ELSE}
+  Result := FControl.Height;
+  {$ENDIF}
+end;
+
+function TControlGridItem.GetLeft: Integer;
+begin
+  {$IFDEF FRAMEWORK_FMX}
+  Result := Trunc(FControl.Position.X);
+  {$ELSE}
+  Result := FControl.Left;
+  {$ENDIF}
+end;
+
+procedure TControlGridItem.SetHeight(AValue: Integer);
+begin
+  FControl.Height := AValue;
+end;
+
+procedure TControlGridItem.SetVisible(AValue: Boolean);
+begin
+  FControl.Visible := AValue;
+end;
+
+procedure TControlGridItem.SetWidth(AValue: Integer);
+begin
+  FControl.Width := AValue;
 end;
 
 function TControlGridItem.GetRenderer: IGridItemRenderer;
 begin
   Result := TControlGridItemRenderer.Create(Self);
+end;
+
+function TControlGridItem.GetTop: Integer;
+begin
+  {$IFDEF FRAMEWORK_FMX}
+  Result := Trunc(FControl.Position.Y);
+  {$ELSE}
+  Result := FControl.Top;
+  {$ENDIF}
+end;
+
+function TControlGridItem.GetVisible: Boolean;
+begin
+  Result := FControl.Visible;
+end;
+
+function TControlGridItem.GetWidth: Integer;
+begin
+  {$IFDEF FRAMEWORK_FMX}
+  Result := Trunc(FControl.Width);
+  {$ELSE}
+  Result := FControl.Width;
+  {$ENDIF}
+end;
+
+function TControlGridItem.IsControlOfType(AClass: TClass): Boolean;
+begin
+  if not Assigned(FControl) then
+    Exit;
+  Result := FControl is AClass;
+end;
+
+procedure TControlGridItem.Redraw;
+begin
+
 end;
 
 { TControlInfo }
@@ -616,12 +550,10 @@ begin
 
   Cell := Self.GetCell(ARow, ACol);
 
-  if (not Assigned(Cell))
-    or (not Assigned(Cell.Item))
-    or (not Assigned(Cell.Item.GetVisualElement)) then
+  if (not Assigned(Cell)) or (not Assigned(Cell.Item)) then
     Exit;
 
-  Result := (Cell.Item.GetVisualElement as TControlVisualElement).GetControl;
+  Result := (Cell.Item as TControlGridItem).GetControl;
 end;
 
 { TGridLayoutBuilderHelper }

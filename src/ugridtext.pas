@@ -69,21 +69,24 @@ type
   TTextAlignHorizontal = (tahLeft, tahCenter, tahRight);
   TTextAlignVertical = (tavTop, tavMiddle, tavBottom);
 
-  { TTextVisualElement }
+  { TTextGridItem }
 
-  TTextVisualElement = class(TInterfacedObject, IVisualElement)
-    FRenderer: TTextGridRenderer;
-    FLines: TStringList;
-    FLeft, FTop, FWidth, FHeight: Integer;
-    FVisible: Boolean;
+  TTextGridItem = class(TInterfacedObject, IGridItem)
   private
     FHorizontalAlign: TTextAlignHorizontal;
     FVerticalAlign: TTextAlignVertical;
     procedure AdjustSize;
     function GetAlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
+  protected
+    FRenderer: TTextGridRenderer;
+    FLines: TStringList;
+    FLeft, FTop, FWidth, FHeight: Integer;
+    FVisible: Boolean;
+    procedure AfterSetBounds; virtual;
   public
     constructor Create(const ARenderer: TTextGridRenderer);
     destructor Destroy; override;
+    function GetRenderer: IGridItemRenderer;
     procedure Redraw;
     function GetHeight: Integer;
     function GetLeft: Integer;
@@ -99,20 +102,7 @@ type
     property HorizontalAlign: TTextAlignHorizontal read FHorizontalAlign write FHorizontalAlign;
     property VerticalAlign: TTextAlignVertical read FVerticalAlign write FVerticalAlign;
     property Renderer: TTextGridRenderer read FRenderer;
-  end;
 
-  { TTextGridItem }
-
-  TTextGridItem = class(TInterfacedObject, IGridItem)
-  protected
-    FGridRenderer: TTextGridRenderer;
-    FElement: IVisualElement;
-    procedure AfterSetBounds; virtual;
-  public
-    constructor Create(AElement: TTextVisualElement);
-    function GetVisualElement: IVisualElement;
-    function GetRenderer: IGridItemRenderer;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
   { TTextGridItemRenderer }
@@ -358,9 +348,72 @@ begin
     end;
 end;
 
-{ TTextVisualElement }
+{ TTextGridItem }
 
-function TTextVisualElement.GetAlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
+procedure TTextGridItem.AdjustSize;
+var
+  I, MaxLineLength: Integer;
+begin
+  MaxLineLength := 0;
+  for I := 0 to FLines.Count - 1 do
+    if Length(FLines[I]) > MaxLineLength then
+      MaxLineLength := Length(FLines[I]);
+
+  FWidth := MaxLineLength;
+  FHeight := FLines.Count;
+end;
+
+procedure TTextGridItem.AfterSetBounds;
+begin
+  // nessa classe não faz nada
+end;
+
+constructor TTextGridItem.Create(const ARenderer: TTextGridRenderer);
+begin
+  inherited Create;
+  FRenderer := ARenderer;
+  FLines := TStringList.Create;
+end;
+
+destructor TTextGridItem.Destroy;
+begin
+  FLines.Free;
+  inherited Destroy;
+end;
+
+function TTextGridItem.GetVisible: Boolean;
+begin
+  Result := FVisible;
+end;
+
+function TTextGridItem.GetWidth: Integer;
+begin
+  Result := FWidth;
+end;
+
+procedure TTextGridItem.Redraw;
+var
+  I: Integer;
+  AlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
+begin
+  if (not Assigned(FRenderer)) or (not FVisible) then
+    Exit;
+
+  AlignedLines := GetAlignedLines;
+  for I := 0 to High(AlignedLines) do
+    FRenderer.WriteTextAt(FLeft, FTop + I, AlignedLines[I]);
+end;
+
+procedure TTextGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+begin
+  FLeft := ALeft;
+  FTop := ATop;
+  FWidth := AWidth;
+  FHeight := AHeight;
+  GetRenderer.Render;
+end;
+
+function TTextGridItem.GetAlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
 var
   I, PadTop: Integer;
   Line: string;
@@ -406,133 +459,50 @@ begin
   end;
 end;
 
-procedure TTextVisualElement.Redraw;
-var
-  I: Integer;
-  AlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
-begin
-  if (not Assigned(FRenderer)) or (not FVisible) then
-    Exit;
-
-  AlignedLines := GetAlignedLines;
-  for I := 0 to High(AlignedLines) do
-    FRenderer.WriteTextAt(FLeft, FTop + I, AlignedLines[I]);
-end;
-
-constructor TTextVisualElement.Create(const ARenderer: TTextGridRenderer);
-begin
-  inherited Create;
-  FRenderer := ARenderer;
-  FLines := TStringList.Create;
-  FVisible := True;
-end;
-
-destructor TTextVisualElement.Destroy;
-begin
-  FLines.Free;
-  inherited Destroy;
-end;
-
-function TTextVisualElement.GetHeight: Integer;
+function TTextGridItem.GetHeight: Integer;
 begin
   Result := FHeight;
 end;
 
-function TTextVisualElement.GetLeft: Integer;
+function TTextGridItem.GetLeft: Integer;
 begin
   Result := FLeft;
 end;
 
-function TTextVisualElement.GetTop: Integer;
-begin
-  Result := FTop;
-end;
-
-function TTextVisualElement.GetVisible: Boolean;
-begin
-  Result := FVisible;
-end;
-
-function TTextVisualElement.GetWidth: Integer;
-begin
-  Result := FWidth;
-end;
-
-procedure TTextVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-begin
-  FLeft := ALeft;
-  FTop := ATop;
-  FWidth := AWidth;
-  FHeight := AHeight;
-end;
-
-procedure TTextVisualElement.SetHeight(AValue: Integer);
+procedure TTextGridItem.SetHeight(AValue: Integer);
 begin
   FHeight := AValue;
 end;
 
-procedure TTextVisualElement.SetVisible(AValue: Boolean);
-begin
-  FVisible := AValue;
-end;
-
-procedure TTextVisualElement.SetWidth(AValue: Integer);
-begin
-  FWidth := AValue;
-end;
-
-procedure TTextVisualElement.AdjustSize;
-var
-  I, MaxLineLength: Integer;
-begin
-  MaxLineLength := 0;
-  for I := 0 to FLines.Count - 1 do
-    if Length(FLines[I]) > MaxLineLength then
-      MaxLineLength := Length(FLines[I]);
-
-  FWidth := MaxLineLength;
-  FHeight := FLines.Count;
-end;
-
-procedure TTextVisualElement.SetText(const AText: string);
+procedure TTextGridItem.SetText(const AText: string);
 begin
   FLines.Text := AText;
   AdjustSize;
 end;
 
-function TTextVisualElement.GetTextLines: TStringList;
+procedure TTextGridItem.SetVisible(AValue: Boolean);
 begin
-  Result := FLines;
+  FVisible := AValue;
 end;
 
-{ TTextGridItem }
-
-procedure TTextGridItem.AfterSetBounds;
+procedure TTextGridItem.SetWidth(AValue: Integer);
 begin
-  // nessa classe não faz nada
-end;
-
-constructor TTextGridItem.Create(AElement: TTextVisualElement);
-begin
-  inherited Create;
-  FGridRenderer := AElement.Renderer;
-  FElement := AElement;
-end;
-
-function TTextGridItem.GetVisualElement: IVisualElement;
-begin
-  Result := FElement;
-end;
-
-procedure TTextGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-begin
-  GetVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight);
-  GetRenderer.Render;
+  FWidth := AValue;
 end;
 
 function TTextGridItem.GetRenderer: IGridItemRenderer;
 begin
-  Result := TTextGridItemRenderer.Create(Self.FGridRenderer, Self);
+  Result := TTextGridItemRenderer.Create(Self.FRenderer, Self);
+end;
+
+function TTextGridItem.GetTextLines: TStringList;
+begin
+  Result := FLines;
+end;
+
+function TTextGridItem.GetTop: Integer;
+begin
+  Result := FTop;
 end;
 
 { TTextGridItemRenderer }
@@ -546,14 +516,7 @@ end;
 
 procedure TTextGridItemRenderer.Render;
 begin
-  FGridItem.GetVisualElement.SetBounds(
-    FGridItem.GetVisualElement.GetLeft,
-    FGridItem.GetVisualElement.GetTop,
-    FGridItem.GetVisualElement.GetWidth,
-    FGridItem.GetVisualElement.GetHeight
-  );
-
-  FGridItem.GetVisualElement.Redraw;
+  FGridItem.Redraw;
 end;
 
 end.

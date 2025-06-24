@@ -65,7 +65,8 @@ var
   Renderer: TTextGridRenderer;
   I, Row: Integer;
   Item: TVendaItem;
-  TextElement: TTextVisualElement;
+  // TextElement: TTextVisualElement;
+  TextGridItem: TTextGridItem;
   Items: array of TVendaItem;
   TotalGeral: Double;
 
@@ -154,23 +155,28 @@ begin
       AddItemCell(FormatFloat('0.00', Item.Total) + ' ', COL_TOTAL, tahRight);
     end;
 
-    TextElement := TTextVisualElement.Create(Renderer);
+    TextGridItem := TTextGridItem.Create(Renderer);
+    TextGridItem.SetText('Total Geral  ');
+    TextGridItem.HorizontalAlign := tahRight;
+    TextGridItem.VerticalAlign := tavMiddle;
+
+    {TextElement := TTextVisualElement.Create(Renderer);
     TextElement.SetText('Total Geral  ');
     TextElement.HorizontalAlign := tahRight;
-    TextElement.VerticalAlign := tavMiddle;
+    TextElement.VerticalAlign := tavMiddle;}
     Grid.AddItem(
-      TTextGridItem.Create(TextElement),
+      TextGridItem,
       TGridCellSettings.Create(Row+1, 0)
         .WithColumnSpan(3)
         .WithRowSpan(3)
     );
 
-    TextElement := TTextVisualElement.Create(Renderer);
-    TextElement.SetText(FormatFloat('0.00', TotalGeral) + ' ');
-    TextElement.HorizontalAlign := tahRight;
-    TextElement.VerticalAlign := tavMiddle;
+    TextGridItem := TTextGridItem.Create(Renderer);
+    TextGridItem.SetText(FormatFloat('0.00', TotalGeral) + ' ');
+    TextGridItem.HorizontalAlign := tahRight;
+    TextGridItem.VerticalAlign := tavMiddle;
     Grid.AddItem(
-      TTextGridItem.Create(TextElement),
+      TextGridItem,
       TGridCellSettings.Create(Row+1, 3)
         .WithRowSpan(3)
     );
@@ -232,7 +238,8 @@ var
   Grid: TGridLayout;
   I, Row: Integer;
   Item: TVendaItem;
-  Element: THtmlVisualElement;
+  // Element: THtmlVisualElement;
+  HtmlGridItem: THtmlGridItem;
   Items: array of TVendaItem;
   TotalGeral: Double;
 
@@ -323,20 +330,20 @@ begin
       AddItemCell(FormatFloat('0.00', Item.Total) + ' ', COL_TOTAL, laEnd);
     end;
 
-    Element := THtmlVisualElement.Create(ARenderer);
-    Element.StrContent := 'Total Geral  ';
+    HtmlGridItem := THtmlGridItem.Create(ARenderer);
+    HtmlGridItem.StrContent := 'Total Geral  ';
     Grid.AddItem(
-      THtmlGridItem.Create(Element),
+      HtmlGridItem,
       TGridCellSettings.Create(Row+1, 0)
         .WithAlignment(laEnd, laCenter)
         .WithColumnSpan(3)
         .WithRowSpan(3)
     );
 
-    Element := THtmlVisualElement.Create(ARenderer);
-    Element.StrContent := FormatFloat('0.00', TotalGeral) + ' ';
+    HtmlGridItem := THtmlGridItem.Create(ARenderer);
+    HtmlGridItem.StrContent := FormatFloat('0.00', TotalGeral) + ' ';
     Grid.AddItem(
-      THtmlGridItem.Create(Element),
+      HtmlGridItem,
       TGridCellSettings.Create(Row+1, 3)
         .WithRowSpan(3)
         .WithAlignment(laEnd, laCenter)

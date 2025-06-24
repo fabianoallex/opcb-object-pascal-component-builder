@@ -77,8 +77,8 @@ type
 
   THtmlGridItemBuilder = class(TInterfacedObject, IHtmlGridItemBuilder)
   private
+    FHtmlGridItem: THtmlGridItem;
     FRenderer: IHtmlGridRenderer;
-    FElement: THtmlVisualElement;
     FCellSettings: TGridCellSettings;
   protected
     constructor Create(ARenderer: IHtmlGridRenderer);
@@ -94,8 +94,8 @@ type
   TTextGridItemBuilder = class(TInterfacedObject, ITextGridItemBuilder)
   private
     FRenderer: TTextGridRenderer;
-    FTextElement: TTextVisualElement;
     FCellSettings: TGridCellSettings;
+    FTextGridItem: TTextGridItem;
   protected
     constructor Create(ARenderer: TTextGridRenderer);
   public
@@ -125,36 +125,36 @@ end;
 function TTextGridItemBuilder.NewTextItem: ITextGridItemBuilder;
 begin
   Result := Self;
-  FTextElement := TTextVisualElement.Create(FRenderer);
+  FTextGridItem := TTextGridItem.Create(FRenderer);
   FCellSettings := nil;
 end;
 
 function TTextGridItemBuilder.WithText(AText: string): ITextGridItemBuilder;
 begin
   Result := Self;
-  FTextElement.SetText(AText);
+  FTextGridItem.SetText(AText);
 end;
 
 function TTextGridItemBuilder.WithHorizontalAlign
   (AHorizontalAlign: TTextAlignHorizontal): ITextGridItemBuilder;
 begin
   Result := Self;
-  FTextElement.HorizontalAlign := AHorizontalAlign;
+  FTextGridItem.HorizontalAlign := AHorizontalAlign;
 end;
 
 function TTextGridItemBuilder.WithVerticalAlign
   (AVerticalAlign: TTextAlignVertical): ITextGridItemBuilder;
 begin
   Result := Self;
-  FTextElement.VerticalAlign := AVerticalAlign;
+  FTextGridItem.VerticalAlign := AVerticalAlign;
 end;
 
 function TTextGridItemBuilder.WithAlignment(AHorizontal: TTextAlignHorizontal;
   AVertical: TTextAlignVertical): ITextGridItemBuilder;
 begin
   Result := Self;
-  FTextElement.HorizontalAlign := AHorizontal;
-  FTextElement.VerticalAlign := AVertical;
+  FTextGridItem.HorizontalAlign := AHorizontal;
+  FTextGridItem.VerticalAlign := AVertical;
 end;
 
 function TTextGridItemBuilder.WithCellSettings(ACellSettings: TGridCellSettings
@@ -168,17 +168,14 @@ function TTextGridItemBuilder.AddToGrid(AGrid: TGridLayout
   ): ITextGridItemBuilder;
 begin
   Result := Self;
-  AGrid.AddItem(TTextGridItem.Create(FTextElement), FCellSettings);
+  AGrid.AddItem(FTextGridItem, FCellSettings);
 end;
 
 function TTextGridItemBuilder.AddToGrid(AGrid: TGridLayout;
   ARow, AColumn: Integer): ITextGridItemBuilder;
 begin
   Result := Self;
-  AGrid.AddItem(
-    TTextGridItem.Create(FTextElement),
-    TGridCellSettings.Create(ARow, AColumn)
-  );
+  AGrid.AddItem(FTextGridItem, TGridCellSettings.Create(ARow, AColumn));
 end;
 
 { TGridItemFactory }
@@ -245,7 +242,8 @@ end;
 constructor THtmlGridItemBuilder.Create
   (ARenderer: IHtmlGridRenderer);
 begin
-  FElement := THtmlVisualElement.Create(FRenderer);
+  FRenderer := ARenderer;
+  FHtmlGridItem := THtmlGridItem.Create(FRenderer);
   FCellSettings := nil;
 end;
 
@@ -253,7 +251,7 @@ function THtmlGridItemBuilder.WithStrContent(AContent: string
   ): IHtmlGridItemBuilder;
 begin
   Result := Self;
-  FElement.StrContent := AContent;
+  FHtmlGridItem.StrContent := AContent;
 end;
 
 function THtmlGridItemBuilder.WithCellSettings
@@ -267,19 +265,14 @@ function THtmlGridItemBuilder.AddToGrid(AGrid: TGridLayout
   ): IHtmlGridItemBuilder;
 begin
   Result := Self;
-  AGrid.AddItem(
-    THtmlGridItem.Create(FElement),
-    FCellSettings
-  );
+  AGrid.AddItem(FHtmlGridItem, FCellSettings);
 end;
 
 function THtmlGridItemBuilder.AddWithFiller(AFiller: IGridFill
   ): IHtmlGridItemBuilder;
 begin
   Result := Self;
-  AFiller.PlaceItem(
-    THtmlGridItem.Create(FElement)
-  );
+  AFiller.PlaceItem(FHtmlGridItem);
 end;
 
 end.

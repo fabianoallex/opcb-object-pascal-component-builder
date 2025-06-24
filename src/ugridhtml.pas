@@ -41,44 +41,31 @@ type
     function GetAsString(AGrid: TGridLayout): string;
   end;
 
-  { THtmlVisualElement }
+  { THtmlGridItem }
 
-  THtmlVisualElement = class(TInterfacedObject, IVisualElement)
+  THtmlGridItem = class(TInterfacedObject, IGridItem)
   private
-    FRenderer: IHtmlGridRenderer;
     FLeft, FTop, FWidth, FHeight: Integer;
     FStrContent: string;
     FVisible: Boolean;
     procedure Redraw;
     procedure SetStrContent(AValue: string);
+  protected
+    FGridRenderer: IHtmlGridRenderer;
+    procedure AfterSetBounds; virtual;
   public
     constructor Create(ARenderer: IHtmlGridRenderer);
-    destructor Destroy; override;
+    function GetRenderer: IGridItemRenderer;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     function GetHeight: Integer;
     function GetLeft: Integer;
     function GetTop: Integer;
     function GetVisible: Boolean;
     function GetWidth: Integer;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     procedure SetHeight(AValue: Integer);
     procedure SetVisible(AValue: Boolean);
     procedure SetWidth(AValue: Integer);
     property StrContent: string read FStrContent write SetStrContent;
-    property Renderer: IHtmlGridRenderer read FRenderer;
-  end;
-
-  { THtmlGridItem }
-
-  THtmlGridItem = class(TInterfacedObject, IGridItem)
-  protected
-    FGridRenderer: IHtmlGridRenderer;
-    FElement: IVisualElement;
-    procedure AfterSetBounds; virtual;
-  public
-    constructor Create(AElement: THtmlVisualElement);
-    function GetVisualElement: IVisualElement;
-    function GetRenderer: IGridItemRenderer;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
   { THtmlGridItemRenderer }
@@ -272,7 +259,7 @@ begin
           Continue;
         end;
 
-        if (not Assigned(Cell.Item)) or (not Assigned(Cell.Item.GetVisualElement))  then
+        if (not Assigned(Cell.Item)) then
           Continue;
 
         TdElement := TrElement.CreateChild('td');
@@ -292,7 +279,7 @@ begin
         );
 
         TdElement.Attributes.AddClass(GetAlignmentClass(cell));
-        TdElement.SetText((Cell.Item.GetVisualElement as THtmlVisualElement).StrContent);
+        TdElement.SetText((Cell.Item as THtmlGridItem).StrContent);
       end;
     end;
 
@@ -473,7 +460,7 @@ var
       Result.Attributes.AddStyle('grid-row', ' span ' + ACell.RowSpan.ToString);
 
      Result.SetText(
-       (ACell.Item.GetVisualElement as THtmlVisualElement).StrContent
+       (ACell.Item as THtmlGridItem).StrContent
      );
   end;
 
@@ -502,77 +489,6 @@ begin
   end;
 end;
 
-{ THtmlVisualElement }
-
-procedure THtmlVisualElement.Redraw;
-begin
-
-end;
-
-procedure THtmlVisualElement.SetStrContent(AValue: string);
-begin
-  if FStrContent = AValue then Exit;
-  FStrContent := AValue;
-end;
-
-constructor THtmlVisualElement.Create(ARenderer: IHtmlGridRenderer);
-begin
-  FRenderer := ARenderer;
-end;
-
-destructor THtmlVisualElement.Destroy;
-begin
-  inherited Destroy;
-end;
-
-function THtmlVisualElement.GetHeight: Integer;
-begin
-  Result := FHeight;
-end;
-
-function THtmlVisualElement.GetLeft: Integer;
-begin
-  Result := FLeft;
-end;
-
-function THtmlVisualElement.GetTop: Integer;
-begin
-  Result := FTop;
-end;
-
-function THtmlVisualElement.GetVisible: Boolean;
-begin
-  Result := FVisible;
-end;
-
-function THtmlVisualElement.GetWidth: Integer;
-begin
-  Result := FWidth;
-end;
-
-procedure THtmlVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-begin
-  FLeft := ALeft;
-  FTop := ATop;
-  FWidth := AWidth;
-  FHeight := AHeight;
-end;
-
-procedure THtmlVisualElement.SetHeight(AValue: Integer);
-begin
-  FHeight := AValue;
-end;
-
-procedure THtmlVisualElement.SetVisible(AValue: Boolean);
-begin
-  FVisible := AValue;
-end;
-
-procedure THtmlVisualElement.SetWidth(AValue: Integer);
-begin
-  FWidth := AValue;
-end;
-
 { THtmlGridItem }
 
 procedure THtmlGridItem.AfterSetBounds;
@@ -580,16 +496,20 @@ begin
   // nessa classe não faz nada
 end;
 
-constructor THtmlGridItem.Create(AElement: THtmlVisualElement);
+constructor THtmlGridItem.Create(ARenderer: IHtmlGridRenderer);
 begin
   inherited Create;
-  FGridRenderer := AElement.Renderer;
-  FElement := AElement;
+  FGridRenderer := ARenderer;
 end;
 
-function THtmlGridItem.GetVisualElement: IVisualElement;
+function THtmlGridItem.GetHeight: Integer;
 begin
-  Result := FElement;
+  Result := FHeight;
+end;
+
+function THtmlGridItem.GetLeft: Integer;
+begin
+  Result := FLeft;
 end;
 
 function THtmlGridItem.GetRenderer: IGridItemRenderer;
@@ -597,10 +517,53 @@ begin
   Result := THtmlGridItemRenderer.Create(Self.FGridRenderer, Self);
 end;
 
+function THtmlGridItem.GetTop: Integer;
+begin
+  Result := FTop;
+end;
+
+function THtmlGridItem.GetVisible: Boolean;
+begin
+  Result := FVisible;
+end;
+
+function THtmlGridItem.GetWidth: Integer;
+begin
+  Result := FWidth;
+end;
+
+procedure THtmlGridItem.Redraw;
+begin
+
+end;
+
 procedure THtmlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
 begin
-  FElement.SetBounds(ALeft, ATop, AWidth, AHeight);
+  FLeft := ALeft;
+  FTop := ATop;
+  FWidth := AWidth;
+  FHeight := AHeight;
   AfterSetBounds;
+end;
+
+procedure THtmlGridItem.SetHeight(AValue: Integer);
+begin
+  FHeight := AValue;
+end;
+
+procedure THtmlGridItem.SetStrContent(AValue: string);
+begin
+  FStrContent := AValue;;
+end;
+
+procedure THtmlGridItem.SetVisible(AValue: Boolean);
+begin
+  FVisible := AValue;
+end;
+
+procedure THtmlGridItem.SetWidth(AValue: Integer);
+begin
+  FWidth := AValue;
 end;
 
 { THtmlGridItemRenderer }
@@ -614,14 +577,7 @@ end;
 
 procedure THtmlGridItemRenderer.Render;
 begin
-{  FGridItem.GetVisualElement.SetBounds(
-    AVisualElement.GetLeft,
-    AVisualElement.GetTop,
-    AVisualElement.GetWidth,
-    AVisualElement.GetHeight
-  );}
-
-  FGridItem.GetVisualElement.Redraw;
+  FGridItem.Redraw;
 end;
 
 end.

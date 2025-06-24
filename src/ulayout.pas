@@ -11,8 +11,14 @@ uses
   Classes, SysUtils, Generics.Collections, Generics.Defaults;
 
 type
-  IVisualElement = interface
-    ['{02F693DD-5377-477F-9B17-05906737F1F1}']
+  IGridItemRenderer = interface
+    ['{D6739A9C-A12E-4D46-A25C-158F77799147}']
+    procedure Render;
+  end;
+
+  IGridItem = interface
+    ['{7A972D12-00D4-4113-96C3-880C95E3FCD1}']
+    function GetRenderer: IGridItemRenderer;
     function GetVisible: Boolean;
     procedure SetVisible(AValue: Boolean);
     function GetWidth: Integer;
@@ -23,18 +29,6 @@ type
     function GetLeft: Integer;
     function GetTop: Integer;
     procedure Redraw;
-  end;
-
-  IGridItemRenderer = interface
-    ['{D6739A9C-A12E-4D46-A25C-158F77799147}']
-    procedure Render;
-  end;
-
-  IGridItem = interface
-    ['{7A972D12-00D4-4113-96C3-880C95E3FCD1}']
-    function GetVisualElement: IVisualElement;
-    function GetRenderer: IGridItemRenderer;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
   TItemAlignment = (laStretch, laCenter, laStart, laEnd);
@@ -1216,7 +1210,6 @@ var
   Cell: TGridCell;
   Item: IGridItem;
   X, Y, W, H: Integer;
-  Element: IVisualElement;
 begin
   ApplyCellsVisibility;
 
@@ -1224,10 +1217,6 @@ begin
   begin
     Item := Cell.Item;
     if not Assigned(Item) then
-      Continue;
-
-    Element := Item.GetVisualElement;
-    if not Assigned(Element) then
       Continue;
 
     if not IsVisibleCell(Cell) then
@@ -1243,16 +1232,16 @@ begin
         W := W + Cell.ExtraWidth;
       laCenter:
         begin
-          W := Element.GetWidth;
+          W := Item.GetWidth;
           X := X + (CalculateCellWidth(Cell) - W) div 2;
         end;
       laStart:
         begin
-          W := Element.GetWidth;
+          W := Item.GetWidth;
         end;
       laEnd:
         begin
-          W := Element.GetWidth;
+          W := Item.GetWidth;
           X := X + (CalculateCellWidth(Cell) - W);
         end;
     end;
@@ -1262,16 +1251,16 @@ begin
         H := H + Cell.ExtraHeight;
       laCenter:
         begin
-          H := Element.GetHeight;
+          H := Item.GetHeight;
           Y := Y + (CalculateCellHeight(Cell) - H) div 2;
         end;
       laStart:
         begin
-          H := Element.GetHeight;
+          H := Item.GetHeight;
         end;
       laEnd:
         begin
-          H := Element.GetHeight;
+          H := Item.GetHeight;
           Y := Y + (CalculateCellHeight(Cell) - H);
         end;
     end;
@@ -1291,16 +1280,14 @@ procedure TGridLayout.ApplyCellsVisibility;
 var
   Cell: TGridCell;
   Item: IGridItem;
-  Element: IVisualElement;
 begin
   for Cell in FCells do
   begin
     if Assigned(Cell) then
       Item := Cell.Item;
+
     if Assigned(Item) then
-      Element := Item.GetVisualElement;
-    if Assigned(Element) then
-      Element.SetVisible(IsVisibleCell(Cell));
+      Item.SetVisible(IsVisibleCell(Cell));
   end;
 end;
 

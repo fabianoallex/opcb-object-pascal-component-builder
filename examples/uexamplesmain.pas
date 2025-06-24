@@ -884,15 +884,12 @@ procedure TFExamplesMain.AddExample_GridFillWithSpansBeforePlaceItem(
   AGridFill: IGridFill; AGrid: TGridLayout; AItem: IGridItem; APos: IGridPosition;
   var ASettings: TGridCellSettings; var ACanPlace: Boolean);
 var
-  ControlElement: TControlVisualElement;
+  //ControlElement: TControlVisualElement;
   Control: TControl;
 begin
-  if (AItem.GetVisualElement as TControlVisualElement).IsControlOfType(TButton) then
+  if (AItem as TControlGridItem).IsControlOfType(TButton) then
   begin
-    Control := nil;
-    ControlElement := (AItem.GetVisualElement as TControlVisualElement);
-    if Assigned(ControlElement) then
-      Control := ControlElement.GetControl;
+    Control := (AItem as TControlGridItem).GetControl;
 
     if Assigned(Control) and (Control is TButton) and (TButton(Control).Tag = 4) then
       ASettings.WithColumnSpan(2);
@@ -903,15 +900,12 @@ procedure TFExamplesMain.AddExample_GridFillWithSpansAfterPlaceItem(
   AGridFill: IGridFill; AGrid: TGridLayout; AItem: IGridItem;
   var APos: IGridPosition);
 var
-  ControlElement: TControlVisualElement;
+//  ControlElement: TControlVisualElement;
   Control: TControl;
 begin
-  if (AItem.GetVisualElement as TControlVisualElement).IsControlOfType(TButton) then
+  if (AItem as TControlGridItem).IsControlOfType(TButton) then
   begin
-    Control := nil;
-    ControlElement := (AItem.GetVisualElement as TControlVisualElement);
-    if Assigned(ControlElement) then
-      Control := ControlElement.GetControl;
+    Control := (AItem as TControlGridItem).GetControl;
 
     if Assigned(Control) and (Control is TButton) and (TButton(Control).Tag in [4, 8]) then
       APos := AGridFill.NextPosition;
