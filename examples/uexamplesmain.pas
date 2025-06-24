@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
-  StdCtrls, ULayout, UGridLayoutBuilder, UGridLayoutFillerFactory;
+  StdCtrls, ULayout, UGridLayoutBuilder, UGridLayoutFillerFactory, ULayout.controls;
 
 type
 
@@ -1904,235 +1904,20 @@ begin
 end;
 
 procedure TFExamplesMain.AddExample_NestedGrid(AOwner: TForm; APageControl: TPageControl);
-var
-  Tab: TTabSheet;
-  MainGrid, SubGrid: TGridLayout;
-  SubItem: TSubGridItem;
-  BtnMain, Btn: TButton;
-  I: Integer;
 begin
-  Tab := TTabSheet.Create(APageControl);
-  Tab.PageControl := APageControl;
-  Tab.Caption := 'Nested Grid';
 
-  // Grid principal
-  MainGrid := TGridLayout.Create;
-  try
-    MainGrid.Rows := 2;
-    MainGrid.Columns := 2;
-    MainGrid.RowHeights := 80;
-    MainGrid.ColumnWidths := 250;
-    MainGrid.Margins.All := 10;
-
-    // Botão normal
-    BtnMain := TButton.Create(Tab);
-    BtnMain.Parent := Tab;
-    BtnMain.Caption := 'Principal 1';
-    MainGrid.AddItem(BtnMain, TGridCellSettings.Create(0, 0));
-
-    try
-      // Subgrid configurado
-      SubGrid := TGridLayout.Create;
-      SubGrid.Rows := 3;
-      SubGrid.Columns := 3;
-      SubGrid.ColumnWidths := 50;
-      SubGrid.RowHeights := 30;
-      SubGrid.HorizontalSpacings := 5;
-      SubGrid.Margins.All := 10;
-
-      // Criando SubGrid
-      SubItem := TSubGridItem.CreateWithContainerClass(
-        SubGrid,
-        Tab,
-        TGroupBox
-      );
-
-      SubItem.Container.Parent := Tab;
-      TGroupBox(SubItem.Container).Caption := 'Item do Grid Aninhado';
-      SubItem.Container.Color := clYellow;
-
-      for I := 0 to 8 do
-      begin
-        Btn := TButton.Create(Tab);
-        Btn.Parent := SubItem.Container;
-        Btn.Caption := IntToStr(I + 1);
-        SubGrid.AddItem(Btn, TGridCellSettings.Create(I div 3, I mod 3));
-      end;
-
-      SubGrid.ArrangeItems; //quando o subgrid tem seu proprio container, precisa chamar ArrangeItems Manualmente.
-
-      SubItem.Container.Height := SubGrid.ContentHeight + 25;
-      SubItem.Container.Width := SubGrid.ContentWidth;
-
-      // Adicionando subgrid ao grid principal
-      MainGrid.AddItem(
-        SubItem,
-        TGridCellSettings.Create(0, 1)
-          .WithRowSpan(2)
-          .WithAlignment(laCenter, laCenter)
-      );
-    finally
-      //SubGrid.Free;
-    end;
-
-    // Outro botão normal
-    BtnMain := TButton.Create(Tab);
-    BtnMain.Parent := Tab;
-    BtnMain.Caption := 'Principal 2';
-    MainGrid.AddItem(BtnMain, TGridCellSettings.Create(1, 0));
-
-    MainGrid.ArrangeItems;
-  finally
-    MainGrid.Free;
-  end;
 end;
 
 procedure TFExamplesMain.AddExample_NestedGridNoContainer(AOwner: TForm;
   APageControl: TPageControl);
-var
-  Tab: TTabSheet;
-  MainGrid, SubGrid: TGridLayout;
-  SubItem: TSubGridItem;
-  BtnMain, Btn: TButton;
-  I: Integer;
 begin
-  Tab := TTabSheet.Create(APageControl);
-  Tab.PageControl := APageControl;
-  Tab.Caption := 'Nested Grid';
 
-  // Grid principal
-  MainGrid := TGridLayout.Create;
-  try
-    MainGrid.Rows := 2;
-    MainGrid.Columns := 2;
-    MainGrid.RowHeights := 80;
-    MainGrid.ColumnWidths := 250;
-    MainGrid.Margins.All := 10;
-
-    // Botão normal
-    BtnMain := TButton.Create(Tab);
-    BtnMain.Parent := Tab;
-    BtnMain.Caption := 'Principal 1';
-    MainGrid.AddItem(BtnMain, TGridCellSettings.Create(0, 0));
-
-    try
-      // Subgrid configurado
-      SubGrid := TGridLayout.Create;
-      SubGrid.Rows := 3;
-      SubGrid.Columns := 3;
-      SubGrid.ColumnWidths := 50;
-      SubGrid.RowHeights := 30;
-      SubGrid.HorizontalSpacings := 5;
-      SubGrid.Margins.All := 10;
-
-      // Criando SubGrid
-      SubItem := TSubGridItem.Create(SubGrid);
-
-      for I := 0 to 8 do
-      begin
-        Btn := TButton.Create(Tab);
-        Btn.Parent := Tab; // Importante!
-        Btn.Caption := IntToStr(I + 1);
-        SubGrid.AddItem(Btn, TGridCellSettings.Create(I div 3, I mod 3));
-      end;
-
-      SubItem.Container.Height := SubGrid.ContentHeight;
-      SubItem.Container.Width := SubGrid.ContentWidth;
-
-      // não chamar ArrangeItems aqui no sub grid.
-      // No ArrangeItems do Main será chamado
-      // pois qualquer chamada agora não conseguirá
-      // determinar onde a célula será posicionada.
-      // a celula só terá sua posição definida no ArrangeItem
-      // do MainGrid.
-
-      //SubGrid.ArrangeItems;
-
-      // Adicionando subgrid ao grid principal
-      MainGrid.AddItem(
-        SubItem,
-        TGridCellSettings.Create(0, 1)
-          .WithRowSpan(2)
-          .WithAlignment(laCenter, laCenter)
-      );
-    finally
-      // não chamar Free para subGrids.
-      // SubGrid´s são destruídos junto ao Main
-      //SubGrid.Free;
-    end;
-
-    // Outro botão normal
-    BtnMain := TButton.Create(Tab);
-    BtnMain.Parent := Tab;
-    BtnMain.Caption := 'Principal 2';
-    MainGrid.AddItem(BtnMain, TGridCellSettings.Create(1, 0));
-
-    MainGrid.ArrangeItems;
-  finally
-    MainGrid.Free;  // aqui também está destruíndo subGrid
-  end;
 end;
 
 procedure TFExamplesMain.AddExample_BasicGridLayout2(AOwner: TForm;
   APageControl: TPageControl);
-var
-  Tab: TTabSheet;
-  Grid, SubGrid: TGridLayout;
-  I: Integer;
-  Btn: TButton;
 begin
-  Tab := TTabSheet.Create(PageControl);
-  Tab.PageControl := PageControl;
-  Tab.Caption := 'Grid Simples';
 
-  Grid := TGridLayout.Create;
-  try
-    Grid.Rows := 3;
-    Grid.Columns := 3;
-    Grid.ColumnWidths := 80;
-    Grid.RowHeights := 50;
-    Grid.HorizontalSpacings := 10;
-    Grid.VerticalSpacings := 10;
-    Grid.Margins.All := 10;
-
-    SubGrid := TGridLayout.Create;
-    SubGrid.Rows := 1;
-    SubGrid.Columns := 2;
-    SubGrid.ColumnWidths := 125;
-    SubGrid.RowHeights := 50;
-    SubGrid.HorizontalSpacings := 10;
-    SubGrid.VerticalSpacings := 10;
-    SubGrid.Margins.All := 0;
-
-    Btn := TButton.Create(Tab);
-    Btn.Parent := Tab;
-    Btn.Caption := 'A';
-    SubGrid.AddItem(Btn, TGridCellSettings.Create(0, 0));
-
-    Btn := TButton.Create(Tab);
-    Btn.Parent := Tab;
-    Btn.Caption := 'B';
-    SubGrid.AddItem(Btn, TGridCellSettings.Create(0, 1));
-
-    Grid.AddItem(
-      SubGrid,
-      TGridCellSettings.Create(0, 0)
-        .WithColumnSpan(3)
-    );
-
-    for I := 3 to 8 do
-    begin
-      Btn := TButton.Create(Tab);
-      Btn.Parent := Tab;
-      Btn.Caption := 'Botão ' + IntToStr(I + 1);
-
-      Grid.AddItem(Btn, TGridCellSettings.Create(I div 3, I mod 3));
-    end;
-
-    Grid.ArrangeItems;
-  finally
-    Grid.Free;
-  end;
 end;
 
 procedure TFExamplesMain.AddExample_BasicGridLayoutBuilder(AOwner: TForm;

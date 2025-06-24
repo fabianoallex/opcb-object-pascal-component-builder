@@ -81,9 +81,8 @@
         <ResourceBaseClass Value="Form"/>
       </Unit>
       <Unit>
-        <Filename Value="..\src\ulayout.pas"/>
+        <Filename Value="..\src\ULayout.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ULayout"/>
       </Unit>
       <Unit>
         <Filename Value="..\src\ugridlayoutbuilder.pas"/>

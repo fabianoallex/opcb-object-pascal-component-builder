@@ -1,4 +1,4 @@
-unit UGridHtml;
+﻿unit UGridHtml;
 
 {$IFDEF FPC}
 {$mode ObjFPC}{$H+}
@@ -49,7 +49,7 @@ type
     FLeft, FTop, FWidth, FHeight: Integer;
     FStrContent: string;
     FVisible: Boolean;
-    procedure Redraw(AContext: TGriItemRenderContext);
+    procedure Redraw;
     procedure SetStrContent(AValue: string);
   public
     constructor Create(ARenderer: IHtmlGridRenderer);
@@ -89,7 +89,7 @@ type
     FGridItem: THtmlGridItem;
   public
     constructor Create(AGridRenderer: IHtmlGridRenderer; AGridItem: THtmlGridItem);
-    procedure RenderTo(AContext: TGriItemRenderContext);
+    procedure Render;
   end;
 
 implementation
@@ -504,7 +504,7 @@ end;
 
 { THtmlVisualElement }
 
-procedure THtmlVisualElement.Redraw(AContext: TGriItemRenderContext);
+procedure THtmlVisualElement.Redraw;
 begin
 
 end;
@@ -612,16 +612,16 @@ begin
   FGridItem := AGridItem;
 end;
 
-procedure THtmlGridItemRenderer.RenderTo(AContext: TGriItemRenderContext);
+procedure THtmlGridItemRenderer.Render;
 begin
-  FGridItem.GetVisualElement.SetBounds(
-    AContext.Left,
-    AContext.Top,
-    AContext.Width,
-    AContext.Height
-  );
+{  FGridItem.GetVisualElement.SetBounds(
+    AVisualElement.GetLeft,
+    AVisualElement.GetTop,
+    AVisualElement.GetWidth,
+    AVisualElement.GetHeight
+  );}
 
-  FGridItem.GetVisualElement.Redraw(AContext);
+  FGridItem.GetVisualElement.Redraw;
 end;
 
 end.

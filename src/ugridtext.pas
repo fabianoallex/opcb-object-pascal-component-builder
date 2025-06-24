@@ -1,4 +1,4 @@
-unit UGridText;
+﻿unit UGridText;
 
 {$IFDEF FPC}
 {$mode ObjFPC}{$H+}
@@ -84,7 +84,7 @@ type
   public
     constructor Create(const ARenderer: TTextGridRenderer);
     destructor Destroy; override;
-    procedure Redraw(AContext: TGriItemRenderContext);
+    procedure Redraw;
     function GetHeight: Integer;
     function GetLeft: Integer;
     function GetTop: Integer;
@@ -112,6 +112,7 @@ type
     constructor Create(AElement: TTextVisualElement);
     function GetVisualElement: IVisualElement;
     function GetRenderer: IGridItemRenderer;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
   { TTextGridItemRenderer }
@@ -122,7 +123,7 @@ type
     FGridItem: TTextGridItem;
   public
     constructor Create(AGridRenderer: TTextGridRenderer; AGridItem: TTextGridItem);
-    procedure RenderTo(AContext: TGriItemRenderContext);
+    procedure Render;
   end;
 
 implementation
@@ -405,7 +406,7 @@ begin
   end;
 end;
 
-procedure TTextVisualElement.Redraw(AContext: TGriItemRenderContext);
+procedure TTextVisualElement.Redraw;
 var
   I: Integer;
   AlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
@@ -523,6 +524,12 @@ begin
   Result := FElement;
 end;
 
+procedure TTextGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+begin
+  GetVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight);
+  GetRenderer.Render;
+end;
+
 function TTextGridItem.GetRenderer: IGridItemRenderer;
 begin
   Result := TTextGridItemRenderer.Create(Self.FGridRenderer, Self);
@@ -537,16 +544,16 @@ begin
   FGridItem := AGridItem;
 end;
 
-procedure TTextGridItemRenderer.RenderTo(AContext: TGriItemRenderContext);
+procedure TTextGridItemRenderer.Render;
 begin
   FGridItem.GetVisualElement.SetBounds(
-    AContext.Left,
-    AContext.Top,
-    AContext.Width,
-    AContext.Height
+    FGridItem.GetVisualElement.GetLeft,
+    FGridItem.GetVisualElement.GetTop,
+    FGridItem.GetVisualElement.GetWidth,
+    FGridItem.GetVisualElement.GetHeight
   );
 
-  FGridItem.GetVisualElement.Redraw(AContext);
+  FGridItem.GetVisualElement.Redraw;
 end;
 
 end.

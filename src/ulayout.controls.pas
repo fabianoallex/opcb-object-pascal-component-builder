@@ -48,7 +48,7 @@ type
     function GetTop: Integer;
     function IsControlOfType(AClass: TClass): Boolean;
     function GetControl: TControl;
-    procedure Redraw(AContext: TGriItemRenderContext);
+    procedure Redraw;
   end;
 
   { TControlGridItem }
@@ -61,6 +61,7 @@ type
     constructor Create(AControl: TControl);
     function GetVisualElement: IVisualElement;
     function GetRenderer: IGridItemRenderer;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
   { TControlGridItemRenderer }
@@ -70,7 +71,7 @@ type
     FGridItem: IGridItem;
   public
     constructor Create(AGridItem: TControlGridItem);
-    procedure RenderTo(AContext: TGriItemRenderContext);
+    procedure Render;
   end;
 
   { TControlInfo }
@@ -293,7 +294,7 @@ begin
   Result := FControl;
 end;
 
-procedure TControlVisualElement.Redraw(AContext: TGriItemRenderContext);
+procedure TControlVisualElement.Redraw;
 begin
 
 end;
@@ -305,14 +306,14 @@ begin
   FGridItem := AGridItem;
 end;
 
-procedure TControlGridItemRenderer.RenderTo(AContext: TGriItemRenderContext);
+procedure TControlGridItemRenderer.Render;
 begin
-  FGridItem.GetVisualElement.SetBounds(
+  {FGridItem.GetVisualElement.SetBounds(
     AContext.Left,
     AContext.Top,
     AContext.Width,
     AContext.Height
-  );
+  );}
 end;
 
 { TControlGridItem }
@@ -331,6 +332,12 @@ end;
 function TControlGridItem.GetVisualElement: IVisualElement;
 begin
   Result := FControlElement;
+end;
+
+procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+begin
+  GetVisualElement.SetBounds(ALeft, ATop, AWidth, AHeight);
+  GetRenderer.Render;
 end;
 
 function TControlGridItem.GetRenderer: IGridItemRenderer;

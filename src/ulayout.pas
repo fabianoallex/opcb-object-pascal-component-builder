@@ -11,37 +11,6 @@ uses
   Classes, SysUtils, Generics.Collections, Generics.Defaults;
 
 type
-
-  { TGriItemRenderContext }
-
-  TGriItemRenderContext = class
-  private
-    FHeight: Integer;
-    FLeft: Integer;
-    FTop: Integer;
-    FVisible: Boolean;
-    FWidth: Integer;
-    procedure SetHeight(AValue: Integer);
-    procedure SetLeft(AValue: Integer);
-    procedure SetTop(AValue: Integer);
-    procedure SetVisible(AValue: Boolean);
-    procedure SetWidth(AValue: Integer);
-  public
-    constructor Create;
-    function WithBounds(ALeft, ATop, AWidth, AHeight: Integer): TGriItemRenderContext;
-    function WithVisibility(AVisibility: Boolean): TGriItemRenderContext;
-    property Top: Integer read FTop write SetTop;
-    property Left: Integer read FLeft write SetLeft;
-    property Width: Integer read FWidth write SetWidth;
-    property Height: Integer read FHeight write SetHeight;
-    property Visible: Boolean read FVisible write SetVisible;
-  end;
-
-  IGridItemRenderer = interface
-    ['{D6739A9C-A12E-4D46-A25C-158F77799147}']
-    procedure RenderTo(AContext: TGriItemRenderContext);
-  end;
-
   IVisualElement = interface
     ['{02F693DD-5377-477F-9B17-05906737F1F1}']
     function GetVisible: Boolean;
@@ -53,13 +22,19 @@ type
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     function GetLeft: Integer;
     function GetTop: Integer;
-    procedure Redraw(AContext: TGriItemRenderContext);
+    procedure Redraw;
+  end;
+
+  IGridItemRenderer = interface
+    ['{D6739A9C-A12E-4D46-A25C-158F77799147}']
+    procedure Render;
   end;
 
   IGridItem = interface
     ['{7A972D12-00D4-4113-96C3-880C95E3FCD1}']
     function GetVisualElement: IVisualElement;
     function GetRenderer: IGridItemRenderer;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
   end;
 
   TItemAlignment = (laStretch, laCenter, laStart, laEnd);
@@ -467,64 +442,6 @@ begin
   FHorizontalAlignment := ASettings.HorizontalAlignment;
   FVerticalAlignment := ASettings.VerticalAlignment;
 end;
-
-{ TGriItemRenderContext }
-
-procedure TGriItemRenderContext.SetHeight(AValue: Integer);
-begin
-  if FHeight = AValue then Exit;
-  FHeight := AValue;
-end;
-
-procedure TGriItemRenderContext.SetLeft(AValue: Integer);
-begin
-  if FLeft = AValue then Exit;
-  FLeft := AValue;
-end;
-
-procedure TGriItemRenderContext.SetTop(AValue: Integer);
-begin
-  if FTop = AValue then Exit;
-  FTop := AValue;
-end;
-
-procedure TGriItemRenderContext.SetVisible(AValue: Boolean);
-begin
-  if FVisible = AValue then Exit;
-  FVisible := AValue;
-end;
-
-procedure TGriItemRenderContext.SetWidth(AValue: Integer);
-begin
-  if FWidth = AValue then Exit;
-  FWidth := AValue;
-end;
-
-constructor TGriItemRenderContext.Create;
-begin
-  FHeight := 0;
-  FWidth := 0;
-  FTop := 0;
-  FLeft := 0;
-end;
-
-function TGriItemRenderContext.WithBounds(ALeft, ATop, AWidth, AHeight: Integer
-  ): TGriItemRenderContext;
-begin
-  Result := Self;
-
-  Self.FLeft := ALeft;
-  Self.FTop := ATop;
-  Self.FWidth := AWidth;
-  Self.FHeight := AHeight;
-end;
-
-function TGriItemRenderContext.WithVisibility(AVisibility: Boolean
-  ): TGriItemRenderContext;
-begin
-  Self.Visible := AVisibility;
-end;
-
 
 { TOptionalInt }
 {$IFDEF FPC}
@@ -1300,7 +1217,6 @@ var
   Item: IGridItem;
   X, Y, W, H: Integer;
   Element: IVisualElement;
-  Context: TGriItemRenderContext;
 begin
   ApplyCellsVisibility;
 
@@ -1360,21 +1276,12 @@ begin
         end;
     end;
 
-    Context := TGriItemRenderContext.Create;
-    try
-      Context
-        .WithBounds(
-          FLeft + ALeft + X + Cell.OffsetX,
-          FTop + ATop + Y + Cell.OffsetY,
-          W,
-          H
-        )
-        .WithVisibility(Item.GetVisualElement.GetVisible);
-
-      Item.GetRenderer.RenderTo(Context);
-    finally
-      Context.Free;
-    end;
+    Item.SetBounds(
+      FLeft + ALeft + X + Cell.OffsetX,
+      FTop + ATop + Y + Cell.OffsetY,
+      W,
+      H
+    );
   end;
 
   NotifyLayoutChange;
