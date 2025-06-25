@@ -39,15 +39,15 @@ type
     procedure AfterSetBounds; virtual;
   public
     constructor Create(AControl: TControl);
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Single);
     function GetVisible: Boolean;
     procedure SetVisible(AValue: Boolean);
-    function GetWidth: Integer;
-    procedure SetWidth(AValue: Integer);
-    function GetHeight: Integer;
-    procedure SetHeight(AValue: Integer);
-    function GetLeft: Integer;
-    function GetTop: Integer;
+    function GetWidth: Single;
+    procedure SetWidth(AValue: Single);
+    function GetHeight: Single;
+    procedure SetHeight(AValue: Single);
+    function GetLeft: Single;
+    function GetTop: Single;
     function IsControlOfType(AClass: TClass): Boolean;
     function GetControl: TControl;
     procedure Redraw;
@@ -172,9 +172,13 @@ begin
   FControl := AControl;
 end;
 
-procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Single);
 begin
+  {$IFDEF FRAMEWORK_FMX}
   FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
+  {$ELSE}
+  FControl.SetBounds(Trunc(ALeft), Trunc(ATop), Trunc(AWidth), Trunc(AHeight));
+  {$ENDIF}
 end;
 
 function TControlGridItem.GetControl: TControl;
@@ -182,27 +186,31 @@ begin
   Result := FControl;
 end;
 
-function TControlGridItem.GetHeight: Integer;
+function TControlGridItem.GetHeight: Single;
 begin
   {$IFDEF FRAMEWORK_FMX}
-  Result := Trunc(FControl.Height);
+  Result := FControl.Height;
   {$ELSE}
   Result := FControl.Height;
   {$ENDIF}
 end;
 
-function TControlGridItem.GetLeft: Integer;
+function TControlGridItem.GetLeft: Single;
 begin
   {$IFDEF FRAMEWORK_FMX}
-  Result := Trunc(FControl.Position.X);
+  Result := FControl.Position.X;
   {$ELSE}
   Result := FControl.Left;
   {$ENDIF}
 end;
 
-procedure TControlGridItem.SetHeight(AValue: Integer);
+procedure TControlGridItem.SetHeight(AValue: Single);
 begin
+  {$IFDEF FRAMEWORK_FMX}
   FControl.Height := AValue;
+  {$ELSE}
+  FControl.Height := Trunc(AValue);
+  {$ENDIF}
 end;
 
 procedure TControlGridItem.SetVisible(AValue: Boolean);
@@ -210,15 +218,19 @@ begin
   FControl.Visible := AValue;
 end;
 
-procedure TControlGridItem.SetWidth(AValue: Integer);
-begin
-  FControl.Width := AValue;
-end;
-
-function TControlGridItem.GetTop: Integer;
+procedure TControlGridItem.SetWidth(AValue: Single);
 begin
   {$IFDEF FRAMEWORK_FMX}
-  Result := Trunc(FControl.Position.Y);
+  FControl.Width := AValue;
+  {$ELSE}
+  FControl.Width := Trunc(AValue);
+  {$ENDIF}
+end;
+
+function TControlGridItem.GetTop: Single;
+begin
+  {$IFDEF FRAMEWORK_FMX}
+  Result := FControl.Position.Y;
   {$ELSE}
   Result := FControl.Top;
   {$ENDIF}
@@ -229,10 +241,10 @@ begin
   Result := FControl.Visible;
 end;
 
-function TControlGridItem.GetWidth: Integer;
+function TControlGridItem.GetWidth: Single;
 begin
   {$IFDEF FRAMEWORK_FMX}
-  Result := Trunc(FControl.Width);
+  Result := FControl.Width;
   {$ELSE}
   Result := FControl.Width;
   {$ENDIF}

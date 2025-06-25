@@ -80,22 +80,22 @@ type
   protected
     FRenderer: TTextGridRenderer;
     FLines: TStringList;
-    FLeft, FTop, FWidth, FHeight: Integer;
+    FLeft, FTop, FWidth, FHeight: Single;
     FVisible: Boolean;
     procedure AfterSetBounds; virtual;
   public
     constructor Create(const ARenderer: TTextGridRenderer);
     destructor Destroy; override;
     procedure Redraw;
-    function GetHeight: Integer;
-    function GetLeft: Integer;
-    function GetTop: Integer;
+    function GetHeight: Single;
+    function GetLeft: Single;
+    function GetTop: Single;
     function GetVisible: Boolean;
-    function GetWidth: Integer;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-    procedure SetHeight(AValue: Integer);
+    function GetWidth: Single;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Single);
+    procedure SetHeight(AValue: Single);
     procedure SetVisible(AValue: Boolean);
-    procedure SetWidth(AValue: Integer);
+    procedure SetWidth(AValue: Single);
     procedure SetText(const AText: string);
     function GetTextLines: TStringList;
     property HorizontalAlign: TTextAlignHorizontal read FHorizontalAlign write FHorizontalAlign;
@@ -302,11 +302,11 @@ var
   end;
 
 begin
-  W := AGrid.ContentWidth + AGrid.Left;
-  H := AGrid.ContentHeight + AGrid.Top;
+  W := Trunc(AGrid.ContentWidth + AGrid.Left);
+  H := Trunc(AGrid.ContentHeight + AGrid.Top);
 
-  for X:=AGrid.Left to W-1 do
-    for Y:=AGrid.Top to H-1 do
+  for X:=Trunc(AGrid.Left) to W-1 do
+    for Y:=Trunc(AGrid.Top) to H-1 do
     begin
       if FCharMatrix.GetCharAt(X, Y) <> #0 then
         Continue;
@@ -373,7 +373,7 @@ begin
   Result := FVisible;
 end;
 
-function TTextGridItem.GetWidth: Integer;
+function TTextGridItem.GetWidth: Single;
 begin
   Result := FWidth;
 end;
@@ -388,10 +388,10 @@ begin
 
   AlignedLines := GetAlignedLines;
   for I := 0 to High(AlignedLines) do
-    FRenderer.WriteTextAt(FLeft, FTop + I, AlignedLines[I]);
+    FRenderer.WriteTextAt(Trunc(FLeft), Trunc(FTop) + I, AlignedLines[I]);
 end;
 
-procedure TTextGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+procedure TTextGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Single);
 begin
   FLeft := ALeft;
   FTop := ATop;
@@ -407,18 +407,18 @@ var
   LeftPad, RightPad: Integer;
 begin
   Result := nil;
-  SetLength(Result, FHeight);
+  SetLength(Result, Trunc(FHeight));
 
   case FVerticalAlign of
     tavTop: PadTop := 0;
-    tavMiddle: PadTop := (FHeight - FLines.Count) div 2;
-    tavBottom: PadTop := FHeight - FLines.Count;
+    tavMiddle: PadTop := Trunc(FHeight - FLines.Count) div 2;
+    tavBottom: PadTop := Trunc(FHeight) - FLines.Count;
   else
     PadTop := 0;
   end;
 
-  for I := 0 to FHeight - 1 do
-    Result[I] := StringOfChar(' ', FWidth);
+  for I := 0 to Trunc(FHeight) - 1 do
+    Result[I] := StringOfChar(' ', Trunc(FWidth));
 
   for I := 0 to FLines.Count - 1 do
   begin
@@ -428,32 +428,32 @@ begin
     Line := FLines[I];
     case FHorizontalAlign of
       tahLeft:
-        Line := Line + StringOfChar(' ', FWidth - Length(Line));
+        Line := Line + StringOfChar(' ', Trunc(FWidth) - Length(Line));
       tahCenter:
         begin
-          LeftPad := (FWidth - Length(Line)) div 2;
-          RightPad := FWidth - Length(Line) - LeftPad;
+          LeftPad := Trunc(FWidth - Length(Line)) div 2;
+          RightPad := Trunc(FWidth) - Length(Line) - LeftPad;
           Line := StringOfChar(' ', LeftPad) + Line + StringOfChar(' ', RightPad);
         end;
       tahRight:
-        Line := StringOfChar(' ', FWidth - Length(Line)) + Line;
+        Line := StringOfChar(' ', Trunc(FWidth) - Length(Line)) + Line;
     end;
 
-    Result[PadTop + I] := Copy(Line, 1, FWidth);
+    Result[PadTop + I] := Copy(Line, 1, Trunc(FWidth));
   end;
 end;
 
-function TTextGridItem.GetHeight: Integer;
+function TTextGridItem.GetHeight: Single;
 begin
   Result := FHeight;
 end;
 
-function TTextGridItem.GetLeft: Integer;
+function TTextGridItem.GetLeft: Single;
 begin
   Result := FLeft;
 end;
 
-procedure TTextGridItem.SetHeight(AValue: Integer);
+procedure TTextGridItem.SetHeight(AValue: Single);
 begin
   FHeight := AValue;
 end;
@@ -469,7 +469,7 @@ begin
   FVisible := AValue;
 end;
 
-procedure TTextGridItem.SetWidth(AValue: Integer);
+procedure TTextGridItem.SetWidth(AValue: Single);
 begin
   FWidth := AValue;
 end;
@@ -479,7 +479,7 @@ begin
   Result := FLines;
 end;
 
-function TTextGridItem.GetTop: Integer;
+function TTextGridItem.GetTop: Single;
 begin
   Result := FTop;
 end;

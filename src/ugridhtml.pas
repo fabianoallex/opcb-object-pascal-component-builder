@@ -11,10 +11,10 @@ uses
 
 type
   TPadding = record
-    Top: Integer;
-    Right: Integer;
-    Bottom: Integer;
-    Left: Integer;
+    Top: Single;
+    Right: Single;
+    Bottom: Single;
+    Left: Single;
   end;
 
   { IHtmlGridRenderer }
@@ -45,7 +45,7 @@ type
 
   THtmlGridItem = class(TInterfacedObject, IGridItem)
   private
-    FLeft, FTop, FWidth, FHeight: Integer;
+    FLeft, FTop, FWidth, FHeight: Single;
     FStrContent: string;
     FVisible: Boolean;
     procedure Redraw;
@@ -55,31 +55,17 @@ type
     procedure AfterSetBounds; virtual;
   public
     constructor Create(ARenderer: IHtmlGridRenderer);
-    //function GetRenderer: IGridItemRenderer;
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-    function GetHeight: Integer;
-    function GetLeft: Integer;
-    function GetTop: Integer;
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Single);
+    function GetHeight: Single;
+    function GetLeft: Single;
+    function GetTop: Single;
     function GetVisible: Boolean;
-    function GetWidth: Integer;
-    procedure SetHeight(AValue: Integer);
+    function GetWidth: Single;
+    procedure SetHeight(AValue: Single);
     procedure SetVisible(AValue: Boolean);
-    procedure SetWidth(AValue: Integer);
+    procedure SetWidth(AValue: Single);
     property StrContent: string read FStrContent write SetStrContent;
   end;
-
-  { THtmlGridItemRenderer }
-
-  (*
-  THtmlGridItemRenderer = class(TInterfacedObject, IGridItemRenderer)
-  private
-    FGridRenderer: IHtmlGridRenderer;
-    FGridItem: THtmlGridItem;
-  public
-    constructor Create(AGridRenderer: IHtmlGridRenderer; AGridItem: THtmlGridItem);
-    procedure Render;
-  end;
-  *)
 
 implementation
 
@@ -174,7 +160,7 @@ var
 
   function CalcColumnWidth(AColumn: Integer): string;
   var
-    Width: Integer;
+    Width: Single;
   begin
     Width := AGrid.ColumnWidth[AColumn];
     if AColumn = 0 then
@@ -190,7 +176,7 @@ var
 
   function CalcRowHeight(ARow: Integer): string;
   var
-    Height: Integer;
+    Height: Single;
   begin
     Height := AGrid.RowHeight[ARow];
     if ARow = 0 then
@@ -312,7 +298,7 @@ function THtmlDivGridRenderer.CreateStyleElement(AGrid: TGridLayout): THTMLEleme
     end;
   end;
 
-  function CalcCurrentHight(Row: Integer): Integer;
+  function CalcCurrentHight(Row: Integer): Single;
   var
     Padding: TPadding;
   begin
@@ -325,7 +311,7 @@ function THtmlDivGridRenderer.CreateStyleElement(AGrid: TGridLayout): THTMLEleme
   function CalcGridTemplateRows: string;
   var
     R, Count: Integer;
-    CurrentHeight: Integer;
+    CurrentHeight: Single;
   begin
     Result := '';
     R := 0;
@@ -358,12 +344,13 @@ function THtmlDivGridRenderer.CreateStyleElement(AGrid: TGridLayout): THTMLEleme
 
   function CalcGridWidht: string;
   var
-    I, Sum: Integer;
+    I: Integer;
+    Sum: Single;
   begin
     Sum := 0;
     for I:=0 to AGrid.Columns-1 do
       Sum := Sum + AGrid.ColumnWidth[I];
-    Result := IntToStr(Sum) + 'px';
+    Result := IntToStr(Trunc(Sum)) + 'px';
   end;
 
   function CalcGridPadding: string;
@@ -504,24 +491,17 @@ begin
   FGridRenderer := ARenderer;
 end;
 
-function THtmlGridItem.GetHeight: Integer;
+function THtmlGridItem.GetHeight: Single;
 begin
   Result := FHeight;
 end;
 
-function THtmlGridItem.GetLeft: Integer;
+function THtmlGridItem.GetLeft: Single;
 begin
   Result := FLeft;
 end;
 
-{
-function THtmlGridItem.GetRenderer: IGridItemRenderer;
-begin
-  Result := THtmlGridItemRenderer.Create(Self.FGridRenderer, Self);
-end;
-}
-
-function THtmlGridItem.GetTop: Integer;
+function THtmlGridItem.GetTop: Single;
 begin
   Result := FTop;
 end;
@@ -531,7 +511,7 @@ begin
   Result := FVisible;
 end;
 
-function THtmlGridItem.GetWidth: Integer;
+function THtmlGridItem.GetWidth: Single;
 begin
   Result := FWidth;
 end;
@@ -541,7 +521,7 @@ begin
 
 end;
 
-procedure THtmlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
+procedure THtmlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Single);
 begin
   FLeft := ALeft;
   FTop := ATop;
@@ -550,7 +530,7 @@ begin
   AfterSetBounds;
 end;
 
-procedure THtmlGridItem.SetHeight(AValue: Integer);
+procedure THtmlGridItem.SetHeight(AValue: Single);
 begin
   FHeight := AValue;
 end;
@@ -565,25 +545,10 @@ begin
   FVisible := AValue;
 end;
 
-procedure THtmlGridItem.SetWidth(AValue: Integer);
+procedure THtmlGridItem.SetWidth(AValue: Single);
 begin
   FWidth := AValue;
 end;
 
-{ THtmlGridItemRenderer }
-
-{
-constructor THtmlGridItemRenderer.Create(AGridRenderer: IHtmlGridRenderer;
-  AGridItem: THtmlGridItem);
-begin
-  FGridRenderer := AGridRenderer;
-  FGridItem := AGridItem;
-end;
-
-procedure THtmlGridItemRenderer.Render;
-begin
-  FGridItem.Redraw;
-end;
-}
 end.
 

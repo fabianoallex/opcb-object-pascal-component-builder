@@ -27,19 +27,19 @@ type
     function EnableAutoFreeOnDone: TGridLayoutBuilder;
     function DisableAutoFreeOnDone: TGridLayoutBuilder;
     function WithDimensions(ARows, AColumns: Integer): TGridLayoutBuilder;
-    function WithTopLeft(ATop, ALeft: Integer): TGridLayoutBuilder;
-    function WithColumnsWidth(AWidth: Integer): TGridLayoutBuilder; overload;
-    function WithColumnsWidth(AColsIndex: array of Integer; AWidth: Integer): TGridLayoutBuilder; overload;
-    function WithRowAndColSizes(AHeight, AWidth: Integer): TGridLayoutBuilder;
-    function WithRowsHeight(AHeight: Integer): TGridLayoutBuilder; overload;
-    function WithRowsHeight(ARowsIndex: array of Integer; AHeight: Integer): TGridLayoutBuilder; overload;
-    function WithRowAndColumnSizes(AHight, AWidth: Integer): TGridLayoutBuilder;
-    function WithHorizontalSpacings(ASpacing: Integer): TGridLayoutBuilder;
-    function WithVerticalSpacings(ASpacing: Integer): TGridLayoutBuilder;
-    function WithSpacings(ASpacing: Integer): TGridLayoutBuilder; overload;
-    function WithSpacings(AHSpacing, AVSpacing: Integer): TGridLayoutBuilder; overload;
-    function WithMargins(ATop, ARight, ABottom, ALeft: Integer): TGridLayoutBuilder; overload;
-    function WithMargins(AAll: Integer): TGridLayoutBuilder; overload;
+    function WithTopLeft(ATop, ALeft: Single): TGridLayoutBuilder;
+    function WithColumnsWidth(AWidth: Single): TGridLayoutBuilder; overload;
+    function WithColumnsWidth(AColsIndex: array of Integer; AWidth: Single): TGridLayoutBuilder; overload;
+    function WithRowAndColSizes(AHeight, AWidth: Single): TGridLayoutBuilder;
+    function WithRowsHeight(AHeight: Single): TGridLayoutBuilder; overload;
+    function WithRowsHeight(ARowsIndex: array of Integer; AHeight: Single): TGridLayoutBuilder; overload;
+    function WithRowAndColumnSizes(AHight, AWidth: Single): TGridLayoutBuilder;
+    function WithHorizontalSpacings(ASpacing: Single): TGridLayoutBuilder;
+    function WithVerticalSpacings(ASpacing: Single): TGridLayoutBuilder;
+    function WithSpacings(ASpacing: Single): TGridLayoutBuilder; overload;
+    function WithSpacings(AHSpacing, AVSpacing: Single): TGridLayoutBuilder; overload;
+    function WithMargins(ATop, ARight, ABottom, ALeft: Single): TGridLayoutBuilder; overload;
+    function WithMargins(AAll: Single): TGridLayoutBuilder; overload;
     function AddItem(AItem: IGridItem; ASettings: TGridCellSettings): TGridLayoutBuilder; overload;
     function UsingFiller(AFillerType: TFillerType): TGridLayoutBuilder; overload;
     function AddItem(AItem: IGridItem): TGridLayoutBuilder; overload;
@@ -95,7 +95,7 @@ begin
   Result := Self;
 end;
 
-function TGridLayoutBuilder.WithTopLeft(ATop, ALeft: Integer
+function TGridLayoutBuilder.WithTopLeft(ATop, ALeft: Single
   ): TGridLayoutBuilder;
 begin
   Result := Self;
@@ -103,7 +103,7 @@ begin
   FGridLayout.Left := ALeft;
 end;
 
-function TGridLayoutBuilder.WithColumnsWidth(AWidth: Integer
+function TGridLayoutBuilder.WithColumnsWidth(AWidth: Single
   ): TGridLayoutBuilder;
 begin
   Result := Self;
@@ -111,7 +111,7 @@ begin
 end;
 
 function TGridLayoutBuilder.WithColumnsWidth(AColsIndex: array of Integer;
-  AWidth: Integer): TGridLayoutBuilder;
+  AWidth: Single): TGridLayoutBuilder;
 var
   I: Integer;
 begin
@@ -120,7 +120,7 @@ begin
     FGridLayout.ColumnWidth[AColsIndex[I]] := AWidth;
 end;
 
-function TGridLayoutBuilder.WithRowAndColSizes(AHeight, AWidth: Integer
+function TGridLayoutBuilder.WithRowAndColSizes(AHeight, AWidth: Single
   ): TGridLayoutBuilder;
 begin
   Result := Self;
@@ -128,7 +128,7 @@ begin
   FGridLayout.ColumnWidths := AWidth;
 end;
 
-function TGridLayoutBuilder.WithRowsHeight(AHeight: Integer
+function TGridLayoutBuilder.WithRowsHeight(AHeight: Single
   ): TGridLayoutBuilder;
 begin
   Result := Self;
@@ -136,7 +136,7 @@ begin
 end;
 
 function TGridLayoutBuilder.WithRowsHeight(ARowsIndex: array of Integer;
-  AHeight: Integer): TGridLayoutBuilder;
+  AHeight: Single): TGridLayoutBuilder;
 var
   I: Integer;
 begin
@@ -145,7 +145,7 @@ begin
     FGridLayout.RowHeight[ARowsIndex[I]] := AHeight;
 end;
 
-function TGridLayoutBuilder.WithRowAndColumnSizes(AHight, AWidth: Integer
+function TGridLayoutBuilder.WithRowAndColumnSizes(AHight, AWidth: Single
   ): TGridLayoutBuilder;
 begin
   FGridLayout.RowHeights := AHight;
@@ -153,35 +153,35 @@ begin
   Result := Self;
 end;
 
-function TGridLayoutBuilder.WithHorizontalSpacings(ASpacing: Integer
+function TGridLayoutBuilder.WithHorizontalSpacings(ASpacing: Single
   ): TGridLayoutBuilder;
 begin
   FGridLayout.HorizontalSpacings := ASpacing;
   Result := Self;
 end;
 
-function TGridLayoutBuilder.WithVerticalSpacings(ASpacing: Integer
+function TGridLayoutBuilder.WithVerticalSpacings(ASpacing: Single
   ): TGridLayoutBuilder;
 begin
   FGridLayout.VerticalSpacings := ASpacing;
   Result := Self;
 end;
 
-function TGridLayoutBuilder.WithSpacings(ASpacing: Integer): TGridLayoutBuilder;
+function TGridLayoutBuilder.WithSpacings(ASpacing: Single): TGridLayoutBuilder;
 begin
   FGridLayout.VerticalSpacings := ASpacing;
   FGridLayout.HorizontalSpacings := ASpacing;
   Result := Self;
 end;
 
-function TGridLayoutBuilder.WithSpacings(AHSpacing, AVSpacing: Integer): TGridLayoutBuilder;
+function TGridLayoutBuilder.WithSpacings(AHSpacing, AVSpacing: Single): TGridLayoutBuilder;
 begin
   FGridLayout.HorizontalSpacings := AHSpacing;
   FGridLayout.VerticalSpacings := AVSpacing;
   Result := Self;
 end;
 
-function TGridLayoutBuilder.WithMargins(ATop, ARight, ABottom, ALeft: Integer
+function TGridLayoutBuilder.WithMargins(ATop, ARight, ABottom, ALeft: Single
   ): TGridLayoutBuilder;
 begin
   FGridLayout.Margins.Top := ATop;
@@ -191,7 +191,7 @@ begin
   Result := Self;
 end;
 
-function TGridLayoutBuilder.WithMargins(AAll: Integer): TGridLayoutBuilder;
+function TGridLayoutBuilder.WithMargins(AAll: Single): TGridLayoutBuilder;
 begin
   FGridLayout.Margins.All := AAll;
   Result := Self;

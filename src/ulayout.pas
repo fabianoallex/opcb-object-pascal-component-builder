@@ -15,13 +15,13 @@ type
     ['{7A972D12-00D4-4113-96C3-880C95E3FCD1}']
     function GetVisible: Boolean;
     procedure SetVisible(AValue: Boolean);
-    function GetWidth: Integer;
-    procedure SetWidth(AValue: Integer);
-    function GetHeight: Integer;
-    procedure SetHeight(AValue: Integer);
-    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
-    function GetLeft: Integer;
-    function GetTop: Integer;
+    function GetWidth: Single;
+    procedure SetWidth(AValue: Single);
+    function GetHeight: Single;
+    procedure SetHeight(AValue: Single);
+    procedure SetBounds(ALeft, ATop, AWidth, AHeight: Single);
+    function GetLeft: Single;
+    function GetTop: Single;
     procedure Redraw;
   end;
 
@@ -29,24 +29,24 @@ type
 
   { TOptionalInt }
 
-  TOptionalInt = record
+  TOptionalSingle = record
     HasValue: Boolean;
-    Value: Integer;
+    Value: Single;
     {$IFDEF FPC}
-    class operator :=(AValue: Integer): TOptionalInt;
+    class operator :=(AValue: Single): TOptionalSingle;
     {$ELSE}
-    class operator Implicit(AValue: Integer): TOptionalInt;
+    class operator Implicit(AValue: Single): TOptionalSingle;
     {$ENDIF}
-    class function Some(AValue: Integer): TOptionalInt; static;
-    class function None: TOptionalInt; static;
+    class function Some(AValue: Single): TOptionalSingle; static;
+    class function None: TOptionalSingle; static;
   end;
 
   { TGridTrackInfo}
 
-  TGridTrackInfo = record      // col      | row
-    Size: TOptionalInt;        // width    | hight
-    Spacing: TOptionalInt;     // vertical | horizontal
-    Shift: TOptionalInt;       // vertical | horizontal
+  TGridTrackInfo = record
+    Size: TOptionalSingle;
+    Spacing: TOptionalSingle;
+    Shift: TOptionalSingle;
     Hidden: Boolean;
     class function Default: TGridTrackInfo; static;
   end;
@@ -55,28 +55,28 @@ type
 
   TMargins = class
   private
-    FBottom: Integer;
-    FLeft: Integer;
+    FBottom: Single;
+    FLeft: Single;
     FOnChange: TNotifyEvent;
-    FRight: Integer;
-    FTop: Integer;
+    FRight: Single;
+    FTop: Single;
     procedure DoChange;
-    procedure SetAll(AValue: Integer);
-    procedure SetBottom(AValue: Integer);
-    procedure SetLeft(AValue: Integer);
+    procedure SetAll(AValue: Single);
+    procedure SetBottom(AValue: Single);
+    procedure SetLeft(AValue: Single);
     procedure SetOnChange(AValue: TNotifyEvent);
-    procedure SetRight(AValue: Integer);
-    procedure SetTop(AValue: Integer);
+    procedure SetRight(AValue: Single);
+    procedure SetTop(AValue: Single);
   public
-    constructor Create(ATop, ARight, ABottom, ALeft: Integer); overload;
+    constructor Create(ATop, ARight, ABottom, ALeft: Single); overload;
     constructor Create; overload;
-    constructor Create(const AMargin: Integer); overload;
-    constructor Create(ATopBottom, ALeftRight: Integer); overload;
-    property Top: Integer read FTop write SetTop;
-    property Right: Integer read FRight write SetRight;
-    property Bottom: Integer read FBottom write SetBottom;
-    property Left: Integer read FLeft write SetLeft;
-    property All: Integer write SetAll;
+    constructor Create(const AMargin: Single); overload;
+    constructor Create(ATopBottom, ALeftRight: Single); overload;
+    property Top: Single read FTop write SetTop;
+    property Right: Single read FRight write SetRight;
+    property Bottom: Single read FBottom write SetBottom;
+    property Left: Single read FLeft write SetLeft;
+    property All: Single write SetAll;
     property OnChange: TNotifyEvent read FOnChange write SetOnChange;
   end;
 
@@ -112,11 +112,11 @@ type
   private
     FColSpan: Integer;
     FColumn: Integer;
-    FExtraHeight: Integer;
-    FExtraWidth: Integer;
+    FExtraHeight: Single;
+    FExtraWidth: Single;
     FHorizontalAlignment: TItemAlignment;
-    FOffsetX: Integer;
-    FOffsetY: Integer;
+    FOffsetX: Single;
+    FOffsetY: Single;
     FRow: Integer;
     FRowSpan: Integer;
     FVerticalAlignment: TItemAlignment;
@@ -127,8 +127,8 @@ type
     function WithColumn(AColum: Integer): TGridCellSettings;
     function WithRowSpan(ARowSpan: Integer): TGridCellSettings;
     function WithColumnSpan(AColSpan: Integer): TGridCellSettings;
-    function WithOffsetX(AOffsetX: Integer): TGridCellSettings;
-    function WithOffsetY(AOffsetY: Integer): TGridCellSettings;
+    function WithOffsetX(AOffsetX: Single): TGridCellSettings;
+    function WithOffsetY(AOffsetY: Single): TGridCellSettings;
     function WithHorizontalAlignment(AHorizontalAlignment: TItemAlignment): TGridCellSettings;
     function WithVerticalAlignment(AVerticalAlignment: TItemAlignment): TGridCellSettings;
     function WithAlignment(AHorizontalAlignment: TItemAlignment;
@@ -139,27 +139,27 @@ type
     property Column: Integer read FColumn;
     property ColSpan: Integer read FColSpan;
     property RowSpan: Integer read FRowSpan;
-    property OffsetX: Integer read FOffsetX;
-    property OffsetY: Integer read FOffsetY;
+    property OffsetX: Single read FOffsetX;
+    property OffsetY: Single read FOffsetY;
     property HorizontalAlignment: TItemAlignment read FHorizontalAlignment;
     property VerticalAlignment: TItemAlignment read FVerticalAlignment;
-    property ExtraWidth: Integer read FExtraWidth;
-    property ExtraHeight: Integer read FExtraHeight;
+    property ExtraWidth: Single read FExtraWidth;
+    property ExtraHeight: Single read FExtraHeight;
   end;
 
   { TGridCell }
 
   TGridCell = class
   private
-    FExtraHeight: Integer;
-    FExtraWidth: Integer;
+    FExtraHeight: Single;
+    FExtraWidth: Single;
     FItem: IGridItem;
     FRow: Integer;
     FColumn: Integer;
     FRowSpan: Integer;
     FColSpan: Integer;
-    FOffsetX: Integer;
-    FOffsetY: Integer;
+    FOffsetX: Single;
+    FOffsetY: Single;
     FHorizontalAlignment: TItemAlignment;
     FVerticalAlignment: TItemAlignment;
   public
@@ -170,10 +170,10 @@ type
     property Column: Integer read FColumn;
     property RowSpan: Integer read FRowSpan;
     property ColSpan: Integer read FColSpan;
-    property OffsetX: Integer read FOffsetX write FOffsetX;
-    property OffsetY: Integer read FOffsetY write FOffsetY;
-    property ExtraWidth: Integer read FExtraWidth write FExtraWidth;
-    property ExtraHeight: Integer read FExtraHeight write FExtraWidth;
+    property OffsetX: Single read FOffsetX write FOffsetX;
+    property OffsetY: Single read FOffsetY write FOffsetY;
+    property ExtraWidth: Single read FExtraWidth write FExtraWidth;
+    property ExtraHeight: Single read FExtraHeight write FExtraWidth;
     property HorizontalAlignment: TItemAlignment read FHorizontalAlignment write FHorizontalAlignment;
     property VerticalAlignment: TItemAlignment read FVerticalAlignment write FVerticalAlignment;
   end;
@@ -242,16 +242,16 @@ type
   { TGridTrackInfoDictionary }
 
   TGridTrackInfoDictionary = class({$IFDEF FPC}specialize{$ENDIF} TIntegerKeyDictionary<TGridTrackInfo>)
-    function GetSizeOrDefault(Index: Integer; const ADefault: Integer): Integer;
-    procedure SetSize(AIndex: Integer; ASize: Integer);
+    function GetSizeOrDefault(Index: Integer; const ADefault: Single): Single;
+    procedure SetSize(AIndex: Integer; ASize: Single);
     function IsSizeDefined(AIndex: Integer): Boolean;
     procedure ClearSizes;
-    function GetSpacingOrDefault(Index: Integer; const ADefault: Integer): Integer;
-    procedure SetSpacing(AIndex: Integer; ASpacing: Integer);
+    function GetSpacingOrDefault(Index: Integer; const ADefault: Single): Single;
+    procedure SetSpacing(AIndex: Integer; ASpacing: Single);
     function IsSpacingDefined(AIndex: Integer): Boolean;
     procedure ClearSpacings;
-    function GetShiftOrDefault(Index: Integer; const ADefault: Integer): Integer;
-    procedure SetShift(AIndex: Integer; AShift: Integer);
+    function GetShiftOrDefault(Index: Integer; const ADefault: Single): Single;
+    procedure SetShift(AIndex: Integer; AShift: Single);
     function IsShiftDefined(AIndex: Integer): Boolean;
     procedure ClearShifts;
     function GetHidden(Index: Integer): Boolean;
@@ -264,42 +264,42 @@ type
 
   TGridLayout = class
   private
-    FLeft: Integer;
+    FLeft: Single;
     FMargins: TMargins;
     FRows: Integer;
     FColumns: Integer;
-    FTop: Integer;
-    FVerticalSpacings: Integer;
-    FHorizontalSpacings: Integer;
-    FRowHeights: Integer;
-    FColumnWidths: Integer;
+    FTop: Single;
+    FVerticalSpacings: Single;
+    FHorizontalSpacings: Single;
+    FRowHeights: Single;
+    FColumnWidths: Single;
     FCells: TGridCellList;
     FRowsInfo: TGridTrackInfoDictionary;
     FColumnsInfo: TGridTrackInfoDictionary;
     FListeners: TInterfaceList;
-    function CalculateCellWidth(Cell: TGridCell): Integer;
-    function CalculateCellHeight(Cell: TGridCell): Integer;
-    function CalculateCellLeft(Cell: TGridCell): Integer;
-    function CalculateCellTop(Cell: TGridCell): Integer;
+    function CalculateCellWidth(Cell: TGridCell): Single;
+    function CalculateCellHeight(Cell: TGridCell): Single;
+    function CalculateCellLeft(Cell: TGridCell): Single;
+    function CalculateCellTop(Cell: TGridCell): Single;
     function CreateDefaultSettings(ARow, AColumn: Integer): TGridCellSettings;
-    function GetColumnShift(ACol: Integer): Integer;
-    function GetContentHeight: Integer;
-    function GetContentWidth: Integer;
-    function GetHorizontalSpacing(AIndex: Integer): Integer;
-    function GetRowHeight(AIndex: Integer): Integer;
-    function GetRowShift(ARow: Integer): Integer;
-    function GetVerticalSpacing(ARow: Integer): Integer;
+    function GetColumnShift(ACol: Integer): Single;
+    function GetContentHeight: Single;
+    function GetContentWidth: Single;
+    function GetHorizontalSpacing(AIndex: Integer): Single;
+    function GetRowHeight(AIndex: Integer): Single;
+    function GetRowShift(ARow: Integer): Single;
+    function GetVerticalSpacing(ARow: Integer): Single;
     function GetVisibleColumn(ACol: Integer): Boolean;
     function GetVisibleRow(ARow: Integer): Boolean;
-    procedure SetColumnShift(ACol: Integer; AValue: Integer);
-    procedure SetHorizontalSpacing(ACol: Integer; AValue: Integer);
-    procedure SetLeft(AValue: Integer);
-    procedure SetRowHeight(AIndex: Integer; AValue: Integer);
-    function GetColumnWidth(AIndex: Integer): Integer;
-    procedure SetColumnWidth(AIndex: Integer; AValue: Integer);
-    procedure SetRowShift(ARow: Integer; AValue: Integer);
-    procedure SetTop(AValue: Integer);
-    procedure SetVerticalSpacing(ARow: Integer; AValue: Integer);
+    procedure SetColumnShift(ACol: Integer; AValue: Single);
+    procedure SetHorizontalSpacing(ACol: Integer; AValue: Single);
+    procedure SetLeft(AValue: Single);
+    procedure SetRowHeight(AIndex: Integer; AValue: Single);
+    function GetColumnWidth(AIndex: Integer): Single;
+    procedure SetColumnWidth(AIndex: Integer; AValue: Single);
+    procedure SetRowShift(ARow: Integer; AValue: Single);
+    procedure SetTop(AValue: Single);
+    procedure SetVerticalSpacing(ARow: Integer; AValue: Single);
     procedure SetVisibleColumn(ACol: Integer; AValue: Boolean);
     procedure SetVisibleRow(ARow: Integer; AValue: Boolean);
   public
@@ -337,23 +337,23 @@ type
     procedure NotifyLayoutChange;
     property Rows: Integer read FRows write FRows;
     property Columns: Integer read FColumns write FColumns;
-    property VerticalSpacings: Integer read FVerticalSpacings write FVerticalSpacings;
-    property HorizontalSpacings: Integer read FHorizontalSpacings write FHorizontalSpacings;
-    property RowHeights: Integer read FRowHeights write FRowHeights;
-    property ColumnWidths: Integer read FColumnWidths write FColumnWidths;
-    property RowHeight[Index: Integer]: Integer read GetRowHeight write SetRowHeight;
-    property ColumnWidth[Index: Integer]: Integer read GetColumnWidth write SetColumnWidth;
-    property VerticalSpacing[Index: Integer]: Integer read GetVerticalSpacing write SetVerticalSpacing;
-    property HorizontalSpacing[Index: Integer]: Integer read GetHorizontalSpacing write SetHorizontalSpacing;
-    property RowShift[Index: Integer]: Integer read GetRowShift write SetRowShift;
-    property ColumnShift[Index: Integer]: Integer read GetColumnShift write SetColumnShift;
+    property VerticalSpacings: Single read FVerticalSpacings write FVerticalSpacings;
+    property HorizontalSpacings: Single read FHorizontalSpacings write FHorizontalSpacings;
+    property RowHeights: Single read FRowHeights write FRowHeights;
+    property ColumnWidths: Single read FColumnWidths write FColumnWidths;
+    property RowHeight[Index: Integer]: Single read GetRowHeight write SetRowHeight;
+    property ColumnWidth[Index: Integer]: Single read GetColumnWidth write SetColumnWidth;
+    property VerticalSpacing[Index: Integer]: Single read GetVerticalSpacing write SetVerticalSpacing;
+    property HorizontalSpacing[Index: Integer]: Single read GetHorizontalSpacing write SetHorizontalSpacing;
+    property RowShift[Index: Integer]: Single read GetRowShift write SetRowShift;
+    property ColumnShift[Index: Integer]: Single read GetColumnShift write SetColumnShift;
     property VisibleRow[Index: Integer]: Boolean read GetVisibleRow write SetVisibleRow;
     property VisibleColumn[Index: Integer]: Boolean read GetVisibleColumn write SetVisibleColumn;
     property Margins: TMargins read FMargins;
-    property ContentWidth: Integer read GetContentWidth;
-    property ContentHeight: Integer read GetContentHeight;
-    property Top: Integer read FTop write SetTop;
-    property Left: Integer read FLeft write SetLeft;
+    property ContentWidth: Single read GetContentWidth;
+    property ContentHeight: Single read GetContentHeight;
+    property Top: Single read FTop write SetTop;
+    property Left: Single read FLeft write SetLeft;
   end;
 
   TGridLayoutCompositeOrientation = (gcoHorizontal, gcoVertical);
@@ -384,8 +384,8 @@ type
     FSpacing: TIntIntDictionary;
     FTail: TGridLayoutNode;
     function ContainsGrid(AGrid: TGridLayout): Boolean;
-    function GetContentHeight: Integer;
-    function GetContentWidth: Integer;
+    function GetContentHeight: Single;
+    function GetContentWidth: Single;
     function GetSpacing(AIndex: Integer): Integer;
     procedure SetSpacing(AIndex: Integer; AValue: Integer);
     procedure SetDefaultSpacing(AValue: Integer);
@@ -403,8 +403,8 @@ type
     function GetGridIndex(AGrid: TGridLayout): Integer;
     property DefaultSpacing: Integer read FDefaultSpacing write SetDefaultSpacing;
     property Spacing[Index: Integer]: Integer read GetSpacing write SetSpacing;
-    property ContentWidth: Integer read GetContentWidth;
-    property ContentHeight: Integer read GetContentHeight;
+    property ContentWidth: Single read GetContentWidth;
+    property ContentHeight: Single read GetContentHeight;
   end;
 
 implementation
@@ -433,21 +433,21 @@ end;
 
 { TOptionalInt }
 {$IFDEF FPC}
-class operator TOptionalInt.:=(AValue: Integer): TOptionalInt;
+class operator TOptionalSingle.:=(AValue: Single): TOptionalSingle;
 {$ELSE}
-class operator TOptionalInt.Implicit(AValue: Integer): TOptionalInt;
+class operator TOptionalSingle.Implicit(AValue: Single): TOptionalSingle;
 {$ENDIF}
 begin
-  Result := TOptionalInt.Some(AValue);
+  Result := TOptionalSingle.Some(AValue);
 end;
 
-class function TOptionalInt.Some(AValue: Integer): TOptionalInt;
+class function TOptionalSingle.Some(AValue: Single): TOptionalSingle;
 begin
   Result.HasValue := True;
   Result.Value := AValue;
 end;
 
-class function TOptionalInt.None: TOptionalInt;
+class function TOptionalSingle.None: TOptionalSingle;
 begin
   Result.Value := -1;
   Result.HasValue := False;
@@ -457,9 +457,9 @@ end;
 
 class function TGridTrackInfo.Default: TGridTrackInfo;
 begin
-  Result.Size := TOptionalInt.None;
-  Result.Shift := TOptionalInt.None;
-  Result.Spacing := TOptionalInt.None;
+  Result.Size := TOptionalSingle.None;
+  Result.Shift := TOptionalSingle.None;
+  Result.Spacing := TOptionalSingle.None;
   Result.Hidden := False;
 end;
 
@@ -471,7 +471,7 @@ begin
     FOnChange(Self);
 end;
 
-procedure TMargins.SetAll(AValue: Integer);
+procedure TMargins.SetAll(AValue: Single);
 begin
   FTop := AValue;
   FRight := AValue;
@@ -479,14 +479,14 @@ begin
   FLeft := AValue;
 end;
 
-procedure TMargins.SetBottom(AValue: Integer);
+procedure TMargins.SetBottom(AValue: Single);
 begin
   if FBottom = AValue then
     Exit;
   FBottom := AValue;
 end;
 
-procedure TMargins.SetLeft(AValue: Integer);
+procedure TMargins.SetLeft(AValue: Single);
 begin
   if FLeft = AValue then
     Exit;
@@ -498,21 +498,21 @@ begin
   FOnChange := AValue;
 end;
 
-procedure TMargins.SetRight(AValue: Integer);
+procedure TMargins.SetRight(AValue: Single);
 begin
   if FRight = AValue then
     Exit;
   FRight := AValue;
 end;
 
-procedure TMargins.SetTop(AValue: Integer);
+procedure TMargins.SetTop(AValue: Single);
 begin
   if FTop = AValue then
     Exit;
   FTop := AValue;
 end;
 
-constructor TMargins.Create(ATop, ARight, ABottom, ALeft: Integer);
+constructor TMargins.Create(ATop, ARight, ABottom, ALeft: Single);
 begin
   inherited Create;
   FTop := ATop;
@@ -526,12 +526,12 @@ begin
   Create(0, 0, 0, 0);
 end;
 
-constructor TMargins.Create(const AMargin: Integer);
+constructor TMargins.Create(const AMargin: Single);
 begin
   Create(AMargin, AMargin, AMargin, AMargin);
 end;
 
-constructor TMargins.Create(ATopBottom, ALeftRight: Integer);
+constructor TMargins.Create(ATopBottom, ALeftRight: Single);
 begin
   Create(ATopBottom, ALeftRight, ATopBottom, ALeftRight);
 end;
@@ -610,13 +610,13 @@ begin
   Result := Self;
 end;
 
-function TGridCellSettings.WithOffsetX(AOffsetX: Integer): TGridCellSettings;
+function TGridCellSettings.WithOffsetX(AOffsetX: Single): TGridCellSettings;
 begin
   FOffsetX := AOffsetX;
   Result := Self;
 end;
 
-function TGridCellSettings.WithOffsetY(AOffsetY: Integer): TGridCellSettings;
+function TGridCellSettings.WithOffsetY(AOffsetY: Single): TGridCellSettings;
 begin
   FOffsetY := AOffsetY;
   Result := Self;
@@ -702,12 +702,12 @@ begin
   Result.WithVerticalAlignment(laStretch);
 end;
 
-function TGridLayout.GetColumnShift(ACol: Integer): Integer;
+function TGridLayout.GetColumnShift(ACol: Integer): Single;
 begin
   Result := FColumnsInfo.GetShiftOrDefault(ACol, 0);
 end;
 
-function TGridLayout.GetContentHeight: Integer;
+function TGridLayout.GetContentHeight: Single;
 var
   I: Integer;
 begin
@@ -721,7 +721,7 @@ begin
       Result := Result + GetVerticalSpacing(I);
 end;
 
-function TGridLayout.GetContentWidth: Integer;
+function TGridLayout.GetContentWidth: Single;
 var
   I: Integer;
 begin
@@ -736,7 +736,7 @@ begin
       Result := Result + GetHorizontalSpacing(I);
 end;
 
-function TGridLayout.GetHorizontalSpacing(AIndex: Integer): Integer;
+function TGridLayout.GetHorizontalSpacing(AIndex: Integer): Single;
 begin
   Result := FColumnsInfo.GetSpacingOrDefault(AIndex, FHorizontalSpacings);
 end;
@@ -858,17 +858,17 @@ begin
   FColumnsInfo.InsertTrackAt(AColumn);
 end;
 
-function TGridLayout.GetRowHeight(AIndex: Integer): Integer;
+function TGridLayout.GetRowHeight(AIndex: Integer): Single;
 begin
   Result := FRowsInfo.GetSizeOrDefault(AIndex, FRowHeights);
 end;
 
-function TGridLayout.GetRowShift(ARow: Integer): Integer;
+function TGridLayout.GetRowShift(ARow: Integer): Single;
 begin
   Result := FRowsInfo.GetShiftOrDefault(ARow, 0);
 end;
 
-function TGridLayout.GetVerticalSpacing(ARow: Integer): Integer;
+function TGridLayout.GetVerticalSpacing(ARow: Integer): Single;
 begin
   Result := FRowsInfo.GetSpacingOrDefault(ARow, FVerticalSpacings);
 end;
@@ -889,50 +889,50 @@ begin
     Result := not FRowsInfo.GetHidden(ARow);
 end;
 
-procedure TGridLayout.SetColumnShift(ACol: Integer; AValue: Integer);
+procedure TGridLayout.SetColumnShift(ACol: Integer; AValue: Single);
 begin
   FColumnsInfo.SetShift(ACol, AValue);
 end;
 
-procedure TGridLayout.SetHorizontalSpacing(ACol: Integer; AValue: Integer);
+procedure TGridLayout.SetHorizontalSpacing(ACol: Integer; AValue: Single);
 begin
   FColumnsInfo.SetSpacing(ACol, AValue);
 end;
 
-procedure TGridLayout.SetLeft(AValue: Integer);
+procedure TGridLayout.SetLeft(AValue: Single);
 begin
   if FLeft = AValue then
     Exit;
   FLeft := AValue;
 end;
 
-procedure TGridLayout.SetRowHeight(AIndex: Integer; AValue: Integer);
+procedure TGridLayout.SetRowHeight(AIndex: Integer; AValue: Single);
 begin
   FRowsInfo.SetSize(AIndex, AValue);
 end;
 
-function TGridLayout.GetColumnWidth(AIndex: Integer): Integer;
+function TGridLayout.GetColumnWidth(AIndex: Integer): Single;
 begin
   Result := FColumnsInfo.GetSizeOrDefault(AIndex, FColumnWidths);
 end;
 
-procedure TGridLayout.SetColumnWidth(AIndex: Integer; AValue: Integer);
+procedure TGridLayout.SetColumnWidth(AIndex: Integer; AValue: Single);
 begin
   FColumnsInfo.SetSize(AIndex, AValue);
 end;
 
-procedure TGridLayout.SetRowShift(ARow: Integer; AValue: Integer);
+procedure TGridLayout.SetRowShift(ARow: Integer; AValue: Single);
 begin
   FRowsInfo.SetShift(ARow, AValue);
 end;
 
-procedure TGridLayout.SetTop(AValue: Integer);
+procedure TGridLayout.SetTop(AValue: Single);
 begin
   if FTop = AValue then Exit;
   FTop := AValue;
 end;
 
-procedure TGridLayout.SetVerticalSpacing(ARow: Integer; AValue: Integer);
+procedure TGridLayout.SetVerticalSpacing(ARow: Integer; AValue: Single);
 begin
   FRowsInfo.SetSpacing(ARow, AValue);
 end;
@@ -981,7 +981,7 @@ begin
     IGridLayoutListener(FListeners[I]).LayoutChanged(Self);
 end;
 
-function TGridLayout.CalculateCellLeft(Cell: TGridCell): Integer;
+function TGridLayout.CalculateCellLeft(Cell: TGridCell): Single;
 var
   I: Integer;
 begin
@@ -993,7 +993,7 @@ begin
         + GetHorizontalSpacing(I);
 end;
 
-function TGridLayout.CalculateCellHeight(Cell: TGridCell): Integer;
+function TGridLayout.CalculateCellHeight(Cell: TGridCell): Single;
 
   function GetLastVisibleRow: Integer;
   var
@@ -1005,7 +1005,7 @@ function TGridLayout.CalculateCellHeight(Cell: TGridCell): Integer;
         Exit(I);
   end;
 
-  function CalculateTotalSpacings: Integer;
+  function CalculateTotalSpacings: Single;
   var
     I, LastVisibleRow: Integer;
   begin
@@ -1013,10 +1013,10 @@ function TGridLayout.CalculateCellHeight(Cell: TGridCell): Integer;
     LastVisibleRow := GetLastVisibleRow;
     for I := Cell.Row to LastVisibleRow - 1 do
       if VisibleRow[I] then
-        Inc(Result, VerticalSpacing[I]);
+        Result := Result + VerticalSpacing[I]; //Inc(Result, VerticalSpacing[I]);
   end;
 
-  function CalculateTotalHeight: Integer;
+  function CalculateTotalHeight: Single;
   var
     I: Integer;
   begin
@@ -1040,7 +1040,7 @@ begin
     + CalculateTotalSpacings;
 end;
 
-function TGridLayout.CalculateCellWidth(Cell: TGridCell): Integer;
+function TGridLayout.CalculateCellWidth(Cell: TGridCell): Single;
 //     horizontal spacing Index
 //     |               Margin
 //     0   1   2   3   |
@@ -1059,7 +1059,7 @@ function TGridLayout.CalculateCellWidth(Cell: TGridCell): Integer;
         Exit(I);
   end;
 
-  function CalculateTotalSpacings: Integer;
+  function CalculateTotalSpacings: Single;
   var
     I, LastVisibleCol: Integer;
   begin
@@ -1067,10 +1067,10 @@ function TGridLayout.CalculateCellWidth(Cell: TGridCell): Integer;
     LastVisibleCol := GetLastVisibleCol;
     for I := Cell.Column to LastVisibleCol - 1 do
       if VisibleColumn[I] then
-        Inc(Result, HorizontalSpacing[I]);
+        Result := Result + HorizontalSpacing[I]; // Inc(Result, HorizontalSpacing[I]);
   end;
 
-  function CalculateTotalWidth: Integer;
+  function CalculateTotalWidth: Single;
   var
     I: Integer;
   begin
@@ -1094,7 +1094,7 @@ begin
     + CalculateTotalSpacings;
 end;
 
-function TGridLayout.CalculateCellTop(Cell: TGridCell): Integer;
+function TGridLayout.CalculateCellTop(Cell: TGridCell): Single;
 var
   Row, I: Integer;
 begin
@@ -1116,7 +1116,7 @@ end;
 
 function TGridLayout.IsInBottomMargin(Y: Integer): Boolean;
 var
-  BottomStart: Integer;
+  BottomStart: Single;
 begin
   BottomStart := Top + GetContentHeight - Margins.Bottom;
   Result :=
@@ -1143,7 +1143,8 @@ end;
 
 function TGridLayout.IsInVerticalSpacing(X, Y: Integer): Boolean;
 var
-  RowIndex, CurrentY, SpacingHeight: Integer;
+  RowIndex: Integer;
+  CurrentY, SpacingHeight: Single;
 begin
   Result := False;
   CurrentY := Top + Margins.Top;
@@ -1172,7 +1173,8 @@ end;
 
 function TGridLayout.IsInHorizontalSpacing(X, Y: Integer): Boolean;
 var
-  ColIndex, CurrentX, SpacingWidth: Integer;
+  ColIndex: Integer;
+  CurrentX, SpacingWidth: Single;
 begin
   Result := False;
   CurrentX := Left + Margins.Left;
@@ -1203,7 +1205,7 @@ procedure TGridLayout.ArrangeItems(ALeft, ATop: Integer);
 var
   Cell: TGridCell;
   Item: IGridItem;
-  X, Y, W, H: Integer;
+  X, Y, W, H: Single;
 begin
   ApplyCellsVisibility;
 
@@ -1227,7 +1229,7 @@ begin
       laCenter:
         begin
           W := Item.GetWidth;
-          X := X + (CalculateCellWidth(Cell) - W) div 2;
+          X := X + (CalculateCellWidth(Cell) - W) / 2;
         end;
       laStart:
         begin
@@ -1246,7 +1248,7 @@ begin
       laCenter:
         begin
           H := Item.GetHeight;
-          Y := Y + (CalculateCellHeight(Cell) - H) div 2;
+          Y := Y + (CalculateCellHeight(Cell) - H) / 2;
         end;
       laStart:
         begin
@@ -1394,12 +1396,12 @@ begin
   Result := False;
 end;
 
-function TGridLayoutComposite.GetContentHeight: Integer;
+function TGridLayoutComposite.GetContentHeight: Single;
 var
   Node: TGridLayoutNode;
   Index: Integer;
 
-  function CalcSpacing: Integer;
+  function CalcSpacing: Single;
   begin
     Result := 0;
     if Node.Next <> nil then       // o ultimo espaço não conta
@@ -1422,7 +1424,7 @@ begin
   end;
 end;
 
-function TGridLayoutComposite.GetContentWidth: Integer;
+function TGridLayoutComposite.GetContentWidth: Single;
 var
   Node: TGridLayoutNode;
   Index: Integer;
@@ -1699,7 +1701,7 @@ end;
 { TGridTrackInfoDictionary }
 
 function TGridTrackInfoDictionary.GetSizeOrDefault(Index: Integer;
-  const ADefault: Integer): Integer;
+  const ADefault: Single): Single;
 var
   Info: TGridTrackInfo;
 begin
@@ -1710,13 +1712,13 @@ begin
 end;
 
 procedure TGridTrackInfoDictionary.SetSize(AIndex: Integer;
-  ASize: Integer);
+  ASize: Single);
 var
   Info: TGridTrackInfo;
 begin
   if not Self.TryGetValue(AIndex, Info) then
     Info := TGridTrackInfo.Default;
-  Info.Size := TOptionalInt.Some(ASize);
+  Info.Size := TOptionalSingle.Some(ASize);
   Self.AddOrSetValue(AIndex, Info);
 end;
 
@@ -1729,7 +1731,7 @@ begin
   begin
     if Self.TryGetValue(Key, Info) then
     begin
-      Info.Size := TOptionalInt.None;
+      Info.Size := TOptionalSingle.None;
       Self[Key] := Info;
     end;
   end;
@@ -1744,7 +1746,7 @@ begin
 end;
 
 function TGridTrackInfoDictionary.GetSpacingOrDefault
-  (Index: Integer; const ADefault: Integer): Integer;
+  (Index: Integer; const ADefault: Single): Single;
 var
   Info: TGridTrackInfo;
 begin
@@ -1755,13 +1757,13 @@ begin
 end;
 
 procedure TGridTrackInfoDictionary.SetSpacing(AIndex: Integer;
-  ASpacing: Integer);
+  ASpacing: Single);
 var
   Info: TGridTrackInfo;
 begin
   if not Self.TryGetValue(AIndex, Info) then
     Info := TGridTrackInfo.Default;
-  Info.Spacing := TOptionalInt.Some(ASpacing);
+  Info.Spacing := TOptionalSingle.Some(ASpacing);
   Self.AddOrSetValue(AIndex, Info);
 end;
 
@@ -1782,14 +1784,14 @@ begin
   begin
     if Self.TryGetValue(Key, Info) then
     begin
-      Info.Spacing := TOptionalInt.None;
+      Info.Spacing := TOptionalSingle.None;
       Self[Key] := Info;
     end;
   end;
 end;
 
 function TGridTrackInfoDictionary.GetShiftOrDefault
-  (Index: Integer; const ADefault: Integer): Integer;
+  (Index: Integer; const ADefault: Single): Single;
 var
   Info: TGridTrackInfo;
 begin
@@ -1800,13 +1802,13 @@ begin
 end;
 
 procedure TGridTrackInfoDictionary.SetShift(AIndex: Integer;
-  AShift: Integer);
+  AShift: Single);
 var
   Info: TGridTrackInfo;
 begin
   if not Self.TryGetValue(AIndex, Info) then
     Info := TGridTrackInfo.Default;
-  Info.Shift := TOptionalInt.Some(AShift);
+  Info.Shift := TOptionalSingle.Some(AShift);
   Self.AddOrSetValue(AIndex, Info);
 end;
 
@@ -1827,7 +1829,7 @@ begin
   begin
     if Self.TryGetValue(Key, Info) then
     begin
-      Info.Shift := TOptionalInt.None;
+      Info.Shift := TOptionalSingle.None;
       Self[Key] := Info;
     end;
   end;
