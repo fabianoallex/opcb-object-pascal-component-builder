@@ -39,7 +39,6 @@ type
     procedure AfterSetBounds; virtual;
   public
     constructor Create(AControl: TControl);
-    function GetRenderer: IGridItemRenderer;
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     function GetVisible: Boolean;
     procedure SetVisible(AValue: Boolean);
@@ -52,16 +51,6 @@ type
     function IsControlOfType(AClass: TClass): Boolean;
     function GetControl: TControl;
     procedure Redraw;
-  end;
-
-  { TControlGridItemRenderer }
-
-  TControlGridItemRenderer = class(TInterfacedObject, IGridItemRenderer)
-  private
-    FGridItem: IGridItem;
-  public
-    constructor Create(AGridItem: TControlGridItem);
-    procedure Render;
   end;
 
   { TControlInfo }
@@ -170,18 +159,6 @@ uses
     {$ENDIF}
   {$ENDIF} ;
 
-{ TControlGridItemRenderer }
-
-constructor TControlGridItemRenderer.Create(AGridItem: TControlGridItem);
-begin
-  FGridItem := AGridItem;
-end;
-
-procedure TControlGridItemRenderer.Render;
-begin
-
-end;
-
 { TControlGridItem }
 
 procedure TControlGridItem.AfterSetBounds;
@@ -198,7 +175,6 @@ end;
 procedure TControlGridItem.SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
 begin
   FControl.SetBounds(ALeft, ATop, AWidth, AHeight);
-  GetRenderer.Render;
 end;
 
 function TControlGridItem.GetControl: TControl;
@@ -237,11 +213,6 @@ end;
 procedure TControlGridItem.SetWidth(AValue: Integer);
 begin
   FControl.Width := AValue;
-end;
-
-function TControlGridItem.GetRenderer: IGridItemRenderer;
-begin
-  Result := TControlGridItemRenderer.Create(Self);
 end;
 
 function TControlGridItem.GetTop: Integer;

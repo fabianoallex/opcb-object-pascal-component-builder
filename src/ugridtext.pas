@@ -86,7 +86,6 @@ type
   public
     constructor Create(const ARenderer: TTextGridRenderer);
     destructor Destroy; override;
-    function GetRenderer: IGridItemRenderer;
     procedure Redraw;
     function GetHeight: Integer;
     function GetLeft: Integer;
@@ -102,18 +101,6 @@ type
     property HorizontalAlign: TTextAlignHorizontal read FHorizontalAlign write FHorizontalAlign;
     property VerticalAlign: TTextAlignVertical read FVerticalAlign write FVerticalAlign;
     property Renderer: TTextGridRenderer read FRenderer;
-
-  end;
-
-  { TTextGridItemRenderer }
-
-  TTextGridItemRenderer = class(TInterfacedObject, IGridItemRenderer)
-  private
-    FGridRenderer: TTextGridRenderer;
-    FGridItem: TTextGridItem;
-  public
-    constructor Create(AGridRenderer: TTextGridRenderer; AGridItem: TTextGridItem);
-    procedure Render;
   end;
 
 implementation
@@ -410,7 +397,7 @@ begin
   FTop := ATop;
   FWidth := AWidth;
   FHeight := AHeight;
-  GetRenderer.Render;
+  Redraw;
 end;
 
 function TTextGridItem.GetAlignedLines: {$IFDEF FPC}specialize{$ENDIF} TArray<string>;
@@ -422,7 +409,6 @@ begin
   Result := nil;
   SetLength(Result, FHeight);
 
-  // Calcular padding superior (vertical alignment)
   case FVerticalAlign of
     tavTop: PadTop := 0;
     tavMiddle: PadTop := (FHeight - FLines.Count) div 2;
@@ -431,11 +417,9 @@ begin
     PadTop := 0;
   end;
 
-  // Preenche com linhas em branco
   for I := 0 to FHeight - 1 do
     Result[I] := StringOfChar(' ', FWidth);
 
-  // Aplica alinhamento horizontal em cada linha
   for I := 0 to FLines.Count - 1 do
   begin
     if PadTop + I >= FHeight then
@@ -455,7 +439,7 @@ begin
         Line := StringOfChar(' ', FWidth - Length(Line)) + Line;
     end;
 
-    Result[PadTop + I] := Copy(Line, 1, FWidth); // Garante corte se necessário
+    Result[PadTop + I] := Copy(Line, 1, FWidth);
   end;
 end;
 
@@ -490,11 +474,6 @@ begin
   FWidth := AValue;
 end;
 
-function TTextGridItem.GetRenderer: IGridItemRenderer;
-begin
-  Result := TTextGridItemRenderer.Create(Self.FRenderer, Self);
-end;
-
 function TTextGridItem.GetTextLines: TStringList;
 begin
   Result := FLines;
@@ -503,20 +482,6 @@ end;
 function TTextGridItem.GetTop: Integer;
 begin
   Result := FTop;
-end;
-
-{ TTextGridItemRenderer }
-
-constructor TTextGridItemRenderer.Create(AGridRenderer: TTextGridRenderer;
-  AGridItem: TTextGridItem);
-begin
-  FGridRenderer := AGridRenderer;
-  FGridItem := AGridItem;
-end;
-
-procedure TTextGridItemRenderer.Render;
-begin
-  FGridItem.Redraw;
 end;
 
 end.

@@ -11,14 +11,8 @@ uses
   Classes, SysUtils, Generics.Collections, Generics.Defaults;
 
 type
-  IGridItemRenderer = interface
-    ['{D6739A9C-A12E-4D46-A25C-158F77799147}']
-    procedure Render;
-  end;
-
   IGridItem = interface
     ['{7A972D12-00D4-4113-96C3-880C95E3FCD1}']
-    function GetRenderer: IGridItemRenderer;
     function GetVisible: Boolean;
     procedure SetVisible(AValue: Boolean);
     function GetWidth: Integer;

@@ -55,7 +55,7 @@ type
     procedure AfterSetBounds; virtual;
   public
     constructor Create(ARenderer: IHtmlGridRenderer);
-    function GetRenderer: IGridItemRenderer;
+    //function GetRenderer: IGridItemRenderer;
     procedure SetBounds(ALeft, ATop, AWidth, AHeight: Integer);
     function GetHeight: Integer;
     function GetLeft: Integer;
@@ -70,6 +70,7 @@ type
 
   { THtmlGridItemRenderer }
 
+  (*
   THtmlGridItemRenderer = class(TInterfacedObject, IGridItemRenderer)
   private
     FGridRenderer: IHtmlGridRenderer;
@@ -78,6 +79,7 @@ type
     constructor Create(AGridRenderer: IHtmlGridRenderer; AGridItem: THtmlGridItem);
     procedure Render;
   end;
+  *)
 
 implementation
 
@@ -512,10 +514,12 @@ begin
   Result := FLeft;
 end;
 
+{
 function THtmlGridItem.GetRenderer: IGridItemRenderer;
 begin
   Result := THtmlGridItemRenderer.Create(Self.FGridRenderer, Self);
 end;
+}
 
 function THtmlGridItem.GetTop: Integer;
 begin
@@ -568,6 +572,7 @@ end;
 
 { THtmlGridItemRenderer }
 
+{
 constructor THtmlGridItemRenderer.Create(AGridRenderer: IHtmlGridRenderer;
   AGridItem: THtmlGridItem);
 begin
@@ -579,6 +584,6 @@ procedure THtmlGridItemRenderer.Render;
 begin
   FGridItem.Redraw;
 end;
-
+}
 end.
 

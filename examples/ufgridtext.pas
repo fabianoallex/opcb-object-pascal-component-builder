@@ -34,9 +34,7 @@ type
   private
     procedure GerarRelatorioVenda;
     procedure GerarRelatorioVendaHtml(ARenderer: IHtmlGridRenderer);
-
   public
-
   end;
 
 var
@@ -51,7 +49,6 @@ uses
 
 { TFGridText }
 
-
 procedure TFGridText.GerarRelatorioVenda;
 const
   COL_DESC = 0;
@@ -65,7 +62,6 @@ var
   Renderer: TTextGridRenderer;
   I, Row: Integer;
   Item: TVendaItem;
-  // TextElement: TTextVisualElement;
   TextGridItem: TTextGridItem;
   Items: array of TVendaItem;
   TotalGeral: Double;
@@ -113,7 +109,6 @@ begin
   Items[3].ValorUnitario := 10.90;
   Items[3].Quantidade := 1;
 
-
   Renderer := TTextGridRenderer.Create; // (Grid);
   Composite := TGridLayoutComposite.Create(gcoVertical);
   Grid := TGridLayout.Create;
@@ -160,10 +155,6 @@ begin
     TextGridItem.HorizontalAlign := tahRight;
     TextGridItem.VerticalAlign := tavMiddle;
 
-    {TextElement := TTextVisualElement.Create(Renderer);
-    TextElement.SetText('Total Geral  ');
-    TextElement.HorizontalAlign := tahRight;
-    TextElement.VerticalAlign := tavMiddle;}
     Grid.AddItem(
       TextGridItem,
       TGridCellSettings.Create(Row+1, 0)
@@ -304,12 +295,8 @@ begin
     Grid.VerticalSpacings := 5;
     Grid.VerticalSpacing[0] := 10;
     Grid.VerticalSpacing[Length(Items)] := 8;  // ultimo item
-
     Grid.HorizontalSpacing[2] := 50;
-
     Grid.Margins.All := 5;
-
-    //GerarRelatorioVendaHtml(THtmlDivGridRenderer.Create);
 
     AddHeaderCell('Descricao', COL_DESC);
     AddHeaderCell('Unidade', COL_UNID);
@@ -351,7 +338,6 @@ begin
 
     Grid.ArrangeItems;
     Memo1.Text := ARenderer.GetAsString(Grid);
-
   finally
     Grid.Free;
   end;
@@ -394,7 +380,6 @@ begin
   CharMatrix.WriteTextAt(1, 3, 'Teste4');
   Memo1.Text := CharMatrix.GetAsString;
 end;
-
 
 end.
 
