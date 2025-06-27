@@ -57,9 +57,18 @@ type
 
   TControlInfo = record
     ControlClass: TControlClass;
-    ControlName: string;
-    class function Create(AClass: TControlClass; const AName: string):
-      TControlInfo; static;
+    Name: string;
+    Align: TAlign;
+    Width: Single;
+    Height: Single;
+    Top: TOptionalSingle;
+    Left: TOptionalSingle;
+    function WithAlign(AAlign: TAlign): TControlInfo;
+    function WithWidth(AWidth: Single): TControlInfo;
+    function WithHeight(AHeight: Single): TControlInfo;
+    function WithTop(ATop: Single): TControlInfo;
+    function WithLeft(ALeft: Single): TControlInfo;
+    class function Create(AClass: TControlClass; const AName: string): TControlInfo; static;
   end;
 
   TStrControlDictionary =
@@ -149,15 +158,53 @@ type
     function UsePopulator(APopulator: TControlGridPopulator): TControlGridPopulator;
   end;
 
+  TControlPopulatorDirection = (cpdHorizontal, cpdVertical);
+
+  TControlPopulator = class
+  private
+    FOwner: TComponent;
+    FParent: TWinControl;
+    FControls: {$IFDEF FPC}specialize{$ENDIF} TList<TControl>;
+    FNamedControls: TStrControlDictionary;
+    FDirection: TControlPopulatorDirection;
+    FVerticalSpace: Single;
+    FHorizontalSpace: Single;
+    FInitialLeft: Single;
+    FInitialTop: Single;
+    FCurrentTop: Single;
+    FCurrentLeft: Single;
+    FCurrentMaxControlHeight: Single;
+    FCurrentRow: Integer;
+    FCurrentCol: Integer;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
+    function SetVerticalSpace(AVerticalSpace: Single): TControlPopulator;
+    function SetHorizontalSpace(AHorizontalSpace: Single): TControlPopulator;
+    function SetTopLeft(ATop, ALeft: Single): TControlPopulator;
+    function SetTop(ATop: Single): TControlPopulator;
+    function SetLeft(ALeft: Single): TControlPopulator;
+    function SetDirection(ADirection: TControlPopulatorDirection): TControlPopulator;
+    function BreakLine: TControlPopulator;
+    function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlPopulator;
+    function WithParent(AParent: TWinControl): TControlPopulator;
+    function AddControl(AControl: TControl): TControlPopulator;
+    function CreateControl(AControlInfo: TControlInfo): TControlPopulator; overload;
+    function CreateControls(AControlCreateInfos: array of TControlInfo): TControlPopulator;
+    function GetNamedControl(const AName: string): TControl;
+    property NamedControls[const AName: string]: TControl read GetNamedControl;
+  end;
+
 implementation
 
 uses
-  {$IFDEF FPC}Graphics
+  {$IFDEF FPC}Graphics,
   {$ELSE}
-    {$IFDEF FRAMEWORK_FMX} Fmx.Graphics
-    {$ELSE} Vcl.Graphics
+    {$IFDEF FRAMEWORK_FMX} Fmx.Graphics,
+    {$ELSE} Vcl.Graphics,
     {$ENDIF}
-  {$ENDIF} ;
+  {$ENDIF} Math;
 
 { TControlGridItem }
 
@@ -268,7 +315,39 @@ class function TControlInfo.Create(AClass: TControlClass;
   const AName: string): TControlInfo;
 begin
   Result.ControlClass := AClass;
-  Result.ControlName := AName;
+  Result.Name := AName;
+  Result.Height := -1;
+  Result.Width := -1;
+end;
+
+function TControlInfo.WithAlign(AAlign: TAlign): TControlInfo;
+begin
+  Result := Self;
+  Result.Align := AAlign;
+end;
+
+function TControlInfo.WithHeight(AHeight: Single): TControlInfo;
+begin
+  Result := Self;
+  Result.Height := AHeight;
+end;
+
+function TControlInfo.WithLeft(ALeft: Single): TControlInfo;
+begin
+  Result := Self;
+  Result.Left := ALeft;
+end;
+
+function TControlInfo.WithTop(ATop: Single): TControlInfo;
+begin
+  Result := Self;
+  Result.Top := ATop;
+end;
+
+function TControlInfo.WithWidth(AWidth: Single): TControlInfo;
+begin
+  Result := Self;
+  Result.Width := AWidth;
 end;
 
 { TControlGridPopulator }
@@ -420,8 +499,8 @@ begin
 
   Control.Parent := FParent;
 
-  if not AControlInfo.ControlName.IsEmpty then
-    Control.Name := UniqueName(AControlInfo.ControlName);
+  if not AControlInfo.Name.IsEmpty then
+    Control.Name := UniqueName(AControlInfo.Name);
 
   AddControl(Control, AProc);
 end;
@@ -432,7 +511,7 @@ var
   ControlInfo: TControlInfo;
 begin
   ControlInfo.ControlClass := AControlClass;
-  ControlInfo.ControlName := '';
+  ControlInfo.Name := '';
   Result := CreateControl(ControlInfo, AProc);
 end;
 
@@ -593,6 +672,217 @@ function TGridLayoutBuilderHelper.UsePopulator(
 begin
   APopulator.SetGrid(Self.GridLayout);
   Result := APopulator;
+end;
+
+{ TControlPopulator }
+
+function TControlPopulator.AddControl(AControl: TControl): TControlPopulator;
+var
+  ControlGridItem: TControlGridItem;
+  Settings: TGridCellSettings;
+begin
+  FControls.Add(AControl);
+
+  if not string(AControl.Name).IsEmpty then
+    FNamedControls.Add(AControl.Name, AControl);
+end;
+
+function TControlPopulator.BreakLine: TControlPopulator;
+begin
+  Result := Self;
+  FCurrentTop := FCurrentTop + FCurrentMaxControlHeight;
+  FCurrentLeft := FInitialLeft;
+  FCurrentMaxControlHeight := 0;
+  FCurrentRow := FCurrentRow + 1;
+  FCurrentCol := 0;
+end;
+
+constructor TControlPopulator.Create;
+begin
+  FControls := {$IFDEF FPC}specialize{$ENDIF} TList<TControl>.Create;
+  FNamedControls := TStrControlDictionary.Create;
+  FDirection := cpdHorizontal;
+  FVerticalSpace := 0;
+  FHorizontalSpace := 0;
+  FInitialLeft := 0;
+  FCurrentTop := 0;
+  FCurrentLeft := 0;
+  FCurrentMaxControlHeight := 0;
+end;
+
+function TControlPopulator.CreateControl(
+  AControlInfo: TControlInfo): TControlPopulator;
+var
+  Control: TControl;
+
+  function UniqueName(const ABaseName: string): string;
+  var
+    Index: Integer;
+    Candidate: string;
+  begin
+    if ABaseName.IsEmpty then
+      Exit('');
+
+    Candidate := ABaseName;
+    Index := 1;
+
+    while FNamedControls.ContainsKey(Candidate) do
+    begin
+      Candidate := ABaseName + IntToStr(Index);
+      Inc(Index);
+    end;
+
+    Result := Candidate;
+  end;
+
+  function GetVerticalSpace: Single;
+  begin
+    if FCurrentRow = 0 then
+      Result := 0
+    else
+      Result := FVerticalSpace;
+  end;
+
+  function GetHorizontalSpace: Single;
+  begin
+    if FCurrentCol = 0 then
+      Result := 0
+    else
+      Result := FHorizontalSpace;
+  end;
+
+begin
+  Result := Self;
+
+  Control := AControlInfo.ControlClass.Create(FOwner);
+  Control.Parent := FParent;
+
+  if not AControlInfo.Name.IsEmpty then
+    Control.Name := UniqueName(AControlInfo.Name);
+
+  Control.Align := AControlInfo.Align;
+
+  if AControlInfo.Width >=0  then
+    Control.Width := Trunc(AControlInfo.Width);
+
+  if AControlInfo.Height >= 0 then
+    Control.Height := Trunc(AControlInfo.Height);
+
+  if AControlInfo.Top.HasValue then
+    Control.Top := Trunc(AControlInfo.Top.Value + GetVerticalSpace)
+  else
+    Control.Top := Trunc(FCurrentTop + GetVerticalSpace);
+
+  if AControlInfo.Left.HasValue then
+    Control.Left := Trunc(AControlInfo.Left.Value + GetHorizontalSpace)
+  else
+    Control.Left := Trunc(FCurrentLeft + GetHorizontalSpace);
+
+  if AControlInfo.Align = alNone then
+  begin
+    if FDirection = cpdHorizontal then
+    begin
+      FCurrentLeft := FCurrentLeft + Control.Width + GetHorizontalSpace;
+      FCurrentMaxControlHeight := Max(FCurrentMaxControlHeight, Control.Height + GetVerticalSpace);
+      FCurrentCol := FCurrentCol + 1;
+    end;
+
+    if FDirection = cpdVertical then
+    begin
+      FCurrentTop := FCurrentTop + Control.Height + GetVerticalSpace;
+      FCurrentRow := FCurrentRow + 1;
+    end;
+  end;
+
+  AddControl(Control);
+end;
+
+function TControlPopulator.CreateControls(
+  AControlCreateInfos: array of TControlInfo): TControlPopulator;
+var
+  I: Integer;
+begin
+  Result := Self;
+  for I := Low(AControlCreateInfos) to High(AControlCreateInfos) do
+    CreateControl(AControlCreateInfos[I]);
+end;
+
+destructor TControlPopulator.Destroy;
+begin
+  FControls.Free;
+  FNamedControls.Free;
+  FCurrentCol := 0;
+  FCurrentRow := 0;
+  inherited;
+end;
+
+function TControlPopulator.GetNamedControl(const AName: string): TControl;
+begin
+  if not FNamedControls.TryGetValue(AName, Result) then
+    Result := nil;
+end;
+
+function TControlPopulator.SetDirection(
+  ADirection: TControlPopulatorDirection): TControlPopulator;
+begin
+  Result := Self;
+  FDirection := ADirection;
+end;
+
+function TControlPopulator.SetHorizontalSpace(
+  AHorizontalSpace: Single): TControlPopulator;
+begin
+  Result := Self;
+  FHorizontalSpace := AHorizontalSpace;
+end;
+
+function TControlPopulator.SetLeft(ALeft: Single): TControlPopulator;
+begin
+  Result := Self;
+  FCurrentLeft := ALeft;
+  FInitialLeft := ALeft;
+end;
+
+function TControlPopulator.SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
+begin
+  Result := Self;
+  FVerticalSpace := AVerticalSpace;
+  FHorizontalSpace := AHorizontalSpace;
+end;
+
+function TControlPopulator.SetTop(ATop: Single): TControlPopulator;
+begin
+  Result := Self;
+  FCurrentTop := ATop;
+  FInitialTop := ATop;
+end;
+
+function TControlPopulator.SetTopLeft(ATop, ALeft: Single): TControlPopulator;
+begin
+  Result := Self;
+  SetTop(ATop);
+  SetLeft(ALeft);
+end;
+
+function TControlPopulator.SetVerticalSpace(
+  AVerticalSpace: Single): TControlPopulator;
+begin
+  Result := Self;
+  FVerticalSpace := AVerticalSpace;
+end;
+
+function TControlPopulator.WithOwnerAndParent(AOwner: TComponent;
+  AParent: TWinControl): TControlPopulator;
+begin
+  Result := Self;
+  FOwner := AOwner;
+  FParent := AParent;
+end;
+
+function TControlPopulator.WithParent(AParent: TWinControl): TControlPopulator;
+begin
+  Result := Self;
+  FParent := AParent;
 end;
 
 end.

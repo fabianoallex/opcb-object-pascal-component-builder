@@ -35,14 +35,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="58"/>
         <CursorPos X="61" Y="110"/>
-        <UsageCount Value="109"/>
+        <UsageCount Value="104"/>
       </Unit>
       <Unit>
         <Filename Value="test\ukeytest.pas"/>
         <UnitName Value="UKeyTest"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="71" Y="27"/>
-        <UsageCount Value="156"/>
+        <UsageCount Value="151"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyboardclasses.pas"/>
@@ -50,7 +50,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="59"/>
         <CursorPos X="69" Y="59"/>
-        <UsageCount Value="156"/>
+        <UsageCount Value="151"/>
       </Unit>
       <Unit>
         <Filename Value="unit1.pas"/>
@@ -58,7 +58,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
         <CursorPos X="3" Y="28"/>
-        <UsageCount Value="155"/>
+        <UsageCount Value="150"/>
       </Unit>
       <Unit>
         <Filename Value="unit2.pas"/>
@@ -66,7 +66,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="29"/>
         <CursorPos X="3" Y="46"/>
-        <UsageCount Value="155"/>
+        <UsageCount Value="150"/>
       </Unit>
       <Unit>
         <Filename Value="unit3.pas"/>
@@ -74,7 +74,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
         <CursorPos X="13" Y="29"/>
-        <UsageCount Value="187"/>
+        <UsageCount Value="182"/>
       </Unit>
       <Unit>
         <Filename Value="unit4.pas"/>
@@ -82,27 +82,27 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="11"/>
         <CursorPos X="3" Y="28"/>
-        <UsageCount Value="187"/>
+        <UsageCount Value="182"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyblockgridlayouttest.pas"/>
         <UnitName Value="UVirtualKeyBlockGridLayoutTest"/>
         <EditorIndex Value="-1"/>
         <CursorPos X="33" Y="21"/>
-        <UsageCount Value="110"/>
+        <UsageCount Value="105"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyblocklayouts.pas"/>
         <UnitName Value="UVirtualKeyBlockLayouts"/>
         <EditorIndex Value="-1"/>
-        <UsageCount Value="109"/>
+        <UsageCount Value="104"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\fpc\3.2.2\source\rtl\objpas\fgl.pp"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="25"/>
         <CursorPos X="72" Y="316"/>
-        <UsageCount Value="52"/>
+        <UsageCount Value="47"/>
       </Unit>
       <Unit>
         <Filename Value="uvirtualkeyregistry.pas"/>
@@ -110,14 +110,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="125"/>
         <CursorPos Y="41"/>
-        <UsageCount Value="56"/>
+        <UsageCount Value="51"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\include\control.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="1544"/>
         <CursorPos X="31" Y="1625"/>
-        <UsageCount Value="56"/>
+        <UsageCount Value="51"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus\lcl\lcltype.pp"/>
@@ -125,7 +125,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="53"/>
         <CursorPos X="3" Y="508"/>
-        <UsageCount Value="67"/>
+        <UsageCount Value="62"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
@@ -133,18 +133,19 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="1457"/>
         <CursorPos Y="1469"/>
-        <UsageCount Value="48"/>
+        <UsageCount Value="43"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\inc\generics.dictionariesh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="23"/>
         <CursorPos Y="42"/>
-        <UsageCount Value="44"/>
+        <UsageCount Value="39"/>
       </Unit>
       <Unit>
         <Filename Value="..\src\ugridlayoutbuilder.pas"/>
         <UnitName Value="UGridLayoutBuilder"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="158"/>
         <CursorPos Y="167"/>
@@ -153,10 +154,8 @@
       </Unit>
       <Unit>
         <Filename Value="..\src\ulayout.controls.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="338"/>
-        <CursorPos X="68" Y="349"/>
+        <CursorPos X="52" Y="10"/>
         <UsageCount Value="114"/>
         <Loaded Value="True"/>
       </Unit>
