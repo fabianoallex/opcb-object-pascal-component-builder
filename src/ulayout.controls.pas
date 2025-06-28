@@ -60,7 +60,6 @@ type
     ControlClass: TControlClass;
     Name: string;
     Align: TAlign;
-    Caption: TCaption;
     Width: Single;
     Height: Single;
     Top: TOptionalSingle;
@@ -71,7 +70,6 @@ type
     function WithWidthAndHeight(AWidth: Single; AHeight: Single): TControlInfo;
     function WithTop(ATop: Single): TControlInfo;
     function WithLeft(ALeft: Single): TControlInfo;
-    function WithCaption(ACaption: TCaption): TControlInfo;
     class function Create(AClass: TControlClass; const AName: string): TControlInfo; overload; static;
     class function Create(AControl: TControl): TControlInfo; overload; static;
   end;
@@ -366,12 +364,6 @@ function TControlInfo.WithAlign(AAlign: TAlign): TControlInfo;
 begin
   Result := Self;
   Result.Align := AAlign;
-end;
-
-function TControlInfo.WithCaption(ACaption: TCaption): TControlInfo;
-begin
-  Result := Self;
-  Result.Caption := ACaption;
 end;
 
 function TControlInfo.WithHeight(AHeight: Single): TControlInfo;
