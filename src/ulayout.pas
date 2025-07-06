@@ -27,6 +27,18 @@ type
 
   TItemAlignment = (laStretch, laCenter, laStart, laEnd);
 
+  TOptionalString = record
+    HasValue: Boolean;
+    Value: string;
+    {$IFDEF FPC}
+    class operator :=(AValue: string): TOptionalString;
+    {$ELSE}
+    class operator Implicit(AValue: string): TOptionalString;
+    {$ENDIF}
+    class function Some(AValue: string): TOptionalString; static;
+    class function None: TOptionalString; static;
+  end;
+
   { TOptionalInt }
 
   TOptionalSingle = record
@@ -1865,6 +1877,29 @@ end;
 procedure TGridTrackInfoDictionary.MoveTrack(AFrom, ATo: Integer);
 begin
   Self.MoveKey(AFrom, ATo);
+end;
+
+{ TOptionalString }
+
+{$IFDEF FPC}
+class operator TOptionalString.:=(AValue: string): TOptionalString;
+{$ELSE}
+class operator TOptionalString.Implicit(AValue: string): TOptionalString;
+{$ENDIF}
+begin
+  Result := TOptionalString.Some(AValue);
+end;
+
+class function TOptionalString.None: TOptionalString;
+begin
+  Result.Value := EmptyStr;
+  Result.HasValue := False;
+end;
+
+class function TOptionalString.Some(AValue: string): TOptionalString;
+begin
+  Result.HasValue := True;
+  Result.Value := AValue;
 end;
 
 end.

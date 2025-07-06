@@ -26,7 +26,9 @@ type
     {$ENDIF}
   {$ENDIF}
 
+  TProtectedControl = class(TControl);
   TControlClass = class of TControl;
+  TWinControlClass = class of TWinControl;
   TControlPopulateProc = procedure(AControl: TControl; AIndex: Integer;
     ASettings: TGridCellSettings) of object;
 
@@ -54,6 +56,32 @@ type
   end;
 
   TControlSetupProc = procedure(AControl: TControl) of object;
+  TWinControlSetupProc = procedure(AWinControl: TWinControl) of object;
+
+  TWinControlInfo = record
+    WinControl: TWinControl;
+    WinControlClass: TWinControlClass;
+    SetupProc: TWinControlSetupProc;
+    Name: string;
+    Caption: TOptionalString;
+    Align: TAlign;
+    Width: Single;
+    Height: Single;
+    Top: TOptionalSingle;
+    Left: TOptionalSingle;
+    function Setup(AProc: TWinControlSetupProc): TWinControlInfo;
+    function WithAlign(AAlign: TAlign): TWinControlInfo;
+    function WithWidth(AWidth: Single): TWinControlInfo;
+    function WithHeight(AHeight: Single): TWinControlInfo;
+    function WithWidthAndHeight(AWidth: Single; AHeight: Single): TWinControlInfo;
+    function WithTop(ATop: Single): TWinControlInfo;
+    function WithLeft(ALeft: Single): TWinControlInfo;
+    function WithCaption(ACaption: string): TWinControlInfo;
+    function CreateWinControl(AOwner: TComponent; AParent: TWinControl;
+      const AName: string): TWinControl;
+    class function Create(AClass: TWinControlClass; const AName: string=''): TWinControlInfo; overload; static;
+    class function Create(AWinControl: TWinControl): TWinControlInfo; overload; static;
+  end;
 
   { TControlInfo }
 
@@ -62,18 +90,24 @@ type
     ControlClass: TControlClass;
     SetupProc: TControlSetupProc;
     Name: string;
+    Caption: TOptionalString;
+    Text: TOptionalString;
     Align: TAlign;
     Width: Single;
     Height: Single;
     Top: TOptionalSingle;
     Left: TOptionalSingle;
-    function WithSetup(AProc: TControlSetupProc): TControlInfo;
+    function Setup(AProc: TControlSetupProc): TControlInfo;
     function WithAlign(AAlign: TAlign): TControlInfo;
     function WithWidth(AWidth: Single): TControlInfo;
     function WithHeight(AHeight: Single): TControlInfo;
     function WithWidthAndHeight(AWidth: Single; AHeight: Single): TControlInfo;
     function WithTop(ATop: Single): TControlInfo;
     function WithLeft(ALeft: Single): TControlInfo;
+    function WithCaption(ACaption: string): TControlInfo;
+    function WithText(AText: string): TControlInfo;
+    function CreateControl(AOwner: TComponent; AParent: TWinControl;
+      const AControlName: string): TControl;
     class function Create(AClass: TControlClass; const AName: string=''): TControlInfo; overload; static;
     class function Create(AControl: TControl): TControlInfo; overload; static;
   end;
@@ -183,11 +217,14 @@ type
   private
     class var FGroupCounter: Integer;
   public
-    Direction: TControlPopulatorDirection;
-    InitialTop, InitialLeft: Single;
-    CurrentTop, CurrentLeft: Single;
-    MaxControlHeight: Single;
+    Parent: TWinControl;
     GroupName: string;
+    Direction: TControlPopulatorDirection;
+    InitialTop: Single;
+    InitialLeft: Single;
+    CurrentTop: Single;
+    CurrentLeft: Single;
+    MaxControlHeight: Single;
     constructor Create;
     function Clone: TControlPopulatorLevel;
   end;
@@ -197,29 +234,71 @@ type
   TControlPopulator = class
   private
     FOwner: TComponent;
-    FParent: TWinControl;
     FControls: TControlList;
     FNamedControls: TStrControlDictionary;
     FGroups: TControlGroupMap;
     FVerticalSpace: Single;
     FHorizontalSpace: Single;
     FLevelStack: TControlPopulatorLevelStack;
-    FContentWidth: Single;
-    FContentHeight: Single;
     procedure MoveTopLeftAfterControl(AControl: TControl);
+    procedure MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
     procedure AddControlToGroups(AControl: TControl; const AGroups: array of string);
     function GetGroupBounds(const AGroupName: string): TControlGroupBounds;
     function GetCurrenteLevel: TControlPopulatorLevel;
+    function GetContentWidth: Single;
+    function GetFContentHeight: Single;
   public
     constructor Create;
     destructor Destroy; override;
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
-    function BeginLevel: TControlPopulator; overload;
-    function BeginLevel(ADirection: TControlPopulatorDirection): TControlPopulator; overload;
-    function EndLevel: TControlPopulator;
-    function NextLevel: TControlPopulator; overload;
-    function NextLevel(ADirection: TControlPopulatorDirection): TControlPopulator; overload;
+
+    function NextLevel(AGroupName: string=''): TControlPopulator; overload;
+    function NextLevel(ADirection: TControlPopulatorDirection;
+      AGroupName: string=''): TControlPopulator; overload;
+    function PreviousLevel: TControlPopulator;
+
+    function NextSiblingLevel(AGroupName: string='';
+      ABreakLine: Boolean=False): TControlPopulator; overload;
+
+    function NextSiblingLevel(ADirection: TControlPopulatorDirection;
+      AGroupName: string=''; ABreakLine: Boolean=False): TControlPopulator; overload;
+
+    function NextSiblingLevel(ABreakLine: Boolean=False): TControlPopulator; overload;
+
+    function NextSiblingLevel(ADirection: TControlPopulatorDirection;
+      ABreakLine: Boolean): TControlPopulator; overload;
+
+    function NextSiblingLevelWithBreak(AGroupName: string=''): TControlPopulator; overload;
+    function NextSiblingLevelWithBreak(ADirection: TControlPopulatorDirection;
+      AGroupName: string=''): TControlPopulator; overload;
+
+    // ----
+    function NextLevel(AWinControlInfo: TWinControlInfo;
+      AGroupName: string=''): TControlPopulator; overload;
+
+    function NextLevel(AWinControlInfo: TWinControlInfo;
+      ADirection: TControlPopulatorDirection; AGroupName: string=''): TControlPopulator; overload;
+
+    function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+      AGroupName: string=''; ABreakLine: Boolean=False): TControlPopulator; overload;
+
+    function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+      ADirection: TControlPopulatorDirection;
+      AGroupName: string=''; ABreakLine: Boolean=False): TControlPopulator; overload;
+
+    function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+      ABreakLine: Boolean=False): TControlPopulator; overload;
+
+    function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+      ADirection: TControlPopulatorDirection;
+      ABreakLine: Boolean): TControlPopulator; overload;
+
+    function NextSiblingLevelWithBreak(AWinControlInfo: TWinControlInfo; AGroupName: string=''): TControlPopulator; overload;
+    function NextSiblingLevelWithBreak(AWinControlInfo: TWinControlInfo; ADirection: TControlPopulatorDirection;
+      AGroupName: string=''): TControlPopulator; overload;
+
+
     function SetVerticalSpace(AVerticalSpace: Single): TControlPopulator;
     function SetHorizontalSpace(AHorizontalSpace: Single): TControlPopulator;
     function SetTopLeft(ATop, ALeft: Single): TControlPopulator;
@@ -256,8 +335,8 @@ type
     function CenterControlsVertically(const AControlNames, AReferenceGroup:
       array of string): TControlPopulator;
     property NamedControls[const AName: string]: TControl read GetNamedControl;
-    property ContentWidth: Single read FContentWidth;
-    property ContentHeight: Single read FContentHeight;
+    property ContentWidth: Single read GetContentWidth;
+    property ContentHeight: Single read GetFContentHeight;
     property CurrentLevel: TControlPopulatorLevel read GetCurrenteLevel;
   end;
 
@@ -395,10 +474,53 @@ begin
   Result.Width := -1;
 end;
 
+function TControlInfo.CreateControl(AOwner: TComponent; AParent: TWinControl;
+  const AControlName: string): TControl;
+begin
+  if Assigned(Control) then
+    Result := Control
+  else
+    Result := ControlClass.Create(AOwner);
+
+  Result.Parent := AParent;
+
+  if not AControlName.IsEmpty then
+    Result.Name := AControlName;
+
+  if Caption.HasValue then
+    TProtectedControl(Result).Caption := Caption.Value;
+
+  if Text.HasValue then
+    TProtectedControl(Result).Caption := Text.Value;
+
+  Result.Align := Align;
+
+  if Width >= 0 then
+    Result.Width := Trunc(Width);
+
+  if Height >= 0 then
+    Result.Height := Trunc(Height);
+
+  if Top.HasValue then
+    Result.Top := Trunc(Top.Value);
+
+  if Left.HasValue then
+    Result.Left := Trunc(Left.Value);
+
+  if Assigned(SetupProc) then
+    SetupProc(Result);
+end;
+
 function TControlInfo.WithAlign(AAlign: TAlign): TControlInfo;
 begin
   Result := Self;
   Result.Align := AAlign;
+end;
+
+function TControlInfo.WithCaption(ACaption: string): TControlInfo;
+begin
+  Result := Self;
+  Result.Caption := ACaption;
 end;
 
 function TControlInfo.WithHeight(AHeight: Single): TControlInfo;
@@ -413,10 +535,16 @@ begin
   Result.Left := ALeft;
 end;
 
-function TControlInfo.WithSetup(AProc: TControlSetupProc): TControlInfo;
+function TControlInfo.Setup(AProc: TControlSetupProc): TControlInfo;
 begin
   Result := Self;
   Result.SetupProc := AProc;
+end;
+
+function TControlInfo.WithText(AText: string): TControlInfo;
+begin
+  Result := Self;
+  Result.Text := AText;
 end;
 
 function TControlInfo.WithTop(ATop: Single): TControlInfo;
@@ -767,7 +895,7 @@ end;
 function TControlPopulator.BreakLine: TControlPopulator;
 begin
   Result := Self;
-  CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + CurrentLevel.MaxControlHeight; // FCurrentMaxControlHeight;
+  CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + CurrentLevel.MaxControlHeight;
   CurrentLevel.CurrentLeft := CurrentLevel.InitialLeft;
   CurrentLevel.MaxControlHeight := 0;
 end;
@@ -809,6 +937,7 @@ function TControlPopulator.AddControl(AControlInfo: TControlInfo;
 var
   Control: TControl;
   ControlRight, ControlBottom: Single;
+  Level: TControlPopulatorLevel;
 
   function UniqueName(const ABaseName: string): string;
   var
@@ -830,63 +959,40 @@ var
     Result := Candidate;
   end;
 
-begin
-  Result := Self;
-
-  if Assigned(AControlInfo.Control) then
-    Control := AControlInfo.Control
-  else
-    Control := AControlInfo.ControlClass.Create(FOwner);
-
-  Control.Parent := FParent;
-
-  if not AControlInfo.Name.IsEmpty then
-    Control.Name := UniqueName(AControlInfo.Name);
-
-  Control.Align := AControlInfo.Align;
-
-  if AControlInfo.Width >=0  then
-    Control.Width := Trunc(AControlInfo.Width);
-
-  if AControlInfo.Height >= 0 then
-    Control.Height := Trunc(AControlInfo.Height);
-
-  if AControlInfo.Top.HasValue then
-    Control.Top := Trunc(AControlInfo.Top.Value)
-  else
-    Control.Top := Trunc(CurrentLevel.CurrentTop);
-
-  if AControlInfo.Left.HasValue then
-    Control.Left := Trunc(AControlInfo.Left.Value)
-  else
-    Control.Left := Trunc(CurrentLevel.CurrentLeft);
-
-  if Assigned(AControlInfo.SetupProc) then
-    AControlInfo.SetupProc(Control);
-
-  MoveTopLeftAfterControl(Control);
-
-  if Control.Align = alNone then
+  function CreateControl(Info: TControlInfo): TControl;
+  var
+    ControlName: string;
   begin
-    ControlRight := Control.Left + Control.Width;
-    ControlBottom := Control.Top + Control.Height;
+    ControlName := '';
+    if not AControlInfo.Name.IsEmpty then
+      ControlName := UniqueName(AControlInfo.Name);
 
-    if ControlRight > FContentWidth then
-      FContentWidth := ControlRight;
+    Info := AControlInfo;
 
-    if ControlBottom > FContentHeight then
-      FContentHeight := ControlBottom;
+    if not Info.Top.HasValue then
+      Info := Info.WithTop(CurrentLevel.CurrentTop);
+
+    if not Info.Left.HasValue then
+      Info := Info.WithLeft(CurrentLevel.CurrentLeft);
+
+    Result := Info.CreateControl(FOwner, CurrentLevel.Parent, ControlName);
   end;
 
+begin
+  Result := Self;
+  Control := CreateControl(AControlInfo);
   FControls.Add(Control);
 
   if not string(Control.Name).IsEmpty then
     FNamedControls.Add(Control.Name, Control);
 
-  if not CurrentLevel.GroupName.IsEmpty then
-    AddControlToGroups(Control, [CurrentLevel.GroupName]);
+  for Level in FLevelStack do
+    if not Level.GroupName.IsEmpty then
+      AddControlToGroups(Control, [Level.GroupName]);
 
   AddControlToGroups(Control, AGroups);
+
+  MoveTopLeftAfterControl(Control);
 end;
 
 function TControlPopulator.AddControl(
@@ -937,9 +1043,9 @@ function TControlPopulator.AddInLevel(const AControls: array of TControlInfo;
   ADirection: TControlPopulatorDirection): TControlPopulator;
 begin
   Result := Self;
-  BeginLevel(ADirection);
+  NextLevel(ADirection);
   AddControls(AControls);
-  EndLevel;
+  PreviousLevel;
 end;
 
 function TControlPopulator.CenterControlsHorizontally(const AControlNames,
@@ -981,17 +1087,47 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-function TControlPopulator.BeginLevel: TControlPopulator;
+function TControlPopulator.NextLevel(AGroupName: string): TControlPopulator;
 begin
   Result := Self;
   FLevelStack.Add(CurrentLevel.Clone);
+  CurrentLevel.InitialTop := CurrentLevel.CurrentTop;
+  CurrentLevel.InitialLeft := CurrentLevel.CurrentLeft;
+  CurrentLevel.MaxControlHeight := 0;
+
+  if not AGroupName.IsEmpty then
+    CurrentLevel.GroupName := AGroupName;
 end;
 
-function TControlPopulator.BeginLevel(
-  ADirection: TControlPopulatorDirection): TControlPopulator;
+function TControlPopulator.NextLevel(
+  ADirection: TControlPopulatorDirection; AGroupName: string): TControlPopulator;
 begin
-  Result := BeginLevel;
+  Result := NextLevel(AGroupName);
   SetDirection(ADirection);
+end;
+
+function TControlPopulator.NextSiblingLevel(ADirection: TControlPopulatorDirection;
+  ABreakLine: Boolean): TControlPopulator;
+begin
+  Result := NextSiblingLevel(ADirection, '', ABreakLine);
+end;
+
+function TControlPopulator.NextSiblingLevelWithBreak(
+  ADirection: TControlPopulatorDirection;
+  AGroupName: string): TControlPopulator;
+begin
+  Result := NextSiblingLevel(ADirection, AGroupName, True);
+end;
+
+function TControlPopulator.NextSiblingLevelWithBreak(
+  AGroupName: string): TControlPopulator;
+begin
+  Result := NextSiblingLevel(AGroupName, True);
+end;
+
+function TControlPopulator.NextSiblingLevel( ABreakLine: Boolean): TControlPopulator;
+begin
+  Result := NextSiblingLevel('', ABreakLine);
 end;
 
 function TControlPopulator.BreakLine(AIncTop: Single): TControlPopulator;
@@ -1013,18 +1149,30 @@ begin
   inherited;
 end;
 
-function TControlPopulator.EndLevel: TControlPopulator;
+function TControlPopulator.PreviousLevel: TControlPopulator;
 var
   SubLevel, SuperLevel: TControlPopulatorLevel;
   Bounds: TControlGroupBounds;
+
+  function GetSubLevelBounds: TControlGroupBounds;
+  begin
+    if SubLevel.Parent = SuperLevel.Parent then
+      Result := GetGroupBounds(SubLevel.GroupName)
+    else
+    begin
+      Result.Reset;
+      Result.Include(SubLevel.Parent);
+    end;
+  end;
+
 begin
   if FLevelStack.Count <= 1 then
-    raise Exception.Create('EndLevel chamado no nível raiz');
+    raise Exception.Create('PreviousLevel chamado no nível raiz');
 
   SubLevel := FLevelStack.Last;
   SuperLevel := FLevelStack[FLevelStack.Count - 2];
 
-  Bounds := GetGroupBounds(SubLevel.GroupName);
+  Bounds := GetSubLevelBounds;
 
   case SuperLevel.Direction of
     cpdHorizontal:
@@ -1037,6 +1185,8 @@ begin
         SuperLevel.CurrentTop := Bounds.Bottom + FVerticalSpace;
       end;
   end;
+
+  MoveTopLeftAfterBound(GetGroupBounds(SuperLevel.GroupName));
 
   FLevelStack.Delete(FLevelStack.Count - 1); // remove nível atual
   Result := Self;
@@ -1068,24 +1218,41 @@ begin
   IncLeft(AIncLeft);
 end;
 
+function TControlPopulator.GetContentWidth: Single;
+begin
+  Result := GetGroupBounds(FLevelStack.First.GroupName).Width;
+end;
+
 function TControlPopulator.GetControlsBounds(
   AControlsNames: array of string): TControlGroupBounds;
 var
   I: Integer;
+  Name: string;
   Control: TControl;
+  Group: TControlList;
 begin
   Result.Reset;
 
   for I := Low(AControlsNames) to High(AControlsNames) do
   begin
-    Control := GetNamedControl(AControlsNames[I]);
-    Result.Include(Control);
+    Name := AControlsNames[I];
+
+    if FNamedControls.TryGetValue(Name, Control) then
+      Result.Include(Control)
+    else if FGroups.TryGetValue(Name, Group) then
+      for Control in Group do
+        Result.Include(Control);
   end;
 end;
 
 function TControlPopulator.GetCurrenteLevel: TControlPopulatorLevel;
 begin
   Result := FLevelStack.Last;
+end;
+
+function TControlPopulator.GetFContentHeight: Single;
+begin
+  Result := GetGroupBounds(FLevelStack.First.GroupName).Height;
 end;
 
 function TControlPopulator.GetGroupBounds(
@@ -1120,6 +1287,18 @@ begin
   end;
 end;
 
+procedure TControlPopulator.MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
+begin
+  if CurrentLevel.Direction = cpdHorizontal then
+  begin
+    CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + ABounds.Width + FHorizontalSpace;
+    CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, ABounds.Height + FVerticalSpace);
+  end;
+
+  if CurrentLevel.Direction = cpdVertical then
+    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + ABounds.Height + FVerticalSpace;
+end;
+
 procedure TControlPopulator.MoveTopLeftAfterControl(AControl: TControl);
 begin
   if AControl.Align = alNone then
@@ -1133,17 +1312,33 @@ begin
     if CurrentLevel.Direction = cpdVertical then
       CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + AControl.Height + FVerticalSpace;
   end;
+
+  if AControl.Align = alTop then
+    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + AControl.Height + FVerticalSpace;
+
+  if AControl.Align = alLeft then
+    SetTopLeft(
+      CurrentLevel.CurrentTop,
+      CurrentLevel.CurrentLeft + AControl.Width + FHorizontalSpace
+    )
 end;
 
-function TControlPopulator.NextLevel(
-  ADirection: TControlPopulatorDirection): TControlPopulator;
+function TControlPopulator.NextSiblingLevel(ADirection: TControlPopulatorDirection;
+  AGroupName: string; ABreakLine: Boolean): TControlPopulator;
 begin
-  Result := EndLevel.BeginLevel(ADirection);
+  Result := PreviousLevel;
+  if ABreakLine then
+    BreakLine;
+  NextLevel(ADirection, AGroupName);
 end;
 
-function TControlPopulator.NextLevel: TControlPopulator;
+function TControlPopulator.NextSiblingLevel(AGroupName: string;
+  ABreakLine: Boolean): TControlPopulator;
 begin
-  Result := EndLevel.BeginLevel;
+  Result := PreviousLevel;
+  if ABreakLine then
+    BreakLine;
+  NextLevel(AGroupName);
 end;
 
 function TControlPopulator.SetDirection(
@@ -1280,13 +1475,79 @@ function TControlPopulator.WithOwnerAndParent(AOwner: TComponent;
 begin
   Result := Self;
   FOwner := AOwner;
-  FParent := AParent;
+  CurrentLevel.Parent := AParent;
 end;
 
 function TControlPopulator.WithParent(AParent: TWinControl): TControlPopulator;
 begin
   Result := Self;
-  FParent := AParent;
+  CurrentLevel.Parent := AParent;
+end;
+
+function TControlPopulator.NextLevel(AWinControlInfo: TWinControlInfo;
+  AGroupName: string): TControlPopulator;
+var
+  WinControl: TWinControl;
+begin
+  Result := Self;
+  WinControl := AWinControlInfo.CreateWinControl(
+    FOwner, CurrentLevel.Parent, AWinControlInfo.Name);
+  AddControl(TControlInfo.Create(WinControl));
+  NextLevel(AGroupName);
+  WithParent(WinControl);
+  SetTopLeft(0, 0);
+end;
+
+function TControlPopulator.NextLevel(AWinControlInfo: TWinControlInfo;
+  ADirection: TControlPopulatorDirection; AGroupName: string): TControlPopulator;
+begin
+  Result := NextLevel(AWinControlInfo, AGroupName);
+  SetDirection(ADirection);
+end;
+
+function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+  AGroupName: string; ABreakLine: Boolean): TControlPopulator;
+begin
+  Result := PreviousLevel;
+  if ABreakLine then
+    BreakLine;
+  NextLevel(AWinControlInfo, AGroupName);
+end;
+
+function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+  ADirection: TControlPopulatorDirection; AGroupName: string;
+  ABreakLine: Boolean): TControlPopulator;
+begin
+  Result := PreviousLevel;
+  if ABreakLine then
+    BreakLine;
+  NextLevel(AWinControlInfo, ADirection, AGroupName);
+end;
+
+function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+  ABreakLine: Boolean): TControlPopulator;
+begin
+  Result := NextSiblingLevel(AWinControlInfo, '', ABreakLine);
+end;
+
+function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+  ADirection: TControlPopulatorDirection;
+  ABreakLine: Boolean): TControlPopulator;
+begin
+  Result := NextSiblingLevel(AWinControlInfo, ADirection, '', ABreakLine);
+end;
+
+function TControlPopulator.NextSiblingLevelWithBreak(
+  AWinControlInfo: TWinControlInfo; ADirection: TControlPopulatorDirection;
+  AGroupName: string): TControlPopulator;
+begin
+  Result := NextSiblingLevel(AWinControlInfo, ADirection, AGroupName, True);
+end;
+
+function TControlPopulator.NextSiblingLevelWithBreak(
+  AWinControlInfo: TWinControlInfo; AGroupName: string): TControlPopulator;
+begin
+  Result := NextSiblingLevel(AWinControlInfo, AGroupName, True);
 end;
 
 { TControlGroupBounds }
@@ -1334,6 +1595,7 @@ end;
 function TControlPopulatorLevel.Clone: TControlPopulatorLevel;
 begin
   Result := TControlPopulatorLevel.Create;
+  Result.Parent := Parent;
   Result.Direction := Direction;
   Result.InitialTop := InitialTop;
   Result.InitialLeft := InitialLeft;
@@ -1351,7 +1613,112 @@ begin
   CurrentLeft := 0;
   MaxControlHeight := 0;
   Inc(FGroupCounter);
-  GroupName := '__LEVEL_GROUP_' + IntToStr(FGroupCounter) + '__';
+  GroupName := '__LEVEL_GROUP_' + IntToStr(FGroupCounter - 1) + '__';
+end;
+
+{ TWinControlInfo }
+
+class function TWinControlInfo.Create(AClass: TWinControlClass;
+  const AName: string): TWinControlInfo;
+begin
+  Result.WinControl := nil;
+  Result.WinControlClass := AClass;
+  Result.Name := AName;
+  Result.Height := -1;
+  Result.Width := -1;
+end;
+
+class function TWinControlInfo.Create(AWinControl: TWinControl): TWinControlInfo;
+begin
+  Result.WinControl := AWinControl;
+  Result.WinControlClass := TWinControlClass(AWinControl.ClassType);
+  Result.Name := AWinControl.Name;
+  Result.Height := -1;
+  Result.Width := -1;
+end;
+
+function TWinControlInfo.CreateWinControl(AOwner: TComponent;
+  AParent: TWinControl; const AName: string): TWinControl;
+begin
+  if Assigned(WinControl) then
+    Result := WinControl
+  else
+    Result := WinControlClass.Create(AOwner);
+
+  Result.Parent := AParent;
+
+  if not AName.IsEmpty then
+    Result.Name := AName;
+
+  if Caption.HasValue then
+    TProtectedControl(Result).Caption := Caption.Value;
+
+  Result.Align := Align;
+
+  if Width >= 0 then
+    Result.Width := Trunc(Width);
+
+  if Height >= 0 then
+    Result.Height := Trunc(Height);
+
+  if Top.HasValue then
+    Result.Top := Trunc(Top.Value);
+
+  if Left.HasValue then
+    Result.Left := Trunc(Left.Value);
+
+  if Assigned(SetupProc) then
+    SetupProc(Result);
+end;
+
+function TWinControlInfo.Setup(AProc: TWinControlSetupProc): TWinControlInfo;
+begin
+  Result := Self;
+  Result.SetupProc := AProc;
+end;
+
+function TWinControlInfo.WithAlign(AAlign: TAlign): TWinControlInfo;
+begin
+  Result := Self;
+  Result.Align := AAlign;
+end;
+
+function TWinControlInfo.WithCaption(ACaption: string): TWinControlInfo;
+begin
+  Result := Self;
+  Result.Caption := ACaption;
+end;
+
+function TWinControlInfo.WithHeight(AHeight: Single): TWinControlInfo;
+begin
+  Result := Self;
+  Result.Height := AHeight;
+end;
+
+function TWinControlInfo.WithLeft(ALeft: Single): TWinControlInfo;
+begin
+  Result := Self;
+  Result.Left := ALeft;
+end;
+
+function TWinControlInfo.WithTop(ATop: Single): TWinControlInfo;
+begin
+  Result := Self;
+  Result.Top := ATop;
+end;
+
+function TWinControlInfo.WithWidth(AWidth: Single): TWinControlInfo;
+begin
+  Result := Self;
+  Result.Width := AWidth;
+end;
+
+function TWinControlInfo.WithWidthAndHeight(AWidth,
+  AHeight: Single): TWinControlInfo;
+begin
+  Result := Self;
+  Result.Width := AWidth;
+  Result.Height := AHeight;
 end;
 
 end.
