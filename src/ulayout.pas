@@ -8,7 +8,7 @@
 interface
 
 uses
-  Classes, SysUtils, Generics.Collections, Generics.Defaults;
+  Classes, SysUtils, Generics.Collections, Generics.Defaults, Vcl.Controls;
 
 type
   IGridItem = interface
@@ -37,6 +37,18 @@ type
     {$ENDIF}
     class function Some(AValue: string): TOptionalString; static;
     class function None: TOptionalString; static;
+  end;
+
+  TOptionalAlign = record
+    HasValue: Boolean;
+    Value: TAlign;
+    {$IFDEF FPC}
+    class operator :=(AValue: TAlign): TOptionalAlign;
+    {$ELSE}
+    class operator Implicit(AValue: TAlign): TOptionalAlign;
+    {$ENDIF}
+    class function Some(AValue: TAlign): TOptionalAlign; static;
+    class function None: TOptionalAlign; static;
   end;
 
   { TOptionalInt }
@@ -1897,6 +1909,25 @@ begin
 end;
 
 class function TOptionalString.Some(AValue: string): TOptionalString;
+begin
+  Result.HasValue := True;
+  Result.Value := AValue;
+end;
+
+{ TOptionalAlign }
+
+class operator TOptionalAlign.Implicit(AValue: TAlign): TOptionalAlign;
+begin
+  Result := TOptionalAlign.Some(AValue);
+end;
+
+class function TOptionalAlign.None: TOptionalAlign;
+begin
+  Result.Value := alNone;
+  Result.HasValue := False;
+end;
+
+class function TOptionalAlign.Some(AValue: TAlign): TOptionalAlign;
 begin
   Result.HasValue := True;
   Result.Value := AValue;

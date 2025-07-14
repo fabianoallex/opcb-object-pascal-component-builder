@@ -17,7 +17,8 @@ uses
     {$ENDIF}
   {$ENDIF}
   Classes, SysUtils, ULayout, UGridLayoutBuilder,
-  UGridLayoutFillerFactory, Generics.Collections, Generics.Defaults;
+  UGridLayoutFillerFactory, Generics.Collections, Generics.Defaults,
+  Vcl.Graphics, Vcl.ExtCtrls;
 
 type
   {$IFNDEF FPC}
@@ -64,7 +65,7 @@ type
     SetupProc: TWinControlSetupProc;
     Name: string;
     Caption: TOptionalString;
-    Align: TAlign;
+    Align: TOptionalAlign;
     Width: Single;
     Height: Single;
     Top: TOptionalSingle;
@@ -92,7 +93,7 @@ type
     Name: string;
     Caption: TOptionalString;
     Text: TOptionalString;
-    Align: TAlign;
+    Align: TOptionalAlign;
     Width: Single;
     Height: Single;
     Top: TOptionalSingle;
@@ -112,9 +113,39 @@ type
     class function Create(AControl: TControl): TControlInfo; overload; static;
   end;
 
+  TControlRegistry = class;
+
+  TControlRegistryEntry = record
+    Registry: TControlRegistry;
+    RefCount: Integer;
+  end;
+
+  TStrControlRegistryEntryDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControlRegistryEntry>;
   TStrControlDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControl>;
   TControlList = {$IFDEF FPC}specialize{$ENDIF} TList<TControl>;
   TControlGroupMap = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControlList>;
+  TStrGridDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TGridLayout>;
+
+  TControlRegistry = class
+  private
+    class var FInstances: TStrControlRegistryEntryDictionary;
+  public
+    class function ForContext(const AKey: string): TControlRegistry; static;
+    class procedure ReleaseContext(const AKey: string); static;
+    class procedure ClearAll; static;
+  private
+    FControls: TControlList;
+    FNamedControls: TStrControlDictionary;
+    constructor CreatePrivate;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure AddControl(AControl: TControl; const AName: string = '');
+    function GetControl(const AName: string): TControl;
+    function TryGetControl(const AName: string; out AControl: TControl): Boolean;
+    property Controls: TControlList read FControls;
+    property NamedControls: TStrControlDictionary read FNamedControls;
+  end;
 
   { TControlGridPopulator }
 
@@ -125,20 +156,21 @@ type
     FFillerType: TFillerType;
     FOwner: TComponent;
     FParent: TWinControl;
-    FControls: TControlList;
-    FNamedControls: TStrControlDictionary;
+    // FControls: TControlList;
+    // FNamedControls: TStrControlDictionary;
+    FControlRegistry: TControlRegistry;
+    FControlRegistryName: string;
     FOnControlPopulate: TControlPopulateProc;
     function GetNamedControl(const AName: string): TControl;
-    procedure SetControls(AValue: TControlList);
+    // procedure SetControls(AValue: TControlList);
+    function GetControls: TControlList;
     procedure ConfigControl(AControl: TControl);
   public
-    constructor Create;
+    constructor Create(AControlRegistryName: string);
     destructor Destroy; override;
-    function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl
-      ): TControlGridPopulator;
+    function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl): TControlGridPopulator;
     procedure SetGrid(AGrid: TGridLayout);
-    function UsingFiller(AFillerType: TFillerType; ARow: Integer=0;
-      AColumn: Integer=0): TControlGridPopulator;
+    function UsingFiller(AFillerType: TFillerType; ARow: Integer=0; AColumn: Integer=0): TControlGridPopulator;
     function FillerSkip(ACount: Integer=1): TControlGridPopulator;
     function FillerSetPosition(ARow, AColumn: Integer): TControlGridPopulator;
 
@@ -172,9 +204,12 @@ type
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
 
     function OnControlCreate(AProc: TControlPopulateProc): TControlGridPopulator;
-    property Controls: TControlList read FControls write SetControls;
+    property Controls: TControlList read GetControls;   // property Controls: TControlList read GetControls write SetControls;
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property Grid: TGridLayout read FGrid;
+
+    property ControlRegistry: TControlRegistry read FControlRegistry;
+    property ControlRegistryName: string read FControlRegistryName;
   end;
 
   { TGridLayoutHelper }
@@ -185,18 +220,18 @@ type
     procedure AddItem(AItem: TControl; ASettings: TGridCellSettings); overload;
   end;
 
-  { TGridLayoutBuilderHelper }
-
-  TGridLayoutBuilderHelper = class helper for TGridLayoutBuilder
+  TAutoSizeContainer = class(TPanel)
   public
-    function AddItem(AItem: TControl; ASettings: TGridCellSettings):
-      TGridLayoutBuilder; overload;
-    function FillItems(AControls: array of TControl;
-      AInitialPosition: IGridPosition=nil): TGridLayoutBuilder;
-    function BuildAndPopulate(var AGrid: TGridLayout;
-      APopulator: TControlGridPopulator): TControlGridPopulator;
-    function Build(var AGrid: TGridLayout): TGridLayoutBuilder; overload;
-    function UsePopulator(APopulator: TControlGridPopulator): TControlGridPopulator;
+    constructor Create(AOwner: TComponent); override;
+  end;
+
+  TGridContainer = class(TAutoSizeContainer)
+  private
+    FGrid: TGridLayout;
+    FGridPopulator: TControlGridPopulator;
+  public
+    constructor Create(AOwner: TComponent; AControlRegistryName: string);
+    destructor Destroy; override;
   end;
 
   TControlGroupBounds = record
@@ -231,15 +266,37 @@ type
 
   TControlPopulatorLevelStack = TObjectList<TControlPopulatorLevel>;
 
+  TControlPopulator = class;
+
+  { TGridLayoutBuilderHelper }
+
+  TGridLayoutBuilderHelper = class helper for TGridLayoutBuilder
+  public
+    function AddItem(AItem: TControl; ASettings: TGridCellSettings):
+      TGridLayoutBuilder; overload;
+    function FillItems(AControls: array of TControl;
+      AInitialPosition: IGridPosition=nil): TGridLayoutBuilder;
+    function BuildAndPopulate(var AGrid: TGridLayout;
+      APopulator: TControlGridPopulator): TControlGridPopulator;
+    function Build(var AGrid: TGridLayout): TGridLayoutBuilder; overload;
+    function UsePopulator(APopulator: TControlGridPopulator): TControlGridPopulator;
+  end;
+
   TControlPopulator = class
   private
     FOwner: TComponent;
-    FControls: TControlList;
-    FNamedControls: TStrControlDictionary;
+    // FControls: TControlList;
+    // FNamedControls: TStrControlDictionary;
+
+    FControlRegistryName: string;
+    FControlRegistry: TControlRegistry;
+
+    FGrids: TStrGridDictionary;
     FGroups: TControlGroupMap;
     FVerticalSpace: Single;
     FHorizontalSpace: Single;
     FLevelStack: TControlPopulatorLevelStack;
+    function GetControls: TControlList;
     procedure MoveTopLeftAfterControl(AControl: TControl);
     procedure MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
     procedure AddControlToGroups(AControl: TControl; const AGroups: array of string);
@@ -248,55 +305,44 @@ type
     function GetContentWidth: Single;
     function GetFContentHeight: Single;
   public
-    constructor Create;
+    constructor Create(AControlRegistryName: string);
     destructor Destroy; override;
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
-
     function NextLevel(AGroupName: string=''): TControlPopulator; overload;
     function NextLevel(ADirection: TControlPopulatorDirection;
       AGroupName: string=''): TControlPopulator; overload;
     function PreviousLevel: TControlPopulator;
-
     function NextSiblingLevel(AGroupName: string='';
       ABreakLine: Boolean=False): TControlPopulator; overload;
-
     function NextSiblingLevel(ADirection: TControlPopulatorDirection;
       AGroupName: string=''; ABreakLine: Boolean=False): TControlPopulator; overload;
-
     function NextSiblingLevel(ABreakLine: Boolean=False): TControlPopulator; overload;
-
     function NextSiblingLevel(ADirection: TControlPopulatorDirection;
       ABreakLine: Boolean): TControlPopulator; overload;
-
     function NextSiblingLevelWithBreak(AGroupName: string=''): TControlPopulator; overload;
     function NextSiblingLevelWithBreak(ADirection: TControlPopulatorDirection;
       AGroupName: string=''): TControlPopulator; overload;
-
-    // ----
     function NextLevel(AWinControlInfo: TWinControlInfo;
       AGroupName: string=''): TControlPopulator; overload;
-
     function NextLevel(AWinControlInfo: TWinControlInfo;
       ADirection: TControlPopulatorDirection; AGroupName: string=''): TControlPopulator; overload;
-
     function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
       AGroupName: string=''; ABreakLine: Boolean=False): TControlPopulator; overload;
-
     function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
       ADirection: TControlPopulatorDirection;
       AGroupName: string=''; ABreakLine: Boolean=False): TControlPopulator; overload;
-
     function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
       ABreakLine: Boolean=False): TControlPopulator; overload;
-
     function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
       ADirection: TControlPopulatorDirection;
       ABreakLine: Boolean): TControlPopulator; overload;
-
     function NextSiblingLevelWithBreak(AWinControlInfo: TWinControlInfo; AGroupName: string=''): TControlPopulator; overload;
     function NextSiblingLevelWithBreak(AWinControlInfo: TWinControlInfo; ADirection: TControlPopulatorDirection;
       AGroupName: string=''): TControlPopulator; overload;
+
+    function NextLevelGrid(AGridName: string; ABuilder: TGridLayoutBuilder): TControlPopulator; overload;
+
 
 
     function SetVerticalSpace(AVerticalSpace: Single): TControlPopulator;
@@ -338,6 +384,7 @@ type
     property ContentWidth: Single read GetContentWidth;
     property ContentHeight: Single read GetFContentHeight;
     property CurrentLevel: TControlPopulatorLevel read GetCurrenteLevel;
+    property Controls: TControlList read GetControls;
   end;
 
 implementation
@@ -346,9 +393,8 @@ uses
   {$IFDEF FPC}Graphics,
   {$ELSE}
     {$IFDEF FRAMEWORK_FMX} Fmx.Graphics,
-    {$ELSE} Vcl.Graphics,
     {$ENDIF}
-  {$ENDIF} Math;
+  {$ENDIF} Math, System.Types, Winapi.Messages, Vcl.ComCtrls;
 
 { TControlGridItem }
 
@@ -482,18 +528,19 @@ begin
   else
     Result := ControlClass.Create(AOwner);
 
-  Result.Parent := AParent;
-
   if not AControlName.IsEmpty then
     Result.Name := AControlName;
+
+  Result.Parent := AParent;
 
   if Caption.HasValue then
     TProtectedControl(Result).Caption := Caption.Value;
 
   if Text.HasValue then
-    TProtectedControl(Result).Caption := Text.Value;
+    TProtectedControl(Result).Text := Text.Value;
 
-  Result.Align := Align;
+  if Align.HasValue then
+    Result.Align := Align.Value;
 
   if Width >= 0 then
     Result.Width := Trunc(Width);
@@ -568,16 +615,21 @@ end;
 
 { TControlGridPopulator }
 
-procedure TControlGridPopulator.SetControls(AValue: TControlList);
+{procedure TControlGridPopulator.SetControls(AValue: TControlList);
 begin
   if FControls = AValue then
     Exit;
   FControls := AValue;
+end;}
+
+function TControlGridPopulator.GetControls: TControlList;
+begin
+  Result := FControlRegistry.FControls;
 end;
 
 function TControlGridPopulator.GetNamedControl(const AName: string): TControl;
 begin
-  if not FNamedControls.TryGetValue(AName, Result) then
+  if not FControlRegistry.TryGetControl(AName, Result) then // if not FNamedControls.TryGetValue(AName, Result) then
     Result := nil;
 end;
 
@@ -618,18 +670,22 @@ begin
   {$ENDIF}
 end;
 
-constructor TControlGridPopulator.Create;
+constructor TControlGridPopulator.Create(AControlRegistryName: string);
 begin
   FGrid := nil;
   FFiller := nil;
-  FControls := TControlList.Create;
-  FNamedControls := TStrControlDictionary.Create;
+  // FControls := TControlList.Create;
+  // FNamedControls := TStrControlDictionary.Create;
+
+  FControlRegistryName := AControlRegistryName;
+  FControlRegistry := TControlRegistry.ForContext(AControlRegistryName);
 end;
 
 destructor TControlGridPopulator.Destroy;
 begin
-  FControls.Free;
-  FNamedControls.Free;
+  FControlRegistry.ReleaseContext(FControlRegistryName);
+  // FControls.Free;
+  // FNamedControls.Free;
   inherited;
 end;
 
@@ -661,19 +717,20 @@ var
   ControlGridItem: TControlGridItem;
   Settings: TGridCellSettings;
 begin
-  FControls.Add(AControl);
+  // FControls.Add(AControl);
+  // if not string(AControl.Name).IsEmpty then
+  //  FNamedControls.Add(AControl.Name, AControl);
 
-  if not string(AControl.Name).IsEmpty then
-    FNamedControls.Add(AControl.Name, AControl);
+  FControlRegistry.AddControl(AControl, AControl.Name);
 
   ControlGridItem := TControlGridItem.Create(AControl);
   Settings := TGridCellSettings.Create(0, 0);
 
   try
     if Assigned(FOnControlPopulate) then
-      FOnControlPopulate(AControl, FControls.Count-1, Settings);
+      FOnControlPopulate(AControl, Controls.Count-1, Settings);   // FOnControlPopulate(AControl, FControls.Count-1, Settings);
     if Assigned(AProc) then
-      AProc(AControl, FControls.Count-1, Settings);
+      AProc(AControl, Controls.Count-1, Settings);   // AProc(AControl, FControls.Count-1, Settings);
 
     FFiller.PlaceItem(ControlGridItem, Settings);
   finally
@@ -697,7 +754,7 @@ var
     Candidate := ABaseName;
     Index := 1;
 
-    while FNamedControls.ContainsKey(Candidate) do
+    while ControlRegistry.FNamedControls.ContainsKey(Candidate) do  // while FNamedControls.ContainsKey(Candidate) do
     begin
       Candidate := ABaseName + IntToStr(Index);
       Inc(Index);
@@ -919,10 +976,15 @@ begin
   MoveControls(AControlNames, 0, DeltaY);
 end;
 
-constructor TControlPopulator.Create;
+constructor TControlPopulator.Create(AControlRegistryName: string);
 begin
-  FControls := TControlList.Create;
-  FNamedControls := TStrControlDictionary.Create;
+  // FControls := TControlList.Create;
+  // FNamedControls := TStrControlDictionary.Create;
+
+  FControlRegistryName := AControlRegistryName;
+  FControlRegistry := TControlRegistry.ForContext(FControlRegistryName);
+
+  FGrids := TStrGridDictionary.Create;
   FGroups := TControlGroupMap.Create;
 
   FLevelStack := TControlPopulatorLevelStack.Create(True);
@@ -950,7 +1012,7 @@ var
     Candidate := ABaseName;
     Index := 1;
 
-    while FNamedControls.ContainsKey(Candidate) do
+    while FControlRegistry.NamedControls.ContainsKey(Candidate) do  // while FNamedControls.ContainsKey(Candidate) do
     begin
       Candidate := ABaseName + IntToStr(Index);
       Inc(Index);
@@ -980,11 +1042,20 @@ var
 
 begin
   Result := Self;
-  Control := CreateControl(AControlInfo);
-  FControls.Add(Control);
 
-  if not string(Control.Name).IsEmpty then
-    FNamedControls.Add(Control.Name, Control);
+  Control := CreateControl(AControlInfo);
+
+  FControlRegistry.AddControl(Control); // FControls.Add(Control);
+
+  // caso especial: TTabSheet / TPageControl
+  if (Control is TTabSheet) and (CurrentLevel.Parent is TPageControl) then
+  begin
+    TTabSheet(Control).Parent := nil;
+    TTabSheet(Control).PageControl := TPageControl(CurrentLevel.Parent);
+  end;
+
+  // if not string(Control.Name).IsEmpty then
+  //   FNamedControls.Add(Control.Name, Control);
 
   for Level in FLevelStack do
     if not Level.GroupName.IsEmpty then
@@ -1140,8 +1211,11 @@ destructor TControlPopulator.Destroy;
 var
   GroupList: TControlList;
 begin
-  FControls.Free;
-  FNamedControls.Free;
+  // FControls.Free;
+  // FNamedControls.Free;
+  TControlRegistry.ReleaseContext(FControlRegistryName);
+
+  FGrids.Free;
   for GroupList in FGroups.Values do
     GroupList.Free;
   FGroups.Free;
@@ -1156,10 +1230,20 @@ var
 
   function GetSubLevelBounds: TControlGroupBounds;
   begin
-    if SubLevel.Parent = SuperLevel.Parent then
+    if (SubLevel.Parent = SuperLevel.Parent) then
       Result := GetGroupBounds(SubLevel.GroupName)
     else
     begin
+      // quando o TPanel for o container e estiver configurado para
+      // AutoSize, o TPanel ainda não estará redimensionado, sendo
+      // necessário força-lo a se atualizar.
+      if (SubLevel.Parent is TPanel) and TPanel(SubLevel.Parent).AutoSize then
+      begin
+        SubLevel.Parent.HandleNeeded;
+        SubLevel.Parent.Invalidate;
+        SubLevel.Parent.Update;
+      end;
+
       Result.Reset;
       Result.Include(SubLevel.Parent);
     end;
@@ -1194,7 +1278,7 @@ end;
 
 function TControlPopulator.GetNamedControl(const AName: string): TControl;
 begin
-  if not FNamedControls.TryGetValue(AName, Result) then
+  if not FControlRegistry.NamedControls.TryGetValue(AName, Result) then   // if not FNamedControls.TryGetValue(AName, Result) then
     Result := nil;
 end;
 
@@ -1223,6 +1307,11 @@ begin
   Result := GetGroupBounds(FLevelStack.First.GroupName).Width;
 end;
 
+function TControlPopulator.GetControls: TControlList;
+begin
+  Result := FControlRegistry.Controls;
+end;
+
 function TControlPopulator.GetControlsBounds(
   AControlsNames: array of string): TControlGroupBounds;
 var
@@ -1237,7 +1326,7 @@ begin
   begin
     Name := AControlsNames[I];
 
-    if FNamedControls.TryGetValue(Name, Control) then
+    if FControlRegistry.NamedControls.TryGetValue(Name, Control) then  // if FNamedControls.TryGetValue(Name, Control) then
       Result.Include(Control)
     else if FGroups.TryGetValue(Name, Group) then
       for Control in Group do
@@ -1279,7 +1368,7 @@ begin
 
   for Name in AControlNames do
   begin
-    if not FNamedControls.TryGetValue(Name, Ctrl) then
+    if not FControlRegistry.NamedControls.TryGetValue(Name, Ctrl) then   // if not FNamedControls.TryGetValue(Name, Ctrl) then
       raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
 
     Ctrl.Left := Round(Ctrl.Left + ADX);
@@ -1490,8 +1579,15 @@ var
   WinControl: TWinControl;
 begin
   Result := Self;
-  WinControl := AWinControlInfo.CreateWinControl(
-    FOwner, CurrentLevel.Parent, AWinControlInfo.Name);
+
+  if (AWinControlInfo.WinControlClass.InheritsFrom(TTabSheet))
+      and (CurrentLevel.Parent is TPageControl) then
+    WinControl := AWinControlInfo.CreateWinControl(
+      CurrentLevel.Parent, CurrentLevel.Parent, AWinControlInfo.Name)
+  else
+    WinControl := AWinControlInfo.CreateWinControl(
+      FOwner, CurrentLevel.Parent, AWinControlInfo.Name);
+
   AddControl(TControlInfo.Create(WinControl));
   NextLevel(AGroupName);
   WithParent(WinControl);
@@ -1503,6 +1599,16 @@ function TControlPopulator.NextLevel(AWinControlInfo: TWinControlInfo;
 begin
   Result := NextLevel(AWinControlInfo, AGroupName);
   SetDirection(ADirection);
+end;
+
+function TControlPopulator.NextLevelGrid(AGridName: string;
+  ABuilder: TGridLayoutBuilder): TControlPopulator;
+var
+  Grid: TGridLayout;
+begin
+  Grid := ABuilder.Build;
+  Result := NextLevel(AGridName);
+  FGrids.Add(AGridName, Grid);
 end;
 
 function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
@@ -1645,15 +1751,16 @@ begin
   else
     Result := WinControlClass.Create(AOwner);
 
-  Result.Parent := AParent;
-
   if not AName.IsEmpty then
     Result.Name := AName;
+
+  Result.Parent := AParent;
 
   if Caption.HasValue then
     TProtectedControl(Result).Caption := Caption.Value;
 
-  Result.Align := Align;
+  if Align.HasValue then
+    Result.Align := Align.Value;
 
   if Width >= 0 then
     Result.Width := Trunc(Width);
@@ -1719,6 +1826,141 @@ begin
   Result := Self;
   Result.Width := AWidth;
   Result.Height := AHeight;
+end;
+
+{ TAutoSizeContainer }
+
+constructor TAutoSizeContainer.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  BevelOuter := bvNone;
+  AutoSize := True;
+end;
+
+{ TGridContainer }
+
+constructor TGridContainer.Create(AOwner: TComponent; AControlRegistryName: string);
+begin
+  inherited Create(AOwner);
+  FGrid := nil;
+  FGridPopulator := TControlGridPopulator.Create(AControlRegistryName);
+end;
+
+destructor TGridContainer.Destroy;
+begin
+  FGridPopulator.Free;
+
+  inherited;
+end;
+
+{ TControlRegistry }
+
+procedure TControlRegistry.AddControl(AControl: TControl; const AName: string);
+begin
+  if AControl = nil then
+    Exit;
+
+  FControls.Add(AControl);
+
+  if AName <> '' then
+  begin
+    if FNamedControls.ContainsKey(AName) then
+      raise Exception.CreateFmt('Já existe um controle registrado com o nome "%s".', [AName]);
+    FNamedControls.Add(AName, AControl);
+  end;
+end;
+
+class procedure TControlRegistry.ClearAll;
+var
+  Entry: TControlRegistryEntry;
+begin
+  if not Assigned(FInstances) then
+    Exit;
+
+  for Entry in FInstances.Values do
+    Entry.Registry.Free;
+
+  FInstances.Free;
+  FInstances := nil;
+end;
+
+constructor TControlRegistry.Create;
+begin
+  raise Exception.Create('Use TControlRegistry.ForContext');
+end;
+
+constructor TControlRegistry.CreatePrivate;
+begin
+  inherited Create;
+  FControls := TControlList.Create;
+  FNamedControls := TStrControlDictionary.Create;
+end;
+
+destructor TControlRegistry.Destroy;
+begin
+  FControls.Free;
+  FNamedControls.Free;
+  inherited;
+end;
+
+class function TControlRegistry.ForContext(const AKey: string): TControlRegistry;
+var
+  Entry: TControlRegistryEntry;
+begin
+  if FInstances = nil then
+    FInstances := TStrControlRegistryEntryDictionary.Create; // TDictionary<string, TControlRegistry>.Create;
+
+  if FInstances.TryGetValue(AKey, Entry) then
+  begin
+    Inc(Entry.RefCount);
+    FInstances[AKey] := Entry;
+    Exit(Entry.Registry);
+  end;
+
+  Entry.Registry := TControlRegistry.CreatePrivate;
+  Entry.RefCount := 1;
+  FInstances.Add(AKey, Entry);
+  Result := Entry.Registry;
+end;
+
+function TControlRegistry.GetControl(const AName: string): TControl;
+begin
+  if not FNamedControls.TryGetValue(AName, Result) then
+    raise Exception.CreateFmt('Controle com o nome "%s" não encontrado.', [AName]);
+end;
+
+class procedure TControlRegistry.ReleaseContext(const AKey: string);
+var
+  Entry: TControlRegistryEntry;
+begin
+  if not Assigned(FInstances) then
+    Exit;
+
+  if FInstances.TryGetValue(AKey, Entry) then
+  begin
+    Dec(Entry.RefCount);
+    if Entry.RefCount <= 0 then
+    begin
+      Entry.Registry.Free;
+      FInstances.Remove(AKey);
+    end
+    else
+    begin
+      FInstances[AKey] := Entry;
+    end;
+  end;
+
+  if FInstances.Count = 0 then
+  begin
+    FInstances.Free;
+    FInstances := nil;
+  end;
+end;
+
+function TControlRegistry.TryGetControl(const AName: string;
+  out AControl: TControl): Boolean;
+begin
+  Result := FNamedControls.TryGetValue(AName, AControl);
 end;
 
 end.
