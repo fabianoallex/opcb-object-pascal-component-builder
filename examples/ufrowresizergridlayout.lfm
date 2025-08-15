@@ -1,12 +1,13 @@
 object FRowResizerGridLayout: TFRowResizerGridLayout
-  Left = 352
+  Left = 2923
   Height = 571
-  Top = 250
+  Top = 481
   Width = 1052
   Caption = 'FRowResizerGridLayout'
   ClientHeight = 571
   ClientWidth = 1052
   DesignTimePPI = 120
+  LCLVersion = '4.0.0.4'
   OnCreate = FormCreate
   OnResize = FormResize
   object Button1: TButton

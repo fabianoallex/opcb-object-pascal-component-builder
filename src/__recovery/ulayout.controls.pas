@@ -1,4 +1,4 @@
-﻿unit ulayout.controls;
+unit ulayout.controls;
 
 {$IFDEF FPC}
 {$mode objfpc}{$H+}
@@ -346,7 +346,11 @@ type
     function NextSiblingLevelWithBreak(AWinControlInfo: TWinControlInfo; AGroupName: string=''): TControlPopulator; overload;
     function NextSiblingLevelWithBreak(AWinControlInfo: TWinControlInfo; ADirection: TControlPopulatorDirection;
       AGroupName: string=''): TControlPopulator; overload;
+
     function NextLevelGrid(AGridName: string; ABuilder: TGridLayoutBuilder): TControlPopulator; overload;
+
+
+
     function SetVerticalSpace(AVerticalSpace: Single): TControlPopulator;
     function SetHorizontalSpace(AHorizontalSpace: Single): TControlPopulator;
     function SetTopLeft(ATop, ALeft: Single): TControlPopulator;

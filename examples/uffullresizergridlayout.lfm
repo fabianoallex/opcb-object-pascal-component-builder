@@ -1,10 +1,11 @@
 object FFullResizerGridLayout: TFFullResizerGridLayout
-  Left = 0
+  Left = 3234
   Height = 673
-  Top = 250
+  Top = 217
   Width = 885
   Caption = 'FFullResizerGridLayout'
   DesignTimePPI = 120
+  LCLVersion = '4.0.0.4'
   OnCreate = FormCreate
   OnResize = FormResize
 end

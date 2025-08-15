@@ -22,10 +22,12 @@
         <Loaded Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="..\src\ulayout.pas"/>
+        <Filename Value="..\src\ULayout.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="ULayout"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
+        <TopLine Value="11"/>
+        <CursorPos X="63" Y="11"/>
         <UsageCount Value="223"/>
         <Loaded Value="True"/>
       </Unit>
@@ -145,7 +147,6 @@
       <Unit>
         <Filename Value="..\src\ugridlayoutbuilder.pas"/>
         <UnitName Value="UGridLayoutBuilder"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <TopLine Value="158"/>
         <CursorPos Y="167"/>
@@ -271,11 +272,11 @@
       </Position>
       <Position>
         <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="456" Column="42" TopLine="474"/>
+        <Caret Line="1987" Column="5" TopLine="1961"/>
       </Position>
       <Position>
-        <Filename Value="..\src\ulayout.pas"/>
-        <Caret Line="1987" Column="5" TopLine="1961"/>
+        <Filename Value="..\src\ugridlayoutbuilder.pas"/>
+        <Caret Line="167" TopLine="158"/>
       </Position>
     </JumpHistory>
     <RunParams>

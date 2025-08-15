@@ -59,7 +59,6 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit4"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="3"/>
         <UsageCount Value="60"/>
         <Loaded Value="True"/>
@@ -75,18 +74,18 @@
         <Loaded Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="..\..\src\ulayout.pas"/>
-        <UnitName Value="ULayout"/>
+        <Filename Value="..\..\src\ULayout.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="1602"/>
-        <CursorPos X="3" Y="1606"/>
+        <TopLine Value="11"/>
+        <CursorPos X="63" Y="11"/>
         <UsageCount Value="101"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\src\ugridlayoutfill.pas"/>
         <UnitName Value="UGridLayoutFill"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="13"/>
         <TopLine Value="178"/>
         <CursorPos Y="182"/>
         <UsageCount Value="68"/>
@@ -171,7 +170,7 @@
       <Unit>
         <Filename Value="..\..\src\ugridlayoutfillerfactory.pas"/>
         <UnitName Value="UGridLayoutFillerFactory"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="12"/>
         <CursorPos X="30"/>
         <UsageCount Value="74"/>
         <Loaded Value="True"/>
@@ -277,16 +276,14 @@
         <TopLine Value="370"/>
         <UsageCount Value="7"/>
       </Unit>
+      <Unit>
+        <Filename Value="..\..\examples\GridLayoutExamples2.lpr"/>
+        <EditorIndex Value="11"/>
+        <UsageCount Value="10"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\..\src\ulayout.pas"/>
-        <Caret Line="1544" Column="3" TopLine="1542"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\src\ulayout.pas"/>
-        <Caret Line="443" Column="16" TopLine="421"/>
-      </Position>
       <Position>
         <Filename Value="..\..\src\ulayout.pas"/>
         <Caret Line="1544" Column="3" TopLine="1542"/>
@@ -398,6 +395,13 @@
       <Position>
         <Filename Value="..\..\src\ulayout.pas"/>
         <Caret Line="459" Column="24" TopLine="428"/>
+      </Position>
+      <Position>
+        <Filename Value="unit4.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="project1.lpr"/>
+        <Caret Line="19" Column="3"/>
       </Position>
     </JumpHistory>
     <RunParams>

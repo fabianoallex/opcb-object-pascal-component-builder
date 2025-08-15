@@ -8,7 +8,15 @@
 interface
 
 uses
-  Classes, SysUtils, Generics.Collections, Generics.Defaults, Vcl.Controls;
+  {$IFDEF FPC}Controls, StdCtrls,
+  {$ELSE}
+    {$IFDEF FRAMEWORK_FMX}
+    FMX.Controls, FMX.StdCtrls, Fmx.Types,
+    {$ELSE}
+    Vcl.Controls, Vcl.StdCtrls,
+    {$ENDIF}
+  {$ENDIF}
+  Classes, SysUtils, Generics.Collections, Generics.Defaults;
 
 type
   IGridItem = interface
@@ -39,15 +47,21 @@ type
     class function None: TOptionalString; static;
   end;
 
+  //{$IFDEF FRAMEWORK_FMX}
+  //TAlign = TAlignLayout;
+  //{$ENDIF}
+
   TOptionalAlign = record
     HasValue: Boolean;
-    Value: TAlign;
+    Value: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF};
     {$IFDEF FPC}
     class operator :=(AValue: TAlign): TOptionalAlign;
     {$ELSE}
-    class operator Implicit(AValue: TAlign): TOptionalAlign;
+    class operator Implicit(
+      AValue: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TOptionalAlign;
     {$ENDIF}
-    class function Some(AValue: TAlign): TOptionalAlign; static;
+    class function Some(
+      AValue: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TOptionalAlign; static;
     class function None: TOptionalAlign; static;
   end;
 
@@ -1916,18 +1930,28 @@ end;
 
 { TOptionalAlign }
 
-class operator TOptionalAlign.Implicit(AValue: TAlign): TOptionalAlign;
+{$IFDEF FPC}
+class operator TOptionalAlign.:=(AValue: TAlign): TOptionalAlign;
+{$ELSE}
+class operator TOptionalAlign.Implicit(
+  AValue: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TOptionalAlign;
+{$ENDIF}
 begin
   Result := TOptionalAlign.Some(AValue);
 end;
 
 class function TOptionalAlign.None: TOptionalAlign;
 begin
+  {$IFDEF FRAMEWORK_FMX}
+  Result.Value := TAlignLayout.None;
+  {$ELSE}
   Result.Value := alNone;
+  {$ENDIF}
   Result.HasValue := False;
 end;
 
-class function TOptionalAlign.Some(AValue: TAlign): TOptionalAlign;
+class function TOptionalAlign.Some(
+  AValue: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TOptionalAlign;
 begin
   Result.HasValue := True;
   Result.Value := AValue;
