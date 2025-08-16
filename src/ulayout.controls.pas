@@ -59,32 +59,6 @@ type
   TControlSetupProc = procedure(AControl: TControl) of object;
   TWinControlSetupProc = procedure(AWinControl: TWinControl) of object;
 
-  TWinControlInfo = record
-    WinControl: TWinControl;
-    WinControlClass: TWinControlClass;
-    SetupProc: TWinControlSetupProc;
-    Name: string;
-    Caption: TOptionalString;
-    Align: TOptionalAlign;
-    Width: Single;
-    Height: Single;
-    Top: TOptionalSingle;
-    Left: TOptionalSingle;
-    function Setup(AProc: TWinControlSetupProc): TWinControlInfo;
-    function WithAlign(
-      AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TWinControlInfo;
-    function WithWidth(AWidth: Single): TWinControlInfo;
-    function WithHeight(AHeight: Single): TWinControlInfo;
-    function WithWidthAndHeight(AWidth: Single; AHeight: Single): TWinControlInfo;
-    function WithTop(ATop: Single): TWinControlInfo;
-    function WithLeft(ALeft: Single): TWinControlInfo;
-    function WithCaption(ACaption: string): TWinControlInfo;
-    function CreateWinControl(AOwner: TComponent; AParent: TWinControl;
-      const AName: string): TWinControl;
-    class function Create(AClass: TWinControlClass; const AName: string=''): TWinControlInfo; overload; static;
-    class function Create(AWinControl: TWinControl): TWinControlInfo; overload; static;
-  end;
-
   { TControlInfo }
 
   TControlInfo = record
@@ -102,6 +76,7 @@ type
     function Setup(AProc: TControlSetupProc): TControlInfo;
     function WithAlign(
       AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TControlInfo;
+    function WithName(AName: string): TControlInfo;
     function WithWidth(AWidth: Single): TControlInfo;
     function WithHeight(AHeight: Single): TControlInfo;
     function WithWidthAndHeight(AWidth: Single; AHeight: Single): TControlInfo;
@@ -329,22 +304,22 @@ type
     function NextSiblingLevelWithBreak(AGroupName: string=''): TControlPopulator; overload;
     function NextSiblingLevelWithBreak(ADirection: TControlPopulatorDirection;
       AGroupName: string=''): TControlPopulator; overload;
-    function NextLevel(AWinControlInfo: TWinControlInfo;
+    function NextLevel(AControlInfo: TControlInfo;
       AGroupName: string=''): TControlPopulator; overload;
-    function NextLevel(AWinControlInfo: TWinControlInfo;
+    function NextLevel(AControlInfo: TControlInfo;
       ADirection: TControlPopulatorDirection; AGroupName: string=''): TControlPopulator; overload;
-    function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+    function NextSiblingLevel(AControlInfo: TControlInfo;
       AGroupName: string=''; ABreak: Boolean=False): TControlPopulator; overload;
-    function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+    function NextSiblingLevel(AControlInfo: TControlInfo;
       ADirection: TControlPopulatorDirection;
       AGroupName: string=''; ABreak: Boolean=False): TControlPopulator; overload;
-    function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+    function NextSiblingLevel(AControlInfo: TControlInfo;
       ABreak: Boolean=False): TControlPopulator; overload;
-    function NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+    function NextSiblingLevel(AControlInfo: TControlInfo;
       ADirection: TControlPopulatorDirection;
       ABreak: Boolean): TControlPopulator; overload;
-    function NextSiblingLevelWithBreak(AWinControlInfo: TWinControlInfo; AGroupName: string=''): TControlPopulator; overload;
-    function NextSiblingLevelWithBreak(AWinControlInfo: TWinControlInfo; ADirection: TControlPopulatorDirection;
+    function NextSiblingLevelWithBreak(AControlInfo: TControlInfo; AGroupName: string=''): TControlPopulator; overload;
+    function NextSiblingLevelWithBreak(AControlInfo: TControlInfo; ADirection: TControlPopulatorDirection;
       AGroupName: string=''): TControlPopulator; overload;
     function NextLevelGrid(AGridName: string; ABuilder: TGridLayoutBuilder): TControlPopulator; overload;
     function SetVerticalSpace(AVerticalSpace: Single): TControlPopulator;
@@ -562,6 +537,10 @@ begin
     {$IFDEF FRAMEWORK_FMX}
     if Result is TPresentedTextControl then
       TPresentedTextControl(Result).Text := Caption.Value;
+
+    if Result is TTextControl then
+      TTextControl(Result).Text := Caption.Value;
+
     {$ELSE}
     TProtectedControl(Result).Caption := Caption.Value;
     {$ENDIF}
@@ -572,6 +551,9 @@ begin
     {$IFDEF FRAMEWORK_FMX}
     if Result is TPresentedTextControl then
       TPresentedTextControl(Result).Text := Text.Value;
+
+    if Result is TTextControl then
+      TTextControl(Result).Text := Text.Value;
     {$ELSE}
     TProtectedControl(Result).Text := Text.Value;
     {$ENDIF}
@@ -631,6 +613,12 @@ function TControlInfo.WithLeft(ALeft: Single): TControlInfo;
 begin
   Result := Self;
   Result.Left := ALeft;
+end;
+
+function TControlInfo.WithName(AName: string): TControlInfo;
+begin
+  Result := Self;
+  Result.Name := AName;
 end;
 
 function TControlInfo.Setup(AProc: TControlSetupProc): TControlInfo;
@@ -1759,65 +1747,47 @@ begin
   CurrentLevel.Parent := AParent;
 end;
 
-{
-function TControlPopulator.NextLevel(AWinControlInfo: TWinControlInfo;
-  AGroupName: string): TControlPopulator;
+function TControlPopulator.NextLevel(
+  AControlInfo: TControlInfo;
+  AGroupName: string
+): TControlPopulator;
 var
-  WinControl: TWinControl;
+  Control: TControl;
+  OwnerToUse: TComponent;
+  IsTabChild: Boolean;
 begin
   Result := Self;
 
-  if (AWinControlInfo.WinControlClass.InheritsFrom(TTabSheet))
-      and (CurrentLevel.Parent is TPageControl) then
-    WinControl := AWinControlInfo.CreateWinControl(
-      CurrentLevel.Parent, CurrentLevel.Parent, AWinControlInfo.Name)
-  else
-    WinControl := AWinControlInfo.CreateWinControl(
-      FOwner, CurrentLevel.Parent, AWinControlInfo.Name);
+  IsTabChild :=
+    AControlInfo.ControlClass.InheritsFrom(
+      {$IFDEF FRAMEWORK_FMX}TTabItem{$ELSE}TTabSheet{$ENDIF}
+    ) and
+    (CurrentLevel.Parent is
+      {$IFDEF FRAMEWORK_FMX}TTabControl{$ELSE}TPageControl{$ENDIF}
+    );
 
-  AddControl(TControlInfo.Create(WinControl));
+  if IsTabChild then
+    OwnerToUse := CurrentLevel.Parent
+  else
+    OwnerToUse := FOwner;
+
+  Control := AControlInfo.CreateControl(OwnerToUse, CurrentLevel.Parent, AControlInfo.Name);
+  AddControl(TControlInfo.Create(Control));
   NextLevel(AGroupName);
-  WithParent(WinControl);
+
+  WithParent(
+    {$IFDEF FRAMEWORK_FMX}Control
+    {$ELSE}TWinControl(Control)
+    {$ENDIF}
+  );
+
   SetTopLeft(0, 0);
 end;
 
-}
-
-function TControlPopulator.NextLevel(AWinControlInfo: TWinControlInfo;
-  AGroupName: string): TControlPopulator;
-var
-  WinControl: TControl;
-begin
-  Result := Self;
-
-  {$IFDEF FRAMEWORK_FMX}
-  if (AWinControlInfo.WinControlClass.InheritsFrom(TTabItem)) and
-     (CurrentLevel.Parent is TTabControl) then
-    WinControl := AWinControlInfo.CreateWinControl(
-      CurrentLevel.Parent, CurrentLevel.Parent, AWinControlInfo.Name)
-  else
-    WinControl := AWinControlInfo.CreateWinControl(
-      FOwner, CurrentLevel.Parent, AWinControlInfo.Name);
-  {$ELSE}
-  if (AWinControlInfo.WinControlClass.InheritsFrom(TTabSheet)) and
-     (CurrentLevel.Parent is TPageControl) then
-    WinControl := AWinControlInfo.CreateWinControl(
-      CurrentLevel.Parent, CurrentLevel.Parent, AWinControlInfo.Name)
-  else
-    WinControl := AWinControlInfo.CreateWinControl(
-      FOwner, CurrentLevel.Parent, AWinControlInfo.Name);
-  {$ENDIF}
-
-  AddControl(TControlInfo.Create(WinControl));
-  NextLevel(AGroupName);
-  WithParent(TWinControl(WinControl));
-  SetTopLeft(0, 0);
-end;
-
-function TControlPopulator.NextLevel(AWinControlInfo: TWinControlInfo;
+function TControlPopulator.NextLevel(AControlInfo: TControlInfo;
   ADirection: TControlPopulatorDirection; AGroupName: string): TControlPopulator;
 begin
-  Result := NextLevel(AWinControlInfo, AGroupName);
+  Result := NextLevel(AControlInfo, AGroupName);
   SetDirection(ADirection);
 end;
 
@@ -1831,49 +1801,49 @@ begin
   FGrids.Add(AGridName, Grid);
 end;
 
-function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+function TControlPopulator.NextSiblingLevel(AControlInfo: TControlInfo;
   AGroupName: string; ABreak: Boolean): TControlPopulator;
 begin
   Result := PreviousLevel;
   if ABreak then
     Break;
-  NextLevel(AWinControlInfo, AGroupName);
+  NextLevel(AControlInfo, AGroupName);
 end;
 
-function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+function TControlPopulator.NextSiblingLevel(AControlInfo: TControlInfo;
   ADirection: TControlPopulatorDirection; AGroupName: string;
   ABreak: Boolean): TControlPopulator;
 begin
   Result := PreviousLevel;
   if ABreak then
     Break;
-  NextLevel(AWinControlInfo, ADirection, AGroupName);
+  NextLevel(AControlInfo, ADirection, AGroupName);
 end;
 
-function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+function TControlPopulator.NextSiblingLevel(AControlInfo: TControlInfo;
   ABreak: Boolean): TControlPopulator;
 begin
-  Result := NextSiblingLevel(AWinControlInfo, '', ABreak);
+  Result := NextSiblingLevel(AControlInfo, '', ABreak);
 end;
 
-function TControlPopulator.NextSiblingLevel(AWinControlInfo: TWinControlInfo;
+function TControlPopulator.NextSiblingLevel(AControlInfo: TControlInfo;
   ADirection: TControlPopulatorDirection;
   ABreak: Boolean): TControlPopulator;
 begin
-  Result := NextSiblingLevel(AWinControlInfo, ADirection, '', ABreak);
+  Result := NextSiblingLevel(AControlInfo, ADirection, '', ABreak);
 end;
 
 function TControlPopulator.NextSiblingLevelWithBreak(
-  AWinControlInfo: TWinControlInfo; ADirection: TControlPopulatorDirection;
+  AControlInfo: TControlInfo; ADirection: TControlPopulatorDirection;
   AGroupName: string): TControlPopulator;
 begin
-  Result := NextSiblingLevel(AWinControlInfo, ADirection, AGroupName, True);
+  Result := NextSiblingLevel(AControlInfo, ADirection, AGroupName, True);
 end;
 
 function TControlPopulator.NextSiblingLevelWithBreak(
-  AWinControlInfo: TWinControlInfo; AGroupName: string): TControlPopulator;
+  AControlInfo: TControlInfo; AGroupName: string): TControlPopulator;
 begin
-  Result := NextSiblingLevel(AWinControlInfo, AGroupName, True);
+  Result := NextSiblingLevel(AControlInfo, AGroupName, True);
 end;
 
 { TControlGroupBounds }
@@ -1981,7 +1951,7 @@ begin
 end;
 
 { TWinControlInfo }
-
+(*
 class function TWinControlInfo.Create(AClass: TWinControlClass;
   const AName: string): TWinControlInfo;
 begin
@@ -2116,6 +2086,8 @@ begin
   Result.Height := AHeight;
 end;
 
+*)
+
 { TAutoSizeContainer }
 
 constructor TAutoSizeContainer.Create(AOwner: TComponent);
@@ -2137,6 +2109,7 @@ begin
 end;
 
 destructor TGridContainer.Destroy;
+
 begin
   FGridPopulator.Free;
 
