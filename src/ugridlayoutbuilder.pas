@@ -58,7 +58,8 @@ uses
 constructor TGridLayoutBuilder.Create;
 begin
   inherited Create;
-  Create(TGridLayout.Create);
+  FFreeOnDone := True;
+  FGridLayout := TGridLayout.Create;
 end;
 
 constructor TGridLayoutBuilder.Create(AGridLayout: TGridLayout);

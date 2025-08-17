@@ -323,7 +323,7 @@ type
     function NextSiblingLevelWithBreak(AControlInfo: TControlInfo; AGroupName: string=''): TControlPopulator; overload;
     function NextSiblingLevelWithBreak(AControlInfo: TControlInfo; ADirection: TControlPopulatorDirection;
       AGroupName: string=''): TControlPopulator; overload;
-    function NextLevelGrid(AGridName: string; ABuilder: TGridLayoutBuilder): TControlPopulator; overload;
+    function NextLevelGrid(AGridName: string; ABuilder: TGridLayoutBuilder): TControlPopulator;
     function SetVerticalSpace(AVerticalSpace: Single): TControlPopulator;
     function SetHorizontalSpace(AHorizontalSpace: Single): TControlPopulator;
     function SetTopLeft(ATop, ALeft: Single): TControlPopulator;
@@ -367,6 +367,11 @@ type
       array of string): TControlPopulator;
     function CenterControlsVertically(const AControlNames, AReferenceGroup:
       array of string): TControlPopulator;
+
+    function RecalcParentHeight(AExtraHeight: Single = 0): TControlPopulator;
+    function RecalcParentWidth(AExtraWidth: Single = 0): TControlPopulator;
+    function RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0): TControlPopulator;
+
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property ContentWidth: Single read GetContentWidth;
     property ContentHeight: Single read GetFContentHeight;
@@ -1362,6 +1367,39 @@ begin
 
   FLevelStack.Delete(FLevelStack.Count - 1); // remove nível atual
   Result := Self;
+end;
+
+function TControlPopulator.RecalcParentHeight(AExtraHeight: Single): TControlPopulator;
+begin
+  Result := Self;
+  {$IFDEF FRAMEWORK_FMX}
+  CurrentLevel.Parent.Height :=
+    GetControlsBounds([CurrentLevel.GroupName].Height + AExtraHeight);
+  {$ELSE}
+  CurrentLevel.Parent.Height :=
+    Trunc(GetControlsBounds([CurrentLevel.GroupName]).Height + AExtraHeight);
+  {$ENDIF}
+end;
+
+function TControlPopulator.RecalcParentSize(AExtraHeight,
+  AExtraWidth: Single): TControlPopulator;
+begin
+  Result := Self;
+  RecalcParentHeight(AExtraHeight);
+  RecalcParentWidth(AExtraWidth);
+end;
+
+function TControlPopulator.RecalcParentWidth(
+  AExtraWidth: Single): TControlPopulator;
+begin
+  Result := Self;
+  {$IFDEF FRAMEWORK_FMX}
+  CurrentLevel.Parent.Width :=
+    GetControlsBounds([CurrentLevel.GroupName].Width + AExtraWidth);
+  {$ELSE}
+  CurrentLevel.Parent.Width :=
+    Trunc(GetControlsBounds([CurrentLevel.GroupName]).Width + AExtraWidth);
+  {$ENDIF}
 end;
 
 function TControlPopulator.GetNamedControl(const AName: string): TControl;
