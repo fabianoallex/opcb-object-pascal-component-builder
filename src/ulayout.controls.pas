@@ -241,6 +241,8 @@ type
     CurrentLeft: Single;
     MaxControlHeight: Single;
     MaxControlWidth: Single;
+    VerticalSpace: Single;
+    HorizontalSpace: Single;
     constructor Create;
     function Clone: TControlPopulatorLevel;
   end;
@@ -274,8 +276,8 @@ type
 
     FGrids: TStrGridDictionary;
     FGroups: TControlGroupMap;
-    FVerticalSpace: Single;
-    FHorizontalSpace: Single;
+    // FVerticalSpace: Single;
+    // FHorizontalSpace: Single;
     FLevelStack: TControlPopulatorLevelStack;
     function GetControls: TControlList;
     procedure MoveTopLeftAfterControl(AControl: TControl);
@@ -1065,8 +1067,8 @@ begin
   FLevelStack := TControlPopulatorLevelStack.Create(True);
   FLevelStack.Add(TControlPopulatorLevel.Create);
 
-  FVerticalSpace := 0;
-  FHorizontalSpace := 0;
+  // FVerticalSpace := 0;
+  // FHorizontalSpace := 0;
 end;
 
 function TControlPopulator.AddControl(AControlInfo: TControlInfo;
@@ -1346,13 +1348,13 @@ begin
   case SuperLevel.Direction of
     cpdHorizontal:
       begin
-        SuperLevel.CurrentLeft := Bounds.Right + FHorizontalSpace;
-        SuperLevel.MaxControlHeight := Max(SuperLevel.MaxControlHeight, Bounds.Height + FVerticalSpace);
+        SuperLevel.CurrentLeft := Bounds.Right + {FHorizontalSpace} SuperLevel.HorizontalSpace;
+        SuperLevel.MaxControlHeight := Max(SuperLevel.MaxControlHeight, Bounds.Height + {FVerticalSpace} SuperLevel.VerticalSpace);
       end;
     cpdVertical:
       begin
-        SuperLevel.CurrentTop := Bounds.Bottom + FVerticalSpace;
-        SuperLevel.MaxControlWidth := Max(SuperLevel.MaxControlWidth, Bounds.Width + FHorizontalSpace);
+        SuperLevel.CurrentTop := Bounds.Bottom + {FVerticalSpace} SuperLevel.VerticalSpace;
+        SuperLevel.MaxControlWidth := Max(SuperLevel.MaxControlWidth, Bounds.Width + {FHorizontalSpace} SuperLevel.HorizontalSpace);
       end;
   end;
 
@@ -1483,14 +1485,14 @@ procedure TControlPopulator.MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
 begin
   if CurrentLevel.Direction = cpdHorizontal then
   begin
-    CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + ABounds.Width + FHorizontalSpace;
-    CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, ABounds.Height + FVerticalSpace);
+    CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + ABounds.Width + {FHorizontalSpace} CurrentLevel.HorizontalSpace;
+    CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, ABounds.Height + {FVerticalSpace} CurrentLevel.VerticalSpace);
   end;
 
   if CurrentLevel.Direction = cpdVertical then
   begin
-    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + ABounds.Height + FVerticalSpace;
-    CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth, ABounds.Width + FHorizontalSpace);
+    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + ABounds.Height + {FVerticalSpace} CurrentLevel.VerticalSpace;
+    CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth, ABounds.Width + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
   end;
 end;
 
@@ -1521,24 +1523,24 @@ begin
   begin
     if CurrentLevel.Direction = cpdHorizontal then
     begin
-      CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + W + FHorizontalSpace;
-      CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, H + FVerticalSpace);
+      CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + W + {FHorizontalSpace} CurrentLevel.HorizontalSpace;
+      CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, H + {FVerticalSpace} CurrentLevel.VerticalSpace);
     end;
 
     if CurrentLevel.Direction = cpdVertical then
     begin
-      CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + H + FVerticalSpace;
-      CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth, W + FHorizontalSpace);
+      CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + H + {FVerticalSpace} + CurrentLevel.VerticalSpace;
+      CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth, W + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
     end;
   end;
 
   if AControl.Align = AlignTop then
-    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + H + FVerticalSpace;
+    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + H + {FVerticalSpace} CurrentLevel.VerticalSpace;
 
   if AControl.Align = AlignLeft then
     SetTopLeft(
       CurrentLevel.CurrentTop,
-      CurrentLevel.CurrentLeft + W + FHorizontalSpace
+      CurrentLevel.CurrentLeft + W + {FHorizontalSpace} CurrentLevel.HorizontalSpace
     );
 end;
 
@@ -1571,7 +1573,8 @@ function TControlPopulator.SetHorizontalSpace(
   AHorizontalSpace: Single): TControlPopulator;
 begin
   Result := Self;
-  FHorizontalSpace := AHorizontalSpace;
+  // FHorizontalSpace := AHorizontalSpace;
+  CurrentLevel.HorizontalSpace := AHorizontalSpace;
 end;
 
 function TControlPopulator.SetLeft(AControlName: string): TControlPopulator;
@@ -1599,8 +1602,10 @@ end;
 function TControlPopulator.SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
 begin
   Result := Self;
-  FVerticalSpace := AVerticalSpace;
-  FHorizontalSpace := AHorizontalSpace;
+  //FVerticalSpace := AVerticalSpace;
+  //FHorizontalSpace := AHorizontalSpace;
+  CurrentLevel.VerticalSpace := AVerticalSpace;
+  CurrentLevel.HorizontalSpace := AHorizontalSpace;
 end;
 
 function TControlPopulator.SetTop(ATop: Single): TControlPopulator;
@@ -1658,10 +1663,10 @@ begin
   SetLeft(L);
 
   if APosition = rpBelow then
-    SetTop(CurrentLevel.CurrentTop + H + FVerticalSpace);
+    SetTop(CurrentLevel.CurrentTop + H + {FVerticalSpace} CurrentLevel.VerticalSpace);
 
   if APosition = rpRight then
-    SetLeft(CurrentLevel.CurrentLeft + W + FHorizontalSpace);
+    SetLeft(CurrentLevel.CurrentLeft + W + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
 end;
 
 function TControlPopulator.SetTopLeftNearControls(
@@ -1686,11 +1691,11 @@ begin
     rpBelow:
       begin
         SetLeft(Bounds.Left);
-        SetTop(Bounds.Bottom + FVerticalSpace);
+        SetTop(Bounds.Bottom + {FVerticalSpace} CurrentLevel.VerticalSpace);
       end;
     rpRight:
       begin
-        SetLeft(Bounds.Right + FHorizontalSpace);
+        SetLeft(Bounds.Right + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
         SetTop(Bounds.Top);
       end;
   end;
@@ -1708,17 +1713,18 @@ begin
   SetLeft(Bounds.Left);
 
   if APosition = rpBelow then
-    SetTop(CurrentLevel.CurrentTop + Bounds.Height + FVerticalSpace);
+    SetTop(CurrentLevel.CurrentTop + Bounds.Height + {FVerticalSpace} CurrentLevel.VerticalSpace);
 
   if APosition = rpRight then
-    SetLeft(CurrentLevel.CurrentLeft + Bounds.Width + FHorizontalSpace);
+    SetLeft(CurrentLevel.CurrentLeft + Bounds.Width + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
 end;
 
 function TControlPopulator.SetVerticalSpace(
   AVerticalSpace: Single): TControlPopulator;
 begin
   Result := Self;
-  FVerticalSpace := AVerticalSpace;
+  //FVerticalSpace := AVerticalSpace;
+  CurrentLevel.VerticalSpace := AVerticalSpace
 end;
 
 {$IFNDEF FRAMEWORK_FMX}
@@ -1933,6 +1939,8 @@ begin
   Result.InitialLeft := InitialLeft;
   Result.CurrentTop := CurrentTop;
   Result.CurrentLeft := CurrentLeft;
+  Result.VerticalSpace := VerticalSpace;
+  Result.HorizontalSpace := HorizontalSpace;
   Result.MaxControlHeight := MaxControlHeight;
   Result.MaxControlWidth := MaxControlWidth;
 end;
@@ -1946,6 +1954,8 @@ begin
   CurrentLeft := 0;
   MaxControlHeight := 0;
   MaxControlWidth := 0;
+  VerticalSpace := 0;
+  HorizontalSpace := 0;
   Inc(FGroupCounter);
   GroupName := '__LEVEL_GROUP_' + IntToStr(FGroupCounter - 1) + '__';
 end;
