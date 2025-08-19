@@ -273,11 +273,8 @@ type
 
     FControlRegistryName: string;
     FControlRegistry: TControlRegistry;
-
     FGrids: TStrGridDictionary;
     FGroups: TControlGroupMap;
-    // FVerticalSpace: Single;
-    // FHorizontalSpace: Single;
     FLevelStack: TControlPopulatorLevelStack;
     function GetControls: TControlList;
     procedure MoveTopLeftAfterControl(AControl: TControl);
@@ -367,11 +364,19 @@ type
       array of string): TControlPopulator;
     function CenterControlsVertically(const AControlNames, AReferenceGroup:
       array of string): TControlPopulator;
-
+    function CenterControlsInParentVertically(
+      const AControlNames: array of string): TControlPopulator;
+    function CenterControlsInParentHorizontally(
+      const AControlNames: array of string): TControlPopulator;
     function RecalcParentHeight(AExtraHeight: Single = 0): TControlPopulator;
     function RecalcParentWidth(AExtraWidth: Single = 0): TControlPopulator;
     function RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0): TControlPopulator;
-
+    function CopyHeight(const AControlNames,
+      AReferenceGroup: array of string): TControlPopulator;
+    function CopyWidth(const AControlNames,
+      AReferenceGroup: array of string): TControlPopulator;
+    function CopySize(const AControlNames,
+      AReferenceGroup: array of string): TControlPopulator;
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property ContentWidth: Single read GetContentWidth;
     property ContentHeight: Single read GetFContentHeight;
@@ -1058,11 +1063,65 @@ begin
   MoveControls(AControlNames, 0, DeltaY);
 end;
 
+function TControlPopulator.CenterControlsInParentVertically(
+  const AControlNames: array of string): TControlPopulator;
+var
+  TargetBounds: TControlGroupBounds;
+  ParentCtrl: TControl;
+  ParentHeight: Integer;
+  TargetCenterY, ParentCenterY, DeltaY: Single;
+begin
+  Result := Self;
+
+  if Length(AControlNames) = 0 then
+    Exit;
+
+  // pega o parent do primeiro controle da lista
+  ParentCtrl := NamedControls[AControlNames[0]];
+  if not Assigned(ParentCtrl) or not Assigned(ParentCtrl.Parent) then
+    Exit;
+
+  TargetBounds := GetControlsBounds(AControlNames);
+  ParentHeight := ParentCtrl.Parent.ClientHeight;
+
+  TargetCenterY := TargetBounds.Top + (TargetBounds.Height / 2);
+  ParentCenterY := ParentHeight / 2;
+
+  DeltaY := ParentCenterY - TargetCenterY;
+
+  MoveControls(AControlNames, 0, DeltaY);
+end;
+
+function TControlPopulator.CenterControlsInParentHorizontally(
+  const AControlNames: array of string): TControlPopulator;
+var
+  TargetBounds: TControlGroupBounds;
+  ParentCtrl: TControl;
+  ParentWidth: Integer;
+  TargetCenterX, ParentCenterX, DeltaX: Single;
+begin
+  Result := Self;
+
+  if Length(AControlNames) = 0 then
+    Exit;
+
+  ParentCtrl := NamedControls[AControlNames[0]];
+  if not Assigned(ParentCtrl) or not Assigned(ParentCtrl.Parent) then
+    Exit;
+
+  TargetBounds := GetControlsBounds(AControlNames);
+  ParentWidth := ParentCtrl.Parent.ClientWidth;
+
+  TargetCenterX := TargetBounds.Left + (TargetBounds.Width / 2);
+  ParentCenterX := ParentWidth / 2;
+
+  DeltaX := ParentCenterX - TargetCenterX;
+
+  MoveControls(AControlNames, DeltaX, 0);
+end;
+
 constructor TControlPopulator.Create(AControlRegistryName: string);
 begin
-  // FControls := TControlList.Create;
-  // FNamedControls := TStrControlDictionary.Create;
-
   FControlRegistryName := AControlRegistryName;
   FControlRegistry := TControlRegistry.ForContext(FControlRegistryName);
 
@@ -1071,9 +1130,6 @@ begin
 
   FLevelStack := TControlPopulatorLevelStack.Create(True);
   FLevelStack.Add(TControlPopulatorLevel.Create);
-
-  // FVerticalSpace := 0;
-  // FHorizontalSpace := 0;
 end;
 
 function TControlPopulator.AddControl(AControlInfo: TControlInfo;
@@ -1400,6 +1456,89 @@ begin
   CurrentLevel.Parent.Width :=
     Trunc(GetControlsBounds([CurrentLevel.GroupName]).Width + AExtraWidth);
   {$ENDIF}
+end;
+
+function TControlPopulator.CopyHeight(const AControlNames, AReferenceGroup: array of string): TControlPopulator;
+var
+  RefBounds: TControlGroupBounds;
+  Name: string;
+  Ctrl: TControl;
+begin
+  Result := Self;
+
+  if (Length(AControlNames) = 0) or (Length(AReferenceGroup) = 0) then
+    Exit;
+
+  // calcula o bounds dos controles de referência
+  RefBounds := GetControlsBounds(AReferenceGroup);
+
+  for Name in AControlNames do
+  begin
+    if not FControlRegistry.NamedControls.TryGetValue(Name, Ctrl) then
+      raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
+
+    {$IFDEF FRAMEWORK_FMX}
+    Ctrl.Height := RefBounds.Height;
+    {$ELSE}
+    Ctrl.Height := Round(RefBounds.Height);
+    {$ENDIF}
+  end;
+end;
+
+function TControlPopulator.CopyWidth(const AControlNames, AReferenceGroup: array of string): TControlPopulator;
+var
+  RefBounds: TControlGroupBounds;
+  Name: string;
+  Ctrl: TControl;
+begin
+  Result := Self;
+
+  if (Length(AControlNames) = 0) or (Length(AReferenceGroup) = 0) then
+    Exit;
+
+  // calcula o bounds dos controles de referência
+  RefBounds := GetControlsBounds(AReferenceGroup);
+
+  for Name in AControlNames do
+  begin
+    if not FControlRegistry.NamedControls.TryGetValue(Name, Ctrl) then
+      raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
+
+    {$IFDEF FRAMEWORK_FMX}
+    Ctrl.Width := RefBounds.Width;
+    {$ELSE}
+    Ctrl.Width := Round(RefBounds.Width);
+    {$ENDIF}
+  end;
+end;
+
+function TControlPopulator.CopySize(const AControlNames, AReferenceGroup: array of string): TControlPopulator;
+var
+  RefBounds: TControlGroupBounds;
+  Name: string;
+  Ctrl: TControl;
+begin
+  Result := Self;
+
+  if (Length(AControlNames) = 0) or (Length(AReferenceGroup) = 0) then
+    Exit;
+
+  // calcula o bounds dos controles de referência
+  RefBounds := GetControlsBounds(AReferenceGroup);
+
+  for Name in AControlNames do
+  begin
+    if not FControlRegistry.NamedControls.TryGetValue(Name, Ctrl) then
+      raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
+
+    {$IFDEF FRAMEWORK_FMX}
+    Ctrl.Width  := RefBounds.Width;
+    Ctrl.Height := RefBounds.Height;
+    {$ELSE}
+    Ctrl.Width  := Round(RefBounds.Width);
+    Ctrl.Height := Round(RefBounds.Height);
+    {$ENDIF}
+  end;
 end;
 
 function TControlPopulator.GetNamedControl(const AName: string): TControl;
