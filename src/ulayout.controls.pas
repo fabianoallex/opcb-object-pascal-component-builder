@@ -22,8 +22,7 @@ uses
 type
   {$IFNDEF FPC}
     {$IFDEF FRAMEWORK_FMX}
-    TWinControl = TControl; //TFmxObject;
-    //TAlign = TAlignLayout;
+    TWinControl = TControl;
     {$ENDIF}
   {$ENDIF}
 
@@ -92,38 +91,46 @@ type
     class function Create(AControl: TControl): TControlInfo; overload; static;
   end;
 
-  TControlRegistry = class;
+  TComponentRegistry = class;
 
-  TControlRegistryEntry = record
-    Registry: TControlRegistry;
+  TComponentRegistryEntry = record
+    Registry: TComponentRegistry;
     RefCount: Integer;
   end;
 
-  TStrControlRegistryEntryDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControlRegistryEntry>;
+  TStrComponentRegistryEntryDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TComponentRegistryEntry>;
+  TStrComponentDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TComponent>;
   TStrControlDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControl>;
   TControlList = {$IFDEF FPC}specialize{$ENDIF} TList<TControl>;
+  TComponentlList = {$IFDEF FPC}specialize{$ENDIF} TList<TComponent>;
   TControlGroupMap = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControlList>;
   TStrGridDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TGridLayout>;
 
-  TControlRegistry = class
+  TComponentRegistry = class
   private
-    class var FInstances: TStrControlRegistryEntryDictionary;
+    class var FInstances: TStrComponentRegistryEntryDictionary;
   public
-    class function ForContext(const AKey: string): TControlRegistry; static;
+    class function ForContext(const AKey: string): TComponentRegistry; static;
     class procedure ReleaseContext(const AKey: string); static;
     class procedure ClearAll; static;
   private
+    FComponents: TComponentlList;
     FControls: TControlList;
+    FNamedComponents: TStrComponentDictionary;
     FNamedControls: TStrControlDictionary;
     constructor CreatePrivate;
   public
     constructor Create;
     destructor Destroy; override;
     procedure AddControl(AControl: TControl; const AName: string = '');
+    procedure AddComponent(AComponent: TComponent; const AName: string = '');
+    function GetComponent(const AName: string): TComponent;
+    function TryGetComponent(const AName: string; out AComponent: TComponent): Boolean;
     function GetControl(const AName: string): TControl;
     function TryGetControl(const AName: string; out AControl: TControl): Boolean;
+    property Components: TComponentlList read FComponents;
     property Controls: TControlList read FControls;
-    property NamedControls: TStrControlDictionary read FNamedControls;
+    property NamedComponents: TStrComponentDictionary read FNamedComponents;
   end;
 
   { TControlGridPopulator }
@@ -135,60 +142,46 @@ type
     FFillerType: TFillerType;
     FOwner: TComponent;
     FParent: TWinControl;
-    // FControls: TControlList;
-    // FNamedControls: TStrControlDictionary;
-    FControlRegistry: TControlRegistry;
-    FControlRegistryName: string;
+    FComponentRegistry: TComponentRegistry;
+    FComponentRegistryName: string;
     FOnControlPopulate: TControlPopulateProc;
     function GetNamedControl(const AName: string): TControl;
-    // procedure SetControls(AValue: TControlList);
     function GetControls: TControlList;
     procedure ConfigControl(AControl: TControl);
   public
-    constructor Create(AControlRegistryName: string);
+    constructor Create(AComponentRegistryName: string);
     destructor Destroy; override;
     function WithOwnerAndParentControl(AOwner: TComponent; AParent: TWinControl): TControlGridPopulator;
     procedure SetGrid(AGrid: TGridLayout);
     function UsingFiller(AFillerType: TFillerType; ARow: Integer=0; AColumn: Integer=0): TControlGridPopulator;
     function FillerSkip(ACount: Integer=1): TControlGridPopulator;
     function FillerSetPosition(ARow, AColumn: Integer): TControlGridPopulator;
-
     function AddControl(AControl: TControl;
       AProc: TControlPopulateProc=nil): TControlGridPopulator;
-
     function AddControls(AControls: array of TControl;
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
-
     function CreateControl(AControlInfo: TControlInfo;
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
-
     function CreateControl(AControlClass: TControlClass;
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
-
     function CretaeControls(ACount: Integer; AControlClass: TControlClass;
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
-
     function CretaeControls(ACount: Integer; AControlInfo: TControlInfo;
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
-
     function CreateControls(ACount: Integer;
       AControlClasses: array of TControlClass;
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
-
     function CreateControls(ACount: Integer;
       AControlCreateInfos: array of TControlInfo;
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
-
     function CreateControls(AControlCreateInfos: array of TControlInfo;
       AProc: TControlPopulateProc=nil): TControlGridPopulator; overload;
-
     function OnControlCreate(AProc: TControlPopulateProc): TControlGridPopulator;
-    property Controls: TControlList read GetControls;   // property Controls: TControlList read GetControls write SetControls;
+    property Controls: TControlList read GetControls;
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property Grid: TGridLayout read FGrid;
-
-    property ControlRegistry: TControlRegistry read FControlRegistry;
-    property ControlRegistryName: string read FControlRegistryName;
+    property ComponentRegistry: TComponentRegistry read FComponentRegistry;
+    property ComponentRegistryName: string read FComponentRegistryName;
   end;
 
   { TGridLayoutHelper }
@@ -209,7 +202,7 @@ type
     FGrid: TGridLayout;
     FGridPopulator: TControlGridPopulator;
   public
-    constructor Create(AOwner: TComponent; AControlRegistryName: string);
+    constructor Create(AOwner: TComponent; AComponentRegistryName: string);
     destructor Destroy; override;
   end;
 
@@ -250,7 +243,6 @@ type
   end;
 
   TControlPopulatorLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TControlPopulatorLevel>;
-
   TControlPopulator = class;
 
   { TGridLayoutBuilderHelper }
@@ -270,11 +262,8 @@ type
   TControlPopulator = class
   private
     FOwner: TComponent;
-    // FControls: TControlList;
-    // FNamedControls: TStrControlDictionary;
-
-    FControlRegistryName: string;
-    FControlRegistry: TControlRegistry;
+    FComponentRegistryName: string;
+    FComponentRegistry: TComponentRegistry;
     FGrids: TStrGridDictionary;
     FGroups: TControlGroupMap;
     FLevelStack: TControlPopulatorLevelStack;
@@ -287,7 +276,7 @@ type
     function GetContentWidth: Single;
     function GetFContentHeight: Single;
   public
-    constructor Create(AControlRegistryName: string);
+    constructor Create(AComponentRegistryName: string);
     destructor Destroy; override;
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
@@ -553,10 +542,8 @@ begin
     {$IFDEF FRAMEWORK_FMX}
     if Result is TPresentedTextControl then
       TPresentedTextControl(Result).Text := Caption.Value;
-
     if Result is TTextControl then
       TTextControl(Result).Text := Caption.Value;
-
     {$ELSE}
     TProtectedControl(Result).Caption := Caption.Value;
     {$ENDIF}
@@ -567,7 +554,6 @@ begin
     {$IFDEF FRAMEWORK_FMX}
     if Result is TPresentedTextControl then
       TPresentedTextControl(Result).Text := Text.Value;
-
     if Result is TTextControl then
       TTextControl(Result).Text := Text.Value;
     {$ELSE}
@@ -678,21 +664,14 @@ end;
 
 { TControlGridPopulator }
 
-{procedure TControlGridPopulator.SetControls(AValue: TControlList);
-begin
-  if FControls = AValue then
-    Exit;
-  FControls := AValue;
-end;}
-
 function TControlGridPopulator.GetControls: TControlList;
 begin
-  Result := FControlRegistry.FControls;
+  Result := FComponentRegistry.FControls;
 end;
 
 function TControlGridPopulator.GetNamedControl(const AName: string): TControl;
 begin
-  if not FControlRegistry.TryGetControl(AName, Result) then // if not FNamedControls.TryGetValue(AName, Result) then
+  if not FComponentRegistry.TryGetControl(AName, Result) then
     Result := nil;
 end;
 
@@ -733,22 +712,17 @@ begin
   {$ENDIF}
 end;
 
-constructor TControlGridPopulator.Create(AControlRegistryName: string);
+constructor TControlGridPopulator.Create(AComponentRegistryName: string);
 begin
   FGrid := nil;
   FFiller := nil;
-  // FControls := TControlList.Create;
-  // FNamedControls := TStrControlDictionary.Create;
-
-  FControlRegistryName := AControlRegistryName;
-  FControlRegistry := TControlRegistry.ForContext(AControlRegistryName);
+  FComponentRegistryName := AComponentRegistryName;
+  FComponentRegistry := TComponentRegistry.ForContext(AComponentRegistryName);
 end;
 
 destructor TControlGridPopulator.Destroy;
 begin
-  FControlRegistry.ReleaseContext(FControlRegistryName);
-  // FControls.Free;
-  // FNamedControls.Free;
+  FComponentRegistry.ReleaseContext(FComponentRegistryName);
   inherited;
 end;
 
@@ -780,20 +754,16 @@ var
   ControlGridItem: TControlGridItem;
   Settings: TGridCellSettings;
 begin
-  // FControls.Add(AControl);
-  // if not string(AControl.Name).IsEmpty then
-  //  FNamedControls.Add(AControl.Name, AControl);
-
-  FControlRegistry.AddControl(AControl, AControl.Name);
+  FComponentRegistry.AddComponent(AControl, AControl.Name);
 
   ControlGridItem := TControlGridItem.Create(AControl);
   Settings := TGridCellSettings.Create(0, 0);
 
   try
     if Assigned(FOnControlPopulate) then
-      FOnControlPopulate(AControl, Controls.Count-1, Settings);   // FOnControlPopulate(AControl, FControls.Count-1, Settings);
+      FOnControlPopulate(AControl, Controls.Count-1, Settings);
     if Assigned(AProc) then
-      AProc(AControl, Controls.Count-1, Settings);   // AProc(AControl, FControls.Count-1, Settings);
+      AProc(AControl, Controls.Count-1, Settings);
 
     FFiller.PlaceItem(ControlGridItem, Settings);
   finally
@@ -817,7 +787,7 @@ var
     Candidate := ABaseName;
     Index := 1;
 
-    while ControlRegistry.FNamedControls.ContainsKey(Candidate) do  // while FNamedControls.ContainsKey(Candidate) do
+    while ComponentRegistry.FNamedComponents.ContainsKey(Candidate) do
     begin
       Candidate := ABaseName + IntToStr(Index);
       Inc(Index);
@@ -945,12 +915,9 @@ var
   Cell: TGridCell;
 begin
   Result := nil;
-
   Cell := Self.GetCell(ARow, ACol);
-
   if (not Assigned(Cell)) or (not Assigned(Cell.Item)) then
     Exit;
-
   Result := (Cell.Item as TControlGridItem).GetControl;
 end;
 
@@ -1023,10 +990,8 @@ end;
 function TControlPopulator.Break: TControlPopulator;
 begin
   Result := Self;
-
   if CurrentLevel.Direction = cpdHorizontal then
     BreakLine;
-
   if CurrentLevel.Direction = cpdVertical then
     BreakColumn;
 end;
@@ -1034,10 +999,8 @@ end;
 function TControlPopulator.Break(AIncTopOrLeft: Single): TControlPopulator;
 begin
   Result := Break;
-
   if CurrentLevel.Direction = cpdHorizontal then
     IncTop(AIncTopOrLeft);
-
   if CurrentLevel.Direction = cpdVertical then
     IncLeft(AIncTopOrLeft);
 end;
@@ -1132,10 +1095,10 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-constructor TControlPopulator.Create(AControlRegistryName: string);
+constructor TControlPopulator.Create(AComponentRegistryName: string);
 begin
-  FControlRegistryName := AControlRegistryName;
-  FControlRegistry := TControlRegistry.ForContext(FControlRegistryName);
+  FComponentRegistryName := AComponentRegistryName;
+  FComponentRegistry := TComponentRegistry.ForContext(FComponentRegistryName);
 
   FGrids := TStrGridDictionary.Create;
   FGroups := TControlGroupMap.Create;
@@ -1162,7 +1125,7 @@ var
     Candidate := ABaseName;
     Index := 1;
 
-    while FControlRegistry.NamedControls.ContainsKey(Candidate) do  // while FNamedControls.ContainsKey(Candidate) do
+    while FComponentRegistry.FNamedComponents.ContainsKey(Candidate) do
     begin
       Candidate := ABaseName + IntToStr(Index);
       Inc(Index);
@@ -1195,7 +1158,7 @@ begin
 
   Control := CreateControl(AControlInfo);
 
-  FControlRegistry.AddControl(Control, Control.Name); // FControls.Add(Control);
+  FComponentRegistry.AddComponent(Control, Control.Name);
 
   // caso especial: TTabSheet / TPageControl
   {$IFDEF FRAMEWORK_FMX}
@@ -1210,9 +1173,6 @@ begin
     TTabSheet(Control).PageControl := TPageControl(CurrentLevel.Parent);
   end;
   {$ENDIF}
-
-  // if not string(Control.Name).IsEmpty then
-  //   FNamedControls.Add(Control.Name, Control);
 
   for Level in FLevelStack do
     if not Level.GroupName.IsEmpty then
@@ -1369,9 +1329,7 @@ destructor TControlPopulator.Destroy;
 var
   GroupList: TControlList;
 begin
-  // FControls.Free;
-  // FNamedControls.Free;
-  TControlRegistry.ReleaseContext(FControlRegistryName);
+  TComponentRegistry.ReleaseContext(FComponentRegistryName);
 
   FGrids.Free;
   for GroupList in FGroups.Values do
@@ -1421,13 +1379,13 @@ begin
   case SuperLevel.Direction of
     cpdHorizontal:
       begin
-        SuperLevel.CurrentLeft := Bounds.Right + {FHorizontalSpace} SuperLevel.HorizontalSpace;
-        SuperLevel.MaxControlHeight := Max(SuperLevel.MaxControlHeight, Bounds.Height + {FVerticalSpace} SuperLevel.VerticalSpace);
+        SuperLevel.CurrentLeft := Bounds.Right + SuperLevel.HorizontalSpace;
+        SuperLevel.MaxControlHeight := Max(SuperLevel.MaxControlHeight, Bounds.Height + SuperLevel.VerticalSpace);
       end;
     cpdVertical:
       begin
-        SuperLevel.CurrentTop := Bounds.Bottom + {FVerticalSpace} SuperLevel.VerticalSpace;
-        SuperLevel.MaxControlWidth := Max(SuperLevel.MaxControlWidth, Bounds.Width + {FHorizontalSpace} SuperLevel.HorizontalSpace);
+        SuperLevel.CurrentTop := Bounds.Bottom + SuperLevel.VerticalSpace;
+        SuperLevel.MaxControlWidth := Max(SuperLevel.MaxControlWidth, Bounds.Width + SuperLevel.HorizontalSpace);
       end;
   end;
 
@@ -1486,7 +1444,7 @@ begin
 
   for Name in AControlNames do
   begin
-    if not FControlRegistry.NamedControls.TryGetValue(Name, Ctrl) then
+    if not FComponentRegistry.NamedComponents.TryGetValue(Name, TComponent(Ctrl)) then
       raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
 
     {$IFDEF FRAMEWORK_FMX}
@@ -1513,7 +1471,7 @@ begin
 
   for Name in AControlNames do
   begin
-    if not FControlRegistry.NamedControls.TryGetValue(Name, Ctrl) then
+    if not FComponentRegistry.NamedComponents.TryGetValue(Name, TComponent(Ctrl)) then
       raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
 
     {$IFDEF FRAMEWORK_FMX}
@@ -1540,7 +1498,7 @@ begin
 
   for Name in AControlNames do
   begin
-    if not FControlRegistry.NamedControls.TryGetValue(Name, Ctrl) then
+    if not FComponentRegistry.NamedComponents.TryGetValue(Name, TComponent(Ctrl)) then
       raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
 
     {$IFDEF FRAMEWORK_FMX}
@@ -1555,7 +1513,7 @@ end;
 
 function TControlPopulator.GetNamedControl(const AName: string): TControl;
 begin
-  if not FControlRegistry.NamedControls.TryGetValue(AName, Result) then   // if not FNamedControls.TryGetValue(AName, Result) then
+  if not FComponentRegistry.NamedComponents.TryGetValue(AName, TComponent(Result)) then
     Result := nil;
 end;
 
@@ -1586,7 +1544,7 @@ end;
 
 function TControlPopulator.GetControls: TControlList;
 begin
-  Result := FControlRegistry.Controls;
+  Result := FComponentRegistry.Controls;
 end;
 
 function TControlPopulator.GetControlsBounds(
@@ -1603,7 +1561,7 @@ begin
   begin
     Name := AControlsNames[I];
 
-    if FControlRegistry.NamedControls.TryGetValue(Name, Control) then  // if FNamedControls.TryGetValue(Name, Control) then
+    if FComponentRegistry.NamedComponents.TryGetValue(Name, TComponent(Control)) then
       Result.Include(Control)
     else if FGroups.TryGetValue(Name, Group) then
       for Control in Group do
@@ -1646,7 +1604,7 @@ begin
 
   for Name in AControlNames do
   begin
-    if not FControlRegistry.NamedControls.TryGetValue(Name, Ctrl) then
+    if not FComponentRegistry.NamedComponents.TryGetValue(Name, TComponent(Ctrl)) then
       raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
 
     {$IFDEF FRAMEWORK_FMX}
@@ -1674,14 +1632,14 @@ procedure TControlPopulator.MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
 begin
   if CurrentLevel.Direction = cpdHorizontal then
   begin
-    CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + ABounds.Width + {FHorizontalSpace} CurrentLevel.HorizontalSpace;
-    CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, ABounds.Height + {FVerticalSpace} CurrentLevel.VerticalSpace);
+    CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + ABounds.Width + CurrentLevel.HorizontalSpace;
+    CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, ABounds.Height + CurrentLevel.VerticalSpace);
   end;
 
   if CurrentLevel.Direction = cpdVertical then
   begin
-    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + ABounds.Height + {FVerticalSpace} CurrentLevel.VerticalSpace;
-    CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth, ABounds.Width + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
+    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + ABounds.Height + CurrentLevel.VerticalSpace;
+    CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth, ABounds.Width + CurrentLevel.HorizontalSpace);
   end;
 end;
 
@@ -1712,24 +1670,24 @@ begin
   begin
     if CurrentLevel.Direction = cpdHorizontal then
     begin
-      CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + W + {FHorizontalSpace} CurrentLevel.HorizontalSpace;
-      CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, H + {FVerticalSpace} CurrentLevel.VerticalSpace);
+      CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + W + CurrentLevel.HorizontalSpace;
+      CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight, H + CurrentLevel.VerticalSpace);
     end;
 
     if CurrentLevel.Direction = cpdVertical then
     begin
-      CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + H + {FVerticalSpace} + CurrentLevel.VerticalSpace;
-      CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth, W + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
+      CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + H + CurrentLevel.VerticalSpace;
+      CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth, W + CurrentLevel.HorizontalSpace);
     end;
   end;
 
   if AControl.Align = AlignTop then
-    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + H + {FVerticalSpace} CurrentLevel.VerticalSpace;
+    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + H + CurrentLevel.VerticalSpace;
 
   if AControl.Align = AlignLeft then
     SetTopLeft(
       CurrentLevel.CurrentTop,
-      CurrentLevel.CurrentLeft + W + {FHorizontalSpace} CurrentLevel.HorizontalSpace
+      CurrentLevel.CurrentLeft + W + CurrentLevel.HorizontalSpace
     );
 end;
 
@@ -1762,7 +1720,6 @@ function TControlPopulator.SetHorizontalSpace(
   AHorizontalSpace: Single): TControlPopulator;
 begin
   Result := Self;
-  // FHorizontalSpace := AHorizontalSpace;
   CurrentLevel.HorizontalSpace := AHorizontalSpace;
 end;
 
@@ -1791,8 +1748,6 @@ end;
 function TControlPopulator.SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
 begin
   Result := Self;
-  //FVerticalSpace := AVerticalSpace;
-  //FHorizontalSpace := AHorizontalSpace;
   CurrentLevel.VerticalSpace := AVerticalSpace;
   CurrentLevel.HorizontalSpace := AHorizontalSpace;
 end;
@@ -1852,10 +1807,10 @@ begin
   SetLeft(L);
 
   if APosition = rpBelow then
-    SetTop(CurrentLevel.CurrentTop + H + {FVerticalSpace} CurrentLevel.VerticalSpace);
+    SetTop(CurrentLevel.CurrentTop + H + CurrentLevel.VerticalSpace);
 
   if APosition = rpRight then
-    SetLeft(CurrentLevel.CurrentLeft + W + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
+    SetLeft(CurrentLevel.CurrentLeft + W + CurrentLevel.HorizontalSpace);
 end;
 
 function TControlPopulator.SetTopLeftNearControls(
@@ -1880,11 +1835,11 @@ begin
     rpBelow:
       begin
         SetLeft(Bounds.Left);
-        SetTop(Bounds.Bottom + {FVerticalSpace} CurrentLevel.VerticalSpace);
+        SetTop(Bounds.Bottom + CurrentLevel.VerticalSpace);
       end;
     rpRight:
       begin
-        SetLeft(Bounds.Right + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
+        SetLeft(Bounds.Right + CurrentLevel.HorizontalSpace);
         SetTop(Bounds.Top);
       end;
   end;
@@ -1902,17 +1857,16 @@ begin
   SetLeft(Bounds.Left);
 
   if APosition = rpBelow then
-    SetTop(CurrentLevel.CurrentTop + Bounds.Height + {FVerticalSpace} CurrentLevel.VerticalSpace);
+    SetTop(CurrentLevel.CurrentTop + Bounds.Height + CurrentLevel.VerticalSpace);
 
   if APosition = rpRight then
-    SetLeft(CurrentLevel.CurrentLeft + Bounds.Width + {FHorizontalSpace} CurrentLevel.HorizontalSpace);
+    SetLeft(CurrentLevel.CurrentLeft + Bounds.Width + CurrentLevel.HorizontalSpace);
 end;
 
 function TControlPopulator.SetVerticalSpace(
   AVerticalSpace: Single): TControlPopulator;
 begin
   Result := Self;
-  //FVerticalSpace := AVerticalSpace;
   CurrentLevel.VerticalSpace := AVerticalSpace
 end;
 
@@ -2149,144 +2103,6 @@ begin
   GroupName := '__LEVEL_GROUP_' + IntToStr(FGroupCounter - 1) + '__';
 end;
 
-{ TWinControlInfo }
-(*
-class function TWinControlInfo.Create(AClass: TWinControlClass;
-  const AName: string): TWinControlInfo;
-begin
-  Result.WinControl := nil;
-  Result.WinControlClass := AClass;
-  Result.Name := AName;
-  Result.Height := -1;
-  Result.Width := -1;
-  Result.Align := TOptionalAlign.None;
-  Result.Caption := TOptionalString.None;
-  Result.Top := TOptionalSingle.None;
-  Result.Left := TOptionalSingle.None;
-  Result.SetupProc := nil;
-end;
-
-class function TWinControlInfo.Create(AWinControl: TWinControl): TWinControlInfo;
-begin
-  Result.WinControl := AWinControl;
-  Result.WinControlClass := TWinControlClass(AWinControl.ClassType);
-  Result.Name := AWinControl.Name;
-  Result.Height := -1;
-  Result.Width := -1;
-  Result.Align := TOptionalAlign.None;
-  Result.Caption := TOptionalString.None;
-  Result.Top := TOptionalSingle.None;
-  Result.Left := TOptionalSingle.None;
-  Result.SetupProc := nil;
-end;
-
-function TWinControlInfo.CreateWinControl(AOwner: TComponent;
-  AParent: TWinControl; const AName: string): TWinControl;
-begin
-  if Assigned(WinControl) then
-    Result := WinControl
-  else
-    Result := WinControlClass.Create(AOwner);
-
-  if not AName.IsEmpty then
-    Result.Name := AName;
-
-  Result.Parent := AParent;
-
-  if Caption.HasValue then
-  begin
-    {$IFDEF FRAMEWORK_FMX}
-    if Result is TPresentedTextControl then
-      TPresentedTextControl(Result).Text := Caption.Value;
-    {$ELSE}
-    TProtectedControl(Result).Caption := Caption.Value;
-    {$ENDIF}
-  end;
-
-  if Align.HasValue then
-    Result.Align := Align.Value;
-
-  if Width >= 0 then
-    Result.Width := {$IFDEF FRAMEWORK_FMX}Width{$ELSE}Trunc(Width){$ENDIF};
-
-  if Height >= 0 then
-    Result.Height := {$IFDEF FRAMEWORK_FMX}Height{$ELSE}Trunc(Height){$ENDIF};
-
-  if Top.HasValue then
-  begin
-    {$IFDEF FRAMEWORK_FMX}
-    Result.Position.Y := Top.Value;
-    {$ELSE}
-    Result.Top := Trunc(Top.Value);
-    {$ENDIF}
-  end;
-
-  if Left.HasValue then
-  begin
-    {$IFDEF FRAMEWORK_FMX}
-    Result.Position.X := Left.Value;
-    {$ELSE}
-    Result.Left := Trunc(Left.Value);
-    {$ENDIF}
-  end;
-
-  if Assigned(SetupProc) then
-    SetupProc(Result);
-end;
-
-function TWinControlInfo.Setup(AProc: TWinControlSetupProc): TWinControlInfo;
-begin
-  Result := Self;
-  Result.SetupProc := AProc;
-end;
-
-function TWinControlInfo.WithAlign(
-  AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TWinControlInfo;
-begin
-  Result := Self;
-  Result.Align := AAlign;
-end;
-
-function TWinControlInfo.WithCaption(ACaption: string): TWinControlInfo;
-begin
-  Result := Self;
-  Result.Caption := ACaption;
-end;
-
-function TWinControlInfo.WithHeight(AHeight: Single): TWinControlInfo;
-begin
-  Result := Self;
-  Result.Height := AHeight;
-end;
-
-function TWinControlInfo.WithLeft(ALeft: Single): TWinControlInfo;
-begin
-  Result := Self;
-  Result.Left := ALeft;
-end;
-
-function TWinControlInfo.WithTop(ATop: Single): TWinControlInfo;
-begin
-  Result := Self;
-  Result.Top := ATop;
-end;
-
-function TWinControlInfo.WithWidth(AWidth: Single): TWinControlInfo;
-begin
-  Result := Self;
-  Result.Width := AWidth;
-end;
-
-function TWinControlInfo.WithWidthAndHeight(AWidth,
-  AHeight: Single): TWinControlInfo;
-begin
-  Result := Self;
-  Result.Width := AWidth;
-  Result.Height := AHeight;
-end;
-
-*)
-
 { TAutoSizeContainer }
 
 constructor TAutoSizeContainer.Create(AOwner: TComponent);
@@ -2300,41 +2116,52 @@ end;
 
 { TGridContainer }
 
-constructor TGridContainer.Create(AOwner: TComponent; AControlRegistryName: string);
+constructor TGridContainer.Create(AOwner: TComponent; AComponentRegistryName: string);
 begin
   inherited Create(AOwner);
   FGrid := nil;
-  FGridPopulator := TControlGridPopulator.Create(AControlRegistryName);
+  FGridPopulator := TControlGridPopulator.Create(AComponentRegistryName);
 end;
 
 destructor TGridContainer.Destroy;
 
 begin
   FGridPopulator.Free;
-
   inherited;
 end;
 
-{ TControlRegistry }
+{ TComponentRegistry }
 
-procedure TControlRegistry.AddControl(AControl: TControl; const AName: string);
+procedure TComponentRegistry.AddComponent(AComponent: TComponent; const AName: string);
 begin
-  if AControl = nil then
+  if AComponent = nil then
     Exit;
 
-  FControls.Add(AControl);
+  FComponents.Add(AComponent);
+
+  if AComponent is TControl then
+    FControls.Add(TControl(AComponent));
 
   if AName <> '' then
   begin
-    if FNamedControls.ContainsKey(AName) then
-      raise Exception.CreateFmt('Já existe um controle registrado com o nome "%s".', [AName]);
-    FNamedControls.Add(AName, AControl);
+    if FNamedComponents.ContainsKey(AName) then
+      raise Exception.CreateFmt('Já existe um componente registrado com o nome "%s".', [AName]);
+    FNamedComponents.Add(AName, AComponent);
+
+    if AComponent is TControl then
+      FNamedControls.Add(AName, TControl(AComponent))
   end;
 end;
 
-class procedure TControlRegistry.ClearAll;
+procedure TComponentRegistry.AddControl(AControl: TControl;
+  const AName: string);
+begin
+  AddComponent(AControl, AName);
+end;
+
+class procedure TComponentRegistry.ClearAll;
 var
-  Entry: TControlRegistryEntry;
+  Entry: TComponentRegistryEntry;
 begin
   if not Assigned(FInstances) then
     Exit;
@@ -2346,31 +2173,35 @@ begin
   FInstances := nil;
 end;
 
-constructor TControlRegistry.Create;
+constructor TComponentRegistry.Create;
 begin
-  raise Exception.Create('Use TControlRegistry.ForContext');
+  raise Exception.Create('Use TComponentRegistry.ForContext');
 end;
 
-constructor TControlRegistry.CreatePrivate;
+constructor TComponentRegistry.CreatePrivate;
 begin
   inherited Create;
+  FComponents := TComponentlList.Create;
   FControls := TControlList.Create;
+  FNamedComponents := TStrComponentDictionary.Create;
   FNamedControls := TStrControlDictionary.Create;
 end;
 
-destructor TControlRegistry.Destroy;
+destructor TComponentRegistry.Destroy;
 begin
+  FComponents.Free;
   FControls.Free;
+  FNamedComponents.Free;
   FNamedControls.Free;
   inherited;
 end;
 
-class function TControlRegistry.ForContext(const AKey: string): TControlRegistry;
+class function TComponentRegistry.ForContext(const AKey: string): TComponentRegistry;
 var
-  Entry: TControlRegistryEntry;
+  Entry: TComponentRegistryEntry;
 begin
   if FInstances = nil then
-    FInstances := TStrControlRegistryEntryDictionary.Create; // TDictionary<string, TControlRegistry>.Create;
+    FInstances := TStrComponentRegistryEntryDictionary.Create;
 
   if FInstances.TryGetValue(AKey, Entry) then
   begin
@@ -2379,21 +2210,27 @@ begin
     Exit(Entry.Registry);
   end;
 
-  Entry.Registry := TControlRegistry.CreatePrivate;
+  Entry.Registry := TComponentRegistry.CreatePrivate;
   Entry.RefCount := 1;
   FInstances.Add(AKey, Entry);
   Result := Entry.Registry;
 end;
 
-function TControlRegistry.GetControl(const AName: string): TControl;
+function TComponentRegistry.GetComponent(const AName: string): TComponent;
+begin
+  if not FNamedComponents.TryGetValue(AName, Result) then
+    raise Exception.CreateFmt('Componente com o nome "%s" não encontrado.', [AName]);
+end;
+
+function TComponentRegistry.GetControl(const AName: string): TControl;
 begin
   if not FNamedControls.TryGetValue(AName, Result) then
     raise Exception.CreateFmt('Controle com o nome "%s" não encontrado.', [AName]);
 end;
 
-class procedure TControlRegistry.ReleaseContext(const AKey: string);
+class procedure TComponentRegistry.ReleaseContext(const AKey: string);
 var
-  Entry: TControlRegistryEntry;
+  Entry: TComponentRegistryEntry;
 begin
   if not Assigned(FInstances) then
     Exit;
@@ -2407,9 +2244,7 @@ begin
       FInstances.Remove(AKey);
     end
     else
-    begin
       FInstances[AKey] := Entry;
-    end;
   end;
 
   if FInstances.Count = 0 then
@@ -2419,7 +2254,13 @@ begin
   end;
 end;
 
-function TControlRegistry.TryGetControl(const AName: string;
+function TComponentRegistry.TryGetComponent(const AName: string;
+  out AComponent: TComponent): Boolean;
+begin
+  Result := FNamedComponents.TryGetValue(AName, AComponent);
+end;
+
+function TComponentRegistry.TryGetControl(const AName: string;
   out AControl: TControl): Boolean;
 begin
   Result := FNamedControls.TryGetValue(AName, AControl);
