@@ -73,6 +73,7 @@ type
     Height: Single;
     Top: TOptionalSingle;
     Left: TOptionalSingle;
+    OnClick: TNotifyEvent;
     function Setup(AProc: TControlSetupProc): TControlInfo;
     function WithAlign(
       AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TControlInfo;
@@ -84,6 +85,7 @@ type
     function WithLeft(ALeft: Single): TControlInfo;
     function WithCaption(ACaption: string): TControlInfo;
     function WithText(AText: string): TControlInfo;
+    function WithOnClick(AOnClick: TNotifyEvent): TControlInfo;
     function CreateControl(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl;
     class function Create(AClass: TControlClass; const AName: string=''): TControlInfo; overload; static;
@@ -514,6 +516,7 @@ begin
   Result.Top := TOptionalSingle.None;
   Result.Left := TOptionalSingle.None;
   Result.SetupProc := nil;
+  Result.OnClick := nil;
 end;
 
 class function TControlInfo.Create(AControl: TControl): TControlInfo;
@@ -529,6 +532,7 @@ begin
   Result.Top := TOptionalSingle.None;
   Result.Left := TOptionalSingle.None;
   Result.SetupProc := nil;
+  Result.OnClick := nil;
 end;
 
 function TControlInfo.CreateControl(AOwner: TComponent; AParent: TWinControl;
@@ -598,6 +602,8 @@ begin
     {$ENDIF}
   end;
 
+  TProtectedControl(Result).OnClick := OnClick;
+
   if Assigned(SetupProc) then
     SetupProc(Result);
 end;
@@ -631,6 +637,12 @@ function TControlInfo.WithName(AName: string): TControlInfo;
 begin
   Result := Self;
   Result.Name := AName;
+end;
+
+function TControlInfo.WithOnClick(AOnClick: TNotifyEvent): TControlInfo;
+begin
+  Result := Self;
+  Result.OnClick := AOnClick;
 end;
 
 function TControlInfo.Setup(AProc: TControlSetupProc): TControlInfo;
