@@ -154,6 +154,7 @@ type
     FNamedComponents: TStrComponentDictionary;
     FNamedControls: TStrControlDictionary;
     constructor CreatePrivate;
+    function GetItem(const AName: string): TComponent;
   public
     constructor Create;
     destructor Destroy; override;
@@ -182,6 +183,8 @@ type
     property Components: TComponentList read FComponents;
     property Controls: TControlList read FControls;
     property NamedComponents: TStrComponentDictionary read FNamedComponents;
+
+    property Items[const AName: string]: TComponent read GetItem; default;
   end;
 
   { TControlGridPopulator }
@@ -326,12 +329,19 @@ type
     FComponentRegistryAccessor: TComponentRegistryAccessor;
     function GetComponentRegistry: TComponentRegistry;
     function GetComponents: TComponentList;
+    function GetItem(const AName: string): TComponent;
   public
     constructor Create(AComponentRegistryName: string);
     destructor Destroy; override;
+
+    {$IFDEF FPC}generic{$ENDIF}
+    function GetComponent<T: TComponent>(const AName: string): T; overload;
+    function GetComponent(const AName: string): TComponent; overload;
+
     function WithOwner(AOwner: TComponent): TComponentPopulator;
     function Add(AComponentInfo: TComponentInfo): TComponentPopulator; overload;
     property Registry: TComponentRegistry read GetComponentRegistry;
+    property Items[const AName: string]: TComponent read GetItem; default;
   end;
 
   TControlPopulator = class
@@ -350,9 +360,16 @@ type
     function GetContentWidth: Single;
     function GetFContentHeight: Single;
     function GetComponentRegistry: TComponentRegistry;
+    function GetItem(const AName: string): TControl;
   public
     constructor Create(AComponentRegistryName: string);
     destructor Destroy; override;
+
+    {$IFDEF FPC}generic{$ENDIF}
+    function GetControl<T: TControl>(const AName: string): T; overload;
+    function GetControl(const AName: string): TControl; overload;
+
+
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
     function NextLevel(AGroupName: string=''): TControlPopulator; overload;
@@ -449,6 +466,7 @@ type
     property CurrentLevel: TControlPopulatorLevel read GetCurrenteLevel;
     property Controls: TControlList read GetControls;
     property Registry: TComponentRegistry read GetComponentRegistry;
+    property Items[const AName: string]: TControl read GetItem; default;
   end;
 
 implementation
@@ -1624,6 +1642,17 @@ begin
   Result := GetGroupBounds(FLevelStack.First.GroupName).Width;
 end;
 
+function TControlPopulator.GetControl(const AName: string): TControl;
+begin
+  Result := Registry.GetControl(AName);
+end;
+
+{$IFDEF FPC}generic{$ENDIF}
+function TControlPopulator.GetControl<T>(const AName: string): T;
+begin
+  Result := Registry.GetControl<T>(AName);
+end;
+
 function TControlPopulator.GetControls: TControlList;
 begin
   Result := Registry.Controls;
@@ -1673,6 +1702,11 @@ begin
 
   for Control in FGroups[AGroupName] do
     Result.Include(Control);
+end;
+
+function TControlPopulator.GetItem(const AName: string): TControl;
+begin
+  Result := Self.GetControl(AName);
 end;
 
 function TControlPopulator.MoveControls(const AControlNames: array of string;
@@ -2357,6 +2391,11 @@ begin
   Result := T(TComponentRegistry.GetControlFromContext(AContextKey, AControlName));
 end;
 
+function TComponentRegistry.GetItem(const AName: string): TComponent;
+begin
+  Result := GetControl(AName);
+end;
+
 function TComponentRegistry.GetControl(const AName: string): TControl;
 begin
   if not FNamedControls.TryGetValue(AName, Result) then
@@ -2500,6 +2539,16 @@ begin
   inherited;
 end;
 
+function TComponentPopulator.GetComponent(const AName: string): TComponent;
+begin
+  Result := Registry.GetComponent(AName);
+end;
+
+function TComponentPopulator.GetComponent<T>(const AName: string): T;
+begin
+  Result := Registry.GetComponent<T>(AName);
+end;
+
 function TComponentPopulator.GetComponentRegistry: TComponentRegistry;
 begin
   Result := FComponentRegistryAccessor.FComponentRegistry;
@@ -2508,6 +2557,11 @@ end;
 function TComponentPopulator.GetComponents: TComponentList;
 begin
   Result := Registry.FComponents;
+end;
+
+function TComponentPopulator.GetItem(const AName: string): TComponent;
+begin
+  Result := Self.GetComponent(AName);
 end;
 
 function TComponentPopulator.WithOwner(AOwner: TComponent): TComponentPopulator;
