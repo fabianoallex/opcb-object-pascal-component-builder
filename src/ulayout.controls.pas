@@ -32,8 +32,6 @@ type
   TControlPopulateProc = procedure(AControl: TControl; AIndex: Integer;
     ASettings: TGridCellSettings) of object;
 
-  { TControlGridItem }
-
   TControlGridItem = class(TInterfacedObject, IGridItem)
   private
     FControl: TControl;
@@ -64,17 +62,12 @@ type
     ComponentClass: TComponentClass;
     SetupProc: TComponentSetupProc;
     Name: string;
-
     function Setup(AProc: TComponentSetupProc): TComponentInfo;
     function WithName(AName: string): TComponentInfo;
-
     function CreateComponent(AOwner: TComponent; const AControlName: string): TComponent;
-
     class function Create(AClass: TComponentClass; const AName: string=''): TComponentInfo; overload; static;
     class function Create(AComponent: TComponent): TComponentInfo; overload; static;
   end;
-
-  { TControlInfo }
 
   TControlInfo = record
     Control: TControl;
@@ -109,6 +102,22 @@ type
 
   TComponentRegistry = class;
 
+  IRegistryContextHandle = interface
+    ['{A7D78704-853A-43D2-B3D4-770B3B3143D1}']
+    function GetRegistry: TComponentRegistry;
+    property Registry: TComponentRegistry read GetRegistry;
+  end;
+
+  TRegistryContextHandle = class(TInterfacedObject, IRegistryContextHandle)
+  private
+    FContextKey: string;
+    FRegistry: TComponentRegistry;
+  public
+    constructor Create(const AContextKey: string);
+    destructor Destroy; override;
+    function GetRegistry: TComponentRegistry;
+  end;
+
   TComponentRegistryEntry = record
     Registry: TComponentRegistry;
     RefCount: Integer;
@@ -122,7 +131,6 @@ type
   TControlGroupMap = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControlList>;
   TStrGridDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TGridLayout>;
 
-
   TRegistryNotifier = class(TComponent)
   private
     FOwnerRegistry: TComponentRegistry;
@@ -135,18 +143,20 @@ type
   TComponentRegistry = class
   private
     class var FInstances: TStrComponentRegistryEntryDictionary;
-  public
+    class function GetContextComponents(const AContext, AName: string): TComponent; static;
+  protected
     class function ForContext(const AKey: string): TComponentRegistry; static;
     class procedure ReleaseContext(const AKey: string); static;
+  public
+    class function UseContext(AKey: string): IRegistryContextHandle;
     class procedure ClearAll; static;
-
     {$IFDEF FPC}generic{$ENDIF}
     class function GetControlFromContext<T: TControl>(const AContextKey: string; const AControlName: string): T; overload;
     class function GetControlFromContext(const AContextKey: string; const AControlName: string): TControl; overload;
-
     {$IFDEF FPC}generic{$ENDIF}
     class function GetComponentFromContext<T: TComponent>(const AContextKey: string; const AComponentlName: string): T; overload;
     class function GetComponentFromContext(const AContextKey: string; const AComponentlName: string): TComponent; overload;
+    class property ContextComponents[const AContext, AName: string]: TComponent read GetContextComponents;
   private
     FNotifier: TRegistryNotifier;
     FComponents: TComponentList;
@@ -154,40 +164,31 @@ type
     FNamedComponents: TStrComponentDictionary;
     FNamedControls: TStrControlDictionary;
     constructor CreatePrivate;
-    function GetItem(const AName: string): TComponent;
+    function GetItem(ACompName: string): TComponent;
   public
     constructor Create;
     destructor Destroy; override;
     procedure AddControl(AControl: TControl; const AName: string = '');
     procedure AddComponent(AComponent: TComponent; const AName: string = '');
-
     {$IFDEF FPC}generic{$ENDIF}
     function GetComponent<T: TComponent>(const AName: string): T; overload;
     function GetComponent(const AName: string): TComponent; overload;
-
     {$IFDEF FPC}generic{$ENDIF}
     function TryGetComponent<T: TComponent>(const AName: string; out AComponent: T): Boolean; overload;
     function TryGetComponent(const AName: string; out AComponent: TComponent): Boolean; overload;
-
     {$IFDEF FPC}generic{$ENDIF}
     function GetControl<T: TControl>(const AName: string): T; overload;
     function GetControl(const AName: string): TControl; overload;
-
     {$IFDEF FPC}generic{$ENDIF}
     function TryGetControl<T: TControl>(const AName: string; out AControl: T): Boolean; overload;
     function TryGetControl(const AName: string; out AControl: TControl): Boolean; overload;
-
     procedure RegisterComponentForNotification(AComp: TComponent);
     procedure UnregisterComponentForNotification(AComp: TComponent);
-
     property Components: TComponentList read FComponents;
     property Controls: TControlList read FControls;
     property NamedComponents: TStrComponentDictionary read FNamedComponents;
-
-    property Items[const AName: string]: TComponent read GetItem; default;
+    property Items[ACompName: string]: TComponent read GetItem; default;
   end;
-
-  { TControlGridPopulator }
 
   TControlGridPopulator = class
   private
@@ -238,8 +239,6 @@ type
     property ComponentRegistryName: string read FComponentRegistryName;
   end;
 
-  { TGridLayoutHelper }
-
   TGridLayoutHelper = class helper for TGridLayout
   public
     function GetControl(ARow, ACol: Integer): TControl;
@@ -259,8 +258,6 @@ type
     constructor Create(AOwner: TComponent; AComponentRegistryName: string);
     destructor Destroy; override;
   end;
-
-  { TGridLayoutBuilderHelper }
 
   TGridLayoutBuilderHelper = class helper for TGridLayoutBuilder
   public
@@ -312,32 +309,19 @@ type
 
   TControlPopulatorLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TControlPopulatorLevel>;
 
-  TComponentRegistryAccessor = class
-  protected
-    FComponentRegistryName: string;
-    FComponentRegistry: TComponentRegistry;
-  public
-    constructor Create(ARegistryName: string);
-    destructor Destroy; override;
-    function GetComponents: TComponentList;
-    property Registry: TComponentRegistry read FComponentRegistry;
-  end;
-
   TComponentPopulator = class
   private
     FOwner: TComponent;
-    FComponentRegistryAccessor: TComponentRegistryAccessor;
+    FRegistryContextHandle: IRegistryContextHandle;
     function GetComponentRegistry: TComponentRegistry;
     function GetComponents: TComponentList;
     function GetItem(const AName: string): TComponent;
   public
     constructor Create(AComponentRegistryName: string);
     destructor Destroy; override;
-
     {$IFDEF FPC}generic{$ENDIF}
     function GetComponent<T: TComponent>(const AName: string): T; overload;
     function GetComponent(const AName: string): TComponent; overload;
-
     function WithOwner(AOwner: TComponent): TComponentPopulator;
     function Add(AComponentInfo: TComponentInfo): TComponentPopulator; overload;
     property Registry: TComponentRegistry read GetComponentRegistry;
@@ -347,7 +331,7 @@ type
   TControlPopulator = class
   private
     FOwner: TComponent;
-    FComponentRegistryAccessor: TComponentRegistryAccessor;
+    FRegistryContextHandle: IRegistryContextHandle;
     FGrids: TStrGridDictionary;
     FGroups: TControlGroupMap;
     FLevelStack: TControlPopulatorLevelStack;
@@ -362,14 +346,11 @@ type
     function GetComponentRegistry: TComponentRegistry;
     function GetItem(const AName: string): TControl;
   public
-    constructor Create(AComponentRegistryName: string);
+    constructor Create(ARegistryContext: string);
     destructor Destroy; override;
-
     {$IFDEF FPC}generic{$ENDIF}
     function GetControl<T: TControl>(const AName: string): T; overload;
     function GetControl(const AName: string): TControl; overload;
-
-
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlPopulator;
     function NextLevel(AGroupName: string=''): TControlPopulator; overload;
@@ -424,10 +405,8 @@ type
     function Break(AIncTopOrLeft: Single): TControlPopulator; overload;
     function BreakLine(AIncTop: Single): TControlPopulator; overload;
     function BreakColumn(AIncLeft: Single): TControlPopulator; overload;
-    {$IFDEF FRAMEWORK_FMX}
-    function WithOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlPopulator;
-    {$ELSE}
-    function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlPopulator;
+    {$IFDEF FRAMEWORK_FMX}function WithOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlPopulator;
+    {$ELSE}function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlPopulator;
     {$ENDIF}
     function WithParent(AParent: TWinControl): TControlPopulator;
     function AddControl(AControlInfo: TControlInfo;
@@ -1189,12 +1168,9 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-constructor TControlPopulator.Create(AComponentRegistryName: string);
+constructor TControlPopulator.Create(ARegistryContext: string);
 begin
-  // FComponentRegistryName := AComponentRegistryName;
-  // FComponentRegistry := TComponentRegistry.ForContext(FComponentRegistryName);
-
-  FComponentRegistryAccessor := TComponentRegistryAccessor.Create(AComponentRegistryName);
+  FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContext);
 
   FGrids := TStrGridDictionary.Create;
   FGroups := TControlGroupMap.Create;
@@ -1425,7 +1401,6 @@ destructor TControlPopulator.Destroy;
 var
   GroupList: TControlList;
 begin
-  FComponentRegistryAccessor.Free;
   FGrids.Free;
   for GroupList in FGroups.Values do
     GroupList.Free;
@@ -1634,7 +1609,7 @@ end;
 
 function TControlPopulator.GetComponentRegistry: TComponentRegistry;
 begin
-  Result := FComponentRegistryAccessor.FComponentRegistry;
+  Result := FRegistryContextHandle.GetRegistry;
 end;
 
 function TControlPopulator.GetContentWidth: Single;
@@ -2391,9 +2366,15 @@ begin
   Result := T(TComponentRegistry.GetControlFromContext(AContextKey, AControlName));
 end;
 
-function TComponentRegistry.GetItem(const AName: string): TComponent;
+function TComponentRegistry.GetItem(ACompName: string): TComponent;
 begin
-  Result := GetControl(AName);
+  Result := GetControl(ACompName);
+end;
+
+class function TComponentRegistry.GetContextComponents(const AContext,
+  AName: string): TComponent;
+begin
+  Result := TComponentRegistry.GetComponentFromContext(AContext, AName);
 end;
 
 function TComponentRegistry.GetControl(const AName: string): TControl;
@@ -2481,6 +2462,12 @@ begin
   AComp.RemoveFreeNotification(FNotifier);
 end;
 
+class function TComponentRegistry.UseContext(
+  AKey: string): IRegistryContextHandle;
+begin
+  Result := TRegistryContextHandle.Create(AKey);
+end;
+
 { TComponentPopulator }
 
 function TComponentPopulator.Add(
@@ -2529,13 +2516,11 @@ end;
 
 constructor TComponentPopulator.Create(AComponentRegistryName: string);
 begin
-  FComponentRegistryAccessor :=
-    TComponentRegistryAccessor.Create(AComponentRegistryName);
+  FRegistryContextHandle := TRegistryContextHandle.Create(AComponentRegistryName);
 end;
 
 destructor TComponentPopulator.Destroy;
 begin
-  FComponentRegistryAccessor.Free;
   inherited;
 end;
 
@@ -2544,6 +2529,7 @@ begin
   Result := Registry.GetComponent(AName);
 end;
 
+{$IFDEF FPC}generic{$ENDIF}
 function TComponentPopulator.GetComponent<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
@@ -2551,7 +2537,7 @@ end;
 
 function TComponentPopulator.GetComponentRegistry: TComponentRegistry;
 begin
-  Result := FComponentRegistryAccessor.FComponentRegistry;
+  Result := FRegistryContextHandle.GetRegistry;
 end;
 
 function TComponentPopulator.GetComponents: TComponentList;
@@ -2616,25 +2602,6 @@ begin
   Result.SetupProc := nil;
 end;
 
-{ TComponentRegistryAccessor }
-
-constructor TComponentRegistryAccessor.Create(ARegistryName: string);
-begin
-  FComponentRegistryName := ARegistryName;
-  FComponentRegistry := TComponentRegistry.ForContext(FComponentRegistryName);
-end;
-
-destructor TComponentRegistryAccessor.Destroy;
-begin
-  TComponentRegistry.ReleaseContext(FComponentRegistryName);
-  inherited;
-end;
-
-function TComponentRegistryAccessor.GetComponents: TComponentList;
-begin
-  Result := FComponentRegistry.FComponents;
-end;
-
 { TRegistryNotifier }
 
 constructor TRegistryNotifier.Create(AOwner: TComponentRegistry);
@@ -2648,6 +2615,26 @@ begin
   inherited;
   if Operation = opRemove then
     FOwnerRegistry.UnregisterComponentForNotification(AComponent);
+end;
+
+{ TContextHandle }
+
+constructor TRegistryContextHandle.Create(const AContextKey: string);
+begin
+  inherited Create;
+  FContextKey := AContextKey;
+  FRegistry := TComponentRegistry.ForContext(AContextKey);
+end;
+
+destructor TRegistryContextHandle.Destroy;
+begin
+  TComponentRegistry.ReleaseContext(FContextKey);
+  inherited;
+end;
+
+function TRegistryContextHandle.GetRegistry: TComponentRegistry;
+begin
+  Result := FRegistry;
 end;
 
 end.
