@@ -11,7 +11,7 @@ uses
   {$IFDEF FPC}Controls, StdCtrls, ExtCtrls,
   {$ELSE}
     {$IFDEF FRAMEWORK_FMX}
-    FMX.Controls, FMX.StdCtrls, Fmx.Types, FMX.ExtCtrls, FMX.TabControl,
+    FMX.Controls, FMX.StdCtrls, Fmx.Types, FMX.ExtCtrls, FMX.TabControl, FMX.Forms,
     {$ELSE}
     Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls,
     {$ENDIF}
@@ -277,9 +277,6 @@ type
     Right: Single;
     Bottom: Single;
     procedure Include(Control: TControl); overload;
-    {$IFDEF FRAMEWORK_FMX}
-    procedure Include_old(ControlObj: TFmxObject); overload;
-    {$ENDIF}
     procedure Reset;
     function Width: Single;
     function Height: Single;
@@ -1114,8 +1111,24 @@ function TControlPopulator.CenterControlsInParentVertically(
 var
   TargetBounds: TControlGroupBounds;
   ParentCtrl: TControl;
-  ParentHeight: Integer;
+  ParentHeight: Single;
   TargetCenterY, ParentCenterY, DeltaY: Single;
+
+  {$IFDEF FRAMEWORK_FMX}
+  function GetParentClientHeight(AControl: TControl): Single;
+  begin
+    if AControl.Parent is TForm then
+      Result := TForm(AControl.Parent).ClientHeight
+    else if AControl.Parent is TControl then
+      Result :=
+        TControl(AControl.Parent).Height
+        - TControl(AControl.Parent).Padding.Top
+        + TControl(AControl.Parent).Padding.Bottom
+    else
+      Result := 0; // não tem dimensão
+  end;
+  {$ENDIF}
+
 begin
   Result := Self;
 
@@ -1128,7 +1141,11 @@ begin
     Exit;
 
   TargetBounds := GetControlsBounds(AControlNames);
+  {$IFDEF FRAMEWORK_FMX}
+  ParentHeight := GetParentClientHeight(ParentCtrl);
+  {$ELSE}
   ParentHeight := ParentCtrl.Parent.ClientHeight;
+  {$ENDIF}
 
   TargetCenterY := TargetBounds.Top + (TargetBounds.Height / 2);
   ParentCenterY := ParentHeight / 2;
@@ -1143,8 +1160,24 @@ function TControlPopulator.CenterControlsInParentHorizontally(
 var
   TargetBounds: TControlGroupBounds;
   ParentCtrl: TControl;
-  ParentWidth: Integer;
+  ParentWidth: Single;
   TargetCenterX, ParentCenterX, DeltaX: Single;
+
+  {$IFDEF FRAMEWORK_FMX}
+  function GetParentClientWidth(AControl: TControl): Single;
+  begin
+    if AControl.Parent is TForm then
+      Result := TForm(AControl.Parent).ClientHeight
+    else if AControl.Parent is TControl then
+      Result :=
+        TControl(AControl.Parent).Height
+        - TControl(AControl.Parent).Padding.Top
+        + TControl(AControl.Parent).Padding.Bottom
+    else
+      Result := 0; // não tem dimensão
+  end;
+  {$ENDIF}
+
 begin
   Result := Self;
 
@@ -1156,7 +1189,11 @@ begin
     Exit;
 
   TargetBounds := GetControlsBounds(AControlNames);
+  {$IFDEF FRAMEWORK_FMX}
+  ParentWidth := GetParentClientWidth(ParentCtrl);
+  {$ELSE}
   ParentWidth := ParentCtrl.Parent.ClientWidth;
+  {$ENDIF}
 
   TargetCenterX := TargetBounds.Left + (TargetBounds.Width / 2);
   ParentCenterX := ParentWidth / 2;
@@ -1464,10 +1501,13 @@ begin
   Result := Self;
   {$IFDEF FRAMEWORK_FMX}
   CurrentLevel.Parent.Height :=
-    GetControlsBounds([CurrentLevel.GroupName].Height + AExtraHeight);
+    GetControlsBounds([CurrentLevel.GroupName]).Height
+    + AExtraHeight;
   {$ELSE}
-  CurrentLevel.Parent.Height :=
-    Trunc(GetControlsBounds([CurrentLevel.GroupName]).Height + AExtraHeight);
+  CurrentLevel.Parent.Height := Trunc(
+    GetControlsBounds([CurrentLevel.GroupName]).Height
+    + AExtraHeight
+  );
   {$ENDIF}
 end;
 
@@ -1485,10 +1525,13 @@ begin
   Result := Self;
   {$IFDEF FRAMEWORK_FMX}
   CurrentLevel.Parent.Width :=
-    GetControlsBounds([CurrentLevel.GroupName].Width + AExtraWidth);
+    GetControlsBounds([CurrentLevel.GroupName]).Width
+    + AExtraWidth;
   {$ELSE}
-  CurrentLevel.Parent.Width :=
-    Trunc(GetControlsBounds([CurrentLevel.GroupName]).Width + AExtraWidth);
+  CurrentLevel.Parent.Width := Trunc(
+    GetControlsBounds([CurrentLevel.GroupName]).Width
+    + AExtraWidth
+  );
   {$ENDIF}
 end;
 
@@ -2104,34 +2147,6 @@ begin
   if Bottom < T + H then
     Bottom := T + H;
 end;
-
-{$IFDEF FRAMEWORK_FMX}
-procedure TControlGroupBounds.Include_old(ControlObj: TFmxObject);
-var
-  Ctrl: TControl;
-  CtrlRight, CtrlBottom: Single;
-begin
-  if ControlObj = nil then
-    Exit;
-
-  if ControlObj is TControl then
-  begin
-    Ctrl := TControl(ControlObj);
-
-    CtrlRight := Ctrl.Position.X + Ctrl.Width;
-    CtrlBottom := Ctrl.Position.Y + Ctrl.Height;
-
-    if Left > Ctrl.Position.X then
-      Left := Ctrl.Position.X;
-    if Top > Ctrl.Position.Y then
-      Top := Ctrl.Position.Y;
-    if Right < CtrlRight then
-      Right := CtrlRight;
-    if Bottom < CtrlBottom then
-      Bottom := CtrlBottom;
-  end;
-end;
-{$ENDIF}
 
 procedure TControlGroupBounds.Reset;
 begin
