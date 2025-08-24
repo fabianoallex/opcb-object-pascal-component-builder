@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ComCtrls, ExtCtrls,
-  StdCtrls, ULayout, UGridLayoutBuilder, UGridLayoutFillerFactory, ULayout.controls;
+  StdCtrls, ULayout, UGridLayoutBuilder, UGridLayoutFillerFactory, Populators;
 
 type
 

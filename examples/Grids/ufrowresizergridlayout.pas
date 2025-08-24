@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, ULayout,
-  UGridaLayoutResizer, ULayout.controls;
+  UGridaLayoutResizer, Populators;
 
 type
 

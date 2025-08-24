@@ -112,7 +112,7 @@ type
 implementation
 
 uses
-  ulayout.controls;
+  Populators;
 
 { TTextGridItemBuilder }
 
