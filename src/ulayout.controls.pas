@@ -332,7 +332,6 @@ type
   private
     FOwner: TComponent;
     FRegistryContextHandle: IRegistryContextHandle;
-    FGrids: TStrGridDictionary;
     FGroups: TControlGroupMap;
     FLevelStack: TControlPopulatorLevelStack;
     function GetControls: TControlList;
@@ -384,7 +383,6 @@ type
     function NextSiblingLevelWithBreak(AControlInfo: TControlInfo; AGroupName: string=''): TControlPopulator; overload;
     function NextSiblingLevelWithBreak(AControlInfo: TControlInfo; ADirection: TControlPopulatorDirection;
       AGroupName: string=''): TControlPopulator; overload;
-    function NextLevelGrid(AGridName: string; ABuilder: TGridLayoutBuilder): TControlPopulator;
     function SetVerticalSpace(AVerticalSpace: Single): TControlPopulator;
     function SetHorizontalSpace(AHorizontalSpace: Single): TControlPopulator;
     function SetTopLeft(ATop, ALeft: Single): TControlPopulator;
@@ -1171,10 +1169,7 @@ end;
 constructor TControlPopulator.Create(ARegistryContext: string);
 begin
   FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContext);
-
-  FGrids := TStrGridDictionary.Create;
   FGroups := TControlGroupMap.Create;
-
   FLevelStack := TControlPopulatorLevelStack.Create(True);
   FLevelStack.Add(TControlPopulatorLevel.Create);
 end;
@@ -1401,7 +1396,6 @@ destructor TControlPopulator.Destroy;
 var
   GroupList: TControlList;
 begin
-  FGrids.Free;
   for GroupList in FGroups.Values do
     GroupList.Free;
   FGroups.Free;
@@ -2029,16 +2023,6 @@ function TControlPopulator.NextLevel(AControlInfo: TControlInfo;
 begin
   Result := NextLevel(AControlInfo, AGroupName);
   SetDirection(ADirection);
-end;
-
-function TControlPopulator.NextLevelGrid(AGridName: string;
-  ABuilder: TGridLayoutBuilder): TControlPopulator;
-var
-  Grid: TGridLayout;
-begin
-  Grid := ABuilder.Build;
-  Result := NextLevel(AGridName);
-  FGrids.Add(AGridName, Grid);
 end;
 
 function TControlPopulator.NextSiblingLevel(AControlInfo: TControlInfo;
