@@ -148,7 +148,7 @@ type
     class function ForContext(const AKey: string): TComponentRegistry; static;
     class procedure ReleaseContext(const AKey: string); static;
   public
-    class function UseContext(AKey: string): IRegistryContextHandle;
+    class function GetContextHandle(AKey: string): IRegistryContextHandle;
     class procedure ClearAll; static;
     {$IFDEF FPC}generic{$ENDIF}
     class function GetControlFromContext<T: TControl>(const AContextKey: string; const AControlName: string): T; overload;
@@ -2461,7 +2461,7 @@ begin
   AComp.RemoveFreeNotification(FNotifier);
 end;
 
-class function TComponentRegistry.UseContext(
+class function TComponentRegistry.GetContextHandle(
   AKey: string): IRegistryContextHandle;
 begin
   Result := TRegistryContextHandle.Create(AKey);
