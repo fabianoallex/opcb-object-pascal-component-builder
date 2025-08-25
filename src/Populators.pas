@@ -445,9 +445,9 @@ type
 
   TPopulators = class
   private
+    FContextName: string;
     FComponentPopulator: TComponentPopulator;
     FControlPopulator: TControlPopulator;
-    FContextName: string;
   public
     constructor Create(const AContextName: string);
     destructor Destroy; override;
