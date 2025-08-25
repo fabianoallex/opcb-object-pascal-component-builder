@@ -1,7 +1,5 @@
 ﻿unit OPCB;
 
-  // teste de commit apos renomear repositório
-
 {$IFDEF FPC}
 {$mode objfpc}{$H+}
 {$LONGSTRINGS ON}{$MODESWITCH TYPEHELPERS}{$MODESWITCH ADVANCEDRECORDS}
