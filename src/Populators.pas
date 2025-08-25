@@ -140,6 +140,8 @@ type
     constructor Create(AOwner: TComponentRegistry);
   end;
 
+  TRegistryLifetime = (rlTransient, rlPersistent);
+
   TComponentRegistry = class
   private
     class var FInstances: TStrComponentRegistryEntryDictionary;
@@ -147,6 +149,7 @@ type
   protected
     class function ForContext(const AKey: string): TComponentRegistry; static;
     class procedure ReleaseContext(const AKey: string); static;
+    class procedure Finalize; static;
   public
     class function GetContextHandle(AKey: string): IRegistryContextHandle;
     class procedure ClearAll; static;
@@ -163,8 +166,11 @@ type
     FControls: TControlList;
     FNamedComponents: TStrComponentDictionary;
     FNamedControls: TStrControlDictionary;
+    FRegistryLifetime: TRegistryLifetime;
     constructor CreatePrivate;
     function GetItem(ACompName: string): TComponent;
+    procedure SetRegistryLifetime(const Value: TRegistryLifetime);
+    procedure CheckRelease;
   public
     constructor Create;
     destructor Destroy; override;
@@ -188,6 +194,7 @@ type
     property Controls: TControlList read FControls;
     property NamedComponents: TStrComponentDictionary read FNamedComponents;
     property Items[ACompName: string]: TComponent read GetItem; default;
+    property RegistryLifetime: TRegistryLifetime read FRegistryLifetime write SetRegistryLifetime;
   end;
 
   TControlGridPopulator = class
@@ -2263,6 +2270,32 @@ begin
   AddComponent(AControl, AName);
 end;
 
+procedure TComponentRegistry.CheckRelease;
+var
+  Entry: TComponentRegistryEntry;
+  Key: string;
+begin
+  for Key in FInstances.Keys do
+    if FInstances[Key].Registry = Self then
+    begin
+      Entry := FInstances[Key];
+
+      if (Entry.RefCount <= 0) and (Entry.Registry.RegistryLifetime = rlTransient) then
+      begin
+        Free; // vai destruir a si mesmo
+        FInstances.Remove(Key);
+      end;
+
+      Break;
+    end;
+
+  if FInstances.Count = 0 then
+  begin
+    FInstances.Free;
+    FInstances := nil;
+  end;
+end;
+
 class procedure TComponentRegistry.ClearAll;
 var
   Entry: TComponentRegistryEntry;
@@ -2285,6 +2318,7 @@ end;
 constructor TComponentRegistry.CreatePrivate;
 begin
   inherited Create;
+  FRegistryLifetime := rlTransient;
   FNotifier := TRegistryNotifier.Create(Self);
   FComponents := TComponentList.Create;
   FControls := TControlList.Create;
@@ -2300,6 +2334,18 @@ begin
   FNamedControls.Free;
   FNotifier.Free;
   inherited;
+end;
+
+class procedure TComponentRegistry.Finalize;
+var
+  Entry: TComponentRegistryEntry;
+begin
+  if Assigned(TComponentRegistry.FInstances) then
+  begin
+    for Entry in TComponentRegistry.FInstances.Values do
+      Entry.Registry.Free;
+    TComponentRegistry.FInstances.Free;
+  end;
 end;
 
 // ATENÇÃO: Ao chamar ForContext, é obrigatório chamar TComponentRegistry.ReleaseContext
@@ -2415,19 +2461,20 @@ begin
   if FInstances.TryGetValue(AKey, Entry) then
   begin
     Dec(Entry.RefCount);
-    if Entry.RefCount <= 0 then
-    begin
-      Entry.Registry.Free;
-      FInstances.Remove(AKey);
-    end
-    else
-      FInstances[AKey] := Entry;
-  end;
+    FInstances[AKey] := Entry;  // reinsere Entry com o novo RefCont
 
-  if FInstances.Count = 0 then
+    if Entry.RefCount <= 0 then
+      Entry.Registry.CheckRelease;
+  end;
+end;
+
+procedure TComponentRegistry.SetRegistryLifetime(
+  const Value: TRegistryLifetime);
+begin
+  if FRegistryLifetime <> Value then
   begin
-    FInstances.Free;
-    FInstances := nil;
+    FRegistryLifetime := Value;
+    CheckRelease; // garante destruição se precisar
   end;
 end;
 
@@ -2683,6 +2730,11 @@ begin
 
   inherited;
 end;
+
+initialization
+
+finalization
+  TComponentRegistry.Finalize;
 
 end.
 
