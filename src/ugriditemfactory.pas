@@ -112,7 +112,7 @@ type
 implementation
 
 uses
-  Builders;
+  OPCB;
 
 { TTextGridItemBuilder }
 

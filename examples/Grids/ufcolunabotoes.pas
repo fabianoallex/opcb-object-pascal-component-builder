@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, Buttons, StdCtrls,
-  ExtCtrls, SpinEx, ULayout, Builders;
+  ExtCtrls, SpinEx, ULayout, OPCB;
 
 type
 

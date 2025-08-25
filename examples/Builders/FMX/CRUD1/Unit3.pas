@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  Builders, FMX.Controls.Presentation, FMX.StdCtrls;
+  OPCB, FMX.Controls.Presentation, FMX.StdCtrls;
 
 type
   TForm3 = class(TForm)
@@ -25,9 +25,9 @@ implementation
 
 procedure TForm3.FormCreate(Sender: TObject);
 var
-  Builders: TBuilders;
+  Builders: TOPCBBuilders;
 begin
-  Builders := TBuilders.Create(Self.Name);
+  Builders := TOPCBBuilders.Create(Self.Name);
 
   try
     Builders.AsComponentBuilder

@@ -1,4 +1,4 @@
-﻿unit Builders;
+﻿unit OPCB;
 
 {$IFDEF FPC}
 {$mode objfpc}{$H+}
@@ -450,7 +450,7 @@ type
     property Items[const AName: string]: TControl read GetItem; default;
   end;
 
-  TBuilders = class
+  TOPCBBuilders = class
   private
     FContextName: string;
     FComponentBuilder: TComponentBuilder;
@@ -2695,9 +2695,9 @@ begin
   Result := FRegistry;
 end;
 
-{ TBuilders }
+{ TOPCBBuilders }
 
-function TBuilders.AsComponentBuilder: TComponentBuilder;
+function TOPCBBuilders.AsComponentBuilder: TComponentBuilder;
 begin
   if not Assigned(FComponentBuilder) then
     FComponentBuilder := TComponentBuilder.Create(FContextName);
@@ -2705,7 +2705,7 @@ begin
   Result := FComponentBuilder;
 end;
 
-function TBuilders.AsControlBuilder: TControlBuilder;
+function TOPCBBuilders.AsControlBuilder: TControlBuilder;
 begin
   if not Assigned(FControlBuilder) then
     FControlBuilder := TControlBuilder.Create(FContextName);
@@ -2713,14 +2713,14 @@ begin
   Result := FControlBuilder;
 end;
 
-constructor TBuilders.Create(const AContextName: string);
+constructor TOPCBBuilders.Create(const AContextName: string);
 begin
   FContextName := AContextName;
   FComponentBuilder := nil;
   FControlBuilder := nil;
 end;
 
-destructor TBuilders.Destroy;
+destructor TOPCBBuilders.Destroy;
 begin
   if Assigned(FComponentBuilder) then
     FComponentBuilder.Free;
