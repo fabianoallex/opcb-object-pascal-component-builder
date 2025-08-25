@@ -443,6 +443,18 @@ type
     property Items[const AName: string]: TControl read GetItem; default;
   end;
 
+  TPopulators = class
+  private
+    FComponentPopulator: TComponentPopulator;
+    FControlPopulator: TControlPopulator;
+    FContextName: string;
+  public
+    constructor Create(const AContextName: string);
+    destructor Destroy; override;
+    function AsComponentPopulator: TComponentPopulator;
+    function AsControlPopulator: TControlPopulator;
+  end;
+
 implementation
 
 uses
@@ -2634,6 +2646,42 @@ end;
 function TRegistryContextHandle.GetRegistry: TComponentRegistry;
 begin
   Result := FRegistry;
+end;
+
+{ TPopulators }
+
+function TPopulators.AsComponentPopulator: TComponentPopulator;
+begin
+  if not Assigned(FComponentPopulator) then
+    FComponentPopulator := TComponentPopulator.Create(FContextName);
+
+  Result := FComponentPopulator;
+end;
+
+function TPopulators.AsControlPopulator: TControlPopulator;
+begin
+  if not Assigned(FControlPopulator) then
+    FControlPopulator := TControlPopulator.Create(FContextName);
+
+  Result := FControlPopulator;
+end;
+
+constructor TPopulators.Create(const AContextName: string);
+begin
+  FContextName := AContextName;
+  FComponentPopulator := nil;
+  FControlPopulator := nil;
+end;
+
+destructor TPopulators.Destroy;
+begin
+  if Assigned(FComponentPopulator) then
+    FComponentPopulator.Free;
+
+  if Assigned(FControlPopulator) then
+    FControlPopulator.Free;
+
+  inherited;
 end;
 
 end.
