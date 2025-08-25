@@ -5,7 +5,7 @@ interface
 uses
   System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
   FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs,
-  Populators, FMX.Controls.Presentation, FMX.StdCtrls;
+  Builders, FMX.Controls.Presentation, FMX.StdCtrls;
 
 type
   TForm3 = class(TForm)
@@ -25,16 +25,16 @@ implementation
 
 procedure TForm3.FormCreate(Sender: TObject);
 var
-  Populators: TPopulators;
+  Builders: TBuilders;
 begin
-  Populators := TPopulators.Create(Self.Name);
+  Builders := TBuilders.Create(Self.Name);
 
   try
-    Populators.AsComponentPopulator
+    Builders.AsComponentBuilder
       .WithOwner(Self)
     ;
 
-    Populators.AsControlPopulator
+    Builders.AsControlBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .AddControls([
@@ -43,7 +43,7 @@ begin
       ])
     ;
   finally
-    Populators.Free;
+    Builders.Free;
   end;
 end;
 

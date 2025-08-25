@@ -3,7 +3,7 @@ unit Unit1;
 interface
 
 uses
-  Populators,
+  Builders,
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs;
 
@@ -44,12 +44,12 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  Populator: TControlPopulator;
+  Builder: TControlBuilder;
 begin
-  Populator := TControlPopulator.Create(Self.Name);
+  Builder := TControlBuilder.Create(Self.Name);
 
   try
-    Populator
+    Builder
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
@@ -59,7 +59,7 @@ begin
     ;
 
   finally
-    Populator.Free;
+    Builder.Free;
   end;
 end;
 
