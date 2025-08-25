@@ -5,7 +5,7 @@ unit Unit1;
 interface
 
 uses
-  Populators, ULayout, Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
+  Builders, ULayout, Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls,
   DBCtrls, Grids, ColorBox, ExtCtrls, Buttons, ListViewFilterEdit,
   SynHighlighterPas, TAGraph;
 
@@ -78,7 +78,7 @@ end;
 procedure TForm1.Button1Click(Sender: TObject);
 var
   Grid: TGridLayout;
-  ControlGridPopulator: TControlGridPopulator;
+  ControlGridBuilder: TControlGridBuilder;
 begin
   Grid := TGridLayoutBuilder.Create
     .WithDimensions(5, 5)
@@ -90,10 +90,10 @@ begin
     .WithColumnsWidth([1], 100)
     .Build;
 
-  ControlGridPopulator := TControlGridPopulator.Create(Grid);
+  ControlGridBuilder := TControlGridBuilder.Create(Grid);
 
   try
-    ControlGridPopulator
+    ControlGridBuilder
       .WithOwnerAndParentControl(Self, Self)
       .UsingFiller(ftColumnFirst)
       .CreateControls(5, [TLabel], @OnControlCreate)
@@ -101,7 +101,7 @@ begin
       .CreateControls(19, [TMemo, TButton, TCheckBox, TEdit], @OnControlCreate)
     ;
   finally
-    ControlGridPopulator.Free;
+    ControlGridBuilder.Free;
   end;
 
   Grid.ArrangeItems;
@@ -120,15 +120,15 @@ end;
 procedure TForm1.Button2Click(Sender: TObject);
 var
   Grid: TGridLayout;
-  Populator: TControlGridPopulator;
+  Builder: TControlGridBuilder;
 
   procedure ConfigControls;
   begin
-    Populator.NamedControls['LabelEdit'].Caption := 'LabelEdit';
-    Populator.NamedControls['LabelMemo'].Caption := 'LabelMemo';
+    Builder.NamedControls['LabelEdit'].Caption := 'LabelEdit';
+    Builder.NamedControls['LabelMemo'].Caption := 'LabelMemo';
 
-    (Populator.NamedControls['BtnOk'] as TBitBtn).Kind := bkOk;
-    (Populator.NamedControls['BtnCancel'] as TBitBtn).Kind := bkCancel;
+    (Builder.NamedControls['BtnOk'] as TBitBtn).Kind := bkOk;
+    (Builder.NamedControls['BtnCancel'] as TBitBtn).Kind := bkCancel;
   end;
 
 begin
@@ -141,10 +141,10 @@ begin
     .WithRowsHeight([3], 200)
     .Build;
 
-  Populator := TControlGridPopulator.Create(Grid);
+  Builder := TControlGridBuilder.Create(Grid);
 
   try
-    Populator
+    Builder
       .WithOwnerAndParentControl(Self, Self)
       .UsingFiller(ftRowFirst)
       .CreateControls(4, [
@@ -166,7 +166,7 @@ begin
 
     Grid.ArrangeItems;
   finally
-    Populator.Free;
+    Builder.Free;
     Grid.Free;
   end;
 end;
@@ -174,7 +174,7 @@ end;
 procedure TForm1.Button3Click(Sender: TObject);
 var
   Grid: TGridLayout;
-  Populator: TControlGridPopulator;
+  Builder: TControlGridBuilder;
 begin
   Grid := TGridLayoutBuilder.Create
     .WithDimensions(7, 7)
@@ -183,10 +183,10 @@ begin
     .WithSpacings(3, 3)
     .Build;
 
-  Populator := TControlGridPopulator.Create(Grid);
+  Builder := TControlGridBuilder.Create(Grid);
 
   try
-    Populator
+    Builder
       .WithOwnerAndParentControl(Self, Self)
       .UsingFiller(ftColumnFirst, 5, 5)
       .CreateControls(2, [TControlInfo.Create(TLabel, 'Label')])
@@ -196,11 +196,11 @@ begin
       .CreateControls(40, [TControlInfo.Create(TSpeedButton, 'SB')])
     ;
 
-    Populator.NamedControls['SB'].Caption := '01';
+    Builder.NamedControls['SB'].Caption := '01';
 
     Grid.ArrangeItems;
   finally
-    Populator.Free;
+    Builder.Free;
     Grid.Free;
   end;
 end;
@@ -216,10 +216,10 @@ procedure TForm1.Button4Click(Sender: TObject);
 var
   Form: TForm;
   Grid: TGridLayout;
-  Populator: TControlGridPopulator;
+  Builder: TControlGridBuilder;
 begin
   Grid := nil;
-  Populator := nil;
+  Builder := nil;
 
   Form := TForm.Create(Application);
   Form.Position := poMainFormCenter;
@@ -232,7 +232,7 @@ begin
       .WithSpacings(8, 8)
       .WithRowsHeight([1], 185)
       .WithRowsHeight([2], 35)
-      .BuildAndPopulate(Grid, Populator)
+      .BuildAndPopulate(Grid, Builder)
       .WithOwnerAndParentControl(Form, Form)
       .UsingFiller(ftRowFirst)
       .CreateControls(4, [
@@ -243,11 +243,11 @@ begin
         ], @OnControlCreateForm
       );
 
-    Grid.RowHeight[0] := (Populator.NamedControls['Label'] as TLabel).Height;
-    (Populator.NamedControls['Label'] as TLabel).Caption := 'Escolha o item';
-    (Populator.NamedControls['ListBox'] as TListBox).Items.AddCommaText('Item1,Item2,Item3');
-    (Populator.NamedControls['BtnOk'] as TBitBtn).Kind := bkOK;
-    (Populator.NamedControls['BtnCancel'] as TBitBtn).Kind := bkCancel;
+    Grid.RowHeight[0] := (Builder.NamedControls['Label'] as TLabel).Height;
+    (Builder.NamedControls['Label'] as TLabel).Caption := 'Escolha o item';
+    (Builder.NamedControls['ListBox'] as TListBox).Items.AddCommaText('Item1,Item2,Item3');
+    (Builder.NamedControls['BtnOk'] as TBitBtn).Kind := bkOK;
+    (Builder.NamedControls['BtnCancel'] as TBitBtn).Kind := bkCancel;
 
     Grid.ArrangeItems;
 
@@ -260,8 +260,8 @@ begin
       Form.Free;
     if Assigned(Grid) then
       Grid.Free;
-    if Assigned(Populator) then
-      Populator.Free;
+    if Assigned(Builder) then
+      Builder.Free;
   end;
 end;
 

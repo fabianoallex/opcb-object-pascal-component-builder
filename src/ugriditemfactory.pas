@@ -112,7 +112,7 @@ type
 implementation
 
 uses
-  Populators;
+  Builders;
 
 { TTextGridItemBuilder }
 

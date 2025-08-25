@@ -5,7 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs,
-  Populators, Vcl.ExtCtrls, Vcl.StdCtrls;
+  Builders, Vcl.ExtCtrls, Vcl.StdCtrls;
 
 type
 
@@ -20,7 +20,7 @@ type
     procedure SetupLabelLogin(AControl: TControl);
     procedure SetupSenha(AControl: TControl);
     procedure SetupLoginButton(AControl: TControl);
-    procedure PopulateLoginControls(Populator: TControlPopulator);
+    procedure PopulateLoginControls(Builder: TControlBuilder);
     procedure SetButtonLogin(const Value: TButton);
     procedure SetCheckBoxConnected(const Value: TCheckBox);
     procedure SetEditEmail(const Value: TEdit);
@@ -112,7 +112,7 @@ begin
   CheckBox.Width := CaptionWidth + 20;
 end;
 
-procedure TForm1.PopulateLoginControls(Populator: TControlPopulator);
+procedure TForm1.PopulateLoginControls(Builder: TControlBuilder);
 var
   CILabel: TControlInfo;
   CIEdit: TControlInfo;
@@ -120,7 +120,7 @@ begin
   CILabel := TControlInfo.Create(TLabel);
   CIEdit := TControlInfo.Create(TEdit).WithWidth(250);
 
-  Populator
+  Builder
     .NextLevel(TControlInfo.Create(TPanel, 'PanelLogin').WithCaption(''), cpdVertical)
       .SetTopLeft(10, 10)
       .AddControl(CILabel.Setup(SetupLabelLogin).WithName('LabelLogin'))
@@ -157,30 +157,30 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  Populator: TControlPopulator;
+  Builder: TControlBuilder;
 begin
-  Populator := TControlPopulator.Create(Self.Name);
+  Builder := TControlBuilder.Create(Self.Name);
 
   try
-    Populator
+    Builder
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
     ;
 
-    PopulateLoginControls(Populator);
+    PopulateLoginControls(Builder);
 
-    Populator
+    Builder
       .AddControl(TControlInfo.Create(TPanel, 'PanelRight'))
       .CopySize(['PanelRight'], ['PanelLogin'])
     ;
 
-    Form1.ButtonLogin := TButton(Populator.NamedControls['LoginButton']);
-    Form1.EditPassword := TEdit(Populator.NamedControls['EditPassword']);
-    Form1.EditEmail := TEdit(Populator.NamedControls['EditEmail']);
-    Form1.CheckBoxConnected := TCheckBox(Populator.NamedControls['CheckBoxConnected']);
+    Form1.ButtonLogin := TButton(Builder.NamedControls['LoginButton']);
+    Form1.EditPassword := TEdit(Builder.NamedControls['EditPassword']);
+    Form1.EditEmail := TEdit(Builder.NamedControls['EditEmail']);
+    Form1.CheckBoxConnected := TCheckBox(Builder.NamedControls['CheckBoxConnected']);
   finally
-    Populator.Free;
+    Builder.Free;
   end;
 end;
 
