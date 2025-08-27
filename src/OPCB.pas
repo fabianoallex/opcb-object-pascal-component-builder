@@ -69,6 +69,13 @@ type
     class function Create(AComponent: TComponent): TComponentInfo; overload; static;
   end;
 
+  TComponentInfoArray = array of TComponentInfo;
+
+  TComponentInfoHelper = record helper for TComponentInfo
+    class function CreateArray(AClass: TComponentClass;
+      const ANames: array of string): TComponentInfoArray; overload; static;
+  end;
+
   TControlInfo = record
     Control: TControl;
     ControlClass: TControlClass;
@@ -106,16 +113,19 @@ type
     ['{A7D78704-853A-43D2-B3D4-770B3B3143D1}']
     function GetRegistry: TComponentRegistry;
     property Registry: TComponentRegistry read GetRegistry;
+    procedure ReleaseContext;
   end;
 
   TRegistryContextHandle = class(TInterfacedObject, IRegistryContextHandle)
   private
+    FIsReleased: Boolean;
     FContextKey: string;
     FRegistry: TComponentRegistry;
   public
     constructor Create(const AContextKey: string);
     destructor Destroy; override;
     function GetRegistry: TComponentRegistry;
+    procedure ReleaseContext;
   end;
 
   TComponentRegistryEntry = record
@@ -140,7 +150,7 @@ type
     constructor Create(AOwner: TComponentRegistry);
   end;
 
-  TRegistryLifetime = (rlTransient, rlPersistent);
+  TRegistryLifetime = (rlTransient, rlPersistent);  // rlTimeout (future)
 
   TComponentRegistry = class
   private
@@ -171,9 +181,9 @@ type
     function GetItem(ACompName: string): TComponent;
     procedure SetRegistryLifetime(const Value: TRegistryLifetime);
     procedure CheckRelease;
-  public
     constructor Create;
     destructor Destroy; override;
+  public
     procedure AddControl(AControl: TControl; const AName: string = '');
     procedure AddComponent(AComponent: TComponent; const AName: string = '');
     {$IFDEF FPC}generic{$ENDIF}
@@ -328,6 +338,7 @@ type
     function GetComponent(const AName: string): TComponent; overload;
     function WithOwner(AOwner: TComponent): TComponentBuilder;
     function Add(AComponentInfo: TComponentInfo): TComponentBuilder; overload;
+    function Add(AComponentInfos: TComponentInfoArray): TComponentBuilder; overload;
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TComponent read GetItem; default;
   end;
@@ -2572,6 +2583,15 @@ begin
   Registry.AddComponent(Component, Component.Name);
 end;
 
+function TComponentBuilder.Add(
+  AComponentInfos: TComponentInfoArray): TComponentBuilder;
+var
+  I: Integer;
+begin
+  for I:= Low(AComponentInfos) to High(AComponentInfos) do
+    Add(AComponentInfos[I]);
+end;
+
 constructor TComponentBuilder.Create(AComponentRegistryName: string);
 begin
   FRegistryContextHandle := TRegistryContextHandle.Create(AComponentRegistryName);
@@ -2680,19 +2700,29 @@ end;
 constructor TRegistryContextHandle.Create(const AContextKey: string);
 begin
   inherited Create;
+  FIsReleased := False;
   FContextKey := AContextKey;
   FRegistry := TComponentRegistry.ForContext(AContextKey);
 end;
 
 destructor TRegistryContextHandle.Destroy;
 begin
-  TComponentRegistry.ReleaseContext(FContextKey);
+  if not FIsReleased then
+    TComponentRegistry.ReleaseContext(FContextKey);
   inherited;
 end;
 
 function TRegistryContextHandle.GetRegistry: TComponentRegistry;
 begin
-  Result := FRegistry;
+  Result := nil;
+  if not FIsReleased then
+    Result := FRegistry;
+end;
+
+procedure TRegistryContextHandle.ReleaseContext;
+begin
+  if not FIsReleased then
+    FRegistry.ReleaseContext(FContextKey)
 end;
 
 { TOPCBBuilders }
@@ -2729,6 +2759,18 @@ begin
     FControlBuilder.Free;
 
   inherited;
+end;
+
+{ TComponentInfoHelper }
+
+class function TComponentInfoHelper.CreateArray(AClass: TComponentClass;
+  const ANames: array of string): TComponentInfoArray;
+var
+  I: Integer;
+begin
+  SetLength(Result, Length(ANames));
+  for I := 0 to High(ANames) do
+    Result[I] := Create(AClass, ANames[I]);
 end;
 
 initialization
