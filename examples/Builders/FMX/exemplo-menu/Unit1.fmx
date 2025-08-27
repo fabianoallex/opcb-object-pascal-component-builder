@@ -10,25 +10,4 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnMouseDown = FormMouseDown
   DesignerMasterStyle = 0
-  object Button1: TButton
-    PopupMenu = PopupMenu1
-    Position.X = 144.000000000000000000
-    Position.Y = 296.000000000000000000
-    TabOrder = 1
-    Text = 'Button1'
-    TextSettings.Trimming = None
-  end
-  object PopupMenu1: TPopupMenu
-    Left = 304
-    Top = 224
-    object MenuItem1: TMenuItem
-      Text = 'MenuItem1'
-    end
-    object MenuItem2: TMenuItem
-      Text = 'MenuItem2'
-    end
-    object MenuItem3: TMenuItem
-      Text = 'MenuItem3'
-    end
-  end
 end
