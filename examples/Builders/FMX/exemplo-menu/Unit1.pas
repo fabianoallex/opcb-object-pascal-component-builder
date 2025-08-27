@@ -1,34 +1,42 @@
-unit Unit3;
+unit Unit1;
 
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, OPCB, Vcl.Menus;
+  System.SysUtils, System.Types, System.UITypes, System.Classes, System.Variants,
+  FMX.Types, FMX.Controls, FMX.Forms, FMX.Graphics, FMX.Dialogs, OPCB, FMX.Menus,
+  FMX.Controls.Presentation, FMX.StdCtrls;
 
 type
-  TForm3 = class(TForm)
+  TForm1 = class(TForm)
+    PopupMenu1: TPopupMenu;
+    MenuItem1: TMenuItem;
+    MenuItem2: TMenuItem;
+    MenuItem3: TMenuItem;
+    Button1: TButton;
     procedure FormCreate(Sender: TObject);
+    procedure FormMouseDown(Sender: TObject; Button: TMouseButton;
+      Shift: TShiftState; X, Y: Single);
   private
-    FMainMenu: TMainMenu;
-    FContextHandle: IRegistryContextHandle;
-    FSearchMenu: TMenuItem;
-    FEditMenu: TMenuItem;
-    FFileMenu: TMenuItem;
-    FFileOpenMenu: TMenuItem;
     FFileNewMenu: TMenuItem;
+    FFileOpenMenu: TMenuItem;
+    FSearchMenu: TMenuItem;
     FFileCloseMenu: TMenuItem;
+    FEditMenu: TMenuItem;
     FPopupMenu: TPopupMenu;
-    procedure SetMainMenu(const Value: TMainMenu);
-    procedure ConfigMenus;
+    FFileMenu: TMenuItem;
+    FContextHandle: IRegistryContextHandle;
+    FMainMenu: TMainMenu;
     procedure SetContextHandle(const Value: IRegistryContextHandle);
     procedure SetEditMenu(const Value: TMenuItem);
-    procedure SetFileMenu(const Value: TMenuItem);
-    procedure SetSearchMenu(const Value: TMenuItem);
     procedure SetFileCloseMenu(const Value: TMenuItem);
+    procedure SetFileMenu(const Value: TMenuItem);
     procedure SetFileNewMenu(const Value: TMenuItem);
     procedure SetFileOpenMenu(const Value: TMenuItem);
+    procedure SetMainMenu(const Value: TMainMenu);
     procedure SetPopupMenu(const Value: TPopupMenu);
+    procedure SetSearchMenu(const Value: TMenuItem);
+    procedure ConfigMenus;
   public
     property PopupMenuX: TPopupMenu read FPopupMenu write SetPopupMenu;
     property MainMenuX: TMainMenu read FMainMenu write SetMainMenu;
@@ -42,58 +50,15 @@ type
   end;
 
 var
-  Form3: TForm3;
+  Form1: TForm1;
 
 implementation
 
-{$R *.dfm}
+{$R *.fmx}
 
-procedure TForm3.SetContextHandle(const Value: IRegistryContextHandle);
-begin
-  FContextHandle := Value;
-end;
+{ TForm1 }
 
-procedure TForm3.SetEditMenu(const Value: TMenuItem);
-begin
-  FEditMenu := Value;
-end;
-
-procedure TForm3.SetFileCloseMenu(const Value: TMenuItem);
-begin
-  FFileCloseMenu := Value;
-end;
-
-procedure TForm3.SetFileMenu(const Value: TMenuItem);
-begin
-  FFileMenu := Value;
-end;
-
-procedure TForm3.SetFileNewMenu(const Value: TMenuItem);
-begin
-  FFileNewMenu := Value;
-end;
-
-procedure TForm3.SetFileOpenMenu(const Value: TMenuItem);
-begin
-  FFileOpenMenu := Value;
-end;
-
-procedure TForm3.SetMainMenu(const Value: TMainMenu);
-begin
-  FMainMenu := Value;
-end;
-
-procedure TForm3.SetPopupMenu(const Value: TPopupMenu);
-begin
-  FPopupMenu := Value;
-end;
-
-procedure TForm3.SetSearchMenu(const Value: TMenuItem);
-begin
-  FSearchMenu := Value;
-end;
-
-procedure TForm3.ConfigMenus;
+procedure TForm1.ConfigMenus;
 begin
   PopupMenuX := ContextHandle.Registry.GetComponent<TPopupMenu>('PopupMenu');
   MainMenuX := ContextHandle.Registry.GetComponent<TMainMenu>('MainMenu');
@@ -104,19 +69,27 @@ begin
   EditMenu := ContextHandle.Registry.GetComponent<TMenuItem>('EditMenu');
   SearchMenu := ContextHandle.Registry.GetComponent<TMenuItem>('SearchMenu');
 
-  FileMenu.Caption := '&File';
-  FileNewMenu.Caption := '&New';
-  FileOpenMenu.Caption := '&Open';
-  FileCloseMenu.Caption := '&Close';
+  FileMenu.Text := '&File';
+  FileNewMenu.Text := '&New';
+  FileOpenMenu.Text := '&Open';
+  FileCloseMenu.Text := '&Close';
 
-  EditMenu.Caption := '&Edit';
-  SearchMenu.Caption := '&Search';
-
-  Self.Menu := MainMenuX;
-  Self.PopupMenu := PopupMenuX;
+  EditMenu.Text := '&Edit';
+  SearchMenu.Text := '&Search';
 end;
 
-procedure TForm3.FormCreate(Sender: TObject);
+procedure TForm1.FormMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Single);
+var
+  vPoint : TPointF;
+begin
+  if Button = TMouseButton.mbRight then
+  begin
+    vPoint := Self.ClientToScreen(PointF (X,Y));
+    PopupMenuX.Popup(vPoint.X, vPoint.Y);
+  end;
+end;
+
+procedure TForm1.FormCreate(Sender: TObject);
 var
   Builders: TOPCBBuilders;
 begin
@@ -158,6 +131,51 @@ begin
   end;
 
   ConfigMenus;
+end;
+
+procedure TForm1.SetContextHandle(const Value: IRegistryContextHandle);
+begin
+  FContextHandle := Value;
+end;
+
+procedure TForm1.SetEditMenu(const Value: TMenuItem);
+begin
+  FEditMenu := Value;
+end;
+
+procedure TForm1.SetFileCloseMenu(const Value: TMenuItem);
+begin
+  FFileCloseMenu := Value;
+end;
+
+procedure TForm1.SetFileMenu(const Value: TMenuItem);
+begin
+  FFileMenu := Value;
+end;
+
+procedure TForm1.SetFileNewMenu(const Value: TMenuItem);
+begin
+  FFileNewMenu := Value;
+end;
+
+procedure TForm1.SetFileOpenMenu(const Value: TMenuItem);
+begin
+  FFileOpenMenu := Value;
+end;
+
+procedure TForm1.SetMainMenu(const Value: TMainMenu);
+begin
+  FMainMenu := Value;
+end;
+
+procedure TForm1.SetPopupMenu(const Value: TPopupMenu);
+begin
+  FPopupMenu := Value;
+end;
+
+procedure TForm1.SetSearchMenu(const Value: TMenuItem);
+begin
+  FSearchMenu := Value;
 end;
 
 end.

@@ -11,7 +11,7 @@ uses
   {$IFDEF FPC}Controls, StdCtrls, ExtCtrls, Menus,
   {$ELSE}
     {$IFDEF FRAMEWORK_FMX}
-    FMX.Controls, FMX.StdCtrls, Fmx.Types, FMX.ExtCtrls, FMX.TabControl, FMX.Forms,
+    FMX.Controls, FMX.StdCtrls, Fmx.Types, FMX.ExtCtrls, FMX.TabControl, FMX.Forms, FMX.Menus,
     {$ELSE}
     Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus,
     {$ENDIF}
@@ -23,6 +23,7 @@ type
   {$IFNDEF FPC}
     {$IFDEF FRAMEWORK_FMX}
     TWinControl = TControl;
+    TMenu = TFmxObject;
     {$ENDIF}
   {$ENDIF}
 
@@ -357,7 +358,11 @@ type
 
   TMenuBuilderLevel = class
   public
+    {$IFDEF FRAMEWORK_FMX}
+    Parent: TFmxObject;
+    {$ELSE}
     Parent: TMenuItem;
+    {$ENDIF}
   end;
 
   TMenuBuilderLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TMenuBuilderLevel>;
@@ -2840,7 +2845,13 @@ begin
   Menu := AMenuInfo.CreateMenu(FOwner, MenuName);
   Registry.AddComponent(Menu, Menu.Name);
 
+  {$IFDEF FRAMEWORK_FMX}
+  CurrentLevel.Parent := Menu;
+  if FOwner is TFmxObject then
+    (FOwner as TFmxObject).AddObject(Menu);
+  {$ELSE}
   CurrentLevel.Parent := Menu.Items;
+  {$ENDIF}
 end;
 
 function TMenuBuilder.AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
@@ -2855,7 +2866,11 @@ begin
   MenuItem := AMenuItemInfo.CreateMenuItem(FOwner, MenuItemName);
   Registry.AddComponent(MenuItem, MenuItem.Name);
 
+  {$IFDEF FRAMEWORK_FMX}
+  CurrentLevel.Parent.AddObject(MenuItem);
+  {$ELSE}
   CurrentLevel.Parent.Add(MenuItem);
+  {$ENDIF}
 end;
 
 constructor TMenuBuilder.Create(AComponentRegistryName: string);
@@ -2915,7 +2930,12 @@ begin
   MenuItem := AMenuItemInfo.CreateMenuItem(FOwner, MenuItemName);
   Registry.AddComponent(MenuItem, MenuItem.Name);
 
+  {$IFDEF FRAMEWORK_FMX}
+  CurrentLevel.Parent.AddObject(MenuItem);
+  {$ELSE}
   CurrentLevel.Parent.Add(MenuItem);
+  {$ENDIF}
+
 
   // inclui um novo level
   FLevelStack.Add(TMenuBuilderLevel.Create);
@@ -3018,7 +3038,11 @@ begin
     Result.Name := AMenuItemName;
 
   if Caption.HasValue then
+    {$IFDEF FRAMEWORK_FMX}
+    Result.Text := Caption.Value;
+    {$ELSE}
     Result.Caption := Caption.Value;
+    {$ENDIF}
 
   if Assigned(SetupProc) then
     SetupProc(Result);
