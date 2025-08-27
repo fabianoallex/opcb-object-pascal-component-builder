@@ -8,7 +8,7 @@
 interface
 
 uses
-  {$IFDEF FPC}Controls, StdCtrls, ExtCtrls,
+  {$IFDEF FPC}Controls, StdCtrls, ExtCtrls, Menus,
   {$ELSE}
     {$IFDEF FRAMEWORK_FMX}
     FMX.Controls, FMX.StdCtrls, Fmx.Types, FMX.ExtCtrls, FMX.TabControl, FMX.Forms,
@@ -140,7 +140,7 @@ type
   TComponentRegistry = class;
 
   IRegistryContextHandle = interface
-    ['{A7D78704-853A-43D2-B3D4-770B3B3143D1}']
+    ['{6EEC3518-D8A0-4E8E-A92A-D5D34E5838C3}']
     function GetRegistry: TComponentRegistry;
     property Registry: TComponentRegistry read GetRegistry;
     procedure ReleaseContext;
@@ -156,6 +156,7 @@ type
     destructor Destroy; override;
     function GetRegistry: TComponentRegistry;
     procedure ReleaseContext;
+    property Registry: TComponentRegistry read GetRegistry;
   end;
 
   TComponentRegistryEntry = record
@@ -2822,7 +2823,7 @@ var
 begin
   SetLength(Result, Length(ANames));
   for I := 0 to High(ANames) do
-    Result[I] := Create(AClass, ANames[I]);
+    Result[I] := TComponentInfo.Create(AClass, ANames[I]);
 end;
 
 { TMenuBuilder }
@@ -2885,6 +2886,7 @@ begin
   Result := Registry.GetComponent(AName) as TMenu;
 end;
 
+{$IFDEF FPC}generic{$ENDIF}
 function TMenuBuilder.GetMenu<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
@@ -2895,6 +2897,7 @@ begin
   Result := Registry.GetComponent(AName) as TMenuItem;
 end;
 
+{$IFDEF FPC}generic{$ENDIF}
 function TMenuBuilder.GetMenuItem<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
