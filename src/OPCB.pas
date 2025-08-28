@@ -505,8 +505,10 @@ type
     function AddInLevel(const AControls: array of TControlInfo;
       ADirection: TControlBuilderDirection): TControlBuilder;
     function GetNamedControl(const AName: string): TControl;
+    function MoveControls(const AControl: TControl; const ADX,
+      ADY: Single): TControlBuilder; overload;
     function MoveControls(const AControlNames: array of string;
-      const ADX, ADY: Single): TControlBuilder;
+      const ADX, ADY: Single): TControlBuilder; overload;
     function AlignControlsRight(const AControlNames, AReferenceGroup: array of string;
       const ARightPadding: Single = 0): TControlBuilder;
     function CenterControlsHorizontally(const AControlNames, AReferenceGroup:
@@ -517,6 +519,7 @@ type
       const AControlNames: array of string): TControlBuilder;
     function CenterControlsInParentHorizontally(
       const AControlNames: array of string): TControlBuilder;
+    function CenterControlInParentHorizontally: TControlBuilder;
     function RecalcParentHeight(AExtraHeight: Single = 0): TControlBuilder;
     function RecalcParentWidth(AExtraWidth: Single = 0): TControlBuilder;
     function RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0): TControlBuilder;
@@ -1309,6 +1312,49 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
+function TControlBuilder.CenterControlInParentHorizontally: TControlBuilder;
+var
+  TargetBounds: TControlGroupBounds;
+  ParentCtrl: TControl;
+  ParentWidth: Single;
+  TargetCenterX, ParentCenterX, DeltaX: Single;
+
+  {$IFDEF FRAMEWORK_FMX}
+  function GetParentClientWidth(AControl: TControl): Single;
+  begin
+    if AControl.Parent is TForm then
+      Result := TForm(AControl.Parent).ClientHeight
+    else if AControl.Parent is TControl then
+      Result :=
+        TControl(AControl.Parent).Height
+        - TControl(AControl.Parent).Padding.Top
+        + TControl(AControl.Parent).Padding.Bottom
+    else
+      Result := 0; // não tem dimensão
+  end;
+  {$ENDIF}
+
+begin
+  Result := Self;
+
+  ParentCtrl := Self.GetControls.Last;
+  if not Assigned(ParentCtrl) or not Assigned(ParentCtrl.Parent) then
+    Exit;
+
+  {$IFDEF FRAMEWORK_FMX}
+  ParentWidth := GetParentClientWidth(ParentCtrl);
+  {$ELSE}
+  ParentWidth := ParentCtrl.Parent.ClientWidth;
+  {$ENDIF}
+
+  TargetCenterX := ParentCtrl.BoundsRect.Left + (ParentCtrl.BoundsRect.Width / 2);
+  ParentCenterX := ParentWidth / 2;
+
+  DeltaX := ParentCenterX - TargetCenterX;
+
+  MoveControls(ParentCtrl, DeltaX, 0);
+end;
+
 constructor TControlBuilder.Create(ARegistryContext: string);
 begin
   FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContext);
@@ -1807,12 +1853,36 @@ begin
   Result := Self.GetControl(AName);
 end;
 
+function TControlBuilder.MoveControls(const AControl: TControl;
+  const ADX, ADY: Single): TControlBuilder;
+var
+    L, T: Single;
+begin
+  {$IFDEF FRAMEWORK_FMX}
+  L := AControl.Position.X;
+  T := AControl.Position.Y;
+  {$ELSE}
+  L := AControl.Left;
+  T := AControl.Top;
+  {$ENDIF}
+
+  L := L + ADX;
+  T := T + ADY;
+
+  {$IFDEF FRAMEWORK_FMX}
+  AControl.Position.X := L;
+  AControl.Position.Y := T;
+  {$ELSE}
+  AControl.Left := Round(L);
+  AControl.Top := Round(T);
+  {$ENDIF}
+end;
+
 function TControlBuilder.MoveControls(const AControlNames: array of string;
   const ADX, ADY: Single): TControlBuilder;
 var
   Name: string;
   Ctrl: TControl;
-  L, T: Single;
 begin
   Result := Self;
 
@@ -1821,6 +1891,9 @@ begin
     if not Registry.NamedComponents.TryGetValue(Name, TComponent(Ctrl)) then
       raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
 
+    MoveControls(Ctrl, ADX, ADY);
+
+    (*
     {$IFDEF FRAMEWORK_FMX}
     L := Ctrl.Position.X;
     T := Ctrl.Position.Y;
@@ -1839,6 +1912,7 @@ begin
     Ctrl.Left := Round(L);
     Ctrl.Top := Round(T);
     {$ENDIF}
+    *)
   end;
 end;
 
