@@ -8,7 +8,6 @@ uses
 
 type
   TForm1 = class(TForm)
-    FlowPanel1: TFlowPanel;
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private

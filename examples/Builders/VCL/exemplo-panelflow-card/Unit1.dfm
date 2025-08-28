@@ -13,12 +13,4 @@ object Form1: TForm1
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   TextHeight = 15
-  object FlowPanel1: TFlowPanel
-    Left = 360
-    Top = 248
-    Width = 185
-    Height = 41
-    Caption = 'FlowPanel1'
-    TabOrder = 0
-  end
 end
