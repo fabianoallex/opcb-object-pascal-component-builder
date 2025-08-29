@@ -49,6 +49,7 @@ backup/
 
 # Delphi-specific
 __history/
+__recovery/
 *.identcache
 *.local
 *.tvsconfig
