@@ -1326,7 +1326,7 @@ var
       Result := TForm(AControl.Parent).ClientHeight
     else if AControl.Parent is TControl then
       Result :=
-        TControl(AControl.Parent).Height
+        TControl(AControl.Parent).Width
         - TControl(AControl.Parent).Padding.Top
         + TControl(AControl.Parent).Padding.Bottom
     else
