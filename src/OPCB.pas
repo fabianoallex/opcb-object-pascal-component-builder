@@ -214,6 +214,7 @@ type
     procedure SetRegistryLifetime(const Value: TRegistryLifetime);
     procedure CheckRelease;
     function UniqueName(const ABaseName: string): string;
+    function GetContextKey: string;
   public
     constructor Create;
     destructor Destroy; override;
@@ -238,6 +239,7 @@ type
     property NamedComponents: TStrComponentDictionary read FNamedComponents;
     property Items[ACompName: string]: TComponent read GetItem; default;
     property RegistryLifetime: TRegistryLifetime read FRegistryLifetime write SetRegistryLifetime;
+    property ContextKey: string read GetContextKey;
   end;
 
   TControlGridBuilder = class
@@ -2685,6 +2687,21 @@ class function TComponentRegistry.GetContextHandle(
   AKey: string): IRegistryContextHandle;
 begin
   Result := TRegistryContextHandle.Create(AKey);
+end;
+
+function TComponentRegistry.GetContextKey: string;
+var
+  Pair: TPair<string, TComponentRegistryEntry>;
+begin
+  Result := '';
+  for Pair in FInstances do
+  begin
+    if Pair.Value.Registry = Self then
+    begin
+      Result := Pair.Key;
+      Exit;
+    end;
+  end;
 end;
 
 { TComponentBuilder }
