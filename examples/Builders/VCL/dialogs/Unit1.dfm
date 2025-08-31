@@ -20,6 +20,7 @@ object Form1: TForm1
     Align = alLeft
     ParentBackground = False
     TabOrder = 0
+    ExplicitHeight = 433
     object Button1: TButton
       Left = 8
       Top = 24
@@ -82,6 +83,15 @@ object Form1: TForm1
       Caption = 'Custom'
       TabOrder = 6
       OnClick = Button7Click
+    end
+    object Button8: TButton
+      Left = 8
+      Top = 241
+      Width = 105
+      Height = 25
+      Caption = 'DBGrid'
+      TabOrder = 7
+      OnClick = Button8Click
     end
   end
 end

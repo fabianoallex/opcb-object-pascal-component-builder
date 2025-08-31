@@ -5,7 +5,8 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, OPCB, Vcl.StdCtrls, Vcl.ComCtrls,
-  Vcl.ExtCtrls, Vcl.ButtonGroup, Vcl.WinXCalendars, Vcl.CheckLst, Vcl.Grids;
+  Vcl.ExtCtrls, Vcl.ButtonGroup, Vcl.WinXCalendars, Vcl.CheckLst, Vcl.Grids,
+  Data.DB, Vcl.DBGrids, Datasnap.DBClient;
 
 type
   TForm1 = class(TForm)
@@ -17,6 +18,7 @@ type
     Button5: TButton;
     Button6: TButton;
     Button7: TButton;
+    Button8: TButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -24,6 +26,7 @@ type
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
   private
     procedure SetupListBox(AControl: TControl);
     procedure SetupMaskEdit(AControl: TControl);
@@ -33,6 +36,11 @@ type
     procedure SetupListBoxRight(AControl: TControl);
     procedure ButtonMoveToLeftClick(ASender: TObject);
     procedure ButtonMoveToRightClick(ASender: TObject);
+    procedure SetupCDS(AComponent: TComponent);
+    procedure SetupDS(AComponent: TComponent);
+    procedure SetupDBGrid(AControl: TControl);
+    procedure SetupEditSearch(AControl: TControl);
+    procedure EditSearchChange(ASender: TObject);
   public
   end;
 
@@ -315,6 +323,145 @@ begin
         'Left: ' + #13 + ControlDialog.ControlBuilder.GetControl<TListBox>('ListBoxLeft').Items.Text + #13 +
         'Right: ' + #13 + ControlDialog.ControlBuilder.GetControl<TListBox>('ListBoxRight').Items.Text
       );
+    end;
+  finally
+    ControlDialog.Free;
+  end;
+end;
+
+procedure TForm1.SetupCDS(AComponent: TComponent);
+var
+  CDS: TClientDataSet;
+begin
+  CDS := AComponent as TClientDataSet;
+
+  with CDS.FieldDefs do
+  begin
+    Clear;
+    Add('ID', ftInteger);
+    Add('Cidade', ftString, 100);
+    Add('Estado', ftString, 50);
+    Add('Populacao', ftInteger);
+  end;
+
+  CDS.CreateDataSet;
+
+  CDS.AppendRecord([1, 'São Paulo', 'SP', 12300000]);
+  CDS.AppendRecord([2, 'Rio de Janeiro', 'RJ', 6748000]);
+  CDS.AppendRecord([3, 'Belo Horizonte', 'MG', 2528000]);
+  CDS.AppendRecord([4, 'Curitiba', 'PR', 1960000]);
+  CDS.AppendRecord([5, 'Salvador', 'BA', 2880000]);
+  CDS.AppendRecord([6, 'Fortaleza', 'CE', 2687000]);
+  CDS.AppendRecord([7, 'Manaus', 'AM', 2219000]);
+  CDS.AppendRecord([8, 'Recife', 'PE', 1650000]);
+  CDS.AppendRecord([9, 'Porto Alegre', 'RS', 1480000]);
+  CDS.AppendRecord([10, 'Goiânia', 'GO', 1530000]);
+  CDS.AppendRecord([11, 'Belém', 'PA', 1500000]);
+  CDS.AppendRecord([12, 'Brasília', 'DF', 3050000]);
+  CDS.AppendRecord([13, 'Campinas', 'SP', 1214000]);
+  CDS.AppendRecord([14, 'São Luís', 'MA', 1100000]);
+  CDS.AppendRecord([15, 'Cuiabá', 'MT', 618000]);
+  CDS.AppendRecord([16, 'João Pessoa', 'PB', 817000]);
+  CDS.AppendRecord([17, 'Teresina', 'PI', 868000]);
+  CDS.AppendRecord([18, 'Maceió', 'AL', 1010000]);
+  CDS.AppendRecord([19, 'Natal', 'RN', 890000]);
+  CDS.AppendRecord([20, 'Vitória', 'ES', 365000]);
+end;
+
+procedure TForm1.SetupDS(AComponent: TComponent);
+var
+  I: Integer;
+  CDS: TClientDataSet;
+  DS: TDataSource;
+begin
+  DS := (AComponent as TDataSource);
+  CDS := TComponentRegistry.GetComponentFromContext<TClientDataSet>('ContextKey-Exemplo-Panel', 'CDS');
+  DS.DataSet := CDS;
+end;
+
+procedure TForm1.SetupDBGrid(AControl: TControl);
+var
+  DBGrid: TDBGrid;
+  DS: TDataSource;
+begin
+  DBGrid := (AControl as TDBGrid);
+  DS := TComponentRegistry.GetComponentFromContext<TDataSource>('ContextKey-Exemplo-Panel', 'DS');
+  DBGrid.DataSource := DS;
+  DBGrid.Options := DBGrid.Options + [dgRowSelect, dgAlwaysShowSelection];
+  DBGrid.Columns[0].Width := 50;
+  DBGrid.Columns[1].Width := 150;
+  DBGrid.Columns[2].Width := 70;
+  DBGrid.Columns[2].Width := 100;
+end;
+
+procedure TForm1.EditSearchChange(ASender: TObject);
+var
+  Edit: TEdit;
+  CDS: TClientDataSet;
+begin
+  Edit := (ASender as TEdit);
+  CDS := TComponentRegistry.GetComponentFromContext<TClientDataSet>('ContextKey-Exemplo-Panel', 'CDS');
+  CDS.Locate('Cidade', Edit.Text, [loCaseInsensitive, loPartialKey]);
+end;
+
+procedure TForm1.SetupEditSearch(AControl: TControl);
+var
+  Edit: TEdit;
+  CDS: TClientDataSet;
+begin
+  Edit := (AControl as TEdit);
+  CDS := TComponentRegistry.GetComponentFromContext<TClientDataSet>('ContextKey-Exemplo-Panel', 'CDS');
+  Edit.OnChange := EditSearchChange;
+end;
+
+procedure TForm1.Button8Click(Sender: TObject);
+var
+  ControlDialog: TControlDialog;
+
+  procedure ConfigPanelMain;
+  var
+    Builders: TOPCBBuilders;
+  begin
+    Builders := TOPCBBuilders.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
+    try
+      Builders.AsComponentBuilder
+        .WithOwner(ControlDialog)
+        .Add(TComponentInfo.Create(TClientDataSet, 'CDS').Setup(SetupCDS))
+        .Add(TComponentInfo.Create(TDataSource, 'DS').Setup(SetupDS))
+      ;
+      Builders.AsControlBuilder
+        .WithOwnerAndParent(
+          ControlDialog,
+          ControlDialog.ControlBuilder.GetControl<TPanel>('PanelMain')
+        )
+        .SetTopLeft(10, 10)
+        .SetSpace(20, 20)
+        .NextLevel(TControlInfo.Create(TPanel).WithAlign(alTop).WithCaption(''))
+          .SetTopLeft(5, 5)
+          .AddControl(TControlInfo.Create(TEdit).WithWidth(480).Setup(SetupEditSearch))
+        .PreviousLevel
+        .AddControl(TControlInfo.Create(TDBGrid).WithAlign(alClient).Setup(SetupDBGrid))
+    finally
+      Builders.Free;
+    end;
+  end;
+
+begin
+  ControlDialog := TControlDialog.CreateNew(
+    Self,
+    'Mova os itens',
+    TControlInfo.Create(TPanel, 'PanelMain').WithWidthAndHeight(500, 300).WithCaption(''),
+    'ContextKey-Exemplo-Panel'
+  );
+
+  ConfigPanelMain; // Adiciona outros controles no Panel
+
+  try
+    if ControlDialog.ShowModal = mrOk then
+    begin
+      var CDS := ControlDialog.ControlBuilder.Registry.GetComponent<TClientDataSet>('CDS');
+      if not CDS.Eof then
+        ShowMessage('Selecionou: ' + CDS.FieldByName('Cidade').AsString);
     end;
   finally
     ControlDialog.Free;

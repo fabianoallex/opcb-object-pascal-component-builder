@@ -560,9 +560,6 @@ uses
     {$ENDIF}
   {$ENDIF}
 
-  {$IFNDEF ANDROID}
-  Messages,
-  {$ENDIF}
   Math, Types;
 
 { TControlGridItem }
