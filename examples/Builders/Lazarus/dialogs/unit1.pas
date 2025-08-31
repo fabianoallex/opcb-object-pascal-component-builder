@@ -6,7 +6,8 @@ interface
 
 uses
   Classes, SysUtils, Forms, Controls, Graphics, Dialogs, ActnList, ExtCtrls, OPCB,
-  Buttons, StdCtrls, UDialogs, MaskEdit, ColorBox, Spin, Grids, ComCtrls;
+  Buttons, StdCtrls, UDialogs, MaskEdit, ColorBox, Spin, Grids, ComCtrls, memds, DB,
+  DBGrids;
 
 type
 
@@ -20,6 +21,7 @@ type
     Button5: TButton;
     Button6: TButton;
     Button7: TButton;
+    Button8: TButton;
     Panel1: TPanel;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
@@ -28,13 +30,19 @@ type
     procedure Button5Click(Sender: TObject);
     procedure Button6Click(Sender: TObject);
     procedure Button7Click(Sender: TObject);
+    procedure Button8Click(Sender: TObject);
   private
     procedure ButtonMoveToLeftClick(ASender: TObject);
     procedure ButtonMoveToRightClick(ASender: TObject);
+    procedure EditSearchChange(ASender: TObject);
+    procedure SetupDBGrid(AControl: TControl);
+    procedure SetupDS(AComponent: TComponent);
+    procedure SetupEditSearch(AControl: TControl);
     procedure SetupListBox(AControl: TControl);
     procedure SetupListBoxLeft(AControl: TControl);
     procedure SetupListBoxRight(AControl: TControl);
     procedure SetupMaskEdit(AControl: TControl);
+    procedure SetupMDS(AComponent: TComponent);
     procedure SetupStringGrid(AControl: TControl);
     procedure SetupTrackBar(AControl: TControl);
 
@@ -379,6 +387,135 @@ begin
         'Left: ' + #13 + (ControlDialog.ControlBuilder.GetControl('ListBoxLeft') as TListBox).Items.Text + #13 +
         'Right: ' + #13 + (ControlDialog.ControlBuilder.GetControl('ListBoxRight') as TListBox).Items.Text
       );
+    end;
+  finally
+    ControlDialog.Free;
+  end;
+end;
+
+procedure TForm1.SetupMDS(AComponent: TComponent);
+var
+  MDS: TMemDataSet;
+begin
+  MDS := (AComponent as TMemDataSet);
+  with MDS.FieldDefs do
+  begin
+    Clear;
+    Add('ID', ftInteger);
+    Add('Cidade', ftString, 100);
+    Add('UF', ftString, 2);
+  end;
+
+  MDS.CreateTable; // CreateDataset;
+  MDS.Open;
+
+  // Inserindo alguns dados de cidades
+  MDS.AppendRecord([1, 'São Paulo', 'SP']);
+  MDS.AppendRecord([2, 'Rio de Janeiro', 'RJ']);
+  MDS.AppendRecord([3, 'Belo Horizonte', 'MG']);
+  MDS.AppendRecord([4, 'Curitiba', 'PR']);
+  MDS.AppendRecord([5, 'Porto Alegre', 'RS']);
+  MDS.AppendRecord([6, 'Recife', 'PE']);
+  MDS.AppendRecord([7, 'Fortaleza', 'CE']);
+  MDS.AppendRecord([8, 'Manaus', 'AM']);
+  MDS.AppendRecord([9, 'Salvador', 'BA']);
+  MDS.AppendRecord([10, 'Brasília', 'DF']);
+end;
+
+procedure TForm1.SetupDS(AComponent: TComponent);
+var
+  I: Integer;
+  MemDS_: TMemDataSet;
+  DS: TDataSource;
+begin
+  DS := (AComponent as TDataSource);
+  MemDS_ := TComponentRegistry.GetComponentFromContext('ContextKey-Exemplo-Panel', 'MDS') as TMemDataset;
+  DS.DataSet := MemDS_;
+end;
+
+procedure TForm1.SetupDBGrid(AControl: TControl);
+var
+  DBGrid: TDBGrid;
+  DataSource: TDataSource;
+begin
+  DBGrid := (AControl as TDBGrid);
+  DataSource := TComponentRegistry.GetComponentFromContext('ContextKey-Exemplo-Panel', 'DS') as TDataSource;
+  DBGrid.DataSource := DataSource;
+  DBGrid.Options := DBGrid.Options + [dgRowSelect, dgAlwaysShowSelection];
+  DBGrid.Columns[0].Width := 50;
+  DBGrid.Columns[1].Width := 150;
+  DBGrid.Columns[2].Width := 70;
+  DBGrid.Columns[2].Width := 100;
+end;
+
+procedure TForm1.EditSearchChange(ASender: TObject);
+var
+  EditSearch_: TEdit;
+  MemDS: TMemDataSet;
+begin
+  EditSearch_ := (ASender as TEdit);
+  MemDS := TComponentRegistry.GetComponentFromContext('ContextKey-Exemplo-Panel', 'MDS') as TMemDataset;
+  MemDS.Locate('Cidade', EditSearch_.Text, [loCaseInsensitive, loPartialKey]);
+end;
+
+procedure TForm1.SetupEditSearch(AControl: TControl);
+var
+  Edit_: TEdit;
+begin
+  Edit_ := (AControl as TEdit);
+  Edit_.OnChange := @EditSearchChange;
+end;
+
+procedure TForm1.Button8Click(Sender: TObject);
+var
+  ControlDialog: TControlDialog;
+  MDS: TMemDataset;
+
+  procedure ConfigPanelMain;
+  var
+    Builders: TOPCBBuilders;
+  begin
+    Builders := TOPCBBuilders.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
+    try
+      Builders.AsComponentBuilder
+        .WithOwner(ControlDialog)
+        .Add(TComponentInfo.Create(TMemDataset, 'MDS').Setup(@SetupMDS))
+        .Add(TComponentInfo.Create(TDataSource, 'DS').Setup(@SetupDS))
+      ;
+      Builders.AsControlBuilder
+        .WithOwnerAndParent(
+          ControlDialog,
+          ControlDialog.ControlBuilder.GetControl('PanelMain') as TPanel
+        )
+        .SetTopLeft(10, 10)
+        .SetSpace(20, 20)
+        .NextLevel(TControlInfo.Create(TPanel).WithAlign(alTop).WithHeight(70).WithCaption(''), cpdVertical)
+          .SetTopLeft(5, 5)
+          .SetSpace(5, 5)
+          .AddControl(TControlInfo.Create(TLabel).WithCaption('Buscar por cidade').WithWidth(460))
+          .AddControl(TControlInfo.Create(TEdit).WithWidth(480).Setup(@SetupEditSearch))
+        .PreviousLevel
+        .AddControl(TControlInfo.Create(TDBGrid).WithAlign(alClient).Setup(@SetupDBGrid))
+    finally
+      Builders.Free;
+    end;
+  end;
+
+begin
+  ControlDialog := TControlDialog.CreateNew(
+    Self, '',
+    TControlInfo.Create(TPanel, 'PanelMain').WithWidthAndHeight(500, 300).WithCaption(''),
+    'ContextKey-Exemplo-Panel'
+  );
+
+  ConfigPanelMain; // Adiciona outros controles no Panel
+
+  try
+    if ControlDialog.ShowModal = mrOk then
+    begin
+      MDS := ControlDialog.ControlBuilder.Registry.GetComponent('MDS') as TMemDataSet;
+      if not MDS.Eof then
+        ShowMessage('Selecionou: ' + MDS.FieldByName('Cidade').AsString);
     end;
   finally
     ControlDialog.Free;

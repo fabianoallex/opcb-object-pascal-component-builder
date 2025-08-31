@@ -54,8 +54,12 @@ begin
     .WithOwnerAndParent(Self, Self)
     .SetSpace(5, 5)
     .SetTopLeft(20, 20)
-    .NextLevel(cpdVertical)
-      .AddControl(TControlInfo.Create(TLabel, 'LabelMessage').WithCaption(AMsg))
+    .NextLevel(cpdVertical);
+
+  if AMsg <> '' then
+    ControlBuilder.AddControl(TControlInfo.Create(TLabel, 'LabelMessage').WithCaption(AMsg));
+
+  ControlBuilder
       .AddControl(AControlInfo)
     .PreviousLevel
     .Break

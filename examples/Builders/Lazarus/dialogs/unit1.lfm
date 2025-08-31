@@ -81,5 +81,14 @@ object Form1: TForm1
       TabOrder = 6
       OnClick = Button7Click
     end
+    object Button8: TButton
+      Left = 8
+      Height = 25
+      Top = 244
+      Width = 105
+      Caption = 'TDBGrid'
+      TabOrder = 7
+      OnClick = Button8Click
+    end
   end
 end
