@@ -1,13 +1,15 @@
 unit UDialogs;
 
+{$mode ObjFPC}{$H+}
+
 interface
 
 uses
-  OPCB, Forms, System.Classes,
+  OPCB, Forms,
   {$IFDEF FPC}
-  StdCtrls, ExtCtrls, ComCtrls, Buttons, Controls
+  Classes, StdCtrls, ExtCtrls, ComCtrls, Buttons, Controls
   {$ELSE}
-  Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Buttons, Vcl.Controls
+  System.Classes, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.ComCtrls, Vcl.Buttons, Vcl.Controls
   {$ENDIF}
   ;
 
@@ -43,7 +45,7 @@ begin
 
   ControlBuilder := TControlBuilder.Create(AContextKey);
 
-  if AControlInfo.Name.IsEmpty then
+  if AControlInfo.Name = '' then
     AControlInfo.Name := 'Control';
 
   ControlName := AControlInfo.Name;
@@ -58,13 +60,13 @@ begin
     .PreviousLevel
     .Break
     .IncTop(10)
-    .AddControl(TControlInfo.Create(TBitBtn, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(SetupButton))
-    .AddControl(TControlInfo.Create(TBitBtn, 'ButtonCancel').WithCaption('Cancelar').WithHeight(30).Setup(SetupButton))
+    .AddControl(TControlInfo.Create(TBitBtn, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(@SetupButton))
+    .AddControl(TControlInfo.Create(TBitBtn, 'ButtonCancel').WithCaption('Cancelar').WithHeight(30).Setup(@SetupButton))
     .AlignControlsRight(['ButtonOk', 'ButtonCancel'], [ControlName])
   ;
 
-  Self.Width := Trunc(ControlBuilder.ContentWidth) + 50;
-  Self.Height := Trunc(ControlBuilder.ContentHeight) + 75;
+  Self.Width := Trunc(ControlBuilder.ContentWidth) + 40;
+  Self.Height := Trunc(ControlBuilder.ContentHeight) + 40;
 end;
 
 procedure TControlDialog.SetupButton(AControl: TControl);

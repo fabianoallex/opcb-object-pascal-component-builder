@@ -2691,7 +2691,7 @@ end;
 
 function TComponentRegistry.GetContextKey: string;
 var
-  Pair: TPair<string, TComponentRegistryEntry>;
+  Pair: {$IFDEF FPC}specialize{$ENDIF} TPair<string, TComponentRegistryEntry>;
 begin
   Result := '';
   for Pair in FInstances do
