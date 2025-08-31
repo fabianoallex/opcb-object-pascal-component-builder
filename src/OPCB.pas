@@ -399,22 +399,17 @@ type
   public
     constructor Create(AComponentRegistryName: string);
     destructor Destroy; override;
-
     function WithOwner(AOwner: TComponent): TMenuBuilder;
     function AddMenu(AMenuInfo: TMenuInfo): TMenuBuilder;
     function AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
-
     function NextLevel(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
     function PreviousLevel: TMenuBuilder;
-
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenu<T: TMenu>(const AName: string): T; overload;
     function GetMenu(const AName: string): TMenu; overload;
-
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenuItem<T: TMenuItem>(const AName: string): T; overload;
     function GetMenuItem(const AName: string): TMenuItem; overload;
-
     property CurrentLevel: TMenuBuilderLevel read GetCurrenteLevel;
     property Registry: TComponentRegistry read GetComponentRegistry;
   end;
@@ -563,7 +558,12 @@ uses
     {$ELSE}
     Vcl.ComCtrls,
     {$ENDIF}
-  {$ENDIF} Math, Types, Messages;
+  {$ENDIF}
+
+  {$IFNDEF ANDROID}
+  Messages,
+  {$ENDIF}
+  Math, Types;
 
 { TControlGridItem }
 

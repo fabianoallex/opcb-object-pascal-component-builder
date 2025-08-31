@@ -62,6 +62,7 @@ __recovery/
 /bin/
 /build/
 /output/
+Android64/
 
 # Configurações de IDE específicas (opcional ignorar)
 *.dproj.user
