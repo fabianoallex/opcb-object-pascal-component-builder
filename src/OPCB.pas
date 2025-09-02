@@ -107,19 +107,27 @@ type
     class function Create(AMenuItem: TMenuItem): TMenuItemInfo; overload; static;
   end;
 
-  TControlInfo = record
-    Control: TControl;
-    ControlClass: TControlClass;
-    SetupProc: TControlSetupProc;
-    Name: string;
-    Caption: TOptionalString;
-    Text: TOptionalString;
-    Align: TOptionalAlign;
-    Width: Single;
-    Height: Single;
-    Top: TOptionalSingle;
-    Left: TOptionalSingle;
-    OnClick: TNotifyEvent;
+  { TControlInfo }
+
+  TControlInfo = class
+  private
+    FControl: TControl;
+    FControlClass: TControlClass;
+    FSetupProc: TControlSetupProc;
+    FName: string;
+    FCaption: TOptionalString;
+    FText: TOptionalString;
+    FAlign: TOptionalAlign;
+    FWidth: Single;
+    FHeight: Single;
+    FTop: TOptionalSingle;
+    FLeft: TOptionalSingle;
+    FOnClick: TNotifyEvent;
+    FTargetField: Pointer;
+  public
+    constructor Create(AClass: TControlClass; const AName: string=''); overload;
+    constructor Create(AControl: TControl); overload;
+
     function Setup(AProc: TControlSetupProc): TControlInfo;
     function WithAlign(
       AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TControlInfo;
@@ -132,10 +140,24 @@ type
     function WithCaption(ACaption: string): TControlInfo;
     function WithText(AText: string): TControlInfo;
     function WithOnClick(AOnClick: TNotifyEvent): TControlInfo;
+    {$IFDEF FPC}generic{$ENDIF}
+    function AssignTo<T: TControl>(var AControlField: T): TControlInfo;
     function CreateControl(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl;
-    class function Create(AClass: TControlClass; const AName: string=''): TControlInfo; overload; static;
-    class function Create(AControl: TControl): TControlInfo; overload; static;
+
+    property Control: TControl read FControl ;
+    property ControlClass: TControlClass read FControlClass ;
+    property SetupProc: TControlSetupProc read FSetupProc ;
+    property Name: string read FName ;
+    property Caption: TOptionalString read FCaption ;
+    property Text: TOptionalString read FText ;
+    property Align: TOptionalAlign read FAlign ;
+    property Width: Single read FWidth ;
+    property Height: Single read FHeight ;
+    property Top: TOptionalSingle read FTop ;
+    property Left: TOptionalSingle read FLeft ;
+    property OnClick: TNotifyEvent read FOnClick ;
+    property TargetField: Pointer read FTargetField ;
   end;
 
   TComponentRegistry = class;
@@ -562,6 +584,7 @@ uses
 
   Math, Types;
 
+
 { TControlGridItem }
 
 procedure TControlGridItem.AfterSetBounds;
@@ -667,37 +690,38 @@ end;
 
 { TControlInfo }
 
-class function TControlInfo.Create(AClass: TControlClass;
-  const AName: string): TControlInfo;
+constructor TControlInfo.Create(AClass: TControlClass; const AName: string='');
 begin
-  Result.Control := nil;
-  Result.ControlClass := AClass;
-  Result.Name := AName;
-  Result.Height := -1;
-  Result.Width := -1;
-  Result.Align := TOptionalAlign.None;
-  Result.Caption := TOptionalString.None;
-  Result.Text := TOptionalString.None;
-  Result.Top := TOptionalSingle.None;
-  Result.Left := TOptionalSingle.None;
-  Result.SetupProc := nil;
-  Result.OnClick := nil;
+  FControl := nil;
+  FControlClass := AClass;
+  FName := AName;
+  FHeight := -1;
+  FWidth := -1;
+  FAlign := TOptionalAlign.None;
+  FCaption := TOptionalString.None;
+  FText := TOptionalString.None;
+  FTop := TOptionalSingle.None;
+  FLeft := TOptionalSingle.None;
+  FSetupProc := nil;
+  FOnClick := nil;
+  FTargetField := nil;
 end;
 
-class function TControlInfo.Create(AControl: TControl): TControlInfo;
+constructor TControlInfo.Create(AControl: TControl);
 begin
-  Result.Control := AControl;
-  Result.ControlClass := TControlClass(AControl.ClassType);
-  Result.Name := AControl.Name;
-  Result.Height := -1;
-  Result.Width := -1;
-  Result.Align := TOptionalAlign.None;
-  Result.Caption := TOptionalString.None;
-  Result.Text := TOptionalString.None;
-  Result.Top := TOptionalSingle.None;
-  Result.Left := TOptionalSingle.None;
-  Result.SetupProc := nil;
-  Result.OnClick := nil;
+  FControl := AControl;
+  FControlClass := TControlClass(AControl.ClassType);
+  FName := AControl.Name;
+  FHeight := -1;
+  FWidth := -1;
+  FAlign := TOptionalAlign.None;
+  FCaption := TOptionalString.None;
+  FText := TOptionalString.None;
+  FTop := TOptionalSingle.None;
+  FLeft := TOptionalSingle.None;
+  FSetupProc := nil;
+  FOnClick := nil;
+  FTargetField := nil;
 end;
 
 function TControlInfo.CreateControl(AOwner: TComponent; AParent: TWinControl;
@@ -766,76 +790,89 @@ begin
 
   TProtectedControl(Result).OnClick := OnClick;
 
+  if Assigned(FTargetField) then
+    PPointer(FTargetField)^ := Result;
+
   if Assigned(SetupProc) then
     SetupProc(Result);
+
+  Free;
+end;
+
+{$IFDEF FPC}generic{$ENDIF}
+function TControlInfo.AssignTo<T>(var AControlField: T): TControlInfo;
+begin
+  Result := Self;
+  FTargetField := @AControlField;
 end;
 
 function TControlInfo.WithAlign(
   AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TControlInfo;
 begin
   Result := Self;
-  Result.Align := AAlign;
+  FAlign := AAlign;
 end;
 
 function TControlInfo.WithCaption(ACaption: string): TControlInfo;
 begin
   Result := Self;
-  Result.Caption := ACaption;
+  FCaption := ACaption;
 end;
 
 function TControlInfo.WithHeight(AHeight: Single): TControlInfo;
 begin
   Result := Self;
-  Result.Height := AHeight;
+  FHeight := AHeight;
 end;
 
 function TControlInfo.WithLeft(ALeft: Single): TControlInfo;
 begin
   Result := Self;
-  Result.Left := ALeft;
+  FLeft := ALeft;
 end;
 
 function TControlInfo.WithName(AName: string): TControlInfo;
 begin
   Result := Self;
-  Result.Name := AName;
+  FName := AName;
 end;
 
 function TControlInfo.WithOnClick(AOnClick: TNotifyEvent): TControlInfo;
 begin
   Result := Self;
-  Result.OnClick := AOnClick;
+  FOnClick := AOnClick;
 end;
 
 function TControlInfo.Setup(AProc: TControlSetupProc): TControlInfo;
 begin
   Result := Self;
-  Result.SetupProc := AProc;
+  FSetupProc := AProc;
 end;
 
 function TControlInfo.WithText(AText: string): TControlInfo;
 begin
   Result := Self;
-  Result.Text := AText;
+  FText := AText;
 end;
 
 function TControlInfo.WithTop(ATop: Single): TControlInfo;
 begin
   Result := Self;
-  Result.Top := ATop;
+  FTop := ATop;
 end;
 
 function TControlInfo.WithWidth(AWidth: Single): TControlInfo;
 begin
   Result := Self;
-  Result.Width := AWidth;
+  FWidth := AWidth;
 end;
 
-function TControlInfo.WithWidthAndHeight(AWidth, AHeight: Single): TControlInfo;
+function TControlInfo.WithWidthAndHeight(AWidth: Single; AHeight: Single
+  ): TControlInfo;
 begin
   Result := Self;
-  Result.Width := AWidth;
-  Result.Height := AHeight;
+  FWidth := AWidth;
+  FHeight := AHeight;
 end;
 
 { TControlGridBuilder }
@@ -992,9 +1029,12 @@ function TControlGridBuilder.CreateControl(AControlClass: TControlClass;
 var
   ControlInfo: TControlInfo;
 begin
-  ControlInfo.ControlClass := AControlClass;
-  ControlInfo.Name := '';
-  Result := CreateControl(ControlInfo, AProc);
+  ControlInfo := TControlInfo.Create(AControlClass);
+  try
+    ControlInfo.WithName('');
+    Result := CreateControl(ControlInfo, AProc);
+  finally
+  end;
 end;
 
 function TControlGridBuilder.CretaeControls(ACount: Integer;
@@ -1374,10 +1414,10 @@ var
     ControlName: string;
   begin
     ControlName := '';
-    if not AControlInfo.Name.IsEmpty then
-      ControlName := Registry.UniqueName(AControlInfo.Name);
+    if not Info.Name.IsEmpty then
+      ControlName := Registry.UniqueName(Info.Name);
 
-    Info := AControlInfo;
+    //Info := AControlInfo;
 
     if not Info.Top.HasValue then
       Info := Info.WithTop(CurrentLevel.CurrentTop);
@@ -1404,7 +1444,7 @@ begin
   {$ELSE}
   if (Control is TTabSheet) and (CurrentLevel.Parent is TPageControl) then
   begin
-    TTabSheet(Control).Parent := nil;
+    {$IFNDEF FPC}TTabSheet(Control).Parent := nil;{$ENDIF}
     TTabSheet(Control).PageControl := TPageControl(CurrentLevel.Parent);
   end;
   {$ENDIF}
@@ -3153,6 +3193,7 @@ begin
   Result := Self;
   Result.Name := AName;
 end;
+
 
 initialization
 
