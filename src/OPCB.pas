@@ -68,14 +68,11 @@ type
   public
     constructor Create(AClass: TMenuClass; const AName: string=''); overload;
     constructor Create(AMenu: TMenu); overload;
-
+    constructor Create(AClass: TMenuClass; out Reference); overload;
+    function Assign(out Reference): TMenuInfo; overload;
     function Setup(AProc: TMenuSetupProc): TMenuInfo;
     function WithName(AName: string): TMenuInfo;
-    {$IFDEF FPC}generic{$ENDIF}
-    function AssignTo<T: TMenu>(var AMenuField: T): TMenuInfo;
-
     function CreateMenu(AOwner: TComponent; const AMenuName: string): TMenu;
-
     property Menu: TMenu read FMenu;
     property MenuClass: TMenuClass read FMenuClass;
     property SetupProc: TMenuSetupProc read FSetupProc;
@@ -83,18 +80,30 @@ type
     property TargetField: Pointer read FTargetField;
   end;
 
-  TMenuItemInfo = record
-    MenuItem: TMenuItem;
-    MenuItemClass: TMenuItemClass;
-    SetupProc: TMenuItemSetupProc;
-    Name: string;
-    Caption: TOptionalString;
+  { TMenuItemInfo }
+
+  TMenuItemInfo = class
+  private
+    FMenuItem: TMenuItem;
+    FMenuItemClass: TMenuItemClass;
+    FSetupProc: TMenuItemSetupProc;
+    FName: string;
+    FCaption: TOptionalString;
+    FTargetField: Pointer;
+  public
+    constructor Create(AClass: TMenuItemClass; const AName: string=''); overload;
+    constructor Create(AMenuItem: TMenuItem); overload;
+    constructor Create(AClass: TMenuItemClass; out Reference);
+    function Assign(out Reference): TMenuItemInfo; overload;
     function Setup(AProc: TMenuItemSetupProc): TMenuItemInfo;
     function WithName(AName: string): TMenuItemInfo;
     function WithCaption(ACaption: string): TMenuItemInfo;
     function CreateMenuItem(AOwner: TComponent; const AMenuItemName: string): TMenuItem;
-    class function Create(AClass: TMenuItemClass; const AName: string=''): TMenuItemInfo; overload; static;
-    class function Create(AMenuItem: TMenuItem): TMenuItemInfo; overload; static;
+    property MenuItem: TMenuItem read FMenuItem;
+    property MenuItemClass: TMenuItemClass read FMenuItemClass;
+    property SetupProc: TMenuItemSetupProc read FSetupProc;
+    property Name: string read FName;
+    property Caption: TOptionalString read FCaption;
   end;
 
   { TControlInfo }
@@ -115,9 +124,10 @@ type
     FOnClick: TNotifyEvent;
     FTargetField: Pointer;
   public
-    constructor Create(AClass: TControlClass; const AName: string=''); overload;
     constructor Create(AControl: TControl); overload;
-
+    constructor Create(AClass: TControlClass; const AName: string=''); overload;
+    constructor Create(AClass: TControlClass; out Reference); overload;
+    function Assign(out Reference): TControlInfo; overload;
     function Setup(AProc: TControlSetupProc): TControlInfo;
     function WithAlign(
       AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TControlInfo;
@@ -130,8 +140,6 @@ type
     function WithCaption(ACaption: string): TControlInfo;
     function WithText(AText: string): TControlInfo;
     function WithOnClick(AOnClick: TNotifyEvent): TControlInfo;
-    {$IFDEF FPC}generic{$ENDIF}
-    function AssignTo<T: TControl>(var AControlField: T): TControlInfo;
     function CreateControl(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl;
     property Control: TControl read FControl ;
@@ -494,7 +502,7 @@ uses
     {$ENDIF}
   {$ENDIF}
 
-  Math, Types;
+  Math, Types, TypInfo;
 
 { TControlInfo }
 
@@ -513,6 +521,12 @@ begin
   FSetupProc := nil;
   FOnClick := nil;
   FTargetField := nil;
+end;
+
+constructor TControlInfo.Create(AClass: TControlClass; out Reference);
+begin
+  Create(AClass, '');
+  Assign(Reference);
 end;
 
 constructor TControlInfo.Create(AControl: TControl);
@@ -607,11 +621,10 @@ begin
   Free;
 end;
 
-{$IFDEF FPC}generic{$ENDIF}
-function TControlInfo.AssignTo<T>(var AControlField: T): TControlInfo;
+function TControlInfo.Assign(out Reference): TControlInfo;
 begin
   Result := Self;
-  FTargetField := @AControlField;
+  FTargetField := @Reference;
 end;
 
 function TControlInfo.WithAlign(
@@ -1911,6 +1924,7 @@ begin
   begin
     if FNamedComponents.ContainsKey(AName) then
       raise Exception.CreateFmt('Já existe um componente registrado com o nome "%s".', [AName]);
+
     FNamedComponents.Add(AName, AComponent);
 
     if AComponent is TControl then
@@ -2538,11 +2552,9 @@ begin
   CurrentLevel.Parent.Add(MenuItem);
   {$ENDIF}
 
-  // inclui um novo level
   FLevelStack.Add(TMenuBuilderLevel.Create);
   CurrentLevel.Parent := MenuItem;
 end;
-
 
 function TMenuBuilder.PreviousLevel: TMenuBuilder;
 var
@@ -2588,6 +2600,7 @@ begin
   FMenuClass := AClass;
   FName := AName;
   FSetupProc := nil;
+  FTargetField := nil;
 end;
 
 constructor TMenuInfo.Create(AMenu: TMenu);
@@ -2596,6 +2609,13 @@ begin
   FMenuClass := TMenuClass(AMenu.ClassType);
   FName := AMenu.Name;
   FSetupProc := nil;
+  FTargetField := nil;
+end;
+
+constructor TMenuInfo.Create(AClass: TMenuClass; out Reference);
+begin
+  Create(AClass, '');
+  Assign(Reference);
 end;
 
 function TMenuInfo.Setup(AProc: TMenuSetupProc): TMenuInfo;
@@ -2610,32 +2630,38 @@ begin
   FName := AName;
 end;
 
-{$IFDEF FPC}generic{$ENDIF}
-function TMenuInfo.AssignTo<T>(var AMenuField: T): TMenuInfo;
+function TMenuInfo.Assign(out Reference): TMenuInfo;
 begin
   Result := Self;
-  FTargetField := @AMenuField;
+  FTargetField := @Reference;
 end;
 
 { TMenuItemInfo }
 
-class function TMenuItemInfo.Create(AMenuItem: TMenuItem): TMenuItemInfo;
+constructor TMenuItemInfo.Create(AMenuItem: TMenuItem);
 begin
-  Result.MenuItem := AMenuItem;
-  Result.MenuItemClass := TMenuItemClass(AMenuItem.ClassType);
-  Result.Name := AMenuItem.Name;
-  Result.Caption := TOptionalString.None;
-  Result.SetupProc := nil;
+  FMenuItem := AMenuItem;
+  FMenuItemClass := TMenuItemClass(AMenuItem.ClassType);
+  FName := AMenuItem.Name;
+  FCaption := TOptionalString.None;
+  FSetupProc := nil;
+  FTargetField := nil;
 end;
 
-class function TMenuItemInfo.Create(AClass: TMenuItemClass;
-  const AName: string): TMenuItemInfo;
+constructor TMenuItemInfo.Create(AClass: TMenuItemClass; out Reference);
 begin
-  Result.MenuItem := nil;
-  Result.MenuItemClass := AClass;
-  Result.Name := AName;
-  Result.Caption := TOptionalString.None;;
-  Result.SetupProc := nil;
+  Create(AClass, '');
+  Assign(Reference);
+end;
+
+constructor TMenuItemInfo.Create(AClass: TMenuItemClass; const AName: string);
+begin
+  FMenuItem := nil;
+  FMenuItemClass := AClass;
+  FName := AName;
+  FCaption := TOptionalString.None;;
+  FSetupProc := nil;
+  FTargetField := nil;
 end;
 
 function TMenuItemInfo.CreateMenuItem(AOwner: TComponent;
@@ -2656,28 +2682,39 @@ begin
     Result.Caption := Caption.Value;
     {$ENDIF}
 
+  if Assigned(FTargetField) then
+    PPointer(FTargetField)^ := Result;
+
   if Assigned(SetupProc) then
     SetupProc(Result);
+
+  Free;
 end;
 
 function TMenuItemInfo.Setup(AProc: TMenuItemSetupProc): TMenuItemInfo;
 begin
   Result := Self;
-  Result.SetupProc := AProc;
+  FSetupProc := AProc;
 end;
 
 function TMenuItemInfo.WithCaption(ACaption: string): TMenuItemInfo;
 begin
   Result := Self;
-  Result.Caption := ACaption;
+  FCaption := ACaption;
+end;
+
+{$IFDEF FPC}generic{$ENDIF}
+function TMenuItemInfo.Assign(out Reference): TMenuItemInfo;
+begin
+  Result := Self;
+  FTargetField := @Reference;
 end;
 
 function TMenuItemInfo.WithName(AName: string): TMenuItemInfo;
 begin
   Result := Self;
-  Result.Name := AName;
+  FName := AName;
 end;
-
 
 initialization
 
