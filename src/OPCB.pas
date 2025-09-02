@@ -37,21 +37,32 @@ type
   TMenuSetupProc = procedure(AMenu: TMenu) of object;
   TMenuItemSetupProc = procedure(AMenuItem: TMenuItem) of object;
 
-  TComponentInfo = record
-    Component: TComponent;
-    ComponentClass: TComponentClass;
-    SetupProc: TComponentSetupProc;
-    Name: string;
+  { TComponentInfo }
+
+  TComponentInfo = class
+  private
+    FComponent: TComponent;
+    FComponentClass: TComponentClass;
+    FSetupProc: TComponentSetupProc;
+    FName: string;
+    FTargetField: Pointer;
+  public
+    constructor Create(AClass: TComponentClass; const AName: string=''); overload;
+    constructor Create(AComponent: TComponent); overload;
+    constructor Create(AComponent: TComponent; out Reference); overload;
+    function Assign(out Reference): TComponentInfo; overload;
     function Setup(AProc: TComponentSetupProc): TComponentInfo;
     function WithName(AName: string): TComponentInfo;
     function CreateComponent(AOwner: TComponent; const AComponentName: string): TComponent;
-    class function Create(AClass: TComponentClass; const AName: string=''): TComponentInfo; overload; static;
-    class function Create(AComponent: TComponent): TComponentInfo; overload; static;
+    property Component: TComponent read FComponent;
+    property ComponentClass: TComponentClass read FComponentClass;
+    property SetupProc: TComponentSetupProc read FSetupProc;
+    property Name: string read FName;
   end;
 
   TComponentInfoArray = array of TComponentInfo;
 
-  TComponentInfoHelper = record helper for TComponentInfo
+  TComponentInfoHelper = class helper for TComponentInfo
     class function CreateArray(AClass: TComponentClass;
       const ANames: array of string): TComponentInfoArray; overload; static;
   end;
@@ -86,6 +97,7 @@ type
   private
     FMenuItem: TMenuItem;
     FMenuItemClass: TMenuItemClass;
+    FOnClick: TNotifyEvent;
     FSetupProc: TMenuItemSetupProc;
     FName: string;
     FCaption: TOptionalString;
@@ -93,17 +105,21 @@ type
   public
     constructor Create(AClass: TMenuItemClass; const AName: string=''); overload;
     constructor Create(AMenuItem: TMenuItem); overload;
-    constructor Create(AClass: TMenuItemClass; out Reference);
+    constructor Create(AClass: TMenuItemClass; out Reference); overload;
+    constructor Create; overload;
+    constructor Create(out Reference); overload;
     function Assign(out Reference): TMenuItemInfo; overload;
     function Setup(AProc: TMenuItemSetupProc): TMenuItemInfo;
     function WithName(AName: string): TMenuItemInfo;
     function WithCaption(ACaption: string): TMenuItemInfo;
+    function WithOnClick(AOnClick: TNotifyEvent): TMenuItemInfo;
     function CreateMenuItem(AOwner: TComponent; const AMenuItemName: string): TMenuItem;
     property MenuItem: TMenuItem read FMenuItem;
     property MenuItemClass: TMenuItemClass read FMenuItemClass;
     property SetupProc: TMenuItemSetupProc read FSetupProc;
     property Name: string read FName;
     property Caption: TOptionalString read FCaption;
+    property OnClick: TNotifyEvent read FOnClick;
   end;
 
   { TControlInfo }
@@ -142,19 +158,18 @@ type
     function WithOnClick(AOnClick: TNotifyEvent): TControlInfo;
     function CreateControl(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl;
-    property Control: TControl read FControl ;
-    property ControlClass: TControlClass read FControlClass ;
-    property SetupProc: TControlSetupProc read FSetupProc ;
-    property Name: string read FName ;
-    property Caption: TOptionalString read FCaption ;
-    property Text: TOptionalString read FText ;
-    property Align: TOptionalAlign read FAlign ;
-    property Width: Single read FWidth ;
-    property Height: Single read FHeight ;
-    property Top: TOptionalSingle read FTop ;
-    property Left: TOptionalSingle read FLeft ;
-    property OnClick: TNotifyEvent read FOnClick ;
-    property TargetField: Pointer read FTargetField ;
+    property Control: TControl read FControl;
+    property ControlClass: TControlClass read FControlClass;
+    property SetupProc: TControlSetupProc read FSetupProc;
+    property Name: string read FName;
+    property Caption: TOptionalString read FCaption;
+    property Text: TOptionalString read FText;
+    property Align: TOptionalAlign read FAlign;
+    property Width: Single read FWidth;
+    property Height: Single read FHeight;
+    property Top: TOptionalSingle read FTop;
+    property Left: TOptionalSingle read FLeft;
+    property OnClick: TNotifyEvent read FOnClick;
   end;
 
   TComponentRegistry = class;
@@ -502,7 +517,7 @@ uses
     {$ENDIF}
   {$ENDIF}
 
-  Math, Types, TypInfo;
+  Math, Types;
 
 { TControlInfo }
 
@@ -717,7 +732,8 @@ end;
 
 function TControlBuilder.Break(AIncTopOrLeft: Single): TControlBuilder;
 begin
-  Result := Break;
+  Result := Self;
+  Self.Break;
   if CurrentLevel.Direction = cpdHorizontal then
     IncTop(AIncTopOrLeft);
   if CurrentLevel.Direction = cpdVertical then
@@ -726,7 +742,8 @@ end;
 
 function TControlBuilder.BreakColumn(AIncLeft: Single): TControlBuilder;
 begin
-  Result := BreakColumn;
+  Result := Self;
+  Self.BreakColumn;
   IncLeft(AIncLeft);
 end;
 
@@ -856,7 +873,6 @@ end;
 
 function TControlBuilder.CenterControlInParentHorizontally: TControlBuilder;
 var
-  TargetBounds: TControlGroupBounds;
   ParentCtrl: TControl;
   ParentWidth: Single;
   TargetCenterX, ParentCenterX, DeltaX: Single;
@@ -909,7 +925,6 @@ function TControlBuilder.AddControl(AControlInfo: TControlInfo;
   const AGroups: array of string): TControlBuilder;
 var
   Control: TControl;
-  ControlRight, ControlBottom: Single;
   Level: TControlBuilderLevel;
 
   function CreateControl(Info: TControlInfo): TControl;
@@ -919,8 +934,6 @@ var
     ControlName := '';
     if not Info.Name.IsEmpty then
       ControlName := Registry.UniqueName(Info.Name);
-
-    //Info := AControlInfo;
 
     if not Info.Top.HasValue then
       Info := Info.WithTop(CurrentLevel.CurrentTop);
@@ -1099,7 +1112,8 @@ end;
 
 function TControlBuilder.BreakLine(AIncTop: Single): TControlBuilder;
 begin
-  Result := BreakLine;
+  Result := Self;
+  Self.BreakLine;
   IncTop(AIncTop);
 end;
 
@@ -1400,6 +1414,8 @@ function TControlBuilder.MoveControls(const AControl: TControl;
 var
     L, T: Single;
 begin
+  Result := Self;
+
   {$IFDEF FRAMEWORK_FMX}
   L := AControl.Position.X;
   T := AControl.Position.Y;
@@ -2299,14 +2315,6 @@ end;
 
 { TComponentInfo }
 
-class function TComponentInfo.Create(AComponent: TComponent): TComponentInfo;
-begin
-  Result.Component := AComponent;
-  Result.ComponentClass := TComponentClass(AComponent.ClassType);
-  Result.Name := AComponent.Name;
-  Result.SetupProc := nil;
-end;
-
 function TComponentInfo.CreateComponent(AOwner: TComponent;
   const AComponentName: string): TComponent;
 begin
@@ -2318,29 +2326,53 @@ begin
   if not AComponentName.IsEmpty then
     Result.Name := AComponentName;
 
+  if Assigned(FTargetField) then
+    PPointer(FTargetField)^ := Result;
+
   if Assigned(SetupProc) then
     SetupProc(Result);
+
+  Free;
+end;
+
+constructor TComponentInfo.Create(AClass: TComponentClass; const AName: string);
+begin
+  FComponent := nil;
+  FComponentClass := AClass;
+  FName := AName;
+  FSetupProc := nil;
+end;
+
+constructor TComponentInfo.Create(AComponent: TComponent);
+begin
+  FComponent := AComponent;
+  FComponentClass := TComponentClass(AComponent.ClassType);
+  FName := AComponent.Name;
+  FSetupProc := nil;
+end;
+
+constructor TComponentInfo.Create(AComponent: TComponent; out Reference);
+begin
+  Create(AComponent);
+  Assign(Reference);
+end;
+
+function TComponentInfo.Assign(out Reference): TComponentInfo;
+begin
+  Result := Self;
+  FTargetField := @Reference;
 end;
 
 function TComponentInfo.Setup(AProc: TComponentSetupProc): TComponentInfo;
 begin
   Result := Self;
-  Result.SetupProc := AProc;
+  FSetupProc := AProc;
 end;
 
 function TComponentInfo.WithName(AName: string): TComponentInfo;
 begin
   Result := Self;
-  Result.Name := AName;
-end;
-
-class function TComponentInfo.Create(AClass: TComponentClass;
-  const AName: string): TComponentInfo;
-begin
-  Result.Component := nil;
-  Result.ComponentClass := AClass;
-  Result.Name := AName;
-  Result.SetupProc := nil;
+  FName := AName;
 end;
 
 { TRegistryNotifier }
@@ -2442,6 +2474,7 @@ class function TComponentInfoHelper.CreateArray(AClass: TComponentClass;
 var
   I: Integer;
 begin
+  Result := [];
   SetLength(Result, Length(ANames));
   for I := 0 to High(ANames) do
     Result[I] := TComponentInfo.Create(AClass, ANames[I]);
@@ -2557,8 +2590,6 @@ begin
 end;
 
 function TMenuBuilder.PreviousLevel: TMenuBuilder;
-var
-  SubLevel, SuperLevel: TMenuBuilderLevel;
 begin
   if FLevelStack.Count <= 1 then
     raise Exception.Create('PreviousLevel chamado no nível raiz');
@@ -2654,6 +2685,16 @@ begin
   Assign(Reference);
 end;
 
+constructor TMenuItemInfo.Create;
+begin
+  Create(TMenuItem);
+end;
+
+constructor TMenuItemInfo.Create(out Reference);
+begin
+  Create(TMenuItem, Reference);
+end;
+
 constructor TMenuItemInfo.Create(AClass: TMenuItemClass; const AName: string);
 begin
   FMenuItem := nil;
@@ -2682,6 +2723,8 @@ begin
     Result.Caption := Caption.Value;
     {$ENDIF}
 
+  Result.OnClick := OnClick;
+
   if Assigned(FTargetField) then
     PPointer(FTargetField)^ := Result;
 
@@ -2701,6 +2744,12 @@ function TMenuItemInfo.WithCaption(ACaption: string): TMenuItemInfo;
 begin
   Result := Self;
   FCaption := ACaption;
+end;
+
+function TMenuItemInfo.WithOnClick(AOnClick: TNotifyEvent): TMenuItemInfo;
+begin
+  Result := Self;
+  FOnClick := AOnClick;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
