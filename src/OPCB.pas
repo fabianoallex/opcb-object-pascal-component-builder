@@ -47,9 +47,10 @@ type
     FName: string;
     FTargetField: Pointer;
   public
-    constructor Create(AClass: TComponentClass; const AName: string=''); overload;
     constructor Create(AComponent: TComponent); overload;
-    constructor Create(AComponent: TComponent; out Reference); overload;
+    constructor Create(AClass: TComponentClass; const AName: string=''); overload;
+    constructor Create(AClass: TComponentClass; const AName: string; out Reference); overload;
+    constructor Create(AComponentClass: TComponentClass; out Reference); overload;
     function Assign(out Reference): TComponentInfo; overload;
     function Setup(AProc: TComponentSetupProc): TComponentInfo;
     function WithName(AName: string): TComponentInfo;
@@ -77,8 +78,9 @@ type
     FName: string;
     FTargetField: Pointer;
   public
-    constructor Create(AClass: TMenuClass; const AName: string=''); overload;
     constructor Create(AMenu: TMenu); overload;
+    constructor Create(AClass: TMenuClass; const AName: string=''); overload;
+    constructor Create(AClass: TMenuClass; const AName: string; out Reference); overload;
     constructor Create(AClass: TMenuClass; out Reference); overload;
     function Assign(out Reference): TMenuInfo; overload;
     function Setup(AProc: TMenuSetupProc): TMenuInfo;
@@ -103,8 +105,9 @@ type
     FCaption: TOptionalString;
     FTargetField: Pointer;
   public
-    constructor Create(AClass: TMenuItemClass; const AName: string=''); overload;
     constructor Create(AMenuItem: TMenuItem); overload;
+    constructor Create(AClass: TMenuItemClass; const AName: string=''); overload;
+    constructor Create(AClass: TMenuItemClass; const AName: string; out Reference); overload;
     constructor Create(AClass: TMenuItemClass; out Reference); overload;
     constructor Create; overload;
     constructor Create(out Reference); overload;
@@ -142,6 +145,7 @@ type
   public
     constructor Create(AControl: TControl); overload;
     constructor Create(AClass: TControlClass; const AName: string=''); overload;
+    constructor Create(AClass: TControlClass; const AName: string; out Reference); overload;
     constructor Create(AClass: TControlClass; out Reference); overload;
     function Assign(out Reference): TControlInfo; overload;
     function Setup(AProc: TControlSetupProc): TControlInfo;
@@ -536,6 +540,13 @@ begin
   FSetupProc := nil;
   FOnClick := nil;
   FTargetField := nil;
+end;
+
+constructor TControlInfo.Create(AClass: TControlClass; const AName: string; out
+  Reference);
+begin
+  Create(AClass, AName);
+  Assign(Reference);
 end;
 
 constructor TControlInfo.Create(AClass: TControlClass; out Reference);
@@ -2343,6 +2354,13 @@ begin
   FSetupProc := nil;
 end;
 
+constructor TComponentInfo.Create(AClass: TComponentClass; const AName: string;
+  out Reference);
+begin
+  Create(AClass, AName);
+  Assign(Reference);
+end;
+
 constructor TComponentInfo.Create(AComponent: TComponent);
 begin
   FComponent := AComponent;
@@ -2351,9 +2369,9 @@ begin
   FSetupProc := nil;
 end;
 
-constructor TComponentInfo.Create(AComponent: TComponent; out Reference);
+constructor TComponentInfo.Create(AComponentClass: TComponentClass; out Reference);
 begin
-  Create(AComponent);
+  Create(AComponentClass);
   Assign(Reference);
 end;
 
@@ -2634,6 +2652,13 @@ begin
   FTargetField := nil;
 end;
 
+constructor TMenuInfo.Create(AClass: TMenuClass; const AName: string; out
+  Reference);
+begin
+  Create(AClass, AName);
+  Assign(Reference);
+end;
+
 constructor TMenuInfo.Create(AMenu: TMenu);
 begin
   FMenu := AMenu;
@@ -2703,6 +2728,13 @@ begin
   FCaption := TOptionalString.None;;
   FSetupProc := nil;
   FTargetField := nil;
+end;
+
+constructor TMenuItemInfo.Create(AClass: TMenuItemClass; const AName: string;
+  out Reference);
+begin
+  Create(AClass, AName);
+  Assign(Reference);
 end;
 
 function TMenuItemInfo.CreateMenuItem(AOwner: TComponent;
