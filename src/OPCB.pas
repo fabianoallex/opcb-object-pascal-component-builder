@@ -583,76 +583,78 @@ end;
 function TControlInfo.CreateControl(AOwner: TComponent; AParent: TWinControl;
   const AControlName: string): TControl;
 begin
-  if Assigned(Control) then
-    Result := Control
-  else
-    Result := ControlClass.Create(AOwner);
+  try
+    if Assigned(Control) then
+      Result := Control
+    else
+      Result := ControlClass.Create(AOwner);
 
-  if not AControlName.IsEmpty then
-    Result.Name := AControlName;
+    if not AControlName.IsEmpty then
+      Result.Name := AControlName;
 
-  Result.Parent := AParent;
+    Result.Parent := AParent;
 
-  if Caption.HasValue then
-  begin
-    {$IFDEF FRAMEWORK_FMX}
-    if Result is TPresentedTextControl then
-      TPresentedTextControl(Result).Text := Caption.Value;
-    if Result is TTextControl then
-      TTextControl(Result).Text := Caption.Value;
-    {$ELSE}
-    TProtectedControl(Result).Caption := Caption.Value;
-    {$ENDIF}
+    if Caption.HasValue then
+    begin
+      {$IFDEF FRAMEWORK_FMX}
+      if Result is TPresentedTextControl then
+        TPresentedTextControl(Result).Text := Caption.Value;
+      if Result is TTextControl then
+        TTextControl(Result).Text := Caption.Value;
+      {$ELSE}
+      TProtectedControl(Result).Caption := Caption.Value;
+      {$ENDIF}
+    end;
+
+    if Text.HasValue then
+    begin
+      {$IFDEF FRAMEWORK_FMX}
+      if Result is TPresentedTextControl then
+        TPresentedTextControl(Result).Text := Text.Value;
+      if Result is TTextControl then
+        TTextControl(Result).Text := Text.Value;
+      {$ELSE}
+      TProtectedControl(Result).Text := Text.Value;
+      {$ENDIF}
+    end;
+
+    if Align.HasValue then
+      Result.Align := Align.Value;
+
+    if Width >= 0 then
+      Result.Width := {$IFDEF FRAMEWORK_FMX}Width{$ELSE}Trunc(Width){$ENDIF};
+
+    if Height >= 0 then
+      Result.Height := {$IFDEF FRAMEWORK_FMX}Height{$ELSE}Trunc(Height){$ENDIF};
+
+    if Top.HasValue then
+    begin
+      {$IFDEF FRAMEWORK_FMX}
+      Result.Position.Y := Top.Value;
+      {$ELSE}
+      Result.Top := Trunc(Top.Value);
+      {$ENDIF}
+    end;
+
+    if Left.HasValue then
+    begin
+      {$IFDEF FRAMEWORK_FMX}
+      Result.Position.X := Left.Value;
+      {$ELSE}
+      Result.Left := Trunc(Left.Value);
+      {$ENDIF}
+    end;
+
+    TProtectedControl(Result).OnClick := OnClick;
+
+    if Assigned(FTargetField) then
+      PPointer(FTargetField)^ := Result;
+
+    if Assigned(SetupProc) then
+      SetupProc(Result);
+  finally
+    Free;
   end;
-
-  if Text.HasValue then
-  begin
-    {$IFDEF FRAMEWORK_FMX}
-    if Result is TPresentedTextControl then
-      TPresentedTextControl(Result).Text := Text.Value;
-    if Result is TTextControl then
-      TTextControl(Result).Text := Text.Value;
-    {$ELSE}
-    TProtectedControl(Result).Text := Text.Value;
-    {$ENDIF}
-  end;
-
-  if Align.HasValue then
-    Result.Align := Align.Value;
-
-  if Width >= 0 then
-    Result.Width := {$IFDEF FRAMEWORK_FMX}Width{$ELSE}Trunc(Width){$ENDIF};
-
-  if Height >= 0 then
-    Result.Height := {$IFDEF FRAMEWORK_FMX}Height{$ELSE}Trunc(Height){$ENDIF};
-
-  if Top.HasValue then
-  begin
-    {$IFDEF FRAMEWORK_FMX}
-    Result.Position.Y := Top.Value;
-    {$ELSE}
-    Result.Top := Trunc(Top.Value);
-    {$ENDIF}
-  end;
-
-  if Left.HasValue then
-  begin
-    {$IFDEF FRAMEWORK_FMX}
-    Result.Position.X := Left.Value;
-    {$ELSE}
-    Result.Left := Trunc(Left.Value);
-    {$ENDIF}
-  end;
-
-  TProtectedControl(Result).OnClick := OnClick;
-
-  if Assigned(FTargetField) then
-    PPointer(FTargetField)^ := Result;
-
-  if Assigned(SetupProc) then
-    SetupProc(Result);
-
-  Free;
 end;
 
 function TControlInfo.Assign(out Reference): TControlInfo;
@@ -2347,21 +2349,23 @@ end;
 function TComponentInfo.CreateComponent(AOwner: TComponent;
   const AComponentName: string): TComponent;
 begin
-  if Assigned(Component) then
-    Result := Component
-  else
-    Result := ComponentClass.Create(AOwner);
+  try
+    if Assigned(Component) then
+      Result := Component
+    else
+      Result := ComponentClass.Create(AOwner);
 
-  if not AComponentName.IsEmpty then
-    Result.Name := AComponentName;
+    if not AComponentName.IsEmpty then
+      Result.Name := AComponentName;
 
-  if Assigned(FTargetField) then
-    PPointer(FTargetField)^ := Result;
+    if Assigned(FTargetField) then
+      PPointer(FTargetField)^ := Result;
 
-  if Assigned(SetupProc) then
-    SetupProc(Result);
-
-  Free;
+    if Assigned(SetupProc) then
+      SetupProc(Result);
+  finally
+    Free;
+  end;
 end;
 
 constructor TComponentInfo.Create(AClass: TComponentClass; const AName: string);
@@ -2660,21 +2664,23 @@ end;
 
 function TMenuInfo.CreateMenu(AOwner: TComponent; const AMenuName: string): TMenu;
 begin
-  if Assigned(Menu) then
-    Result := Menu
-  else
-    Result := MenuClass.Create(AOwner);
+  try
+    if Assigned(Menu) then
+      Result := Menu
+    else
+      Result := MenuClass.Create(AOwner);
 
-  if not AMenuName.IsEmpty then
-    Result.Name := AMenuName;
+    if not AMenuName.IsEmpty then
+      Result.Name := AMenuName;
 
-  if Assigned(FTargetField) then
-    PPointer(FTargetField)^ := Result;
+    if Assigned(FTargetField) then
+      PPointer(FTargetField)^ := Result;
 
-  if Assigned(SetupProc) then
-    SetupProc(Result);
-
-  Free;
+    if Assigned(SetupProc) then
+      SetupProc(Result);
+  finally
+    Free;
+  end;
 end;
 
 constructor TMenuInfo.Create(AClass: TMenuClass; const AName: string);
@@ -2774,30 +2780,32 @@ end;
 function TMenuItemInfo.CreateMenuItem(AOwner: TComponent;
   const AMenuItemName: string): TMenuItem;
 begin
-  if Assigned(MenuItem) then
-    Result := MenuItem
-  else
-    Result := MenuItemClass.Create(AOwner);
+  try
+    if Assigned(MenuItem) then
+      Result := MenuItem
+    else
+      Result := MenuItemClass.Create(AOwner);
 
-  if not AMenuItemName.IsEmpty then
-    Result.Name := AMenuItemName;
+    if not AMenuItemName.IsEmpty then
+      Result.Name := AMenuItemName;
 
-  if Caption.HasValue then
-    {$IFDEF FRAMEWORK_FMX}
-    Result.Text := Caption.Value;
-    {$ELSE}
-    Result.Caption := Caption.Value;
-    {$ENDIF}
+    if Caption.HasValue then
+      {$IFDEF FRAMEWORK_FMX}
+      Result.Text := Caption.Value;
+      {$ELSE}
+      Result.Caption := Caption.Value;
+      {$ENDIF}
 
-  Result.OnClick := OnClick;
+    Result.OnClick := OnClick;
 
-  if Assigned(FTargetField) then
-    PPointer(FTargetField)^ := Result;
+    if Assigned(FTargetField) then
+      PPointer(FTargetField)^ := Result;
 
-  if Assigned(SetupProc) then
-    SetupProc(Result);
-
-  Free;
+    if Assigned(SetupProc) then
+      SetupProc(Result);
+  finally
+    Free;
+  end;
 end;
 
 function TMenuItemInfo.Setup(AProc: TMenuItemSetupProc): TMenuItemInfo;
