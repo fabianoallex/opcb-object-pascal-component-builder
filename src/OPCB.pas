@@ -185,13 +185,18 @@ type
     procedure ReleaseContext;
   end;
 
+  { TRegistryContextHandle }
+
   TRegistryContextHandle = class(TInterfacedObject, IRegistryContextHandle)
   private
     FIsReleased: Boolean;
     FContextKey: string;
     FRegistry: TComponentRegistry;
+    class var FAutoCounter: Integer;
+    class function GenerateAutoKey: string; static;
   public
-    constructor Create(const AContextKey: string);
+    constructor Create(const AContextKey: string); overload;
+    constructor Create; overload;
     destructor Destroy; override;
     function GetRegistry: TComponentRegistry;
     procedure ReleaseContext;
@@ -338,7 +343,8 @@ type
     function GetComponents: TComponentList;
     function GetItem(const AName: string): TComponent;
   public
-    constructor Create(AComponentRegistryName: string);
+    constructor Create(ARegistryContextKey: string=''); overload;
+    constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
     {$IFDEF FPC}generic{$ENDIF}
     function GetComponent<T: TComponent>(const AName: string): T; overload;
@@ -358,7 +364,8 @@ type
     function GetComponentRegistry: TComponentRegistry;
     function GetCurrenteLevel: TMenuBuilderLevel;
   public
-    constructor Create(AComponentRegistryName: string);
+    constructor Create(ARegistryContextKey: string=''); overload;
+    constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
     function WithOwner(AOwner: TComponent): TMenuBuilder;
     function AddMenu(AMenuInfo: TMenuInfo): TMenuBuilder;
@@ -392,7 +399,8 @@ type
     function GetComponentRegistry: TComponentRegistry;
     function GetItem(const AName: string): TControl;
   public
-    constructor Create(ARegistryContext: string);
+    constructor Create(ARegistryContextKey: string=''); overload;
+    constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
     {$IFDEF FPC}generic{$ENDIF}
     function GetControl<T: TControl>(const AName: string): T; overload;
@@ -498,12 +506,12 @@ type
 
   TOPCBBuilders = class
   private
-    FContextName: string;
+    FRegistryContextHandle: IRegistryContextHandle;
     FComponentBuilder: TComponentBuilder;
     FControlBuilder: TControlBuilder;
     FMenuBuilder: TMenuBuilder;
   public
-    constructor Create(const AContextName: string);
+    constructor Create(const ARegistryContextKey: string='');
     destructor Destroy; override;
     function AsComponentBuilder: TComponentBuilder;
     function AsControlBuilder: TControlBuilder;
@@ -924,9 +932,14 @@ begin
   MoveControls(ParentCtrl, DeltaX, 0);
 end;
 
-constructor TControlBuilder.Create(ARegistryContext: string);
+constructor TControlBuilder.Create(ARegistryContextKey: string);
 begin
-  FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContext);
+  Create(TRegistryContextHandle.Create(ARegistryContextKey));
+end;
+
+constructor TControlBuilder.Create(ARegistryContextHandle: IRegistryContextHandle); overload;
+begin
+  FRegistryContextHandle := ARegistryContextHandle;
   FGroups := TControlGroupMap.Create;
   FLevelStack := TControlBuilderLevelStack.Create(True);
   FLevelStack.Add(TControlBuilderLevel.Create);
@@ -2282,9 +2295,14 @@ begin
     Add(AComponentInfos[I]);
 end;
 
-constructor TComponentBuilder.Create(AComponentRegistryName: string);
+constructor TComponentBuilder.Create(ARegistryContextKey: string);
 begin
-  FRegistryContextHandle := TRegistryContextHandle.Create(AComponentRegistryName);
+  Create(TRegistryContextHandle.Create(ARegistryContextKey))
+end;
+
+constructor TComponentBuilder.Create(ARegistryContextHandle: IRegistryContextHandle); overload;
+begin
+  FRegistryContextHandle := ARegistryContextHandle;
 end;
 
 destructor TComponentBuilder.Destroy;
@@ -2410,12 +2428,23 @@ end;
 
 { TContextHandle }
 
+class function TRegistryContextHandle.GenerateAutoKey: string;
+begin
+  Inc(FAutoCounter);
+  Result := 'Auto_' + IntToStr(FAutoCounter);
+end;
+
 constructor TRegistryContextHandle.Create(const AContextKey: string);
 begin
   inherited Create;
   FIsReleased := False;
   FContextKey := AContextKey;
   FRegistry := TComponentRegistry.ForContext(AContextKey);
+end;
+
+constructor TRegistryContextHandle.Create;
+begin
+  Create(GenerateAutoKey);
 end;
 
 destructor TRegistryContextHandle.Destroy;
@@ -2443,7 +2472,7 @@ end;
 function TOPCBBuilders.AsComponentBuilder: TComponentBuilder;
 begin
   if not Assigned(FComponentBuilder) then
-    FComponentBuilder := TComponentBuilder.Create(FContextName);
+    FComponentBuilder := TComponentBuilder.Create(FRegistryContextHandle);
 
   Result := FComponentBuilder;
 end;
@@ -2451,7 +2480,7 @@ end;
 function TOPCBBuilders.AsControlBuilder: TControlBuilder;
 begin
   if not Assigned(FControlBuilder) then
-    FControlBuilder := TControlBuilder.Create(FContextName);
+    FControlBuilder := TControlBuilder.Create(FRegistryContextHandle);
 
   Result := FControlBuilder;
 end;
@@ -2459,13 +2488,13 @@ end;
 function TOPCBBuilders.AsMenuBuilder: TMenuBuilder;
 begin
   if not Assigned(FMenuBuilder) then
-    FMenuBuilder := TMenuBuilder.Create(FContextName);
+    FMenuBuilder := TMenuBuilder.Create(FRegistryContextHandle);
   Result := FMenuBuilder;
 end;
 
-constructor TOPCBBuilders.Create(const AContextName: string);
+constructor TOPCBBuilders.Create(const ARegistryContextKey: string);
 begin
-  FContextName := AContextName;
+  FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContextKey);
   FComponentBuilder := nil;
   FControlBuilder := nil;
   FMenuBuilder := nil;
@@ -2540,9 +2569,14 @@ begin
   {$ENDIF}
 end;
 
-constructor TMenuBuilder.Create(AComponentRegistryName: string);
+constructor TMenuBuilder.Create(ARegistryContextKey: string);
 begin
-  FRegistryContextHandle := TRegistryContextHandle.Create(AComponentRegistryName);
+  Create(TRegistryContextHandle.Create(ARegistryContextKey));
+end;
+
+constructor TMenuBuilder.Create(ARegistryContextHandle: IRegistryContextHandle); overload;
+begin
+  FRegistryContextHandle := ARegistryContextHandle;
   FLevelStack := TMenuBuilderLevelStack.Create(True);
   FLevelStack.Add(TMenuBuilderLevel.Create);
 end;
