@@ -335,6 +335,10 @@ type
 
   TMenuBuilderLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TMenuBuilderLevel>;
 
+  TComponentBuilder = class;
+  TComponentBuilderObjProc = procedure(const ABuiler: TComponentBuilder) of object;
+  TComponentBuilderProc = procedure(const ABuiler: TComponentBuilder);
+
   TComponentBuilder = class
   private
     FOwner: TComponent;
@@ -346,6 +350,8 @@ type
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
+    function External(const AProc: TComponentBuilderObjProc): TComponentBuilder; overload;
+    function External(const AProc: TComponentBuilderProc): TComponentBuilder; overload;
     {$IFDEF FPC}generic{$ENDIF}
     function GetComponent<T: TComponent>(const AName: string): T; overload;
     function GetComponent(const AName: string): TComponent; overload;
@@ -355,6 +361,10 @@ type
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TComponent read GetItem; default;
   end;
+
+  TMenuBuilder = class;
+  TMenuBuilderObjProc = procedure(const ABuiler: TMenuBuilder) of object;
+  TMenuBuilderProc = procedure(const ABuiler: TMenuBuilder);
 
   TMenuBuilder = class
   private
@@ -368,6 +378,8 @@ type
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
     function WithOwner(AOwner: TComponent): TMenuBuilder;
+    function External(const AProc: TMenuBuilderObjProc): TMenuBuilder; overload;
+    function External(const AProc: TMenuBuilderProc): TMenuBuilder; overload;
     function AddMenu(AMenuInfo: TMenuInfo): TMenuBuilder;
     function AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
     function NextLevel(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
@@ -381,6 +393,10 @@ type
     property CurrentLevel: TMenuBuilderLevel read GetCurrenteLevel;
     property Registry: TComponentRegistry read GetComponentRegistry;
   end;
+
+  TControlBuilder = class;
+  TControlBuilderObjProc = procedure(const ABuiler: TControlBuilder) of object;
+  TControlBuilderProc = procedure(const ABuiler: TControlBuilder);
 
   TControlBuilder = class
   private
@@ -406,6 +422,8 @@ type
     function GetControl<T: TControl>(const AName: string): T; overload;
     function GetControl(const AName: string): TControl; overload;
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
+    function External(const AProc: TControlBuilderObjProc): TControlBuilder; overload;
+    function External(const AProc: TControlBuilderProc): TControlBuilder; overload;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlBuilder;
     function NextLevel(AGroupName: string=''): TControlBuilder; overload;
     function NextLevel(ADirection: TControlBuilderDirection;
@@ -1617,6 +1635,20 @@ begin
   CurrentLevel.MaxControlWidth := 0;
 end;
 
+function TControlBuilder.External(const AProc: TControlBuilderObjProc): TControlBuilder;
+begin
+  Result := Self;
+  if Assigned(AProc) then
+    AProc(Self);
+end;
+
+function TControlBuilder.External(const AProc: TControlBuilderProc): TControlBuilder;
+begin
+  Result := Self;
+  if Assigned(AProc) then
+    AProc(Self);
+end;
+
 function TControlBuilder.SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlBuilder;
 begin
   Result := Self;
@@ -2317,6 +2349,20 @@ begin
   Result := Registry.GetComponent(AName);
 end;
 
+function TComponentBuilder.External(const AProc: TComponentBuilderObjProc): TComponentBuilder; overload;
+begin
+  Result := Self;
+  if Assigned(AProc) then
+    AProc(Self);
+end;
+
+function TComponentBuilder.External(const AProc: TComponentBuilderProc): TComponentBuilder; overload;
+begin
+  Result := Self;
+  if Assigned(AProc) then
+    AProc(Self);
+end;
+
 {$IFDEF FPC}generic{$ENDIF}
 function TComponentBuilder.GetComponent<T>(const AName: string): T;
 begin
@@ -2658,6 +2704,20 @@ function TMenuBuilder.WithOwner(AOwner: TComponent): TMenuBuilder;
 begin
   Result := Self;
   FOwner := AOwner;
+end;
+
+function TMenuBuilder.External(const AProc: TMenuBuilderObjProc): TMenuBuilder; overload;
+begin
+  Result := Self;
+  if Assigned(AProc) then
+    AProc(Self);
+end;
+
+function TMenuBuilder.External(const AProc: TMenuBuilderProc): TMenuBuilder; overload;
+begin
+  Result := Self;
+  if Assigned(AProc) then
+    AProc(Self);
 end;
 
 { TMenuInfo }
