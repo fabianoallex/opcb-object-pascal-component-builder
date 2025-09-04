@@ -1,0 +1,12 @@
+object FMain: TFMain
+  Left = 2117
+  Height = 192
+  Top = 112
+  Width = 256
+  Caption = 'FMain'
+  Position = poMainFormCenter
+  LCLVersion = '4.0.0.4'
+  WindowState = wsMaximized
+  OnCreate = FormCreate
+  OnShow = FormShow
+end

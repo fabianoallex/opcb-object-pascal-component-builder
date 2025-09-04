@@ -1,0 +1,9 @@
+object DMDatabase: TDMDatabase
+  OnCreate = DataModuleCreate
+  OnDestroy = DataModuleDestroy
+  OldCreateOrder = False
+  Height = 150
+  HorizontalOffset = 2233
+  VerticalOffset = 204
+  Width = 248
+end
