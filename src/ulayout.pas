@@ -79,6 +79,20 @@ type
     class function None: TOptionalSingle; static;
   end;
 
+  { TOptionalInteger }
+
+  TOptionalInteger = record
+    HasValue: Boolean;
+    Value: Integer;
+    {$IFDEF FPC}
+    class operator :=(AValue: Integer): TOptionalInteger;
+    {$ELSE}
+    class operator Implicit(AValue: Integer): TOptionalInteger;
+    {$ENDIF}
+    class function Some(AValue: Integer): TOptionalInteger; static;
+    class function None: TOptionalInteger; static;
+  end;
+
   { TGridTrackInfo}
 
   TGridTrackInfo = record
@@ -486,6 +500,30 @@ begin
 end;
 
 class function TOptionalSingle.None: TOptionalSingle;
+begin
+  Result.Value := -1;
+  Result.HasValue := False;
+end;
+
+{ TOptionalInteger }
+
+
+{$IFDEF FPC}
+class operator TOptionalInteger.:=(AValue: Integer): TOptionalInteger;
+{$ELSE}
+class operator TOptionalInteger.Implicit(AValue: Integer): TOptionalInteger;
+{$ENDIF}
+begin
+  Result := TOptionalInteger.Some(AValue);
+end;
+
+class function TOptionalInteger.Some(AValue: Integer): TOptionalInteger;
+begin
+  Result.HasValue := True;
+  Result.Value := AValue;
+end;
+
+class function TOptionalInteger.None: TOptionalInteger;
 begin
   Result.Value := -1;
   Result.HasValue := False;

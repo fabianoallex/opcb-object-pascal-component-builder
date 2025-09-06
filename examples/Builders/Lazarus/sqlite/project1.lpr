@@ -11,8 +11,7 @@ uses
   {$ENDIF}
   Interfaces, // this includes the LCL widgetset
   Forms, UFMain, UDMDatabase, UDBUser, UUserSession, UFormLogin, UFormUsers,
-  UFormCRUD, UDBEntity
-  { you can add units after this };
+  UFormCRUD, UDBEntity;
 
 {$R *.res}
 

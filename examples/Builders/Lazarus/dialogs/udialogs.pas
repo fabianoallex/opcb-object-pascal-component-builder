@@ -46,7 +46,7 @@ begin
   ControlBuilder := TControlBuilder.Create(AContextKey);
 
   if AControlInfo.Name = '' then
-    AControlInfo.Name := 'Control';
+    AControlInfo.WithName('Control');
 
   ControlName := AControlInfo.Name;
 
@@ -56,10 +56,10 @@ begin
     .SetTopLeft(20, 20)
     .NextLevel(cpdVertical);
 
-  if AMsg <> '' then
-    ControlBuilder.AddControl(TControlInfo.Create(TLabel, 'LabelMessage').WithCaption(AMsg));
+      if AMsg <> '' then
+        ControlBuilder.AddControl(TControlInfo.Create(TLabel, 'LabelMessage').WithCaption(AMsg));
 
-  ControlBuilder
+   ControlBuilder
       .AddControl(AControlInfo)
     .PreviousLevel
     .Break

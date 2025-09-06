@@ -103,6 +103,7 @@ type
     FSetupProc: TMenuItemSetupProc;
     FName: string;
     FCaption: TOptionalString;
+    FImageIndex: TOptionalInteger;
     FTargetField: Pointer;
   public
     constructor Create(AMenuItem: TMenuItem); overload;
@@ -115,6 +116,7 @@ type
     function Setup(AProc: TMenuItemSetupProc): TMenuItemInfo;
     function WithName(AName: string): TMenuItemInfo;
     function WithCaption(ACaption: string): TMenuItemInfo;
+    function WithImageIndex(AImageIndex: Integer): TMenuItemInfo;
     function WithOnClick(AOnClick: TNotifyEvent): TMenuItemInfo;
     function CreateMenuItem(AOwner: TComponent; const AMenuItemName: string): TMenuItem;
     property MenuItem: TMenuItem read FMenuItem;
@@ -122,6 +124,7 @@ type
     property SetupProc: TMenuItemSetupProc read FSetupProc;
     property Name: string read FName;
     property Caption: TOptionalString read FCaption;
+    property ImageIndex: TOptionalInteger read FImageIndex;
     property OnClick: TNotifyEvent read FOnClick;
   end;
 
@@ -2800,6 +2803,7 @@ begin
   FMenuItemClass := TMenuItemClass(AMenuItem.ClassType);
   FName := AMenuItem.Name;
   FCaption := TOptionalString.None;
+  FImageIndex := TOptionalInteger.None;
   FSetupProc := nil;
   FTargetField := nil;
 end;
@@ -2826,6 +2830,7 @@ begin
   FMenuItemClass := AClass;
   FName := AName;
   FCaption := TOptionalString.None;;
+  FImageIndex := TOptionalInteger.None;
   FSetupProc := nil;
   FTargetField := nil;
 end;
@@ -2856,6 +2861,9 @@ begin
       Result.Caption := Caption.Value;
       {$ENDIF}
 
+    if ImageIndex.HasValue then
+      Result.ImageIndex := ImageIndex.Value;
+
     Result.OnClick := OnClick;
 
     if Assigned(FTargetField) then
@@ -2878,6 +2886,12 @@ function TMenuItemInfo.WithCaption(ACaption: string): TMenuItemInfo;
 begin
   Result := Self;
   FCaption := ACaption;
+end;
+
+function TMenuItemInfo.WithImageIndex(AImageIndex: Integer): TMenuItemInfo;
+begin
+  Result := Self;
+  FImageIndex := AImageIndex;
 end;
 
 function TMenuItemInfo.WithOnClick(AOnClick: TNotifyEvent): TMenuItemInfo;

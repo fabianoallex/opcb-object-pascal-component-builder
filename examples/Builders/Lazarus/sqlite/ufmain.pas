@@ -6,7 +6,7 @@ interface
 
 uses
   Classes, SysUtils, sqlite3conn, sqldb, db, Forms, Controls, Graphics, Dialogs,
-  Buttons, ComCtrls, ExtCtrls, Menus, ActnList, OPCB, UFormUsers;
+  Buttons, ComCtrls, ExtCtrls, Menus, ActnList, StdCtrls, OPCB, UFormUsers;
 
 type
 
@@ -17,6 +17,7 @@ type
     procedure FormShow(Sender: TObject);
   private
     FFormUsers: TFormUsers2;
+    FMenuImages: TImageList;
     FPageControl: TPageControl;
     FStatusPanelConnected: TStatusPanel;
     FStatusPanelUser: TStatusPanel;
@@ -24,19 +25,19 @@ type
     procedure MenuItemLogoffClick(ASender: TObject);
     procedure MenuItemUsersClick(ASender: TObject);
     procedure SetFormUsers(AValue: TFormUsers2);
-    procedure SetPageControl(AValue: TPageControl);
-    procedure SetStatusPanelConnected(AValue: TStatusPanel);
-    procedure SetStatusPanelUser(AValue: TStatusPanel);
+    procedure SetupMainMenu(AMenu: TMenu);
+    procedure SetupMenuImages(AComponent: TComponent);
     procedure UpdateStatusBar;
     function AddTabSheet: TTabSheet;
   private
     procedure BuildForm;
     procedure SetupStatusBar(AControl: TControl);
     procedure ShowLogin;
-    property PageControl: TPageControl read FPageControl write SetPageControl;
-    property StatusPanelUser: TStatusPanel read FStatusPanelUser write SetStatusPanelUser;
-    property StatusPanelConnected: TStatusPanel read FStatusPanelConnected write SetStatusPanelConnected;
+    property PageControl: TPageControl read FPageControl;
+    property StatusPanelUser: TStatusPanel read FStatusPanelUser;
+    property StatusPanelConnected: TStatusPanel read FStatusPanelConnected;
     property FormUsers: TFormUsers2 read FFormUsers write SeTFormUsers;
+    property MenuImages: TImageList read FMenuImages;
   public
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   end;
@@ -70,21 +71,82 @@ begin
   StatusBar := (AControl as TStatusBar);
   StatusBar.SimplePanel := False;
 
-  Self.StatusPanelUser := StatusBar.Panels.Add;
-  Self.StatusPanelUser.Width := 150;
+  FStatusPanelUser := StatusBar.Panels.Add;
+  FStatusPanelUser.Width := 150;
 
-  Self.StatusPanelConnected := StatusBar.Panels.Add;
-  Self.StatusPanelConnected.Width := 150;
+  FStatusPanelConnected := StatusBar.Panels.Add;
+  FStatusPanelConnected.Width := 150;
+end;
+
+procedure TFMain.SetupMenuImages(AComponent: TComponent);
+var
+  ImageList: TImageList;
+  Picture: TPicture;
+
+  procedure AddFromFile(AFileName: string);
+  var
+    srcBmp: TBitmap;
+  begin
+    Picture.LoadFromFile(AFileName);
+    SrcBmp := TBitmap.Create;
+    try
+      SrcBmp.Assign(Picture.Graphic);
+      ImageList.Add(SrcBmp, nil);
+    finally
+      SrcBmp.Free;
+    end;
+  end;
+
+begin
+  ImageList := (AComponent as TImageList);
+  ImageList.Width := 16;
+  ImageList.Height := 16;
+
+  Picture := TPicture.Create;
+  try
+    AddFromFile('img.user.png');
+    AddFromFile('img.logout.png');
+    AddFromFile('img.close.png');
+    AddFromFile('img.info.png');
+  finally
+    Picture.Free;
+  end;
+end;
+
+procedure TFMain.SetupMainMenu(AMenu: TMenu);
+begin
+  AMenu.Images := FMenuImages;
 end;
 
 procedure TFMain.BuildForm;
 var
-  ControlBuilder: TControlBuilder;
-  MenuBuilder: TMenuBuilder;
+  Builders: TOPCBBuilders;
 begin
-  ControlBuilder := TControlBuilder.Create(Self.Name);
+  Builders := TOPCBBuilders.Create;
+
   try
-    ControlBuilder
+    Builders.AsComponentBuilder
+      .WithOwner(Self)
+      .Add(TComponentInfo.Create(TImageList, FMenuImages).Setup(@SetupMenuImages))
+    ;
+
+    Builders.AsMenuBuilder
+      .WithOwner(Self)
+      .AddMenu(TMenuInfo.Create(TMainMenu).Setup(@SetupMainMenu))
+        .NextLevel(TMenuItemInfo.Create.WithCaption('Aplicação'))
+          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Logoff').WithOnClick(@MenuItemLogoffClick).WithImageIndex(1))
+          .AddMenuItem(TMenuItemInfo.Create.WithCaption('-'))
+          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Fechar').WithOnClick(@MenuItemCloseClick).WithImageIndex(2))
+        .PreviousLevel
+        .NextLevel(TMenuItemInfo.Create.WithCaption('Cadastros'))
+          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Usuários').WithOnClick(@MenuItemUsersClick).WithImageIndex(0))
+        .PreviousLevel
+        .NextLevel(TMenuItemInfo.Create.WithCaption('Ajuda'))
+          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Sobre').WithImageIndex(3))
+        .PreviousLevel
+    ;
+
+    Builders.AsControlBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
@@ -94,28 +156,7 @@ begin
       .PreviousLevel
     ;
   finally
-    ControlBuilder.Free;
-  end;
-
-  MenuBuilder := TMenuBuilder.Create(Self.Name);
-  try
-    MenuBuilder
-      .WithOwner(Self)
-      .AddMenu(TMenuInfo.Create(TMainMenu))
-        .NextLevel(TMenuItemInfo.Create.WithCaption('Aplicação'))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Logoff').WithOnClick(@MenuItemLogoffClick))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('-'))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Fechar').WithOnClick(@MenuItemCloseClick))
-        .PreviousLevel
-        .NextLevel(TMenuItemInfo.Create.WithCaption('Cadastros'))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Usuários').WithOnClick(@MenuItemUsersClick))
-        .PreviousLevel
-        .NextLevel(TMenuItemInfo.Create.WithCaption('Ajuda'))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Sobre'))
-        .PreviousLevel
-    ;
-  finally
-    MenuBuilder.Free;
+    Builders.Free;
   end;
 end;
 
@@ -137,7 +178,7 @@ begin
   end;
 end;
 
-procedure TFMain.SeTFormUsers(AValue: TFormUsers2);
+procedure TFMain.SetFormUsers(AValue: TFormUsers2);
 begin
   if FFormUsers = AValue then Exit;
   FFormUsers := AValue;
@@ -196,24 +237,6 @@ procedure TFMain.FormShow(Sender: TObject);
 begin
   ShowLogin;
   UpdateStatusBar;
-end;
-
-procedure TFMain.SetStatusPanelConnected(AValue: TStatusPanel);
-begin
-  if FStatusPanelConnected = AValue then Exit;
-  FStatusPanelConnected := AValue;
-end;
-
-procedure TFMain.SetPageControl(AValue: TPageControl);
-begin
-  if FPageControl = AValue then Exit;
-  FPageControl := AValue;
-end;
-
-procedure TFMain.SetStatusPanelUser(AValue: TStatusPanel);
-begin
-  if FStatusPanelUser = AValue then Exit;
-  FStatusPanelUser := AValue;
 end;
 
 {$R *.lfm}
