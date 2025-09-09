@@ -1,8 +1,8 @@
 object FMain: TFMain
-  Left = 456
-  Height = 192
-  Top = 249
-  Width = 256
+  Left = 2326
+  Height = 309
+  Top = 239
+  Width = 277
   Caption = 'FMain'
   Position = poMainFormCenter
   LCLVersion = '4.0.0.4'

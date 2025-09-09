@@ -8,9 +8,11 @@
       <Unit>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="44" Y="17"/>
-        <UsageCount Value="146"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="6"/>
+        <CursorPos X="23" Y="14"/>
+        <UsageCount Value="215"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="ufmain.pas"/>
@@ -19,9 +21,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFMain"/>
-        <TopLine Value="2"/>
-        <CursorPos X="6" Y="16"/>
-        <UsageCount Value="146"/>
+        <TopLine Value="10"/>
+        <CursorPos Y="28"/>
+        <UsageCount Value="215"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -34,7 +36,8 @@
         <UnitName Value="UDMDatabase"/>
         <EditorIndex Value="1"/>
         <TopLine Value="10"/>
-        <UsageCount Value="146"/>
+        <CursorPos X="44" Y="29"/>
+        <UsageCount Value="215"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -43,39 +46,37 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDBUser"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="10"/>
         <CursorPos X="69" Y="35"/>
-        <UsageCount Value="146"/>
+        <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="uusersession.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UUserSession"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="10"/>
         <CursorPos X="25" Y="75"/>
-        <UsageCount Value="146"/>
+        <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="uformlogin.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormLogin"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="60"/>
         <CursorPos X="30" Y="70"/>
-        <UsageCount Value="146"/>
+        <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="uformusers.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormUsers"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="26"/>
-        <CursorPos X="33" Y="21"/>
-        <UsageCount Value="146"/>
+        <TopLine Value="64"/>
+        <CursorPos X="20" Y="107"/>
+        <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -83,9 +84,9 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormCRUD"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="82"/>
-        <CursorPos X="11" Y="218"/>
-        <UsageCount Value="64"/>
+        <TopLine Value="176"/>
+        <CursorPos X="78" Y="218"/>
+        <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -93,16 +94,26 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDBEntity"/>
         <EditorIndex Value="5"/>
+        <TopLine Value="29"/>
         <CursorPos X="15" Y="19"/>
-        <UsageCount Value="29"/>
+        <UsageCount Value="170"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
+        <Filename Value="ubookcard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UBookCard"/>
+        <EditorIndex Value="-1"/>
+        <TopLine Value="127"/>
+        <CursorPos X="95" Y="159"/>
+        <UsageCount Value="161"/>
+      </Unit>
+      <Unit>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <EditorIndex Value="8"/>
-        <TopLine Value="1385"/>
-        <CursorPos X="54" Y="1401"/>
-        <UsageCount Value="74"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="544"/>
+        <CursorPos X="12" Y="566"/>
+        <UsageCount Value="108"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -111,78 +122,25 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="150"/>
         <CursorPos X="3" Y="168"/>
-        <UsageCount Value="17"/>
+        <UsageCount Value="3"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
         <UnitName Value="Controls"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1170"/>
-        <CursorPos X="3" Y="1188"/>
-        <UsageCount Value="10"/>
-      </Unit>
-      <Unit>
-        <Filename Value="C:\lazarus4.0\lcl\lclclasses.pp"/>
-        <UnitName Value="LCLClasses"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="27"/>
-        <CursorPos X="3" Y="45"/>
-        <UsageCount Value="10"/>
-      </Unit>
-      <Unit>
-        <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="101"/>
-        <CursorPos X="3" Y="118"/>
-        <UsageCount Value="12"/>
-      </Unit>
-      <Unit>
-        <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\fcl-db\src\base\db.pas"/>
-        <UnitName Value="DB"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="46"/>
-        <CursorPos X="3" Y="61"/>
-        <UsageCount Value="2"/>
-      </Unit>
-      <Unit>
-        <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
-        <UnitName Value="Generics.Collections"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="1417"/>
-        <CursorPos Y="1443"/>
-        <UsageCount Value="11"/>
+        <EditorIndex Value="12"/>
+        <TopLine Value="2413"/>
+        <CursorPos X="15" Y="2431"/>
+        <UsageCount Value="68"/>
+        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\..\src\ulayout.pas"/>
         <UnitName Value="ULayout"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="14"/>
         <TopLine Value="77"/>
         <CursorPos X="38" Y="88"/>
-        <UsageCount Value="11"/>
+        <UsageCount Value="82"/>
         <Loaded Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="C:\lazarus4.0\lcl\menus.pp"/>
-        <UnitName Value="Menus"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="419"/>
-        <CursorPos X="3" Y="440"/>
-        <UsageCount Value="7"/>
-      </Unit>
-      <Unit>
-        <Filename Value="C:\lazarus4.0\lcl\include\application.inc"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="2252"/>
-        <CursorPos X="3" Y="2263"/>
-        <UsageCount Value="7"/>
-      </Unit>
-      <Unit>
-        <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\fcl-db\src\sqldb\sqldb.pp"/>
-        <UnitName Value="SQLDB"/>
-        <EditorIndex Value="-1"/>
-        <TopLine Value="631"/>
-        <CursorPos X="14" Y="645"/>
-        <UsageCount Value="2"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\dbgrids.pas"/>
@@ -190,136 +148,154 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="41"/>
         <CursorPos X="25" Y="41"/>
-        <UsageCount Value="51"/>
+        <UsageCount Value="37"/>
       </Unit>
       <Unit>
-        <Filename Value="udbcrud.pas"/>
-        <UnitName Value="UDBCRUD"/>
-        <EditorIndex Value="-1"/>
-        <CursorPos X="3" Y="14"/>
-        <UsageCount Value="10"/>
+        <Filename Value="C:\lazarus4.0\lcl\extctrls.pp"/>
+        <UnitName Value="ExtCtrls"/>
+        <EditorIndex Value="7"/>
+        <TopLine Value="1139"/>
+        <CursorPos X="17" Y="1157"/>
+        <UsageCount Value="69"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\lcl\include\custompanel.inc"/>
+        <EditorIndex Value="8"/>
+        <TopLine Value="21"/>
+        <CursorPos X="3" Y="26"/>
+        <UsageCount Value="69"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\lcl\include\wincontrol.inc"/>
+        <EditorIndex Value="13"/>
+        <TopLine Value="7912"/>
+        <CursorPos X="3" Y="7921"/>
+        <UsageCount Value="56"/>
+        <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="..\..\..\..\src\ulayout.pas"/>
-        <Caret Line="523" Column="27" TopLine="512"/>
+        <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
+        <Caret Line="2431" Column="15" TopLine="2413"/>
       </Position>
       <Position>
-        <Filename Value="..\..\..\..\src\ulayout.pas"/>
-        <Caret Line="79" Column="22" TopLine="68"/>
+        <Filename Value="C:\lazarus4.0\lcl\include\wincontrol.inc"/>
+        <Caret Line="7921" Column="3" TopLine="7912"/>
       </Position>
       <Position>
-        <Filename Value="..\..\..\..\src\ulayout.pas"/>
-        <Caret Line="505" Column="28" TopLine="494"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\ulayout.pas"/>
-        <Caret Line="93" Column="22" TopLine="67"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\ulayout.pas"/>
-        <Caret Line="529" Column="28" TopLine="528"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\ulayout.pas"/>
-        <Caret Line="512" Column="40" TopLine="482"/>
+        <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
+        <Caret Line="2431" Column="15" TopLine="2413"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="109" Column="35" TopLine="98"/>
+        <Caret Line="1200" Column="34" TopLine="1177"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2804" Column="39" TopLine="2798"/>
+        <Caret Line="1201" Column="17" TopLine="1177"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="110" Column="17" TopLine="91"/>
+        <Caret Line="510" Column="14" TopLine="494"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2827" Column="3" TopLine="2825"/>
+        <Caret Line="1243" Column="5" TopLine="1232"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="109" Column="17" TopLine="92"/>
+        <Caret Line="427" Column="14" TopLine="410"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2804" Column="3" TopLine="2798"/>
+        <Caret Line="1420" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="110" Column="17" TopLine="91"/>
+        <Caret Line="1420" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2831" Column="40" TopLine="2825"/>
+        <Caret Line="1422" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="111" Column="17" TopLine="92"/>
+        <Caret Line="1424" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2839" Column="3" TopLine="2836"/>
+        <Caret Line="1425" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="112" Column="17" TopLine="93"/>
+        <Caret Line="1426" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2811" Column="3" TopLine="2809"/>
+        <Caret Line="1425" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="113" Column="17" TopLine="94"/>
+        <Caret Line="1426" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2817" Column="3" TopLine="2815"/>
+        <Caret Line="1425" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="114" Column="17" TopLine="95"/>
+        <Caret Line="1426" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2822" Column="3" TopLine="2820"/>
+        <Caret Line="1425" TopLine="1407"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="119" Column="49" TopLine="96"/>
+        <Caret Line="1418" TopLine="1407"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="1415" TopLine="1407"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="1428" TopLine="1407"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="1423" Column="22" TopLine="1407"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="1422" TopLine="1407"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="150" Column="17" TopLine="135"/>
       </Position>
       <Position>
         <Filename Value="ufmain.pas"/>
-        <Caret Line="143" Column="119" TopLine="119"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="121" Column="24" TopLine="102"/>
+        <Caret Line="125" TopLine="113"/>
       </Position>
       <Position>
         <Filename Value="ufmain.pas"/>
-        <Caret Line="103" Column="25" TopLine="122"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="121" Column="16" TopLine="98"/>
-      </Position>
-      <Position>
-        <Filename Value="uformusers.pas"/>
-        <Caret Line="68" Column="39" TopLine="23"/>
+        <Caret Line="166" Column="76" TopLine="146"/>
       </Position>
       <Position>
         <Filename Value="ufmain.pas"/>
-        <Caret Line="39" Column="5" TopLine="11"/>
+        <Caret Line="52" Column="37" TopLine="35"/>
       </Position>
       <Position>
         <Filename Value="ufmain.pas"/>
-        <Caret Line="16" Column="6" TopLine="2"/>
+        <Caret Line="122" TopLine="106"/>
+      </Position>
+      <Position>
+        <Filename Value="ufmain.pas"/>
+        <Caret Line="28" TopLine="10"/>
       </Position>
     </JumpHistory>
     <RunParams>

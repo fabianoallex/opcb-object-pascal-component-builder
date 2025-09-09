@@ -152,7 +152,8 @@ begin
       .SetTopLeft(10, 10)
       .AddControl(TControlInfo.Create(TStatusBar).Setup(@SetupStatusBar))
       .NextLevel(TControlInfo.Create(TPageControl, FPageControl).WithAlign(alClient))
-        .AddControl(TControlInfo.Create(TTabSheet).WithCaption('Dashboard'))
+        .NextLevel(TControlInfo.Create(TTabSheet).WithCaption('Dashboard'))
+        .PreviousLevel
       .PreviousLevel
     ;
   finally

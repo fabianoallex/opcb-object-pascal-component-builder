@@ -86,6 +86,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDBEntity"/>
       </Unit>
+      <Unit>
+        <Filename Value="ubookcard.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UBookCard"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

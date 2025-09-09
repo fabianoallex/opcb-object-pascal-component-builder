@@ -1240,7 +1240,7 @@ begin
     + AExtraHeight;
   {$ELSE}
   CurrentLevel.Parent.Height := Trunc(
-    GetControlsBounds([CurrentLevel.GroupName]).Height
+    GetControlsBounds([CurrentLevel.GroupName]).Bottom
     + AExtraHeight
   );
   {$ENDIF}
@@ -1264,7 +1264,7 @@ begin
     + AExtraWidth;
   {$ELSE}
   CurrentLevel.Parent.Width := Trunc(
-    GetControlsBounds([CurrentLevel.GroupName]).Width
+    GetControlsBounds([CurrentLevel.GroupName]).Right
     + AExtraWidth
   );
   {$ENDIF}
