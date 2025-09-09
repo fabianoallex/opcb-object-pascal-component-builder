@@ -45,7 +45,7 @@ begin
   ControlBuilder := TControlBuilder.Create(AContextKey);
 
   if AControlInfo.Name = '' then
-    AControlInfo.Name := 'Control';
+    AControlInfo.WithName('Control');
 
   ControlName := AControlInfo.Name;
 

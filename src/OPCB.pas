@@ -489,6 +489,15 @@ type
     function AddControls(AControlCreateInfos: array of TControlInfo): TControlBuilder; overload;
     function AddControls(AControlCreateInfos: array of TControlInfo;
       const AGroups: array of string): TControlBuilder; overload;
+
+    function AddControl(AClass: TControlClass; const AName: string=''): TControlBuilder; overload;
+    function AddControl(AClass: TControlClass; const AName: string; out Reference): TControlBuilder; overload;
+    function AddControl(AClass: TControlClass; out Reference): TControlBuilder; overload;
+
+    function AddControl(AClass: TControlClass; const AName: string; AProc: TControlSetupProc): TControlBuilder; overload;
+    function AddControl(AClass: TControlClass; const AName: string; out Reference; AProc: TControlSetupProc): TControlBuilder; overload;
+    function AddControl(AClass: TControlClass; out Reference; AProc: TControlSetupProc): TControlBuilder; overload;
+
     function AddInLevel(const AControls: array of TControlInfo;
       ADirection: TControlBuilderDirection): TControlBuilder;
     function GetNamedControl(const AName: string): TControl;
@@ -960,7 +969,7 @@ begin
   Create(TRegistryContextHandle.Create(ARegistryContextKey));
 end;
 
-constructor TControlBuilder.Create(ARegistryContextHandle: IRegistryContextHandle); overload;
+constructor TControlBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
 begin
   FRegistryContextHandle := ARegistryContextHandle;
   FGroups := TControlGroupMap.Create;
@@ -1019,6 +1028,36 @@ begin
   AddControlToGroups(Control, AGroups);
 
   MoveTopLeftAfterControl(Control);
+end;
+
+function TControlBuilder.AddControl(AClass: TControlClass; const AName: string=''): TControlBuilder;
+begin
+  Result := AddControl(TControlInfo.Create(AClass, AName));
+end;
+
+function TControlBuilder.AddControl(AClass: TControlClass; const AName: string; out Reference): TControlBuilder;
+begin
+  Result := AddControl(TControlInfo.Create(AClass, AName, Reference));
+end;
+
+function TControlBuilder.AddControl(AClass: TControlClass; out Reference): TControlBuilder;
+begin
+  Result := AddControl(TControlInfo.Create(AClass, Reference));
+end;
+
+function TControlBuilder.AddControl(AClass: TControlClass; const AName: string; AProc: TControlSetupProc): TControlBuilder;
+begin
+  Result := AddControl(TControlInfo.Create(AClass, AName).Setup(AProc));
+end;
+
+function TControlBuilder.AddControl(AClass: TControlClass; const AName: string; out Reference; AProc: TControlSetupProc): TControlBuilder;
+begin
+  Result := AddControl(TControlInfo.Create(AClass, AName, Reference).Setup(AProc));
+end;
+
+function TControlBuilder.AddControl(AClass: TControlClass; out Reference; AProc: TControlSetupProc): TControlBuilder;
+begin
+  Result := AddControl(TControlInfo.Create(AClass, Reference).Setup(AProc));
 end;
 
 function TControlBuilder.AddControl(
@@ -2337,7 +2376,7 @@ begin
   Create(TRegistryContextHandle.Create(ARegistryContextKey))
 end;
 
-constructor TComponentBuilder.Create(ARegistryContextHandle: IRegistryContextHandle); overload;
+constructor TComponentBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
 begin
   FRegistryContextHandle := ARegistryContextHandle;
 end;
@@ -2352,14 +2391,14 @@ begin
   Result := Registry.GetComponent(AName);
 end;
 
-function TComponentBuilder.External(const AProc: TComponentBuilderObjProc): TComponentBuilder; overload;
+function TComponentBuilder.External(const AProc: TComponentBuilderObjProc): TComponentBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TComponentBuilder.External(const AProc: TComponentBuilderProc): TComponentBuilder; overload;
+function TComponentBuilder.External(const AProc: TComponentBuilderProc): TComponentBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
@@ -2627,7 +2666,7 @@ begin
   Create(TRegistryContextHandle.Create(ARegistryContextKey));
 end;
 
-constructor TMenuBuilder.Create(ARegistryContextHandle: IRegistryContextHandle); overload;
+constructor TMenuBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
 begin
   FRegistryContextHandle := ARegistryContextHandle;
   FLevelStack := TMenuBuilderLevelStack.Create(True);
@@ -2709,14 +2748,14 @@ begin
   FOwner := AOwner;
 end;
 
-function TMenuBuilder.External(const AProc: TMenuBuilderObjProc): TMenuBuilder; overload;
+function TMenuBuilder.External(const AProc: TMenuBuilderObjProc): TMenuBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TMenuBuilder.External(const AProc: TMenuBuilderProc): TMenuBuilder; overload;
+function TMenuBuilder.External(const AProc: TMenuBuilderProc): TMenuBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
