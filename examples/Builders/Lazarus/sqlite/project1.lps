@@ -8,7 +8,6 @@
       <Unit>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
         <CursorPos X="23" Y="14"/>
         <UsageCount Value="215"/>
@@ -21,8 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFMain"/>
-        <TopLine Value="10"/>
-        <CursorPos Y="28"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="76"/>
+        <CursorPos X="16" Y="107"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -96,7 +96,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="29"/>
         <CursorPos X="15" Y="19"/>
-        <UsageCount Value="170"/>
+        <UsageCount Value="197"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -106,12 +106,12 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="127"/>
         <CursorPos X="95" Y="159"/>
-        <UsageCount Value="161"/>
+        <UsageCount Value="188"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <EditorIndex Value="11"/>
-        <TopLine Value="544"/>
+        <TopLine Value="664"/>
         <CursorPos X="12" Y="566"/>
         <UsageCount Value="108"/>
         <Loaded Value="True"/>
@@ -122,7 +122,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="150"/>
         <CursorPos X="3" Y="168"/>
-        <UsageCount Value="3"/>
+        <UsageCount Value="0"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
@@ -130,7 +130,7 @@
         <EditorIndex Value="12"/>
         <TopLine Value="2413"/>
         <CursorPos X="15" Y="2431"/>
-        <UsageCount Value="68"/>
+        <UsageCount Value="82"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -139,7 +139,7 @@
         <EditorIndex Value="14"/>
         <TopLine Value="77"/>
         <CursorPos X="38" Y="88"/>
-        <UsageCount Value="82"/>
+        <UsageCount Value="96"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -148,7 +148,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="41"/>
         <CursorPos X="25" Y="41"/>
-        <UsageCount Value="37"/>
+        <UsageCount Value="34"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\extctrls.pp"/>
@@ -156,7 +156,7 @@
         <EditorIndex Value="7"/>
         <TopLine Value="1139"/>
         <CursorPos X="17" Y="1157"/>
-        <UsageCount Value="69"/>
+        <UsageCount Value="83"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -164,7 +164,7 @@
         <EditorIndex Value="8"/>
         <TopLine Value="21"/>
         <CursorPos X="3" Y="26"/>
-        <UsageCount Value="69"/>
+        <UsageCount Value="83"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -172,7 +172,7 @@
         <EditorIndex Value="13"/>
         <TopLine Value="7912"/>
         <CursorPos X="3" Y="7921"/>
-        <UsageCount Value="56"/>
+        <UsageCount Value="70"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>

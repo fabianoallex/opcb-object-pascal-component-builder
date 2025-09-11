@@ -43,8 +43,8 @@ begin
 
   ControlBuilder := TControlBuilder.Create(AContextKey);
 
-  if AControlInfo.Name.IsEmpty then
-    AControlInfo.Name := 'Control';
+  if AControlInfo.Name = '' then
+    AControlInfo.WithName('Control');
 
   ControlName := AControlInfo.Name;
 

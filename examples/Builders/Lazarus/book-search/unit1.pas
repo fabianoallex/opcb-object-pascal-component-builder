@@ -78,7 +78,6 @@ begin
   (AControl as TSearchPageNavigation).Results := 1;
   (AControl as TSearchPageNavigation).PageSize := 1;
   (AControl as TSearchPageNavigation).OnPageChange := @SearchNavigationPageChange;
-
   (AControl as TSearchPageNavigation).BevelOuter := bvNone;
 end;
 
@@ -87,8 +86,7 @@ begin
   SearchPageNavigation.Results := 0;
   SearchPageNavigation.CurrentPage := 1;
   OpenLibrarySearch.Search(
-    EditSearch.Text,
-    0,
+    EditSearch.Text, 0,
     ComboBoxPageSize.Items[ComboBoxPageSize.ItemIndex].ToInteger
   );
 end;

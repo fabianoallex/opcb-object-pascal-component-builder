@@ -16,7 +16,7 @@ uses
     Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus,
     {$ENDIF}
   {$ENDIF}
-  Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults;
+  Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults, OPCB.Optionals;
 
 type
   {$IFNDEF FPC}

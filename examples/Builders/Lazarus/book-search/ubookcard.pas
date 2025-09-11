@@ -5,7 +5,7 @@ unit UBookCard;
 interface
 
 uses
-  Classes, SysUtils, ExtCtrls, StdCtrls, OPCB, Controls;
+  Classes, SysUtils, ExtCtrls, StdCtrls, OPCB, Controls, Forms;
 
 type
 
@@ -26,7 +26,7 @@ type
 
   { TBookCard }
 
-  TBookCard = class(TPanel)
+  TBookCard = class(TScrollBox)
   private
     FImage: TImage;
     FLabelAuthor: TLabel;
@@ -221,8 +221,8 @@ var
   ControlBuilder: TControlBuilder;
 begin
   inherited Create(AOwner);
+  Self.HorzScrollBar.Visible := False;
   ControlBuilder := TControlBuilder.Create;
-
   try
     ControlBuilder
       .WithOwnerAndParent(Self, Self)

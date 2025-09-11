@@ -16,7 +16,7 @@ uses
     Vcl.Controls, Vcl.StdCtrls,
     {$ENDIF}
   {$ENDIF}
-  Classes, SysUtils, Generics.Collections, Generics.Defaults;
+  Classes, SysUtils, Generics.Collections, Generics.Defaults, OPCB.Optionals;
 
 type
   IGridItem = interface
@@ -35,63 +35,9 @@ type
 
   TItemAlignment = (laStretch, laCenter, laStart, laEnd);
 
-  TOptionalString = record
-    HasValue: Boolean;
-    Value: string;
-    {$IFDEF FPC}
-    class operator :=(AValue: string): TOptionalString;
-    {$ELSE}
-    class operator Implicit(AValue: string): TOptionalString;
-    {$ENDIF}
-    class function Some(AValue: string): TOptionalString; static;
-    class function None: TOptionalString; static;
-  end;
-
   //{$IFDEF FRAMEWORK_FMX}
   //TAlign = TAlignLayout;
   //{$ENDIF}
-
-  TOptionalAlign = record
-    HasValue: Boolean;
-    Value: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF};
-    {$IFDEF FPC}
-    class operator :=(AValue: TAlign): TOptionalAlign;
-    {$ELSE}
-    class operator Implicit(
-      AValue: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TOptionalAlign;
-    {$ENDIF}
-    class function Some(
-      AValue: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TOptionalAlign; static;
-    class function None: TOptionalAlign; static;
-  end;
-
-  { TOptionalInt }
-
-  TOptionalSingle = record
-    HasValue: Boolean;
-    Value: Single;
-    {$IFDEF FPC}
-    class operator :=(AValue: Single): TOptionalSingle;
-    {$ELSE}
-    class operator Implicit(AValue: Single): TOptionalSingle;
-    {$ENDIF}
-    class function Some(AValue: Single): TOptionalSingle; static;
-    class function None: TOptionalSingle; static;
-  end;
-
-  { TOptionalInteger }
-
-  TOptionalInteger = record
-    HasValue: Boolean;
-    Value: Integer;
-    {$IFDEF FPC}
-    class operator :=(AValue: Integer): TOptionalInteger;
-    {$ELSE}
-    class operator Implicit(AValue: Integer): TOptionalInteger;
-    {$ENDIF}
-    class function Some(AValue: Integer): TOptionalInteger; static;
-    class function None: TOptionalInteger; static;
-  end;
 
   { TGridTrackInfo}
 
@@ -481,52 +427,6 @@ begin
   FExtraWidth := ASettings.ExtraWidth;
   FHorizontalAlignment := ASettings.HorizontalAlignment;
   FVerticalAlignment := ASettings.VerticalAlignment;
-end;
-
-{ TOptionalInt }
-{$IFDEF FPC}
-class operator TOptionalSingle.:=(AValue: Single): TOptionalSingle;
-{$ELSE}
-class operator TOptionalSingle.Implicit(AValue: Single): TOptionalSingle;
-{$ENDIF}
-begin
-  Result := TOptionalSingle.Some(AValue);
-end;
-
-class function TOptionalSingle.Some(AValue: Single): TOptionalSingle;
-begin
-  Result.HasValue := True;
-  Result.Value := AValue;
-end;
-
-class function TOptionalSingle.None: TOptionalSingle;
-begin
-  Result.Value := -1;
-  Result.HasValue := False;
-end;
-
-{ TOptionalInteger }
-
-
-{$IFDEF FPC}
-class operator TOptionalInteger.:=(AValue: Integer): TOptionalInteger;
-{$ELSE}
-class operator TOptionalInteger.Implicit(AValue: Integer): TOptionalInteger;
-{$ENDIF}
-begin
-  Result := TOptionalInteger.Some(AValue);
-end;
-
-class function TOptionalInteger.Some(AValue: Integer): TOptionalInteger;
-begin
-  Result.HasValue := True;
-  Result.Value := AValue;
-end;
-
-class function TOptionalInteger.None: TOptionalInteger;
-begin
-  Result.Value := -1;
-  Result.HasValue := False;
 end;
 
 { TGridTrackInfo }
@@ -1941,58 +1841,6 @@ end;
 procedure TGridTrackInfoDictionary.MoveTrack(AFrom, ATo: Integer);
 begin
   Self.MoveKey(AFrom, ATo);
-end;
-
-{ TOptionalString }
-
-{$IFDEF FPC}
-class operator TOptionalString.:=(AValue: string): TOptionalString;
-{$ELSE}
-class operator TOptionalString.Implicit(AValue: string): TOptionalString;
-{$ENDIF}
-begin
-  Result := TOptionalString.Some(AValue);
-end;
-
-class function TOptionalString.None: TOptionalString;
-begin
-  Result.Value := EmptyStr;
-  Result.HasValue := False;
-end;
-
-class function TOptionalString.Some(AValue: string): TOptionalString;
-begin
-  Result.HasValue := True;
-  Result.Value := AValue;
-end;
-
-{ TOptionalAlign }
-
-{$IFDEF FPC}
-class operator TOptionalAlign.:=(AValue: TAlign): TOptionalAlign;
-{$ELSE}
-class operator TOptionalAlign.Implicit(
-  AValue: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TOptionalAlign;
-{$ENDIF}
-begin
-  Result := TOptionalAlign.Some(AValue);
-end;
-
-class function TOptionalAlign.None: TOptionalAlign;
-begin
-  {$IFDEF FRAMEWORK_FMX}
-  Result.Value := TAlignLayout.None;
-  {$ELSE}
-  Result.Value := alNone;
-  {$ENDIF}
-  Result.HasValue := False;
-end;
-
-class function TOptionalAlign.Some(
-  AValue: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TOptionalAlign;
-begin
-  Result.HasValue := True;
-  Result.Value := AValue;
 end;
 
 end.

@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="11"/>
         <CursorPos X="31" Y="14"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="115"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -20,9 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <TopLine Value="232"/>
-        <CursorPos Y="270"/>
-        <UsageCount Value="93"/>
+        <TopLine Value="103"/>
+        <CursorPos X="22" Y="92"/>
+        <UsageCount Value="115"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -31,9 +31,9 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UBookCard"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="212"/>
-        <CursorPos Y="250"/>
-        <UsageCount Value="93"/>
+        <TopLine Value="213"/>
+        <CursorPos X="48" Y="231"/>
+        <UsageCount Value="115"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -43,23 +43,24 @@
         <EditorIndex Value="8"/>
         <TopLine Value="106"/>
         <CursorPos X="24" Y="56"/>
-        <UsageCount Value="93"/>
+        <UsageCount Value="115"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="1029"/>
-        <CursorPos X="70" Y="1050"/>
+        <TopLine Value="258"/>
+        <CursorPos X="3" Y="133"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
           <IsVisibleTab Value="True"/>
+          <EditorIndex Value="-1"/>
           <WindowIndex Value="1"/>
           <TopLine Value="144"/>
           <CursorPos X="20" Y="154"/>
         </ExtraEditor1>
-        <UsageCount Value="47"/>
+        <UsageCount Value="58"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -69,7 +70,7 @@
         <EditorIndex Value="9"/>
         <TopLine Value="23"/>
         <CursorPos X="73" Y="48"/>
-        <UsageCount Value="85"/>
+        <UsageCount Value="107"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -78,7 +79,7 @@
         <UnitName Value="UOpenLibrarySearch"/>
         <EditorIndex Value="6"/>
         <CursorPos X="16" Y="46"/>
-        <UsageCount Value="82"/>
+        <UsageCount Value="104"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -87,7 +88,7 @@
         <EditorIndex Value="1"/>
         <TopLine Value="1100"/>
         <CursorPos X="3" Y="1120"/>
-        <UsageCount Value="37"/>
+        <UsageCount Value="49"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -96,7 +97,7 @@
         <EditorIndex Value="2"/>
         <TopLine Value="216"/>
         <CursorPos X="3" Y="235"/>
-        <UsageCount Value="37"/>
+        <UsageCount Value="49"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -105,7 +106,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="25"/>
         <CursorPos X="3" Y="44"/>
-        <UsageCount Value="37"/>
+        <UsageCount Value="49"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -113,7 +114,7 @@
         <EditorIndex Value="7"/>
         <TopLine Value="775"/>
         <CursorPos X="10" Y="794"/>
-        <UsageCount Value="34"/>
+        <UsageCount Value="45"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -122,88 +123,11 @@
         <EditorIndex Value="5"/>
         <TopLine Value="244"/>
         <CursorPos X="9" Y="276"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="42"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="180" Column="46" TopLine="59"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="46" Column="19" TopLine="17"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="167" Column="39" TopLine="163"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="46" Column="15" TopLine="27"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="167" Column="31" TopLine="148"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="52" Column="54" TopLine="27"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="224" Column="98" TopLine="195"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="184" Column="3" TopLine="175"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="185" Column="3" TopLine="174"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="196" Column="30" TopLine="179"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="201" Column="40" TopLine="182"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\lazarus4.0\lcl\graphics.pp"/>
-        <Caret Line="576" Column="14" TopLine="558"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\lazarus4.0\lcl\graphics.pp"/>
-        <Caret Line="59" Column="3" TopLine="39"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\lazarus4.0\lcl\graphics.pp"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="177" Column="20" TopLine="157"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2780" Column="54" TopLine="2759"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="266" Column="23" TopLine="250"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2015" Column="3" TopLine="2011"/>
-      </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <Caret Line="266" Column="25" TopLine="248"/>
@@ -241,6 +165,85 @@
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <Caret Line="495" Column="5" TopLine="478"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="250" TopLine="158"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="23" Column="19"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="131" Column="3" TopLine="129"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="23" Column="17" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="131" Column="3" TopLine="129"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="23" Column="17" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="131" Column="3" TopLine="129"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="24" Column="17" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="140" Column="3" TopLine="138"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="23" Column="16" TopLine="5"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="131" Column="3" TopLine="129"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="21" Column="17" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="125" Column="3" TopLine="123"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="23" Column="15" TopLine="2"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="131" Column="3" TopLine="129"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="29" Column="31" TopLine="22"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="261" Column="31" TopLine="55"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="56" Column="23" TopLine="38"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="92" Column="22" TopLine="103"/>
       </Position>
     </JumpHistory>
     <RunParams>
