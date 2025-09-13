@@ -321,6 +321,8 @@ type
     MaxControlWidth: Single;
     VerticalSpace: Single;
     HorizontalSpace: Single;
+    ControlHeight: TOptionalSingle;
+    ControlWidth: TOptionalSingle;
     constructor Create;
     function Clone: TControlBuilderLevel;
   end;
@@ -473,6 +475,14 @@ type
     function IncLeft(AIncLeft: Single): TControlBuilder;
     function IncTopLeft(AIncTop, AIncLeft: Single): TControlBuilder;
     function SetDirection(ADirection: TControlBuilderDirection): TControlBuilder;
+
+    function SetControlHeight(AHeight: Single): TControlBuilder;
+    function SetControlWidth(AWidth: Single): TControlBuilder;
+    function SetControlWidthAndHeight(AWidth, AHeight: Single): TControlBuilder;
+    function UnsetControlHeight: TControlBuilder;
+    function UnsetControlWidth: TControlBuilder;
+    function UnsetControlWidthAndHeight: TControlBuilder;
+
     function BreakLine: TControlBuilder; overload;
     function BreakColumn: TControlBuilder; overload;
     function Break: TControlBuilder; overload;
@@ -500,6 +510,9 @@ type
 
     function AddInLevel(const AControls: array of TControlInfo;
       ADirection: TControlBuilderDirection): TControlBuilder;
+
+
+
     function GetNamedControl(const AName: string): TControl;
     function MoveControls(const AControl: TControl; const ADX,
       ADY: Single): TControlBuilder; overload;
@@ -1000,10 +1013,27 @@ var
     Result := Info.CreateControl(FOwner, CurrentLevel.Parent, ControlName);
   end;
 
+  procedure ApplyDefaultControlSize;
+  begin
+    {$IFDEF FRAMEWORK_FMX}
+    if CurrentLevel.ControlHeight.HasValue then
+      Control.Height := CurrentLevel.ControlHeight.Value;
+    if CurrentLevel.ControlWidth.HasValue then
+      Control.Width := CurrentLevel.ControlWidth.Value;
+    {$ELSE}
+    if CurrentLevel.ControlHeight.HasValue then
+      Control.Height := Trunc(CurrentLevel.ControlHeight.Value);
+    if CurrentLevel.ControlWidth.HasValue then
+      Control.Width := Trunc(CurrentLevel.ControlWidth.Value);
+    {$ENDIF}
+  end;
+
 begin
   Result := Self;
 
   Control := CreateControl(AControlInfo);
+
+  ApplyDefaultControlSize;
 
   Registry.AddComponent(Control, Control.Name);
 
@@ -1641,6 +1671,44 @@ begin
   NextLevel(AGroupName);
 end;
 
+function TControlBuilder.SetControlHeight(AHeight: Single): TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.ControlHeight := AHeight;
+end;
+
+function TControlBuilder.SetControlWidth(AWidth: Single): TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.ControlWidth := AWidth;
+end;
+
+function TControlBuilder.SetControlWidthAndHeight(AWidth, AHeight: Single): TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.ControlHeight := AHeight;
+  CurrentLevel.ControlWidth := AWidth;
+end;
+
+function TControlBuilder.UnsetControlHeight: TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.ControlHeight := TOptionalSingle.None;
+end;
+
+function TControlBuilder.UnsetControlWidth: TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.ControlWidth := TOptionalSingle.None;
+end;
+
+function TControlBuilder.UnsetControlWidthAndHeight: TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.ControlHeight := TOptionalSingle.None;
+  CurrentLevel.ControlWidth := TOptionalSingle.None;
+end;
+
 function TControlBuilder.SetDirection(
   ADirection: TControlBuilderDirection): TControlBuilder;
 begin
@@ -1994,6 +2062,8 @@ begin
   Result.HorizontalSpace := HorizontalSpace;
   Result.MaxControlHeight := MaxControlHeight;
   Result.MaxControlWidth := MaxControlWidth;
+  Result.ControlWidth := TOptionalSingle.None;
+  Result.ControlHeight := TOptionalSingle.None;
 end;
 
 constructor TControlBuilderLevel.Create;
@@ -2007,6 +2077,8 @@ begin
   MaxControlWidth := 0;
   VerticalSpace := 0;
   HorizontalSpace := 0;
+  ControlWidth := TOptionalSingle.None;
+  ControlHeight := TOptionalSingle.None;
   Inc(FGroupCounter);
   GroupName := '__LEVEL_GROUP_' + IntToStr(FGroupCounter - 1) + '__';
 end;
