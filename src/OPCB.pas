@@ -306,6 +306,7 @@ type
   TControlBuilderDirection = (cpdHorizontal, cpdVertical);
   TRelativePosition = (rpRight, rpBelow);
   TGridFillDirection = (gfdRowFirst, gfdColFirst);
+  TGridCellStatus = (csEmpty, csOccupied);
 
   { TGridMode }
 
@@ -313,41 +314,52 @@ type
   private
     FActive: Boolean;
     FCellHeight: Single;
-    FCellSpan: Integer;
     FCellWidth: Single;
+    FColSpan: Integer;
+    FRows: Integer;
     FCols: Integer;
     FCurrentCol: Integer;
     FCurrentRow: Integer;
     FFirstPlace: Boolean;
     FColWidths:  TIntSingleDictionary;
     FRowHeights: TIntSingleDictionary;
-    FRows: Integer;
+    FOccupation: array of array of TGridCellStatus;
+    FRowSpan: Integer;
     procedure SetCellHeight(AValue: Single);
-    procedure SetCellSpan(AValue: Integer);
     procedure SetCellWidth(AValue: Single);
-    procedure SetCols(AValue: Integer);
-    procedure SetRows(AValue: Integer);
     function Next(ADirection: TGridFillDirection; var ABroke: Boolean): Boolean;
+    procedure SetColSpan(AValue: Integer);
+    procedure SetRowSpan(AValue: Integer);
   public
-    constructor Create;
-    destructor Destroy;
+    destructor Destroy; override;
     procedure SetColWidth(ACol: Integer; AWidth: Single);
     procedure SetRowHeight(ARow: Integer; AHeight: Single);
     function GetColWidth(ACol: Integer): Single;
     function GetRowHeight(ARow: Integer): Single;
-    procedure Activate;
+    procedure Activate(ARows, ACols: Integer);
     procedure Inactivate;
-    function Step(ADirection: TGridFillDirection; ASpan: Integer; out ARow,
-      ACol: Integer; out ABroke: Boolean): Boolean;
+    function Step(ADirection: TGridFillDirection; ARowSpan, AColSpan: Integer; out
+      ARow, ACol: Integer): Boolean;
     function CalcSpanRect(ARow, ACol, ARowSpan, AColSpan: Integer;
       AHorizontalSpace, AVerticalSpace: Single;
       out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}): Boolean;
+    procedure ResetOccupation;
+    procedure MarkOccupied(ARow, ACol, ARowSpan, AColSpan: Integer);
+    function IsCellFree(ARow, ACol: Integer): Boolean;
+    function CalcCellRectAbsolute(
+      ARow, ACol, ARowSpan, AColSpan: Integer;
+      AHorizontalSpace, AVerticalSpace: Single;
+      AOriginLeft, AOriginTop: Single;
+      out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}
+    ): Boolean;
+    procedure ResetSpans;
     property Active: Boolean read FActive;
-    property Rows: Integer read FRows write SetRows;
-    property Cols: Integer read FCols write SetCols;
+    property Rows: Integer read FRows;
+    property Cols: Integer read FCols;
     property CellWidth: Single read FCellWidth write SetCellWidth;
     property CellHeight: Single read FCellHeight write SetCellHeight;
-    property CellSpan: Integer read FCellSpan write SetCellSpan;
+    property RowSpan: Integer read FRowSpan write SetRowSpan;
+    property ColSpan: Integer read FColSpan write SetColSpan;
     property CurrentRow: Integer read FCurrentRow;
     property CurrentCol: Integer read FCurrentCol;
   end;
@@ -537,6 +549,8 @@ type
 
     function GridInit(ARows, ACols: Integer): TControlBuilder;
     function GridCellSpan(ACellSpan: Integer): TControlBuilder;
+    function GridRowSpan(ARowSpan: Integer): TControlBuilder;
+    function GridColSpan(AColSpan: Integer): TControlBuilder;
     function GridSetCellWidthAndHeight(AWidth, AHeight: Integer): TControlBuilder;
     function GridSetColWidth(ACol: Integer; AWidth: Single): TControlBuilder;
     function GridSetRowHeight(ARow: Integer; AHeight: Single): TControlBuilder;
@@ -1086,7 +1100,6 @@ var
   procedure GridModeConfig;
   var
     Row, Col: Integer;
-    Broke: Boolean;
     Dir: TGridFillDirection;
     RowSpan, ColSpan: Integer;
     R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
@@ -1094,35 +1107,30 @@ var
     if not CurrentLevel.GridMode.Active then
       Exit;
 
-    if CurrentLevel.Direction = cpdHorizontal then
-    begin
-      Dir := gfdRowFirst;
-      RowSpan := 1;
-      ColSpan := CurrentLevel.GridMode.CellSpan;
-    end
-    else
-    begin
-      Dir := gfdColFirst;
-      RowSpan := CurrentLevel.GridMode.CellSpan;
-      ColSpan := 1;
-    end;
+    RowSpan := CurrentLevel.GridMode.RowSpan;
+    ColSpan := CurrentLevel.GridMode.ColSpan;
 
-    if not CurrentLevel.GridMode.Step(Dir, CurrentLevel.GridMode.CellSpan, Row, Col, Broke) then
+    if CurrentLevel.Direction = cpdHorizontal then
+      Dir := gfdRowFirst
+    else
+      Dir := gfdColFirst;
+
+    if not CurrentLevel.GridMode.Step(Dir, RowSpan, ColSpan, Row, Col) then
       Exit; // fim do grid
 
-    if CurrentLevel.GridMode.CalcSpanRect(
-      Row, Col, RowSpan, ColSpan,
-      CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace, R) then
+    if CurrentLevel.GridMode.CalcCellRectAbsolute(
+       Row, Col, RowSpan, ColSpan,
+       CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace,
+       CurrentLevel.CurrentLeft, CurrentLevel.CurrentTop, R) then
     begin
-      if Broke then
-        Self.Break;
-
       AControlInfo.WithAlign({$IFDEF FRAMEWORK_FMX}TAlignLayout.None{$ELSE}alNone{$ENDIF});
+      AControlInfo.WithLeft(R.Left);
+      AControlInfo.WithTop(R.Top);
       AControlInfo.WithHeight(R.Bottom - R.Top);
       AControlInfo.WithWidth(R.Right - R.Left);
     end;
 
-    CurrentLevel.GridMode.CellSpan := 1; // reset
+    CurrentLevel.GridMode.ResetSpans;
   end;
 
 begin
@@ -1157,7 +1165,8 @@ begin
 
   AddControlToGroups(Control, AGroups);
 
-  MoveTopLeftAfterControl(Control);
+  if not CurrentLevel.GridMode.Active then
+    MoveTopLeftAfterControl(Control);
 end;
 
 function TControlBuilder.AddControl(AClass: TControlClass; const AName: string=''): TControlBuilder;
@@ -1666,27 +1675,6 @@ begin
       raise Exception.CreateFmt('Controle "%s" não encontrado.', [Name]);
 
     MoveControls(Ctrl, ADX, ADY);
-
-    (*
-    {$IFDEF FRAMEWORK_FMX}
-    L := Ctrl.Position.X;
-    T := Ctrl.Position.Y;
-    {$ELSE}
-    L := Ctrl.Left;
-    T := Ctrl.Top;
-    {$ENDIF}
-
-    L := L + ADX;
-    T := T + ADY;
-
-    {$IFDEF FRAMEWORK_FMX}
-    Ctrl.Position.X := L;
-    Ctrl.Position.Y := T;
-    {$ELSE}
-    Ctrl.Left := Round(L);
-    Ctrl.Top := Round(T);
-    {$ENDIF}
-    *)
   end;
 end;
 
@@ -1827,15 +1815,30 @@ end;
 function TControlBuilder.GridInit(ARows, ACols: Integer): TControlBuilder;
 begin
   Result := Self;
-  CurrentLevel.GridMode.Activate;
-  CurrentLevel.GridMode.Rows := ARows;
-  CurrentLevel.GridMode.Cols := ACols;
+  CurrentLevel.GridMode.Activate(ARows, ACols);
 end;
 
 function TControlBuilder.GridCellSpan(ACellSpan: Integer): TControlBuilder;
 begin
   Result := Self;
-  CurrentLevel.GridMode.CellSpan := ACellSpan;
+  CurrentLevel.GridMode.ResetSpans;
+
+  if CurrentLevel.Direction = cpdHorizontal then
+    CurrentLevel.GridMode.ColSpan := ACellSpan
+  else
+    CurrentLevel.GridMode.RowSpan := ACellSpan;
+end;
+
+function TControlBuilder.GridRowSpan(ARowSpan: Integer): TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.GridMode.RowSpan := ARowSpan;
+end;
+
+function TControlBuilder.GridColSpan(AColSpan: Integer): TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.GridMode.ColSpan := AColSpan;
 end;
 
 function TControlBuilder.GridSetCellWidthAndHeight(AWidth, AHeight: Integer): TControlBuilder;
@@ -1860,40 +1863,17 @@ end;
 function TControlBuilder.GridSkipCell: TControlBuilder;
 var
   Row, Col: Integer;
-  Broke: Boolean;
   Dir: TGridFillDirection;
-  RowSpan, ColSpan: Integer;
-  R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
   Result := Self;
-
-  CurrentLevel.GridMode.CellSpan := 1; // skip ira resetar qualquer configuração de span
+  CurrentLevel.GridMode.ResetSpans;  // skip ira resetar qualquer configuração de span
 
   if CurrentLevel.Direction = cpdHorizontal then
-  begin
-    Dir := gfdRowFirst;
-    RowSpan := 1;
-    ColSpan := CurrentLevel.GridMode.CellSpan;
-  end
+    Dir := gfdRowFirst
   else
-  begin
     Dir := gfdColFirst;
-    RowSpan := CurrentLevel.GridMode.CellSpan;
-    ColSpan := 1;
-  end;
 
-  if CurrentLevel.GridMode.Step(Dir, CurrentLevel.GridMode.CellSpan, Row, Col, Broke) then
-  begin
-    if CurrentLevel.GridMode.CalcSpanRect(
-      Row, Col, RowSpan, ColSpan,
-      CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace, R) then
-    begin
-      if Broke then
-        Self.Break;
-
-      MoveTopLeftAfterRect(R, {$IFDEF FRAMEWORK_FMX}TAlignLayout.None{$ELSE}alNone{$ENDIF});
-    end;
-  end;
+  CurrentLevel.GridMode.Step(Dir, 1, 1, Row, Col);
 end;
 
 function TControlBuilder.GridSkipCells(ANumCells: Integer): TControlBuilder;
@@ -2263,33 +2243,10 @@ begin
   FCellHeight := AValue;
 end;
 
-procedure TGridMode.SetCellSpan(AValue: Integer);
-begin
-  if FCellSpan = AValue then Exit;
-  FCellSpan := AValue;
-end;
-
 procedure TGridMode.SetCellWidth(AValue: Single);
 begin
   if FCellWidth = AValue then Exit;
   FCellWidth := AValue;
-end;
-
-procedure TGridMode.SetCols(AValue: Integer);
-begin
-  if FCols = AValue then Exit;
-  FCols := AValue;
-end;
-
-procedure TGridMode.SetRows(AValue: Integer);
-begin
-  if FRows = AValue then Exit;
-  FRows := AValue;
-end;
-
-constructor TGridMode.Create;
-begin
-
 end;
 
 function TGridMode.Next(ADirection: TGridFillDirection; var ABroke: Boolean): Boolean;
@@ -2303,6 +2260,7 @@ begin
     Exit;
   end;
 
+  // Avança na direção do grid
   case ADirection of
     gfdRowFirst:  // percorre linha → depois coluna
       begin
@@ -2328,36 +2286,56 @@ begin
   end;
 
   // chegou no fim do grid
-  if (CurrentRow >= Rows) or (CurrentCol >= Cols) then
+  if (FCurrentRow >= Rows) or (FCurrentCol >= Cols) then
+  begin
     Result := False;
+    Exit;
+  end;
 end;
 
-function TGridMode.Step(ADirection: TGridFillDirection; ASpan: Integer;
-  out ARow, ACol: Integer; out ABroke: Boolean): Boolean;
+procedure TGridMode.SetColSpan(AValue: Integer);
+begin
+  if FColSpan = AValue then Exit;
+  FColSpan := AValue;
+end;
+
+procedure TGridMode.SetRowSpan(AValue: Integer);
+begin
+  if FRowSpan = AValue then Exit;
+  FRowSpan := AValue;
+end;
+
+
+function TGridMode.Step(ADirection: TGridFillDirection; ARowSpan, AColSpan: Integer;
+  out ARow, ACol: Integer): Boolean;
 var
   I: Integer;
-  Broke, Break: Boolean;
+  Broke: Boolean;
+  AdvanceSpan: Integer;
 begin
   Result := False;
-  ARow := -1;
-  ACol := -1;
-  Break := False;
+  Broke := False;
 
-  for I := 1 to ASpan do
-  begin
+  // avança até uma posição livre
+  while FOccupation[CurrentRow, CurrentCol] = csOccupied do
     if not Next(ADirection, Broke) then
-      Exit; // chegou no fim do grid
+      Exit;
 
-    if ARow < 0 then
-      ARow := CurrentRow;
-    if ACol < 0 then
-      ACol := CurrentCol;
+  if ADirection = gfdRowFirst then
+    AdvanceSpan := AColSpan
+  else
+    AdvanceSpan := ARowSpan;
 
-    if Broke then
-      Break := True;
-  end;
+  MarkOccupied(CurrentRow, CurrentCol, ARowSpan, AColSpan);
 
-  ABroke := Break;
+  // retorna a primeira celula ocupada
+  ARow := CurrentRow;
+  ACol := CurrentCol;
+
+  for I:=1 to AdvanceSpan-1 do
+    if not Next(ADirection, Broke) then
+      Exit;
+
   Result := True;
 end;
 
@@ -2388,6 +2366,92 @@ begin
   Result := True;
 end;
 
+procedure TGridMode.ResetOccupation;
+var
+  R, C: Integer;
+begin
+  SetLength(FOccupation, Rows, Cols);
+  for R := 0 to Rows - 1 do
+    for C := 0 to Cols - 1 do
+      FOccupation[R][C] := csEmpty;
+end;
+
+procedure TGridMode.MarkOccupied(ARow, ACol, ARowSpan, AColSpan: Integer);
+var
+  R, C: Integer;
+begin
+  for R := ARow to ARow + ARowSpan - 1 do
+    for C := ACol to ACol + AColSpan - 1 do
+      if (R >= 0) and (R < Rows) and (C >= 0) and (C < Cols) then
+        FOccupation[R][C] := csOccupied;
+end;
+
+function TGridMode.IsCellFree(ARow, ACol: Integer): Boolean;
+begin
+  if (ARow < 0) or (ARow >= Rows) or (ACol < 0) or (ACol >= Cols) then
+    Exit(False); // fora do grid
+  Result := FOccupation[ARow][ACol] = csEmpty;
+end;
+
+procedure TGridMode.ResetSpans;
+begin
+  RowSpan := 1;
+  ColSpan := 1;
+end;
+
+function TGridMode.CalcCellRectAbsolute(
+  ARow, ACol, ARowSpan, AColSpan: Integer;
+  AHorizontalSpace, AVerticalSpace: Single;
+  AOriginLeft, AOriginTop: Single;
+  out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}
+): Boolean;
+var
+  col, row: Integer;
+  leftPos, topPos, w, h: Single;
+begin
+  Result := False;
+
+  // validações básicas
+  if (ARow < 0) or (ACol < 0) then
+    Exit;
+  if (ARow >= Rows) or (ACol >= Cols) then
+    Exit;
+  if ARowSpan < 1 then ARowSpan := 1;
+  if AColSpan < 1 then AColSpan := 1;
+  // não ultrapassar limites (pode optar por falhar ou ajustar span)
+  if (ARow + ARowSpan - 1 >= Rows) or (ACol + AColSpan - 1 >= Cols) then
+    Exit;
+
+  // calcula Left: soma larguras+espacos das colunas anteriores
+  leftPos := AOriginLeft;
+  for col := 0 to ACol - 1 do
+    leftPos := leftPos + GetColWidth(col) + AHorizontalSpace;
+
+  // calcula Top: soma alturas+espacos das linhas anteriores
+  topPos := AOriginTop;
+  for row := 0 to ARow - 1 do
+    topPos := topPos + GetRowHeight(row) + AVerticalSpace;
+
+  // calcula Width (colspan)
+  w := 0.0;
+  for col := ACol to ACol + AColSpan - 1 do
+    w := w + GetColWidth(col);
+  w := w + AHorizontalSpace * (AColSpan - 1);
+
+  // calcula Height (rowspan)
+  h := 0.0;
+  for row := ARow to ARow + ARowSpan - 1 do
+    h := h + GetRowHeight(row);
+  h := h + AVerticalSpace * (ARowSpan - 1);
+
+  {$IFDEF FRAMEWORK_FMX}
+  R := RectF(leftPos, topPos, leftPos + w, topPos + h);
+  {$ELSE}
+  R := Rect(Trunc(leftPos), Trunc(topPos), Trunc(leftPos + w), Trunc(topPos + h));
+  {$ENDIF}
+
+  Result := True;
+end;
 
 destructor TGridMode.Destroy;
 begin
@@ -2395,13 +2459,13 @@ begin
     FColWidths.Free;
   if Assigned(FRowHeights) then
     FRowHeights.Free;
+  inherited;
 end;
 
 procedure TGridMode.SetColWidth(ACol: Integer; AWidth: Single);
 begin
   if not Active then
     Exit;
-
   FColWidths.AddOrSetValue(ACol, AWidth);
 end;
 
@@ -2409,7 +2473,6 @@ procedure TGridMode.SetRowHeight(ARow: Integer; AHeight: Single);
 begin
   if not Active then
     Exit;
-
   FRowHeights.AddOrSetValue(ARow, AHeight);
 end;
 
@@ -2418,7 +2481,6 @@ begin
   Result := 0;
   if not Active then
     Exit;
-
   if not FColWidths.TryGetValue(ACol, Result) then
     Result := CellWidth;
 end;
@@ -2428,39 +2490,37 @@ begin
   Result := 0;
   if not Active then
     Exit;
-
   if not FRowHeights.TryGetValue(ARow, Result) then
     Result := CellHeight;
 end;
 
-procedure TGridMode.Activate;
+procedure TGridMode.Activate(ARows, ACols: Integer);
 begin
   if Active then
     Exit;
-
   FActive := True;
   FFirstPlace := True;
-  Rows := 0;
-  Cols := 0;
+  FRows := ARows;
+  FCols := ACols;
   CellWidth := 0;
   CellHeight := 0;
-  CellSpan := 1;
+  RowSpan := 1;
+  ColSpan := 1;
   FCurrentRow := 0;
   FCurrentCol := 0;
   if not Assigned(FColWidths) then
     FColWidths := TIntSingleDictionary.Create;
   if not Assigned(FRowHeights) then
     FRowHeights := TIntSingleDictionary.Create;
+  ResetOccupation;
 end;
 
 procedure TGridMode.Inactivate;
 begin
   if not Active then
     Exit;
-
   if Assigned(FColWidths) then
     FreeAndNil(FColWidths);
-
   if Assigned(FRowHeights) then
     FreeAndNil(FRowHeights);
 end;
