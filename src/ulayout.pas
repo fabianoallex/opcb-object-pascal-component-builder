@@ -371,6 +371,7 @@ type
   end;
 
   TIntIntDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<Integer, Integer>;
+  TIntSingleDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<Integer, Single>;
 
   { TGridLayoutComposite }
 
