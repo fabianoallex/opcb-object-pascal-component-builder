@@ -52,5 +52,5 @@ begin
   end;
 end;
 ```
-![Exemplo 01](docs/img/01.png)
+![Exemplo 01](docs/img/img-01.png)
 
