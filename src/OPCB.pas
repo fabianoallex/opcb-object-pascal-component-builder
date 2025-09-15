@@ -1370,66 +1370,6 @@ begin
   inherited;
 end;
 
-{
-function TControlBuilder.PreviousLevel: TControlBuilder;
-var
-  SubLevel, SuperLevel: TControlBuilderLevel;
-  Bounds: TControlGroupBounds;
-
-  function GetSubLevelBounds: TControlGroupBounds;
-  begin
-    if (SubLevel.Parent = SuperLevel.Parent) then
-      Result := GetGroupBounds(SubLevel.GroupName)
-    else
-    begin
-      // quando o TPanel for o container e estiver configurado para
-      // AutoSize, o TPanel ainda não estará redimensionado, sendo
-      // necessário força-lo a se atualizar.
-      {$IFNDEF FRAMEWORK_FMX}
-      if (SubLevel.Parent is TPanel) and TPanel(SubLevel.Parent).AutoSize then
-      begin
-        SubLevel.Parent.HandleNeeded;
-        SubLevel.Parent.Invalidate;
-        SubLevel.Parent.Update;
-      end;
-      {$ENDIF}
-
-      Result.Reset;
-      Result.Include(SubLevel.Parent);
-    end;
-  end;
-
-begin
-  if FLevelStack.Count <= 1 then
-    raise Exception.Create('PreviousLevel chamado no nível raiz');
-
-  SubLevel := FLevelStack.Last;
-  SuperLevel := FLevelStack[FLevelStack.Count - 2];
-
-  Bounds := GetSubLevelBounds;
-
-  case SuperLevel.Direction of
-    cpdHorizontal:
-      begin
-        SuperLevel.CurrentLeft := Bounds.Right + SuperLevel.HorizontalSpace;
-        SuperLevel.MaxControlHeight :=
-          Max(SuperLevel.MaxControlHeight, Bounds.Height + SuperLevel.VerticalSpace);
-      end;
-    cpdVertical:
-      begin
-        SuperLevel.CurrentTop := Bounds.Bottom + SuperLevel.VerticalSpace;
-        SuperLevel.MaxControlWidth :=
-          Max(SuperLevel.MaxControlWidth, Bounds.Width + SuperLevel.HorizontalSpace);
-      end;
-  end;
-
-  MoveTopLeftAfterBound(GetGroupBounds(SuperLevel.GroupName));
-
-  FLevelStack.Delete(FLevelStack.Count - 1); // remove nível atual
-  Result := Self;
-end;
-}
-
 function TControlBuilder.PreviousLevel: TControlBuilder;
 var
   SubLevel, SuperLevel: TControlBuilderLevel;
