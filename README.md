@@ -23,7 +23,7 @@ Criação simples de um painel com botões:
 
 ```pascal
 uses
-  uOPCB.Builder;
+  OPCB;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
