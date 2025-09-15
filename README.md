@@ -19,7 +19,7 @@ O **OPCB (Object Pascal Component Builder)** é uma biblioteca que facilita a co
 
 ## 🚀 Exemplo de uso  
 
-Criação simples de um painel com botões:  
+Criação simples de alguns controles:  
 
 ```pascal
 uses
