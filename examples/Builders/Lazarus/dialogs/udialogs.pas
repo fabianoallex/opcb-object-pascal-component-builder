@@ -54,14 +54,14 @@ begin
     .WithOwnerAndParent(Self, Self)
     .SetSpace(5, 5)
     .SetTopLeft(20, 20)
-    .NextLevel(cpdVertical);
+    .SubLevel(cpdVertical);
 
       if AMsg <> '' then
         ControlBuilder.AddControl(TControlInfo.Create(TLabel, 'LabelMessage').WithCaption(AMsg));
 
    ControlBuilder
       .AddControl(AControlInfo)
-    .PreviousLevel
+    .SuperLevel
     .Break
     .IncTop(10)
     .AddControl(TControlInfo.Create(TBitBtn, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(@SetupButton))

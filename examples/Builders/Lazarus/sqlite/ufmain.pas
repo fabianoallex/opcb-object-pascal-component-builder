@@ -133,17 +133,17 @@ begin
     Builders.AsMenuBuilder
       .WithOwner(Self)
       .AddMenu(TMenuInfo.Create(TMainMenu).Setup(@SetupMainMenu))
-        .NextLevel(TMenuItemInfo.Create.WithCaption('Aplicação'))
+        .SubLevel(TMenuItemInfo.Create.WithCaption('Aplicação'))
           .AddMenuItem(TMenuItemInfo.Create.WithCaption('Logoff').WithOnClick(@MenuItemLogoffClick).WithImageIndex(1))
           .AddMenuItem(TMenuItemInfo.Create.WithCaption('-'))
           .AddMenuItem(TMenuItemInfo.Create.WithCaption('Fechar').WithOnClick(@MenuItemCloseClick).WithImageIndex(2))
-        .PreviousLevel
-        .NextLevel(TMenuItemInfo.Create.WithCaption('Cadastros'))
+        .SuperLevel
+        .SubLevel(TMenuItemInfo.Create.WithCaption('Cadastros'))
           .AddMenuItem(TMenuItemInfo.Create.WithCaption('Usuários').WithOnClick(@MenuItemUsersClick).WithImageIndex(0))
-        .PreviousLevel
-        .NextLevel(TMenuItemInfo.Create.WithCaption('Ajuda'))
+        .SuperLevel
+        .SubLevel(TMenuItemInfo.Create.WithCaption('Ajuda'))
           .AddMenuItem(TMenuItemInfo.Create.WithCaption('Sobre').WithImageIndex(3))
-        .PreviousLevel
+        .SuperLevel
     ;
 
     Builders.AsControlBuilder
@@ -151,10 +151,10 @@ begin
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
       .AddControl(TControlInfo.Create(TStatusBar).Setup(@SetupStatusBar))
-      .NextLevel(TControlInfo.Create(TPageControl, FPageControl).WithAlign(alClient))
-        .NextLevel(TControlInfo.Create(TTabSheet).WithCaption('Dashboard'))
-        .PreviousLevel
-      .PreviousLevel
+      .SubLevel(TControlInfo.Create(TPageControl, FPageControl).WithAlign(alClient))
+        .SubLevel(TControlInfo.Create(TTabSheet).WithCaption('Dashboard'))
+        .SuperLevel
+      .SuperLevel
     ;
   finally
     Builders.Free;

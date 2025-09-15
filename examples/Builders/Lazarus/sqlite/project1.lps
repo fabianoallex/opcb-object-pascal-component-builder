@@ -21,8 +21,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFMain"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="76"/>
-        <CursorPos X="16" Y="107"/>
+        <TopLine Value="135"/>
+        <CursorPos X="15" Y="156"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -84,8 +84,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormCRUD"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="176"/>
-        <CursorPos X="78" Y="218"/>
+        <TopLine Value="189"/>
+        <CursorPos X="18" Y="222"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit>
@@ -122,7 +122,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="150"/>
         <CursorPos X="3" Y="168"/>
-        <UsageCount Value="0"/>
+        <UsageCount Value="10"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
@@ -177,18 +177,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
-        <Caret Line="2431" Column="15" TopLine="2413"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\lazarus4.0\lcl\include\wincontrol.inc"/>
-        <Caret Line="7921" Column="3" TopLine="7912"/>
-      </Position>
-      <Position>
-        <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
-        <Caret Line="2431" Column="15" TopLine="2413"/>
-      </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <Caret Line="1200" Column="34" TopLine="1177"/>
@@ -296,6 +284,18 @@
       <Position>
         <Filename Value="ufmain.pas"/>
         <Caret Line="28" TopLine="10"/>
+      </Position>
+      <Position>
+        <Filename Value="ufmain.pas"/>
+        <Caret Line="107" Column="16" TopLine="76"/>
+      </Position>
+      <Position>
+        <Filename Value="uformcrud.pas"/>
+        <Caret Line="222" Column="18" TopLine="189"/>
+      </Position>
+      <Position>
+        <Filename Value="ufmain.pas"/>
+        <Caret Line="157" Column="18" TopLine="129"/>
       </Position>
     </JumpHistory>
     <RunParams>

@@ -53,17 +53,17 @@ begin
     .WithOwnerAndParent(Self, Self)
     .SetSpace(5, 5)
     .SetTopLeft(20, 20)
-    .NextLevel(TControlInfo.Create(TLayout))
-      .NextLevel(cpdVertical)
+    .SubLevel(TControlInfo.Create(TLayout))
+      .SubLevel(cpdVertical)
         .AddControl(TControlInfo.Create(TLabel, 'LabelMessage').WithCaption(AMsg).Setup(SetupLabel))
         .AddControl(AControlInfo)
-      .PreviousLevel
+      .SuperLevel
       .Break
       .IncTop(10)
       .AddControl(TControlInfo.Create(TButton, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(SetupButton))
       .AddControl(TControlInfo.Create(TButton, 'ButtonCancel').WithCaption('Cancelar').WithWidthAndHeight(100, 30).Setup(SetupButton))
       .AlignControlsRight(['ButtonOk', 'ButtonCancel'], [ControlName])
-    .PreviousLevel
+    .SuperLevel
   ;
 
   Self.Width := Trunc(ControlBuilder.ContentWidth) + 40;

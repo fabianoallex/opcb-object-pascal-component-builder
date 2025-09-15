@@ -199,7 +199,7 @@ begin
     Builders.AsControlBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(2, 5)
-      .NextLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alTop))
+      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alTop))
         .SetTopLeft(5, 5)
         .AddControl(TControlInfo.Create(TButton, FButtonAdd).WithCaption('Novo').WithOnClick(@ButtonAddClick))
         .AddControl(TControlInfo.Create(TButton, FButtonEdit).WithCaption('Alterar').WithOnClick(@ButtonEditClick))
@@ -213,13 +213,13 @@ begin
         .IncLeft(20)
         .AddControl(TControlInfo.Create(TButton, FButtonClose).WithCaption('Fechar').WithOnClick(@ButtonCloseClick))
         .RecalcParentHeight(10)
-      .PreviousLevel
-      .NextLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(altop))
+      .SuperLevel
+      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(altop))
          .External(@BuildContents) // aqui injeta a continuacao do build
-      .PreviousLevel
-      .NextLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alClient))
+      .SuperLevel
+      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alClient))
         .AddControl(TControlInfo.Create(TDBGrid, FDBGrid).Setup(@SetupDBGrid))
-      .PreviousLevel
+      .SuperLevel
     ;
 
     FEntity.QueryCRUD.Open;

@@ -16,6 +16,7 @@ type
     Button3: TButton;
     Button4: TButton;
     Button5: TButton;
+    SpeedButton1: TSpeedButton;
     procedure Button1Click(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure Button3Click(Sender: TObject);
@@ -251,10 +252,10 @@ var
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
         .AddControl(TControlInfo.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(80, 280).Setup(SetupListBoxLeft))
-        .NextLevel(cpdVertical)
+        .SubLevel(cpdVertical)
           .AddControl(TControlInfo.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(ButtonMoveToRightClick))
           .AddControl(TControlInfo.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(ButtonMoveToLeftClick))
-        .PreviousLevel
+        .SuperLevel
         .AddControl(TControlInfo.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(80, 280).Setup(SetupListBoxRight))
         .CenterControlsInParentVertically(['ButtonMoveToRight', 'ButtonMoveToLeft'])
     finally

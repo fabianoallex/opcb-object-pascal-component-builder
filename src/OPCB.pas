@@ -462,8 +462,8 @@ type
     function External(const AProc: TMenuBuilderProc): TMenuBuilder; overload;
     function AddMenu(AMenuInfo: TMenuInfo): TMenuBuilder;
     function AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
-    function NextLevel(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
-    function PreviousLevel: TMenuBuilder;
+    function SubLevel(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
+    function SuperLevel: TMenuBuilder;
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenu<T: TMenu>(const AName: string): T; overload;
     function GetMenu(const AName: string): TMenu; overload;
@@ -508,36 +508,36 @@ type
     function External(const AProc: TControlBuilderObjProc): TControlBuilder; overload;
     function External(const AProc: TControlBuilderProc): TControlBuilder; overload;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlBuilder;
-    function NextLevel(AGroupName: string=''): TControlBuilder; overload;
-    function NextLevel(ADirection: TControlBuilderDirection;
+    function SubLevel(AGroupName: string=''): TControlBuilder; overload;
+    function SubLevel(ADirection: TControlBuilderDirection;
       AGroupName: string=''): TControlBuilder; overload;
-    function PreviousLevel: TControlBuilder;
-    function NextSiblingLevel(AGroupName: string='';
+    function SuperLevel: TControlBuilder;
+    function SiblingSubLevel(AGroupName: string='';
       ABreak: Boolean=False): TControlBuilder; overload;
-    function NextSiblingLevel(ADirection: TControlBuilderDirection;
+    function SiblingSubLevel(ADirection: TControlBuilderDirection;
       AGroupName: string=''; ABreak: Boolean=False): TControlBuilder; overload;
-    function NextSiblingLevel(ABreak: Boolean=False): TControlBuilder; overload;
-    function NextSiblingLevel(ADirection: TControlBuilderDirection;
+    function SiblingSubLevel(ABreak: Boolean=False): TControlBuilder; overload;
+    function SiblingSubLevel(ADirection: TControlBuilderDirection;
       ABreak: Boolean): TControlBuilder; overload;
-    function NextSiblingLevelWithBreak(AGroupName: string=''): TControlBuilder; overload;
-    function NextSiblingLevelWithBreak(ADirection: TControlBuilderDirection;
+    function SiblingSubLevelWithBreak(AGroupName: string=''): TControlBuilder; overload;
+    function SiblingSubLevelWithBreak(ADirection: TControlBuilderDirection;
       AGroupName: string=''): TControlBuilder; overload;
-    function NextLevel(AControlInfo: TControlInfo;
+    function SubLevel(AControlInfo: TControlInfo;
       AGroupName: string=''): TControlBuilder; overload;
-    function NextLevel(AControlInfo: TControlInfo;
+    function SubLevel(AControlInfo: TControlInfo;
       ADirection: TControlBuilderDirection; AGroupName: string=''): TControlBuilder; overload;
-    function NextSiblingLevel(AControlInfo: TControlInfo;
+    function SiblingSubLevel(AControlInfo: TControlInfo;
       AGroupName: string=''; ABreak: Boolean=False): TControlBuilder; overload;
-    function NextSiblingLevel(AControlInfo: TControlInfo;
+    function SiblingSubLevel(AControlInfo: TControlInfo;
       ADirection: TControlBuilderDirection;
       AGroupName: string=''; ABreak: Boolean=False): TControlBuilder; overload;
-    function NextSiblingLevel(AControlInfo: TControlInfo;
+    function SiblingSubLevel(AControlInfo: TControlInfo;
       ABreak: Boolean=False): TControlBuilder; overload;
-    function NextSiblingLevel(AControlInfo: TControlInfo;
+    function SiblingSubLevel(AControlInfo: TControlInfo;
       ADirection: TControlBuilderDirection;
       ABreak: Boolean): TControlBuilder; overload;
-    function NextSiblingLevelWithBreak(AControlInfo: TControlInfo; AGroupName: string=''): TControlBuilder; overload;
-    function NextSiblingLevelWithBreak(AControlInfo: TControlInfo; ADirection: TControlBuilderDirection;
+    function SiblingSubLevelWithBreak(AControlInfo: TControlInfo; AGroupName: string=''): TControlBuilder; overload;
+    function SiblingSubLevelWithBreak(AControlInfo: TControlInfo; ADirection: TControlBuilderDirection;
       AGroupName: string=''): TControlBuilder; overload;
     function SetVerticalSpace(AVerticalSpace: Single): TControlBuilder;
     function SetHorizontalSpace(AHorizontalSpace: Single): TControlBuilder;
@@ -1264,9 +1264,9 @@ function TControlBuilder.AddInLevel(const AControls: array of TControlInfo;
   ADirection: TControlBuilderDirection): TControlBuilder;
 begin
   Result := Self;
-  NextLevel(ADirection);
+  SubLevel(ADirection);
   AddControls(AControls);
-  PreviousLevel;
+  SuperLevel;
 end;
 
 function TControlBuilder.CenterControlsHorizontally(const AControlNames,
@@ -1308,7 +1308,7 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-function TControlBuilder.NextLevel(AGroupName: string): TControlBuilder;
+function TControlBuilder.SubLevel(AGroupName: string): TControlBuilder;
 begin
   Result := Self;
   FLevelStack.Add(CurrentLevel.Clone);
@@ -1321,35 +1321,35 @@ begin
     CurrentLevel.GroupName := AGroupName;
 end;
 
-function TControlBuilder.NextLevel(
+function TControlBuilder.SubLevel(
   ADirection: TControlBuilderDirection; AGroupName: string): TControlBuilder;
 begin
-  Result := NextLevel(AGroupName);
+  Result := SubLevel(AGroupName);
   SetDirection(ADirection);
 end;
 
-function TControlBuilder.NextSiblingLevel(ADirection: TControlBuilderDirection;
+function TControlBuilder.SiblingSubLevel(ADirection: TControlBuilderDirection;
   ABreak: Boolean): TControlBuilder;
 begin
-  Result := NextSiblingLevel(ADirection, '', ABreak);
+  Result := SiblingSubLevel(ADirection, '', ABreak);
 end;
 
-function TControlBuilder.NextSiblingLevelWithBreak(
+function TControlBuilder.SiblingSubLevelWithBreak(
   ADirection: TControlBuilderDirection;
   AGroupName: string): TControlBuilder;
 begin
-  Result := NextSiblingLevel(ADirection, AGroupName, True);
+  Result := SiblingSubLevel(ADirection, AGroupName, True);
 end;
 
-function TControlBuilder.NextSiblingLevelWithBreak(
+function TControlBuilder.SiblingSubLevelWithBreak(
   AGroupName: string): TControlBuilder;
 begin
-  Result := NextSiblingLevel(AGroupName, True);
+  Result := SiblingSubLevel(AGroupName, True);
 end;
 
-function TControlBuilder.NextSiblingLevel(ABreak: Boolean): TControlBuilder;
+function TControlBuilder.SiblingSubLevel(ABreak: Boolean): TControlBuilder;
 begin
-  Result := NextSiblingLevel('', ABreak);
+  Result := SiblingSubLevel('', ABreak);
 end;
 
 function TControlBuilder.BreakLine(AIncTop: Single): TControlBuilder;
@@ -1370,9 +1370,9 @@ begin
   inherited;
 end;
 
-function TControlBuilder.PreviousLevel: TControlBuilder;
+function TControlBuilder.SuperLevel: TControlBuilder;
 var
-  SubLevel, SuperLevel: TControlBuilderLevel;
+  SubL, SuperL: TControlBuilderLevel;
   Bounds: TControlGroupBounds;
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
   Dir: TGridFillDirection;
@@ -1380,21 +1380,21 @@ var
 
   function GetSubLevelBounds: TControlGroupBounds;
   begin
-    if (SubLevel.Parent = SuperLevel.Parent) then
-      Result := GetGroupBounds(SubLevel.GroupName)
+    if (SubL.Parent = SuperL.Parent) then
+      Result := GetGroupBounds(SubL.GroupName)
     else
     begin
       {$IFNDEF FRAMEWORK_FMX}
-      if (SubLevel.Parent is TPanel) and TPanel(SubLevel.Parent).AutoSize then
+      if (SubL.Parent is TPanel) and TPanel(SubL.Parent).AutoSize then
       begin
-        SubLevel.Parent.HandleNeeded;
-        SubLevel.Parent.Invalidate;
-        SubLevel.Parent.Update;
+        SubL.Parent.HandleNeeded;
+        SubL.Parent.Invalidate;
+        SubL.Parent.Update;
       end;
       {$ENDIF}
 
       Result.Reset;
-      Result.Include(SubLevel.Parent);
+      Result.Include(SubL.Parent);
     end;
   end;
 
@@ -1402,28 +1402,28 @@ begin
   if FLevelStack.Count <= 1 then
     raise Exception.Create('PreviousLevel chamado no nível raiz');
 
-  SubLevel := FLevelStack.Last;
-  SuperLevel := FLevelStack[FLevelStack.Count - 2];
+  SubL := FLevelStack.Last;
+  SuperL := FLevelStack[FLevelStack.Count - 2];
 
-  if SuperLevel.GridMode.Active then
+  if SuperL.GridMode.Active then
   begin
     if CurrentLevel.Direction = cpdHorizontal then
       Dir := gfdRowFirst
     else
       Dir := gfdColFirst;
 
-    if SuperLevel.GridMode.Step(Dir,
-      SuperLevel.GridMode.RowSpan, SuperLevel.GridMode.ColSpan,
+    if SuperL.GridMode.Step(Dir,
+      SuperL.GridMode.RowSpan, SuperL.GridMode.ColSpan,
       Row, Col
     ) then
     begin
-      if SuperLevel.GridMode.CalcCellRectAbsolute(
-        SuperLevel.GridMode.CurrentRow,
-        SuperLevel.GridMode.CurrentCol,
-        SuperLevel.GridMode.RowSpan,
-        SuperLevel.GridMode.ColSpan,
-        SuperLevel.HorizontalSpace,
-        SuperLevel.VerticalSpace,
+      if SuperL.GridMode.CalcCellRectAbsolute(
+        SuperL.GridMode.CurrentRow,
+        SuperL.GridMode.CurrentCol,
+        SuperL.GridMode.RowSpan,
+        SuperL.GridMode.ColSpan,
+        SuperL.HorizontalSpace,
+        SuperL.VerticalSpace,
         R
       ) then
       begin
@@ -1438,22 +1438,22 @@ begin
     // 🔹 Comportamento antigo (não-grid): usa bounds reais dos controles
     Bounds := GetSubLevelBounds;
 
-    case SuperLevel.Direction of
+    case SuperL.Direction of
       cpdHorizontal:
         begin
-          SuperLevel.CurrentLeft := Bounds.Right + SuperLevel.HorizontalSpace;
-          SuperLevel.MaxControlHeight :=
-            Max(SuperLevel.MaxControlHeight, Bounds.Height + SuperLevel.VerticalSpace);
+          SuperL.CurrentLeft := Bounds.Right + SuperL.HorizontalSpace;
+          SuperL.MaxControlHeight :=
+            Max(SuperL.MaxControlHeight, Bounds.Height + SuperL.VerticalSpace);
         end;
       cpdVertical:
         begin
-          SuperLevel.CurrentTop := Bounds.Bottom + SuperLevel.VerticalSpace;
-          SuperLevel.MaxControlWidth :=
-            Max(SuperLevel.MaxControlWidth, Bounds.Width + SuperLevel.HorizontalSpace);
+          SuperL.CurrentTop := Bounds.Bottom + SuperL.VerticalSpace;
+          SuperL.MaxControlWidth :=
+            Max(SuperL.MaxControlWidth, Bounds.Width + SuperL.HorizontalSpace);
         end;
     end;
 
-    MoveTopLeftAfterBound(GetGroupBounds(SuperLevel.GroupName));
+    MoveTopLeftAfterBound(GetGroupBounds(SuperL.GroupName));
   end;
 
   FLevelStack.Delete(FLevelStack.Count - 1); // remove nível atual
@@ -1825,22 +1825,22 @@ begin
   MoveTopLeftAfterRect(R, AControl.Align);
 end;
 
-function TControlBuilder.NextSiblingLevel(ADirection: TControlBuilderDirection;
+function TControlBuilder.SiblingSubLevel(ADirection: TControlBuilderDirection;
   AGroupName: string; ABreak: Boolean): TControlBuilder;
 begin
-  Result := PreviousLevel;
+  Result := SuperLevel;
   if ABreak then
     Break;
-  NextLevel(ADirection, AGroupName);
+  SubLevel(ADirection, AGroupName);
 end;
 
-function TControlBuilder.NextSiblingLevel(AGroupName: string;
+function TControlBuilder.SiblingSubLevel(AGroupName: string;
   ABreak: Boolean): TControlBuilder;
 begin
-  Result := PreviousLevel;
+  Result := SuperLevel;
   if ABreak then
     Break;
-  NextLevel(AGroupName);
+  SubLevel(AGroupName);
 end;
 
 function TControlBuilder.SetControlHeight(AHeight: Single): TControlBuilder;
@@ -2190,7 +2190,7 @@ begin
   CurrentLevel.Parent := AParent;
 end;
 
-function TControlBuilder.NextLevel(
+function TControlBuilder.SubLevel(
   AControlInfo: TControlInfo;
   AGroupName: string
 ): TControlBuilder;
@@ -2216,7 +2216,7 @@ begin
 
   Control := AControlInfo.CreateControl(OwnerToUse, CurrentLevel.Parent, AControlInfo.Name);
   AddControl(TControlInfo.Create(Control));
-  NextLevel(AGroupName);
+  SubLevel(AGroupName);
 
   WithParent(
     {$IFDEF FRAMEWORK_FMX}Control
@@ -2227,56 +2227,56 @@ begin
   SetTopLeft(0, 0);
 end;
 
-function TControlBuilder.NextLevel(AControlInfo: TControlInfo;
+function TControlBuilder.SubLevel(AControlInfo: TControlInfo;
   ADirection: TControlBuilderDirection; AGroupName: string): TControlBuilder;
 begin
-  Result := NextLevel(AControlInfo, AGroupName);
+  Result := SubLevel(AControlInfo, AGroupName);
   SetDirection(ADirection);
 end;
 
-function TControlBuilder.NextSiblingLevel(AControlInfo: TControlInfo;
+function TControlBuilder.SiblingSubLevel(AControlInfo: TControlInfo;
   AGroupName: string; ABreak: Boolean): TControlBuilder;
 begin
-  Result := PreviousLevel;
+  Result := SuperLevel;
   if ABreak then
     Break;
-  NextLevel(AControlInfo, AGroupName);
+  SubLevel(AControlInfo, AGroupName);
 end;
 
-function TControlBuilder.NextSiblingLevel(AControlInfo: TControlInfo;
+function TControlBuilder.SiblingSubLevel(AControlInfo: TControlInfo;
   ADirection: TControlBuilderDirection; AGroupName: string;
   ABreak: Boolean): TControlBuilder;
 begin
-  Result := PreviousLevel;
+  Result := SuperLevel;
   if ABreak then
     Break;
-  NextLevel(AControlInfo, ADirection, AGroupName);
+  SubLevel(AControlInfo, ADirection, AGroupName);
 end;
 
-function TControlBuilder.NextSiblingLevel(AControlInfo: TControlInfo;
+function TControlBuilder.SiblingSubLevel(AControlInfo: TControlInfo;
   ABreak: Boolean): TControlBuilder;
 begin
-  Result := NextSiblingLevel(AControlInfo, '', ABreak);
+  Result := SiblingSubLevel(AControlInfo, '', ABreak);
 end;
 
-function TControlBuilder.NextSiblingLevel(AControlInfo: TControlInfo;
+function TControlBuilder.SiblingSubLevel(AControlInfo: TControlInfo;
   ADirection: TControlBuilderDirection;
   ABreak: Boolean): TControlBuilder;
 begin
-  Result := NextSiblingLevel(AControlInfo, ADirection, '', ABreak);
+  Result := SiblingSubLevel(AControlInfo, ADirection, '', ABreak);
 end;
 
-function TControlBuilder.NextSiblingLevelWithBreak(
+function TControlBuilder.SiblingSubLevelWithBreak(
   AControlInfo: TControlInfo; ADirection: TControlBuilderDirection;
   AGroupName: string): TControlBuilder;
 begin
-  Result := NextSiblingLevel(AControlInfo, ADirection, AGroupName, True);
+  Result := SiblingSubLevel(AControlInfo, ADirection, AGroupName, True);
 end;
 
-function TControlBuilder.NextSiblingLevelWithBreak(
+function TControlBuilder.SiblingSubLevelWithBreak(
   AControlInfo: TControlInfo; AGroupName: string): TControlBuilder;
 begin
-  Result := NextSiblingLevel(AControlInfo, AGroupName, True);
+  Result := SiblingSubLevel(AControlInfo, AGroupName, True);
 end;
 
 { TControlGroupBounds }
@@ -3373,7 +3373,7 @@ begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
-function TMenuBuilder.NextLevel(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
+function TMenuBuilder.SubLevel(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
 var
   MenuItem: TMenuItem;
   MenuItemName: string;
@@ -3395,7 +3395,7 @@ begin
   CurrentLevel.Parent := MenuItem;
 end;
 
-function TMenuBuilder.PreviousLevel: TMenuBuilder;
+function TMenuBuilder.SuperLevel: TMenuBuilder;
 begin
   if FLevelStack.Count <= 1 then
     raise Exception.Create('PreviousLevel chamado no nível raiz');

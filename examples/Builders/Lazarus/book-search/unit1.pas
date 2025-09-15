@@ -130,7 +130,7 @@ begin
   ControlBuilderPage := TControlBuilder.Create;
   ControlBuilderPage
     .WithOwnerAndParent(Self, FPanelCards)
-    .NextLevel(TControlInfo.Create(TScrollBox, FScrollboxPage).WithAlign(alClient).Setup(@SetupScrollBoxPage))
+    .SubLevel(TControlInfo.Create(TScrollBox, FScrollboxPage).WithAlign(alClient).Setup(@SetupScrollBoxPage))
   ;
 end;
 
@@ -180,8 +180,8 @@ var
 begin
   Memo.Lines.Add('📚 Livro: ' + ADoc.FindPath('title').AsString);
   ControlBuilderPage
-    .NextLevel(TControlInfo.Create(TBookCard, Card).WithCaption(ADoc.FindPath('title').AsString).WithAlign(alTop).WithHeight(180))
-    .PreviousLevel
+    .SubLevel(TControlInfo.Create(TBookCard, Card).WithCaption(ADoc.FindPath('title').AsString).WithAlign(alTop).WithHeight(180))
+    .SuperLevel
   ;
   ConfiguCard;
 
@@ -240,24 +240,24 @@ begin
     ControlBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
-      .NextLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alTop))
+      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alTop))
         .SetTopLeft(10, 10)
-        .NextLevel(cpdVertical)
+        .SubLevel(cpdVertical)
           .AddControl(TControlInfo.Create(TLabel).WithCaption('Pesquisa de Livros na Open Library'))
           .SetDirection(cpdHorizontal)
           .AddControl(TControlInfo.Create(TEdit, FEditSearch).WithWidth(220).WithText('Object Pascal'))
           .AddControl(TControlInfo.Create(TComboBox, FComboBoxPageSize).WithWidth(70).Setup(@SetupComboBoxPageSize))
           .AddControl(TControlInfo.Create(TButton).WithCaption('Pesquisar').Setup(@SetupButtonSearch))
-        .PreviousLevel
+        .SuperLevel
         .IncLeft(50)
         .AddControl(TControlInfo.Create(TSearchPageNavigation, FSearchPageNavigation).WithWidth(300).Setup(@SetupSearchNavigation))
         .RecalcParentHeight(10)
-      .PreviousLevel
-      .NextLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alClient))
+      .SuperLevel
+      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alClient))
         .AddControl(TControlInfo.Create(TPanel, FPanelCards).WithAlign(alClient))
         .AddControl(TControlInfo.Create(TMemo, FMemo).WithAlign(alBottom))
         .AddControl(TControlInfo.Create(TProgressBar, FProgressBar).WithAlign(alBottom).Setup(@SetupProgressBar))
-      .PreviousLevel
+      .SuperLevel
     ;
   finally
     ControlBuilder.Free;

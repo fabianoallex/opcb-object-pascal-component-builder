@@ -121,7 +121,7 @@ begin
   CIEdit := TControlInfo.Create(TEdit).WithWidth(250);
 
   Builder
-    .NextLevel(TControlInfo.Create(TPanel, 'PanelLogin').WithCaption(''), cpdVertical)
+    .SubLevel(TControlInfo.Create(TPanel, 'PanelLogin').WithCaption(''), cpdVertical)
       .SetTopLeft(10, 10)
       .AddControl(CILabel.Setup(SetupLabelLogin).WithName('LabelLogin'))
       .IncTop(20)
@@ -134,7 +134,7 @@ begin
       .AddControl(TControlInfo.Create(TCheckBox, 'CheckBoxConnected').Setup(SetupCheckBox))
       .IncTop(20)
       .AddControl(TControlInfo.Create(TButton).WithName('LoginButton').Setup(SetupLoginButton))
-      .NextLevel(
+      .SubLevel(
         TControlInfo.Create(TPanel, 'PanelRodape')
           .WithAlign(alBottom)
           .WithHeight(100)
@@ -143,7 +143,7 @@ begin
         )
          .AddControl(CILabel.WithName('LabelConta').WithCaption('Ainda não tem conta?'))
          .AddControl(TControlInfo.Create(TButton, 'ButtonConta').WithCaption('Cadastra-se'))
-      .PreviousLevel
+      .SuperLevel
 
       .RecalcParentSize(20, 10)
       .CenterControlsInParentHorizontally(['LabelLogin'])
@@ -151,7 +151,7 @@ begin
       .CenterControlsInParentVertically(['LabelConta', 'ButtonConta'])
       .CenterControlsInParentHorizontally(['LabelConta', 'ButtonConta'])
       .AlignControlsRight(['CheckBoxConnected'], ['EditPassword'])
-    .PreviousLevel
+    .SuperLevel
   ;
 end;
 

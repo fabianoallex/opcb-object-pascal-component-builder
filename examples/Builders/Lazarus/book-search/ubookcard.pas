@@ -228,10 +228,10 @@ begin
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
-      .NextLevel(TControlInfo.Create(TPanel).WithAlign(alLeft).WithWidth(150))
+      .SubLevel(TControlInfo.Create(TPanel).WithAlign(alLeft).WithWidth(150))
         .AddControl(TControlInfo.Create(TImage, 'Image', FImage).Setup(@SetupImage))
-      .PreviousLevel
-      .NextLevel(TControlInfo.Create(TPanel, 'PanelClient').WithAlign(alClient).WithCaption(''))
+      .SuperLevel
+      .SubLevel(TControlInfo.Create(TPanel, 'PanelClient').WithAlign(alClient).WithCaption(''))
         .SetTopLeftNearControl('Image', rpRight)
         .SetDirection(cpdVertical)
         .AddControl(TControlInfo.Create(TLabel, FLabelTitle).WithAlign(alTop).Setup(@SetupLabel))
@@ -239,7 +239,7 @@ begin
         .AddControl(TControlInfo.Create(TLabel, FLabelFirstEditionYear).WithAlign(alTop).Setup(@SetupLabel))
         .AddControl(TControlInfo.Create(TLabel, FLabelBookURL).WithAlign(alTop).Setup(@SetupLabel))
         .RecalcParentHeight()
-      .PreviousLevel
+      .SuperLevel
     ;
   finally
     ControlBuilder.Free;
