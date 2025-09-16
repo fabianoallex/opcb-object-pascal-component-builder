@@ -1323,7 +1323,7 @@ end;
 
 function TControlBuilder.SubLevel(AGroupName: string): TControlBuilder;
 var
-  R: TRect;
+  R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
   Result := Self;
 
