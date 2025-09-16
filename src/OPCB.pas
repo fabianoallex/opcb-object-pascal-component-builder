@@ -343,8 +343,6 @@ type
     function GetNextRow: Integer;
     procedure SetCellHeight(AValue: Single);
     procedure SetCellWidth(AValue: Single);
-    function PeekNext(out NextRow, NextCol: Integer): Boolean;
-    function Next: Boolean;
     procedure SetColSpan(AValue: Integer);
     procedure SetDirection(AValue: TGridFillDirection);
     procedure SetRowSpan(AValue: Integer);
@@ -359,7 +357,9 @@ type
     function GetRowHeight(ARow: Integer): Single;
     procedure Activate(ARows, ACols: Integer; AOriginLeft, AOriginTop: Single);
     procedure Inactivate;
-    function Step(ARowSpan, AColSpan: Integer; out ARow, ACol: Integer): Boolean;
+    function PeekNext(out NextRow, NextCol: Integer): Boolean;
+    function Next: Boolean;
+    function Step(ARowSpan, AColSpan: Integer; out ARow, ACol: Integer; AMark: Boolean = True): Boolean;
     function CalcSpanRect(ARow, ACol, ARowSpan, AColSpan: Integer;
       AHorizontalSpace, AVerticalSpace: Single;
       out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}): Boolean;
@@ -1993,6 +1993,7 @@ begin
   CurrentLevel.GridMode.SetRowHeight(ARow, AHeight);
 end;
 
+
 function TControlBuilder.GridSkipCell: TControlBuilder;
 var
   Row, Col: Integer;
@@ -2007,7 +2008,7 @@ begin
   else
     CurrentLevel.GridMode.Direction := gfdColFirst;
 
-  if CurrentLevel.GridMode.Step(1, 1, Row, Col) then
+  if CurrentLevel.GridMode.Step(1, 1, Row, Col, False) then
   begin
     if CurrentLevel.GridMode.CalcCellRectAbsolute(
       Row, Col, 1, 1,
@@ -2537,7 +2538,8 @@ begin
   FOccupation := TCellCordStatusDictionary.Create;
 end;
 
-function TGridMode.Step(ARowSpan, AColSpan: Integer; out ARow, ACol: Integer): Boolean;
+{
+function TGridMode.Step(ARowSpan, AColSpan: Integer; out ARow, ACol: Integer; AMark: Boolean): Boolean;
 var
   I: Integer;
   AdvanceSpan: Integer;
@@ -2553,17 +2555,61 @@ begin
   else
     AdvanceSpan := ARowSpan;
 
-  MarkOccupied(CurrentRow, CurrentCol, ARowSpan, AColSpan);
+  if AMark then
+    MarkOccupied(CurrentRow, CurrentCol, ARowSpan, AColSpan);
 
   ARow := CurrentRow;
   ACol := CurrentCol;
 
-  for I:=1 to AdvanceSpan-1 do
+  for I := 1 to AdvanceSpan - 1 do
     if not Next then
       Exit;
 
   Result := True;
 end;
+
+function TGridMode.Step(ARowSpan, AColSpan: Integer; out ARow, ACol: Integer; AMark: Boolean): Boolean;
+var
+  I: Integer;
+  AdvanceSpan: Integer;
+begin
+  Result := False;
+
+  while not IsCellFree(CurrentRow, CurrentCol) do
+    if not Next then
+      Exit;
+
+  if FDirection = gfdRowFirst then
+    AdvanceSpan := AColSpan
+  else
+    AdvanceSpan := ARowSpan;
+
+  if AMark then
+  begin
+    // ocupa célula atual
+    MarkOccupied(CurrentRow, CurrentCol, ARowSpan, AColSpan);
+
+    ARow := CurrentRow;
+    ACol := CurrentCol;
+
+    // avança para a célula seguinte (considerando spans)
+    for I := 1 to AdvanceSpan - 1 do
+      if not Next then
+        Exit;
+  end
+  else
+  begin
+    // não marca: apenas pula para a próxima posição
+    if not Next then
+      Exit;
+
+    ARow := CurrentRow;
+    ACol := CurrentCol;
+  end;
+
+  Result := True;
+end;
+
 
 function TGridMode.CalcSpanRect(ARow, ACol, ARowSpan, AColSpan: Integer;
       AHorizontalSpace, AVerticalSpace: Single;
