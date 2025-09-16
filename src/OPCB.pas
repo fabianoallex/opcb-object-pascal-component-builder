@@ -497,6 +497,8 @@ type
     function GetFContentHeight: Single;
     function GetComponentRegistry: TComponentRegistry;
     function GetItem(const AName: string): TControl;
+    procedure SetupControlInfoForGridMode(AControlInfo: TControlInfo);
+    function CreateControl(Info: TControlInfo; AOwner: TComponent = nil): TControl;
   public
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
@@ -522,7 +524,7 @@ type
     function SiblingSubLevelWithBreak(AGroupName: string=''): TControlBuilder; overload;
     function SiblingSubLevelWithBreak(ADirection: TControlBuilderDirection;
       AGroupName: string=''): TControlBuilder; overload;
-    function SubLevel(AControlInfo: TControlInfo;
+    function SubLevel(AControlInfo: TControlInfo;        // main
       AGroupName: string=''): TControlBuilder; overload;
     function SubLevel(AControlInfo: TControlInfo;
       ADirection: TControlBuilderDirection; AGroupName: string=''): TControlBuilder; overload;
@@ -1072,28 +1074,66 @@ begin
   FLevelStack.Add(TControlBuilderLevel.Create);
 end;
 
+procedure TControlBuilder.SetupControlInfoForGridMode(AControlInfo: TControlInfo);
+var
+  Row, Col: Integer;
+  Dir: TGridFillDirection;
+  RowSpan, ColSpan: Integer;
+  R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+begin
+  if not CurrentLevel.GridMode.Active then
+    Exit;
+
+  RowSpan := CurrentLevel.GridMode.RowSpan;
+  ColSpan := CurrentLevel.GridMode.ColSpan;
+
+  if CurrentLevel.Direction = cpdHorizontal then
+    Dir := gfdRowFirst
+  else
+    Dir := gfdColFirst;
+
+  if not CurrentLevel.GridMode.Step(Dir, RowSpan, ColSpan, Row, Col) then
+    Exit; // fim do grid
+
+  if CurrentLevel.GridMode.CalcCellRectAbsolute(
+     Row, Col, RowSpan, ColSpan,
+     CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace, R) then
+  begin
+    AControlInfo.WithAlign({$IFDEF FRAMEWORK_FMX}TAlignLayout.None{$ELSE}alNone{$ENDIF});
+    AControlInfo.WithLeft(R.Left);
+    AControlInfo.WithTop(R.Top);
+    AControlInfo.WithHeight(R.Bottom - R.Top);
+    AControlInfo.WithWidth(R.Right - R.Left);
+  end;
+
+  CurrentLevel.GridMode.ResetSpans;
+end;
+
+function TControlBuilder.CreateControl(Info: TControlInfo; AOwner: TComponent = nil): TControl;
+var
+  ControlName: string;
+begin
+  ControlName := '';
+  if not Info.Name.IsEmpty then
+    ControlName := Registry.UniqueName(Info.Name);
+
+  if not Info.Top.HasValue then
+    Info := Info.WithTop(CurrentLevel.CurrentTop);
+
+  if not Info.Left.HasValue then
+    Info := Info.WithLeft(CurrentLevel.CurrentLeft);
+
+  if not Assigned(AOwner) then
+    AOwner := FOwner;
+
+  Result := Info.CreateControl(AOwner, CurrentLevel.Parent, ControlName);
+end;
+
 function TControlBuilder.AddControl(AControlInfo: TControlInfo;
   const AGroups: array of string): TControlBuilder;
 var
   Control: TControl;
   Level: TControlBuilderLevel;
-
-  function CreateControl(Info: TControlInfo): TControl;
-  var
-    ControlName: string;
-  begin
-    ControlName := '';
-    if not Info.Name.IsEmpty then
-      ControlName := Registry.UniqueName(Info.Name);
-
-    if not Info.Top.HasValue then
-      Info := Info.WithTop(CurrentLevel.CurrentTop);
-
-    if not Info.Left.HasValue then
-      Info := Info.WithLeft(CurrentLevel.CurrentLeft);
-
-    Result := Info.CreateControl(FOwner, CurrentLevel.Parent, ControlName);
-  end;
 
   procedure ApplyDefaultControlSize;
   begin
@@ -1110,46 +1150,11 @@ var
     {$ENDIF}
   end;
 
-  procedure GridModeConfig;
-  var
-    Row, Col: Integer;
-    Dir: TGridFillDirection;
-    RowSpan, ColSpan: Integer;
-    R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
-  begin
-    if not CurrentLevel.GridMode.Active then
-      Exit;
-
-    RowSpan := CurrentLevel.GridMode.RowSpan;
-    ColSpan := CurrentLevel.GridMode.ColSpan;
-
-    if CurrentLevel.Direction = cpdHorizontal then
-      Dir := gfdRowFirst
-    else
-      Dir := gfdColFirst;
-
-    if not CurrentLevel.GridMode.Step(Dir, RowSpan, ColSpan, Row, Col) then
-      Exit; // fim do grid
-
-    if CurrentLevel.GridMode.CalcCellRectAbsolute(
-       Row, Col, RowSpan, ColSpan,
-       CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace, R) then
-    begin
-      AControlInfo.WithAlign({$IFDEF FRAMEWORK_FMX}TAlignLayout.None{$ELSE}alNone{$ENDIF});
-      AControlInfo.WithLeft(R.Left);
-      AControlInfo.WithTop(R.Top);
-      AControlInfo.WithHeight(R.Bottom - R.Top);
-      AControlInfo.WithWidth(R.Right - R.Left);
-    end;
-
-    CurrentLevel.GridMode.ResetSpans;
-  end;
-
 begin
   Result := Self;
 
   if CurrentLevel.GridMode.Active then
-    GridModeConfig;
+    SetupControlInfoForGridMode(AControlInfo);
 
   Control := CreateControl(AControlInfo);
 
@@ -1407,35 +1412,55 @@ begin
 
   if SuperL.GridMode.Active then
   begin
-    if CurrentLevel.Direction = cpdHorizontal then
-      Dir := gfdRowFirst
-    else
-      Dir := gfdColFirst;
-
-    if SuperL.GridMode.Step(Dir,
-      SuperL.GridMode.RowSpan, SuperL.GridMode.ColSpan,
-      Row, Col
-    ) then
+    if (SubL.Parent = SuperL.Parent) then  // sublevel sem container
     begin
-      if SuperL.GridMode.CalcCellRectAbsolute(
-        SuperL.GridMode.CurrentRow,
-        SuperL.GridMode.CurrentCol,
-        SuperL.GridMode.RowSpan,
-        SuperL.GridMode.ColSpan,
-        SuperL.HorizontalSpace,
-        SuperL.VerticalSpace,
-        R
+      if CurrentLevel.Direction = cpdHorizontal then
+        Dir := gfdRowFirst
+      else
+        Dir := gfdColFirst;
+
+      if SuperL.GridMode.Step(Dir,
+        SuperL.GridMode.RowSpan, SuperL.GridMode.ColSpan,
+        Row, Col
       ) then
       begin
-        // move o cursor para depois da célula
-        MoveTopLeftAfterRect(R,
-          {$IFDEF FRAMEWORK_FMX} TAlignLayout.None {$ELSE} alNone {$ENDIF});
+        if SuperL.GridMode.CalcCellRectAbsolute(
+          SuperL.GridMode.CurrentRow,
+          SuperL.GridMode.CurrentCol,
+          SuperL.GridMode.RowSpan,
+          SuperL.GridMode.ColSpan,
+          SuperL.HorizontalSpace,
+          SuperL.VerticalSpace,
+          R
+        ) then
+        begin
+          // move o cursor para depois da célula
+          MoveTopLeftAfterRect(R,
+            {$IFDEF FRAMEWORK_FMX} TAlignLayout.None {$ELSE} alNone {$ENDIF});
+        end;
       end;
+    end
+    else   // sublevel com container
+    begin
+      if SuperL.GridMode.CalcCellRectAbsolute(
+          SuperL.GridMode.CurrentRow,
+          SuperL.GridMode.CurrentCol,
+          SuperL.GridMode.RowSpan,
+          SuperL.GridMode.ColSpan,
+          SuperL.HorizontalSpace,
+          SuperL.VerticalSpace,
+          R
+        ) then
+        begin
+          // move o cursor para depois da célula
+          MoveTopLeftAfterRect(R,
+            {$IFDEF FRAMEWORK_FMX} TAlignLayout.None {$ELSE} alNone {$ENDIF});
+        end;
     end;
   end
   else
   begin
-    // 🔹 Comportamento antigo (não-grid): usa bounds reais dos controles
+    // Comportamento antigo (não-grid): usa bounds reais dos controles
     Bounds := GetSubLevelBounds;
 
     case SuperL.Direction of
@@ -2214,8 +2239,16 @@ begin
   else
     OwnerToUse := FOwner;
 
-  Control := AControlInfo.CreateControl(OwnerToUse, CurrentLevel.Parent, AControlInfo.Name);
-  AddControl(TControlInfo.Create(Control));
+  if CurrentLevel.GridMode.Active then
+    SetupControlInfoForGridMode(AControlInfo);
+
+  Control := CreateControl(AControlInfo, OwnerToUse);
+
+  if not CurrentLevel.GridMode.Active then
+    AddControl(TControlInfo.Create(Control))
+  else
+    MoveTopLeftAfterControl(Control);
+
   SubLevel(AGroupName);
 
   WithParent(
@@ -2610,9 +2643,7 @@ begin
   ColSpan := 1;
   FCurrentRow := 0;
   FCurrentCol := 0;
-  //if not Assigned(FColWidths) then
   FColWidths := TIntSingleDictionary.Create;
-  //if not Assigned(FRowHeights) then
   FRowHeights := TIntSingleDictionary.Create;
   ResetOccupation;
 end;
