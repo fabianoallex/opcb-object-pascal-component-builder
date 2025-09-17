@@ -8,7 +8,7 @@
 interface
 
 uses
-  {$IFDEF FPC}Controls, StdCtrls, ExtCtrls, Menus, Types,
+  {$IFDEF FPC}Controls, ExtCtrls, Menus,
   {$ELSE}
     {$IFDEF FRAMEWORK_FMX}
     FMX.Controls, FMX.StdCtrls, Fmx.Types, FMX.ExtCtrls, FMX.TabControl, FMX.Forms, FMX.Menus, System.Types,
@@ -580,6 +580,7 @@ type
     function GridSetRowHeight(ARow: Integer; AHeight: Single): TControlBuilder;
     function GridSkipCell: TControlBuilder;
     function GridSkipCells(ANumCells: Integer): TControlBuilder;
+    function GridGotoCell(ARow, ACol: Integer): TControlBuilder;
     function GridFinish: TControlBuilder;
 
     function BreakLine: TControlBuilder; overload;
@@ -1993,7 +1994,6 @@ begin
   CurrentLevel.GridMode.SetRowHeight(ARow, AHeight);
 end;
 
-
 function TControlBuilder.GridSkipCell: TControlBuilder;
 var
   Row, Col: Integer;
@@ -2036,6 +2036,36 @@ begin
   Result := Self;
   for I:=1 to ANumCells do
     GridSkipCell;
+end;
+
+function TControlBuilder.GridGotoCell(ARow, ACol: Integer): TControlBuilder;
+var
+  R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+begin
+  Result := Self;
+
+  // valida limites
+  if (ARow < 0) or (ARow >= CurrentLevel.GridMode.Rows) then
+    raise Exception.CreateFmt('GridGotoCell: linha %d fora dos limites', [ARow]);
+
+  if (ACol < 0) or (ACol >= CurrentLevel.GridMode.Cols) then
+    raise Exception.CreateFmt('GridGotoCell: coluna %d fora dos limites', [ACol]);
+
+  // atualiza posição corrente do grid
+  CurrentLevel.GridMode.FCurrentRow := ARow;
+  CurrentLevel.GridMode.FCurrentCol := ACol;
+  CurrentLevel.GridMode.FFirstPlace := False; // já posicionado manualmente
+
+  // calcula posição absoluta e atualiza CurrentLeft/Top
+  if CurrentLevel.GridMode.CalcCellRectAbsolute(
+    ARow, ACol, 1, 1,
+    CurrentLevel.HorizontalSpace,
+    CurrentLevel.VerticalSpace,
+    R) then
+  begin
+    CurrentLevel.CurrentLeft := R.Left;
+    CurrentLevel.CurrentTop  := R.Top;
+  end;
 end;
 
 function TControlBuilder.GridFinish: TControlBuilder;
@@ -2538,36 +2568,6 @@ begin
   FOccupation := TCellCordStatusDictionary.Create;
 end;
 
-{
-function TGridMode.Step(ARowSpan, AColSpan: Integer; out ARow, ACol: Integer; AMark: Boolean): Boolean;
-var
-  I: Integer;
-  AdvanceSpan: Integer;
-begin
-  Result := False;
-
-  while not IsCellFree(CurrentRow, CurrentCol) do
-    if not Next then
-      Exit;
-
-  if FDirection = gfdRowFirst then
-    AdvanceSpan := AColSpan
-  else
-    AdvanceSpan := ARowSpan;
-
-  if AMark then
-    MarkOccupied(CurrentRow, CurrentCol, ARowSpan, AColSpan);
-
-  ARow := CurrentRow;
-  ACol := CurrentCol;
-
-  for I := 1 to AdvanceSpan - 1 do
-    if not Next then
-      Exit;
-
-  Result := True;
-end;
-
 function TGridMode.Step(ARowSpan, AColSpan: Integer; out ARow, ACol: Integer; AMark: Boolean): Boolean;
 var
   I: Integer;
@@ -2586,20 +2586,17 @@ begin
 
   if AMark then
   begin
-    // ocupa célula atual
     MarkOccupied(CurrentRow, CurrentCol, ARowSpan, AColSpan);
 
     ARow := CurrentRow;
     ACol := CurrentCol;
 
-    // avança para a célula seguinte (considerando spans)
     for I := 1 to AdvanceSpan - 1 do
       if not Next then
         Exit;
   end
   else
   begin
-    // não marca: apenas pula para a próxima posição
     if not Next then
       Exit;
 
