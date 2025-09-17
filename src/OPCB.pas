@@ -324,6 +324,7 @@ type
   TGridMode = class
   private
     FActive: Boolean;
+    FAutoExpand: Boolean;
     FCellHeight: Single;
     FCellWidth: Single;
     FColSpan: Integer;
@@ -348,6 +349,8 @@ type
     procedure SetRowSpan(AValue: Integer);
     function GetColSpanForFill: Integer;
     function GetRowSpanForFill: Integer;
+    procedure ExpandIfNeeded(ARow, ACol: Integer);
+    procedure ExpandForSpan(ARow, ACol, ARowSpan, AColSpan: Integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -384,6 +387,7 @@ type
     property NextRow: Integer read GetNextRow;
     property NextCol: Integer read GetNextCol;
     property Direction: TGridFillDirection read FDirection write SetDirection;
+    property AutoExpand: Boolean read FAutoExpand write FAutoExpand;
   end;
 
   { TControlBuilderLevel }
@@ -572,6 +576,7 @@ type
     function UnsetControlWidthAndHeight: TControlBuilder;
 
     function GridInit(ARows, ACols: Integer): TControlBuilder;
+    function GridFinish: TControlBuilder;
     function GridCellSpan(ACellSpan: Integer): TControlBuilder;
     function GridRowSpan(ARowSpan: Integer): TControlBuilder;
     function GridColSpan(AColSpan: Integer): TControlBuilder;
@@ -581,7 +586,7 @@ type
     function GridSkipCell: TControlBuilder;
     function GridSkipCells(ANumCells: Integer): TControlBuilder;
     function GridGotoCell(ARow, ACol: Integer): TControlBuilder;
-    function GridFinish: TControlBuilder;
+    function GridAutoExpand(AAutoExpand: Boolean): TControlBuilder;
 
     function BreakLine: TControlBuilder; overload;
     function BreakColumn: TControlBuilder; overload;
@@ -1159,11 +1164,28 @@ var
     {$ENDIF}
   end;
 
+  function CanAddToGrid: Boolean;
+  var
+    R, C: Integer;
+  begin
+    Result := False;
+
+    if CurrentLevel.GridMode.AutoExpand then
+      Exit(True);
+
+    Result := CurrentLevel.GridMode.PeekNext(R, C);
+  end;
+
 begin
   Result := Self;
 
   if CurrentLevel.GridMode.Active then
+  begin
+    if not CanAddToGrid then
+      Exit;
+
     SetupControlInfoForGridMode(AControlInfo);
+  end;
 
   Control := CreateControl(AControlInfo);
 
@@ -1941,6 +1963,7 @@ end;
 function TControlBuilder.GridInit(ARows, ACols: Integer): TControlBuilder;
 begin
   Result := Self;
+  SubLevel;
   CurrentLevel.GridMode.Activate(
     ARows,
     ACols,
@@ -1994,6 +2017,12 @@ begin
   CurrentLevel.GridMode.SetRowHeight(ARow, AHeight);
 end;
 
+function TControlBuilder.GridAutoExpand(AAutoExpand: Boolean): TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.GridMode.AutoExpand := AAutoExpand;
+end;
+
 function TControlBuilder.GridSkipCell: TControlBuilder;
 var
   Row, Col: Integer;
@@ -2044,19 +2073,16 @@ var
 begin
   Result := Self;
 
-  // valida limites
   if (ARow < 0) or (ARow >= CurrentLevel.GridMode.Rows) then
     raise Exception.CreateFmt('GridGotoCell: linha %d fora dos limites', [ARow]);
 
   if (ACol < 0) or (ACol >= CurrentLevel.GridMode.Cols) then
     raise Exception.CreateFmt('GridGotoCell: coluna %d fora dos limites', [ACol]);
 
-  // atualiza posição corrente do grid
   CurrentLevel.GridMode.FCurrentRow := ARow;
   CurrentLevel.GridMode.FCurrentCol := ACol;
-  CurrentLevel.GridMode.FFirstPlace := False; // já posicionado manualmente
+  CurrentLevel.GridMode.FFirstPlace := False;
 
-  // calcula posição absoluta e atualiza CurrentLeft/Top
   if CurrentLevel.GridMode.CalcCellRectAbsolute(
     ARow, ACol, 1, 1,
     CurrentLevel.HorizontalSpace,
@@ -2071,7 +2097,11 @@ end;
 function TControlBuilder.GridFinish: TControlBuilder;
 begin
   Result := Self;
-  CurrentLevel.GridMode.Inactivate;
+  if CurrentLevel.GridMode.Active then
+  begin
+    CurrentLevel.GridMode.Inactivate;
+    SuperLevel;
+  end;
 end;
 
 function TControlBuilder.SetDirection(
@@ -2499,11 +2529,51 @@ begin
     Result := False;
 end;
 
+procedure TGridMode.ExpandIfNeeded(ARow, ACol: Integer);
+begin
+  if not FAutoExpand then
+    Exit;
+
+  case Direction of
+    gfdRowFirst:
+      if ARow >= (FRows-1) then
+        Inc(FRows);
+
+    gfdColFirst:
+      if ACol >= (FCols-1) then
+        Inc(FCols);
+  end;
+end;
+
+procedure TGridMode.ExpandForSpan(ARow, ACol, ARowSpan, AColSpan: Integer);
+var
+  RequiredRows, RequiredCols: Integer;
+begin
+  if not FAutoExpand then
+    Exit;
+
+  RequiredRows := ARow + ARowSpan;
+  RequiredCols := ACol + AColSpan;
+
+  if RequiredRows > FRows then
+    FRows := RequiredRows;
+
+  if RequiredCols > FCols then
+    FCols := RequiredCols;
+end;
+
 function TGridMode.Next: Boolean;
 var
   Row, Col: Integer;
 begin
   Result := PeekNext(Row, Col);
+
+  if not Result then
+  begin
+    ExpandIfNeeded(CurrentRow, CurrentCol);
+    Result := PeekNext(Row, Col);
+  end;
+
   if not Result then
     Exit;
 
@@ -2514,6 +2584,8 @@ begin
     FCurrentRow := Row;
     FCurrentCol := Col;
   end;
+
+  Result := True;
 end;
 
 procedure TGridMode.SetColSpan(AValue: Integer);
@@ -2532,29 +2604,52 @@ function TGridMode.GetRowSpanForFill: Integer;
 var
   MaxSpan: Integer;
 begin
-  MaxSpan := (FRows - NextRow);
-
-  if FRowSpan > MaxSpan then
-    Result := MaxSpan
-  else if FRowSpan < 1 then
-    Result := 1
+  if FAutoExpand then
+  begin
+    // com autoexpand não limita pelo tamanho atual
+    if FRowSpan < 1 then
+      Result := 1
+    else
+      Result := FRowSpan;
+  end
   else
-    Result := FRowSpan;
+  begin
+    // sem autoexpand, limita pelo tamanho atual do grid
+    MaxSpan := (FRows - NextRow);
+
+    if FRowSpan > MaxSpan then
+      Result := MaxSpan
+    else if FRowSpan < 1 then
+      Result := 1
+    else
+      Result := FRowSpan;
+  end;
 end;
 
 function TGridMode.GetColSpanForFill: Integer;
 var
   MaxSpan: Integer;
 begin
-  MaxSpan := (FCols - NextCol);
-
-  if FColSpan > MaxSpan then
-    Result := MaxSpan
-  else if FColSpan < 1 then
-    Result := 1
+  if FAutoExpand then
+  begin
+    if FColSpan < 1 then
+      Result := 1
+    else
+      Result := FColSpan;
+  end
   else
-    Result := FColSpan;
+  begin
+    MaxSpan := (FCols - NextCol);
+
+    if FColSpan > MaxSpan then
+      Result := MaxSpan
+    else if FColSpan < 1 then
+      Result := 1
+    else
+      Result := FColSpan;
+  end;
 end;
+
 
 procedure TGridMode.SetRowSpan(AValue: Integer);
 begin
@@ -2566,6 +2661,7 @@ constructor TGridMode.Create;
 begin
   FActive := False;
   FOccupation := TCellCordStatusDictionary.Create;
+  FAutoExpand := False;
 end;
 
 function TGridMode.Step(ARowSpan, AColSpan: Integer; out ARow, ACol: Integer; AMark: Boolean): Boolean;
@@ -2574,6 +2670,8 @@ var
   AdvanceSpan: Integer;
 begin
   Result := False;
+
+  ExpandForSpan(CurrentRow, CurrentCol, ARowSpan, AColSpan);
 
   while not IsCellFree(CurrentRow, CurrentCol) do
     if not Next then
@@ -2686,8 +2784,9 @@ begin
   if AColSpan < 1 then
     AColSpan := 1;
 
-  if (ARow + ARowSpan - 1 >= Rows) or (ACol + AColSpan - 1 >= Cols) then
-    Exit;
+  if not AutoExpand then
+    if (ARow + ARowSpan - 1 >= Rows) or (ACol + AColSpan - 1 >= Cols) then
+      Exit;
 
   // calcula Left: soma larguras+espacos das colunas anteriores
   leftPos := FOriginLeft;
