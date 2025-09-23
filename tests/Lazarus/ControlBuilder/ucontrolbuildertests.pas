@@ -65,6 +65,21 @@ type
     procedure TestGridGotoCell;
     procedure TestGridRowSpanWithSpace;
     procedure TestGridColSpanWithSpace;
+    procedure TestGrid1x1;
+    procedure TestGridGoToLastCell;
+    procedure TestCellStrechHorizontal;
+    procedure TestCellStrechVertical;
+    procedure TestCellStrechAll;
+    procedure TestCellNoStrech;
+    procedure TestCellNoStrechCenter;
+    procedure TestCellNoStrechTop;
+    procedure TestCellNoStrechTopRight;
+    procedure TestCellNoStrechRight;
+    procedure TestCellNoStrechBottomRight;
+    procedure TestCellNoStrechBottom;
+    procedure TestCellNoStrechBottomLeft;
+    procedure TestCellNoStrechLeft;
+    procedure TestCellNoStrechTopLeft;
   end;
 
 implementation
@@ -1382,6 +1397,363 @@ begin
     ;
 
     AssertEquals('Propriedade Width diferente da esperada', 50*2+9, P.Width);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellStrechHorizontal;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(50, 60)
+        .GridCellStrechHorizontal                                                // strech na horizontal = largura da celula
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(30, 25))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Width diferente da esperada', 50, P.Width);        // usa largura da celula (streched)
+    AssertEquals('Propriedade Height diferente da esperada', 25, P.Height);      // usa altura definida TControlInfo (not streched)
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellStrechVertical;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(50, 60)
+        .GridCellStrechVertical                                                // strech na horizontal = largura da celula
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(30, 25))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Width diferente da esperada', 30, P.Width);        // usa largura definida TControlInfo (not streched)
+    AssertEquals('Propriedade Height diferente da esperada', 60, P.Height);      // usa altura da celula (streched)
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellStrechAll;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(50, 60)
+        .GridCellStrechAll                                                // strech na horizontal e vertical
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(30, 25))   // 30 e 25: esses valores sao ignorados
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Width diferente da esperada', 50, P.Width);        // usa largura da celula (streched)
+    AssertEquals('Propriedade Height diferente da esperada', 60, P.Height);      // usa altura da celula (streched)
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrech;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(50, 60)
+        .GridCellNoStrech                                                     // sem strech
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(30, 25))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Width diferente da esperada', 30, P.Width);        // usa largura definida no TControlInfo
+    AssertEquals('Propriedade Height diferente da esperada', 25, P.Height);      // usa altura definida no TControlInfo
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechCenter;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpCenter)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', (60 div 2) - (10 div 2), P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', (50 div 2) - (14 div 2), P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechTop;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpTop)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', (60 div 2) - (10 div 2), P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechTopRight;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpTopRight)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', 60 - 10, P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechRight;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpRight)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', 60 - 10, P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', (50 div 2) - (14 div 2), P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechBottomRight;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpBottomRight)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', 60 - 10, P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', 50 - 14, P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechBottom;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpBottom)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', (60 div 2) - (10 div 2), P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', 50 - 14, P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechBottomLeft;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpBottomLeft)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', 50 - 14, P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechLeft;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpLeft)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', (50 div 2) - (14 div 2), P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestCellNoStrechTopLeft;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(60, 50)
+        .GridCellNoStrech
+        .GridCellPosition(cpTopLeft)
+        .AddControl(TControlInfo.Create(TPanel, P).WithWidthAndHeight(10, 14))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
+    AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGrid1x1;
+{ testa bug corrigido. não incluia controle em grid 1x1 }
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    P := nil;
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(50, 50)
+        .GridCellStrechAll
+        .AddControl(TControlInfo.Create(TPanel, P))
+      .GridFinish
+    ;
+
+    AssertNotNull('P não deveria ser null', P);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGridGoToLastCell;
+{ testa bug corrigido. não incluia controle ao posicionar na última celula. }
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    P := nil;
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .GridInit(2, 2)
+        .GridGotoCell(1, 1)
+        .GridSetCellWidthAndHeight(50, 50)
+        .GridCellStrechAll
+        .AddControl(TControlInfo.Create(TPanel, P))
+      .GridFinish
+    ;
+
+    AssertNotNull('P não deveria ser null', P);
   finally
     ControlBuilder.Free;
   end;

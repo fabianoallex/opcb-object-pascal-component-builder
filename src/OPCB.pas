@@ -1203,6 +1203,16 @@ var
   begin
     Result := False;
 
+    if CurrentLevel.GridMode.IsCellFree(
+      CurrentLevel.GridMode.CurrentRow,
+      CurrentLevel.GridMode.CurrentCol
+    ) then
+    begin
+      Result := True;
+      Exit;
+    end;
+
+
     if (CurrentLevel.GridMode.Direction = gfdRowFirst) and (gaeRows in CurrentLevel.GridMode.AutoExpand)
        or
        (CurrentLevel.GridMode.Direction = gfdColFirst) and (gaeCols in CurrentLevel.GridMode.AutoExpand)
