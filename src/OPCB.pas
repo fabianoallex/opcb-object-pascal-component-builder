@@ -590,7 +590,8 @@ type
     function GridAutoExpand: TControlBuilder;
     function GridAutoExpandRows: TControlBuilder;
     function GridAutoExpandCols: TControlBuilder;
-
+    function GridReturnNumberOfRows(out ARows: Integer): TControlBuilder;
+    function GridReturnNumberOfCols(out ACols: Integer): TControlBuilder;
 
     function BreakLine: TControlBuilder; overload;
     function BreakColumn: TControlBuilder; overload;
@@ -641,6 +642,11 @@ type
       AReferenceGroup: array of string): TControlBuilder;
     function CopySize(const AControlNames,
       AReferenceGroup: array of string): TControlBuilder;
+
+    function ReturnCurrentLevel(var ACurrentLevel: TControlBuilderLevel): TControlBuilder;
+    function ReturnLastControl(out AControl: TControl): TControlBuilder;
+
+
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property ContentWidth: Single read GetContentWidth;
     property ContentHeight: Single read GetFContentHeight;
@@ -1521,24 +1527,31 @@ begin
   else
   begin
     // Comportamento antigo (não-grid): usa bounds reais dos controles
-    Bounds := GetSubLevelBounds;
+    if FGroups.ContainsKey(SubL.GroupName) then
+    begin
+      Bounds := GetSubLevelBounds;
 
-    case SuperL.Direction of
-      cpdHorizontal:
-        begin
-          SuperL.CurrentLeft := Bounds.Right + SuperL.HorizontalSpace;
-          SuperL.MaxControlHeight :=
-            Max(SuperL.MaxControlHeight, Bounds.Height + SuperL.VerticalSpace);
-        end;
-      cpdVertical:
-        begin
-          SuperL.CurrentTop := Bounds.Bottom + SuperL.VerticalSpace;
-          SuperL.MaxControlWidth :=
-            Max(SuperL.MaxControlWidth, Bounds.Width + SuperL.HorizontalSpace);
-        end;
+      case SuperL.Direction of
+        cpdHorizontal:
+          begin
+            SuperL.CurrentLeft := Bounds.Right + SuperL.HorizontalSpace;
+            SuperL.MaxControlHeight :=
+              Max(SuperL.MaxControlHeight, Bounds.Height + SuperL.VerticalSpace);
+          end;
+        cpdVertical:
+          begin
+            SuperL.CurrentTop := Bounds.Bottom + SuperL.VerticalSpace;
+            SuperL.MaxControlWidth :=
+              Max(SuperL.MaxControlWidth, Bounds.Width + SuperL.HorizontalSpace);
+          end;
+      end;
     end;
 
-    MoveTopLeftAfterBound(GetGroupBounds(SuperL.GroupName));
+    // só move o top/left se existir o GroupName do level,
+    // ou seja foi inserido pelo menos 1 controle
+
+    if FGroups.ContainsKey(SuperL.GroupName) then
+      MoveTopLeftAfterBound(GetGroupBounds(SuperL.GroupName));
   end;
 
   FLevelStack.Delete(FLevelStack.Count - 1); // remove nível atual
@@ -1669,6 +1682,20 @@ begin
     Ctrl.Height := Round(RefBounds.Height);
     {$ENDIF}
   end;
+end;
+
+function TControlBuilder.ReturnCurrentLevel(var ACurrentLevel: TControlBuilderLevel): TControlBuilder;
+begin
+  Result := Self;
+  ACurrentLevel := Self.CurrentLevel;
+end;
+
+function TControlBuilder.ReturnLastControl(out AControl: TControl): TControlBuilder;
+begin
+  Result := Self;
+  AControl := nil;
+  if Self.Controls.Count > 0 then;
+    AControl := Self.Controls.Last;
 end;
 
 function TControlBuilder.GetNamedControl(const AName: string): TControl;
@@ -2040,6 +2067,18 @@ function TControlBuilder.GridAutoExpandCols: TControlBuilder;
 begin
   Result := Self;
   CurrentLevel.GridMode.AutoExpand := [gaeCols];
+end;
+
+function TControlBuilder.GridReturnNumberOfRows(out ARows: Integer): TControlBuilder;
+begin
+  Result := Self;
+  ARows := Self.CurrentLevel.GridMode.Rows;
+end;
+
+function TControlBuilder.GridReturnNumberOfCols(out ACols: Integer): TControlBuilder;
+begin
+  Result := Self;
+  ACols := Self.CurrentLevel.GridMode.Cols;
 end;
 
 function TControlBuilder.GridSkipCell: TControlBuilder;

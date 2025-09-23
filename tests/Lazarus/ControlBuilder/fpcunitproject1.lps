@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONFIG>
+  <ProjectSession>
+    <PathDelim Value="\"/>
+    <Version Value="12"/>
+    <BuildModes Active="Default"/>
+    <Units>
+      <Unit>
+        <Filename Value="fpcunitproject1.lpr"/>
+        <IsPartOfProject Value="True"/>
+        <EditorIndex Value="-1"/>
+        <WindowIndex Value="-1"/>
+        <TopLine Value="-1"/>
+        <CursorPos X="-1" Y="-1"/>
+        <UsageCount Value="142"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UControlBuilderTests"/>
+        <TopLine Value="48"/>
+        <CursorPos X="21" Y="63"/>
+        <UsageCount Value="142"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="2"/>
+        <TopLine Value="291"/>
+        <CursorPos X="14" Y="589"/>
+        <UsageCount Value="71"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\fcl-fpcunit\src\fpcunit.pp"/>
+        <EditorIndex Value="1"/>
+        <TopLine Value="70"/>
+        <CursorPos X="64" Y="98"/>
+        <UsageCount Value="54"/>
+        <Loaded Value="True"/>
+      </Unit>
+    </Units>
+    <JumpHistory HistoryIndex="29">
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1263" Column="3" TopLine="1233"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="62" Column="15" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1222" Column="5" TopLine="1186"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="64" Column="15" TopLine="45"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1281" Column="39" TopLine="1265"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="589" Column="24" TopLine="578"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="2132" Column="3" TopLine="2126"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="65" Column="32" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1301" Column="3" TopLine="1271"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="56" Column="15" TopLine="48"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1020" Column="5" TopLine="995"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="65" Column="15" TopLine="39"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1301" Column="37" TopLine="1269"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="67" Column="39" TopLine="48"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1327" Column="3" TopLine="1297"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="59" Column="15" TopLine="50"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1121" Column="5" TopLine="1088"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="67" Column="15" TopLine="42"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1328" Column="4" TopLine="1319"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1335" Column="86" TopLine="1325"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="68" Column="39" TopLine="50"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1361" Column="3" TopLine="1331"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="67" Column="15" TopLine="51"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1331" Column="3" TopLine="1324"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="60" Column="15" TopLine="50"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1154" Column="5" TopLine="1122"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="68" Column="15" TopLine="43"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1385" Column="78" TopLine="1352"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="68" Column="15" TopLine="51"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="1376" Column="61" TopLine="1354"/>
+      </Position>
+    </JumpHistory>
+    <RunParams>
+      <FormatVersion Value="2"/>
+      <Modes ActiveMode=""/>
+    </RunParams>
+  </ProjectSession>
+  <Debugging>
+    <Watches>
+      <Item>
+        <Expression Value="InitialLevel.Direction"/>
+      </Item>
+      <Item>
+        <Expression Value="SubLevel.Direction"/>
+      </Item>
+      <Item>
+        <Expression Value="SuperLevel.Direction"/>
+      </Item>
+    </Watches>
+  </Debugging>
+</CONFIG>
