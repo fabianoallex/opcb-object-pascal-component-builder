@@ -12,8 +12,7 @@ O **OPCB (Object Pascal Component Builder)** é uma biblioteca que facilita a co
 - 🔹 **Menos código repetitivo**.
 - 🔹 **Organização em níveis hierárquicos** – Facilita a criação de layouts aninhados.  
 - 🔹 **Suporte a grids automáticos** – Adicione controles em células com `RowSpan` e `ColSpan`.  
-- 🔹 **Compatível com VCL, LCL e FMX** .  
-- 🔹 **Extensível** – Crie seus próprios builders especializados.  
+- 🔹 **Compatível com VCL, LCL e FMX** . 
 
 ---
 
