@@ -320,6 +320,10 @@ type
     = {$IFDEF FPC}specialize{$ENDIF} TDictionary<TGridCellCoord, TGridCellStatus>;
 
   TGridAutoExpand = set of (gaeRows, gaeCols);
+  TCellStrech = set of (csVertical, csHorizontal);
+  TCellPosition = (cpCenter, cpTop, cpRight, cpBottom, cpLeft,
+    cpTopRight, cpTopLeft, cpBottomRight, cpBottomLeft);
+
 
   { TGridMode }
 
@@ -341,9 +345,13 @@ type
     FOccupation: TCellCordStatusDictionary;
     FRowSpan: Integer;
     FDirection: TGridFillDirection;
+    FCellStrech: TCellStrech;
+    FCellPosition: TCellPosition;
     function GetNextCol: Integer;
     function GetNextRow: Integer;
     procedure SetCellHeight(AValue: Single);
+    procedure SetCellPosition(AValue: TCellPosition);
+    procedure SetCellStrech(AValue: TCellStrech);
     procedure SetCellWidth(AValue: Single);
     procedure SetColSpan(AValue: Integer);
     procedure SetDirection(AValue: TGridFillDirection);
@@ -370,6 +378,10 @@ type
     procedure ResetOccupation;
     procedure MarkOccupied(ARow, ACol, ARowSpan, AColSpan: Integer);
     function IsCellFree(ARow, ACol: Integer): Boolean;
+    function AdjustRectForCellLayout(
+      const CellRect: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+        AControlWidth, AControlHeight: Single
+      ): {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
     function CalcCellRectAbsolute(
       ARow, ACol, ARowSpan, AColSpan: Integer;
       AHorizontalSpace, AVerticalSpace: Single;
@@ -389,6 +401,8 @@ type
     property NextCol: Integer read GetNextCol;
     property Direction: TGridFillDirection read FDirection write SetDirection;
     property AutoExpand: TGridAutoExpand read FAutoExpand write FAutoExpand;
+    property CellStrech: TCellStrech read FCellStrech write SetCellStrech;
+    property CellPosition: TCellPosition read FCellPosition write SetCellPosition;
   end;
 
   { TControlBuilderLevel }
@@ -590,6 +604,11 @@ type
     function GridAutoExpand: TControlBuilder;
     function GridAutoExpandRows: TControlBuilder;
     function GridAutoExpandCols: TControlBuilder;
+    function GridCellPosition(ACellPosition: TCellPosition): TControlBuilder;
+    function GridCellNoStrech: TControlBuilder;
+    function GridCellStrechAll: TControlBuilder;
+    function GridCellStrechHorizontal: TControlBuilder;
+    function GridCellStrechVertical: TControlBuilder;
     function GridReturnNumberOfRows(out ARows: Integer): TControlBuilder;
     function GridReturnNumberOfCols(out ACols: Integer): TControlBuilder;
 
@@ -1103,7 +1122,8 @@ procedure TControlBuilder.SetupControlInfoForGridMode(AControlInfo: TControlInfo
 var
   Row, Col: Integer;
   RowSpan, ColSpan: Integer;
-  R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  RCell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  RControl: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
   if not CurrentLevel.GridMode.Active then
     Exit;
@@ -1118,13 +1138,19 @@ begin
 
   if CurrentLevel.GridMode.CalcCellRectAbsolute(
      Row, Col, RowSpan, ColSpan,
-     CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace, R) then
+     CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace, RCell) then
   begin
+    RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(
+      RCell,
+      AControlInfo.Width,
+      AControlInfo.Height
+    );
+
     AControlInfo.WithAlign({$IFDEF FRAMEWORK_FMX}TAlignLayout.None{$ELSE}alNone{$ENDIF});
-    AControlInfo.WithLeft(R.Left);
-    AControlInfo.WithTop(R.Top);
-    AControlInfo.WithHeight(R.Bottom - R.Top);
-    AControlInfo.WithWidth(R.Right - R.Left);
+    AControlInfo.WithLeft(RControl.Left);
+    AControlInfo.WithTop(RControl.Top);
+    AControlInfo.WithHeight(RControl.Bottom - RControl.Top);
+    AControlInfo.WithWidth(RControl.Right - RControl.Left);
   end;
 
   CurrentLevel.GridMode.ResetSpans;
@@ -2069,6 +2095,36 @@ begin
   CurrentLevel.GridMode.AutoExpand := [gaeCols];
 end;
 
+function TControlBuilder.GridCellPosition(ACellPosition: TCellPosition): TControlBuilder;
+begin
+  Result := Self;
+  Self.CurrentLevel.GridMode.CellPosition := ACellPosition;
+end;
+
+function TControlBuilder.GridCellNoStrech: TControlBuilder;
+begin
+  Result := Self;
+  Self.CurrentLevel.GridMode.CellStrech := [];
+end;
+
+function TControlBuilder.GridCellStrechAll: TControlBuilder;
+begin
+  Result := Self;
+  Self.CurrentLevel.GridMode.CellStrech := [csVertical, csHorizontal];
+end;
+
+function TControlBuilder.GridCellStrechHorizontal: TControlBuilder;
+begin
+  Result := Self;
+  Self.CurrentLevel.GridMode.CellStrech := [csHorizontal];
+end;
+
+function TControlBuilder.GridCellStrechVertical: TControlBuilder;
+begin
+  Result := Self;
+  Self.CurrentLevel.GridMode.CellStrech := [csVertical];
+end;
+
 function TControlBuilder.GridReturnNumberOfRows(out ARows: Integer): TControlBuilder;
 begin
   Result := Self;
@@ -2524,6 +2580,18 @@ begin
   FCellHeight := AValue;
 end;
 
+procedure TGridMode.SetCellPosition(AValue: TCellPosition);
+begin
+  if FCellPosition = AValue then Exit;
+  FCellPosition := AValue;
+end;
+
+procedure TGridMode.SetCellStrech(AValue: TCellStrech);
+begin
+  if FCellStrech = AValue then Exit;
+  FCellStrech := AValue;
+end;
+
 function TGridMode.GetNextCol: Integer;
 var
   Row: Integer;
@@ -2701,7 +2769,6 @@ begin
   end;
 end;
 
-
 procedure TGridMode.SetRowSpan(AValue: Integer);
 begin
   if FRowSpan = AValue then Exit;
@@ -2713,6 +2780,8 @@ begin
   FActive := False;
   FOccupation := TCellCordStatusDictionary.Create;
   FAutoExpand := [];
+  FCellStrech := [csVertical, csHorizontal];
+  FCellPosition := cpCenter;
 end;
 
 function TGridMode.Step(out ARowSpan, AColSpan: Integer; out ARow, ACol: Integer; AMark: Boolean): Boolean;
@@ -2817,6 +2886,55 @@ procedure TGridMode.ResetSpans;
 begin
   RowSpan := 1;
   ColSpan := 1;
+end;
+
+function TGridMode.AdjustRectForCellLayout(
+  const CellRect: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  AControlWidth, AControlHeight: Single
+): {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+var
+  FinalW, FinalH: Single;
+  X, Y: Single;
+begin
+  // --- largura ---
+  if csHorizontal in FCellStrech then
+    FinalW := CellRect.Width
+  else
+    FinalW := AControlWidth;
+
+  // --- altura ---
+  if csVertical in FCellStrech then
+    FinalH := CellRect.Height
+  else
+    FinalH := AControlHeight;
+
+  // --- posição horizontal ---
+  case FCellPosition of
+    cpLeft, cpTopLeft, cpBottomLeft:
+      X := CellRect.Left;
+    cpRight, cpTopRight, cpBottomRight:
+      X := CellRect.Right - FinalW;
+  else
+    // centraliza (default)
+    X := CellRect.Left + (CellRect.Width - FinalW) / 2;
+  end;
+
+  // --- posição vertical ---
+  case FCellPosition of
+    cpTop, cpTopLeft, cpTopRight:
+      Y := CellRect.Top;
+    cpBottom, cpBottomLeft, cpBottomRight:
+      Y := CellRect.Bottom - FinalH;
+  else
+    // centraliza (default)
+    Y := CellRect.Top + (CellRect.Height - FinalH) / 2;
+  end;
+
+  {$IFDEF FRAMEWORK_FMX}
+    Result := TRectF.Create(X, Y, X + FinalW, Y + FinalH);
+  {$ELSE}
+    Result := TRect.Create(Trunc(X), Trunc(Y), Trunc(X + FinalW), Trunc(Y + FinalH));
+  {$ENDIF}
 end;
 
 function TGridMode.CalcCellRectAbsolute(
