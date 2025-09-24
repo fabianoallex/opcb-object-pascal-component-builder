@@ -37,6 +37,8 @@ type
   TMenuSetupProc = procedure(AMenu: TMenu) of object;
   TMenuItemSetupProc = procedure(AMenuItem: TMenuItem) of object;
 
+  TControlSetupProcList = {$IFDEF FPC}specialize{$ENDIF} TList<TControlSetupProc>;
+
   { TComponentInfo }
 
   TComponentInfo = class
@@ -134,7 +136,7 @@ type
   private
     FControl: TControl;
     FControlClass: TControlClass;
-    FSetupProc: TControlSetupProc;
+    FSetupProcList: TControlSetupProcList;
     FName: string;
     FCaption: TOptionalString;
     FText: TOptionalString;
@@ -150,8 +152,10 @@ type
     constructor Create(AClass: TControlClass; const AName: string=''); overload;
     constructor Create(AClass: TControlClass; const AName: string; out Reference); overload;
     constructor Create(AClass: TControlClass; out Reference); overload;
+    destructor Destroy; override;
     function Assign(out Reference): TControlInfo; overload;
-    function Setup(AProc: TControlSetupProc): TControlInfo;
+    function Setup(AProc: TControlSetupProc): TControlInfo; overload;
+    function Setup(const AProcs: array of TControlSetupProc): TControlInfo; overload;
     function WithAlign(
       AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TControlInfo;
     function WithName(AName: string): TControlInfo;
@@ -167,7 +171,7 @@ type
       const AControlName: string): TControl;
     property Control: TControl read FControl;
     property ControlClass: TControlClass read FControlClass;
-    property SetupProc: TControlSetupProc read FSetupProc;
+    // property SetupProc: TControlSetupProc read FSetupProc;
     property Name: string read FName;
     property Caption: TOptionalString read FCaption;
     property Text: TOptionalString read FText;
@@ -716,7 +720,7 @@ begin
   FText := TOptionalString.None;
   FTop := TOptionalSingle.None;
   FLeft := TOptionalSingle.None;
-  FSetupProc := nil;
+  FSetupProcList := nil;
   FOnClick := nil;
   FTargetField := nil;
 end;
@@ -746,13 +750,15 @@ begin
   FText := TOptionalString.None;
   FTop := TOptionalSingle.None;
   FLeft := TOptionalSingle.None;
-  FSetupProc := nil;
+  FSetupProcList := nil;
   FOnClick := nil;
   FTargetField := nil;
 end;
 
 function TControlInfo.CreateControl(AOwner: TComponent; AParent: TWinControl;
   const AControlName: string): TControl;
+var
+  Proc: TControlSetupProc;
 begin
   try
     if Assigned(Control) then
@@ -821,11 +827,21 @@ begin
     if Assigned(FTargetField) then
       PPointer(FTargetField)^ := Result;
 
-    if Assigned(SetupProc) then
-      SetupProc(Result);
+    // if Assigned(SetupProc) then
+    //  SetupProc(Result);
+    if Assigned(FSetupProcList) then
+      for Proc in FSetupProcList do
+        Proc(Result);
   finally
     Free;
   end;
+end;
+
+destructor TControlInfo.Destroy;
+begin
+  if Assigned(FSetupProcList) then
+    FSetupProcList.Free;
+  inherited;
 end;
 
 function TControlInfo.Assign(out Reference): TControlInfo;
@@ -874,7 +890,20 @@ end;
 function TControlInfo.Setup(AProc: TControlSetupProc): TControlInfo;
 begin
   Result := Self;
-  FSetupProc := AProc;
+  if not Assigned(FSetupProcList) then
+    FSetupProcList := TControlSetupProcList.Create;
+  FSetupProcList.Add(AProc);
+end;
+
+function TControlInfo.Setup(const AProcs: array of TControlSetupProc): TControlInfo;
+var
+  Proc: TControlSetupProc;
+begin
+  if not Assigned(FSetupProcList) then
+    FSetupProcList := TControlSetupProcList.Create;
+  for Proc in AProcs do
+    FSetupProcList.Add(Proc);
+  Result := Self;
 end;
 
 function TControlInfo.WithText(AText: string): TControlInfo;

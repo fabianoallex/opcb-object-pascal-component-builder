@@ -106,14 +106,28 @@ procedure TControlBuilderTests.TestTopLeft;
 var
   ControlBuilder: TControlBuilder;
   P: TPanel;
+  ci: TControlInfo;
 begin
   ControlBuilder := TControlBuilder.Create;
   try
+    with ControlBuilder do
+    begin
+      WithOwnerAndParent(FForm, FForm);
+      SetTopLeft(10, 20);
+
+      ci := TControlInfo.Create(TPanel, P);
+
+      AddControl(
+        ci
+      );
+    end;
+     {
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .AddControl(TControlInfo.Create(TPanel, P))
     ;
+    }
 
     AssertEquals('Propriedade Top diferente da esperada', 10, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 20, P.Left);
