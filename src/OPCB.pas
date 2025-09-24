@@ -1225,6 +1225,32 @@ var
     Result := CurrentLevel.GridMode.PeekNext(R, C);
   end;
 
+  procedure AdjustControlToCell(AControl: TControl; ACellRect: TRect);
+  var
+    RControl: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  begin
+
+    RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(
+      ACellRect,
+      AControl.Width,
+      AControl.Height
+    );
+
+    AControl.Left := RControl.Left;
+    AControl.Top := RControl.Top;
+    // AControlInfo.WithHeight(RCell.Bottom - RCell.Top);
+    // AControlInfo.WithWidth(RCell.Right - RCell.Left);
+  end;
+
+  function GetRectFromControlInfo(AControlInfo: TControlInfo): TRect;
+  begin
+    Result := TRect.Create(
+      TPoint.Create(Trunc(AControlInfo.Top.Value), Trunc(AControlInfo.Left.Value)),
+      Trunc(AControlInfo.Width),
+      Trunc(AControlInfo.Height)
+    );
+  end;
+
 begin
   Result := Self;
 
@@ -1234,9 +1260,16 @@ begin
       Exit;
 
     SetupControlInfoForGridMode(AControlInfo);
+    Control := CreateControl(AControlInfo);
+
+
+  end
+  else
+  begin
+    Control := CreateControl(AControlInfo);
   end;
 
-  Control := CreateControl(AControlInfo);
+
 
   ApplyDefaultControlSize;
 
