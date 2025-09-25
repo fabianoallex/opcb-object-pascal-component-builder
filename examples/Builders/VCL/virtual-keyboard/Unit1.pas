@@ -78,7 +78,7 @@ begin
           .GridSetCellWidthAndHeight(80, 80)
           .GridSetRowOffset(1, 15)
           .GridSetRowOffset(2, 50)
-          .ExternalProc(procedure (ABuilder: TControlBuilder)
+          .External(procedure (ABuilder: TControlBuilder)
             const KeyRows: array[0..2] of string = ('QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM');
             var Key: Char;
             begin
@@ -95,7 +95,7 @@ begin
         .IncLeft(20)
         .GridInit(4, 3)
           .GridSetCellWidthAndHeight(80, 80)
-          .ExternalProc(procedure (ABuilder: TControlBuilder)
+          .External(procedure (ABuilder: TControlBuilder)
             const Keys = '789456123';
             var Key: Char;
             begin

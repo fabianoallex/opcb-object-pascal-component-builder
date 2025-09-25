@@ -546,7 +546,7 @@ type
     function GetControl(const AName: string): TControl; overload;
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
     function External(const AProc: TControlBuilderObjProc): TControlBuilder; overload;
-    function ExternalProc(const AProc: TControlBuilderProc): TControlBuilder; overload;
+    function External(const AProc: TControlBuilderProc): TControlBuilder; overload;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlBuilder;
     function SubLevel(AGroupName: string=''): TControlBuilder; overload;  // xx
     function SubLevel(ADirection: TControlBuilderDirection;
@@ -2350,7 +2350,7 @@ begin
     AProc(Self);
 end;
 
-function TControlBuilder.ExternalProc(const AProc: TControlBuilderProc): TControlBuilder;
+function TControlBuilder.External(const AProc: TControlBuilderProc): TControlBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
