@@ -36,16 +36,13 @@ type
     procedure TestSetControlWidth;
     procedure TestUnsetControlWidth;
     procedure TestExternal;
-
     procedure TestAddControlToRegistry;                // testa se um conrole ao ser criado é inserido no registro
     procedure TestRemoveControlFromRegistryOnDestroy;  // testa se um controle quando destruído será removido do registro
-
     procedure TestSubLevel;
     procedure TestSubLevelSubLevel;    // mais de um nivel de profunidade
     procedure TestSubLevelSuperLevel;  // testa se volta ao nivel inicial
     procedure TestSubLevelEmpty;       // testa sublevel vazio. deve permitir sem mover top/left.
     procedure TestSubLevelDirectionSuperLevelDirection;
-
     procedure TestGridMode;
     procedure TestGridModeIgnoreAddAfterEndOfGrid;
     procedure TestGridModeNotIgnoreAddAfterEndOfGridWhenAutoExpand;
@@ -58,10 +55,8 @@ type
     procedure TestGridColWidth;
     procedure TestGridRowSpan;
     procedure TestGridColSpan;
-
     procedure TestGridRowSpanOnlyOnce;
     procedure TestGridColSpanOnlyOnce;
-
     procedure TestGridRowSpanOutOfBounds;
     procedure TestGridColSpanOutOfBounds;
     procedure TestGridRowSpanExpandGridRows;
@@ -84,6 +79,8 @@ type
     procedure TestCellNoStrechBottomLeft;
     procedure TestCellNoStrechLeft;
     procedure TestCellNoStrechTopLeft;
+    procedure TestGridRowOffset;
+    procedure TestGridColOffset;
   end;
 
 implementation
@@ -1790,6 +1787,99 @@ begin
 
     AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
     AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGridRowOffset;
+var
+  ControlBuilder: TControlBuilder;
+  P1, P2, P3, P4, P5, P6, P7, P8, P9: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdHorizontal)
+      .GridInit(3, 3)
+        .GridSetCellWidthAndHeight(50, 60)
+        .GridSetRowOffset(1, 15)                      // segunda linha com offset positivo de 15
+        .AddControl(TControlInfo.Create(TPanel, P1))  // linha 1
+        .AddControl(TControlInfo.Create(TPanel, P2))  // linha 1
+        .AddControl(TControlInfo.Create(TPanel, P3))  // linha 1
+
+        .AddControl(TControlInfo.Create(TPanel, P4))  // linha 2
+        .AddControl(TControlInfo.Create(TPanel, P5))  // linha 2
+        .AddControl(TControlInfo.Create(TPanel, P6))  // linha 2
+
+        .AddControl(TControlInfo.Create(TPanel, P7))  // linha 3
+        .AddControl(TControlInfo.Create(TPanel, P8))  // linha 3
+        .AddControl(TControlInfo.Create(TPanel, P9))  // linha 3
+      .GridFinish
+    ;
+
+    // primeira coluna
+    AssertEquals('propriedade Left de P1 diferente da esperada', 0, P1.Left);
+    AssertEquals('propriedade Left de P4 diferente da esperada', 15, P4.Left);  // linha com offset
+    AssertEquals('propriedade Left de P7 diferente da esperada', 0, P7.Left);
+
+    // segunda coluna
+    AssertEquals('propriedade Left de P2 diferente da esperada', 50, P2.Left);
+    AssertEquals('propriedade Left de P5 diferente da esperada', 50 + 15, P5.Left);  // linha com offset
+    AssertEquals('propriedade Left de P8 diferente da esperada', 50, P8.Left);
+
+    // terceira coluna
+    AssertEquals('propriedade Left de P3 diferente da esperada', 50*2, P3.Left);
+    AssertEquals('propriedade Left de P6 diferente da esperada', 50*2 + 15, P6.Left);  // linha com offset
+    AssertEquals('propriedade Left de P9 diferente da esperada', 50*2, P9.Left);
+
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGridColOffset;
+var
+  ControlBuilder: TControlBuilder;
+  P1, P2, P3, P4, P5, P6, P7, P8, P9: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdVertical)
+      .GridInit(3, 3)
+        .GridSetCellWidthAndHeight(50, 60)
+        .GridSetColOffset(1, 15)                      // segunda coluna com offset positivo de 15
+        .AddControl(TControlInfo.Create(TPanel, P1))  // coluna 1
+        .AddControl(TControlInfo.Create(TPanel, P2))  // coluna 1
+        .AddControl(TControlInfo.Create(TPanel, P3))  // coluna 1
+
+        .AddControl(TControlInfo.Create(TPanel, P4))  // coluna 2
+        .AddControl(TControlInfo.Create(TPanel, P5))  // coluna 2
+        .AddControl(TControlInfo.Create(TPanel, P6))  // coluna 2
+
+        .AddControl(TControlInfo.Create(TPanel, P7))  // coluna 3
+        .AddControl(TControlInfo.Create(TPanel, P8))  // coluna 3
+        .AddControl(TControlInfo.Create(TPanel, P9))  // coluna 3
+      .GridFinish
+    ;
+
+    // primeira linha
+    AssertEquals('propriedade Top de P1 diferente da esperada', 0, P1.Top);
+    AssertEquals('propriedade Top de P4 diferente da esperada', 15, P4.Top);  // coluna com offset
+    AssertEquals('propriedade Top de P7 diferente da esperada', 0, P7.Top);
+
+    // segunda linha
+    AssertEquals('propriedade Top de P2 diferente da esperada', 60, P2.Top);
+    AssertEquals('propriedade Top de P5 diferente da esperada', 60 + 15, P5.Top);  // coluna com offset
+    AssertEquals('propriedade Top de P8 diferente da esperada', 60, P8.Top);
+
+    // terceira linha
+    AssertEquals('propriedade Top de P3 diferente da esperada', 60*2, P3.Top);
+    AssertEquals('propriedade Top de P6 diferente da esperada', 60*2 + 15, P6.Top);  // coluna com offset
+    AssertEquals('propriedade Top de P9 diferente da esperada', 60*2, P9.Top);
   finally
     ControlBuilder.Free;
   end;
