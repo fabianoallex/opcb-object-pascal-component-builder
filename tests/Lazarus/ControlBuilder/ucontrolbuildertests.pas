@@ -58,6 +58,10 @@ type
     procedure TestGridColWidth;
     procedure TestGridRowSpan;
     procedure TestGridColSpan;
+
+    procedure TestGridRowSpanOnlyOnce;
+    procedure TestGridColSpanOnlyOnce;
+
     procedure TestGridRowSpanOutOfBounds;
     procedure TestGridColSpanOutOfBounds;
     procedure TestGridRowSpanExpandGridRows;
@@ -1142,8 +1146,8 @@ begin
       .GridFinish
     ;
 
-    AssertEquals('propriedade Height de P1 diferente do esperada', 60, P1.Height);
-    AssertEquals('Propriedade Height de P2 diferente do esperada', 60*2, P2.Height);
+    AssertEquals('propriedade Height de P1 diferente da esperada', 60, P1.Height);
+    AssertEquals('Propriedade Height de P2 diferente da esperada', 60*2, P2.Height);
   finally
     ControlBuilder.Free;
   end;
@@ -1174,8 +1178,75 @@ begin
       .GridFinish
     ;
 
-    AssertEquals('propriedade Width de P1 diferente do esperada', 50, P1.Width);
-    AssertEquals('Propriedade Width de P2 diferente do esperada', 50*2, P2.Width);
+    AssertEquals('propriedade Width de P1 diferente da esperada', 50, P1.Width);
+    AssertEquals('Propriedade Width de P2 diferente da esperada', 50*2, P2.Width);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGridRowSpanOnlyOnce;
+var
+  ControlBuilder: TControlBuilder;
+  P1, P2, P3: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdVertical)
+      .GridInit(4, 2)
+        .GridSetCellWidthAndHeight(50, 60)  // altura da celula
+
+        .AddControl(TControlInfo.Create(TPanel, P1)) // sem rowspan
+        .GridRowSpan(2)
+        .AddControl(TControlInfo.Create(TPanel, P2)) // com rowspan=2
+        .AddControl(TControlInfo.Create(TPanel, P3)) // sem rowspan automaticamente
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+      .GridFinish
+    ;
+
+    AssertEquals('propriedade Height de P1 diferente da esperada', 60, P1.Height);
+    AssertEquals('Propriedade Height de P2 diferente da esperada', 60*2, P2.Height);
+    AssertEquals('propriedade Height de P3 diferente da esperada', 60, P3.Height);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGridColSpanOnlyOnce;
+var
+  ControlBuilder: TControlBuilder;
+  P1, P2, P3: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdHorizontal)
+      .GridInit(2, 4)
+        .GridSetCellWidthAndHeight(50, 60)
+        .AddControl(TControlInfo.Create(TPanel, P1)) // sem colspan
+        .GridColSpan(2)
+        .AddControl(TControlInfo.Create(TPanel, P2)) // com colspan=2
+        .AddControl(TControlInfo.Create(TPanel, P3)) // sem colspan automaticamente
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+      .GridFinish
+    ;
+
+    AssertEquals('propriedade Width de P1 diferente da esperada', 50, P1.Width);
+    AssertEquals('Propriedade Width de P2 diferente da esperada', 50*2, P2.Width);
+    AssertEquals('propriedade Width de P3 diferente da esperada', 50, P3.Width);
   finally
     ControlBuilder.Free;
   end;
