@@ -26,25 +26,10 @@ uses
 {$R *.dfm}
 
 
-procedure TForm1.FormCreate(Sender: TObject);
-var
-  ControlBuilder: TControlBuilder;
-  P: TPanel;
-begin
-  ControlBuilder := TControlBuilder.Create;
-  try
-    ControlBuilder
-      .WithOwnerAndParent(Self, Self)
-      .SetSpace(2, 2)
-      .SetTopLeft(20, 20)
-      .SubLevel(TControlInfo.Create(TPanel))
-        .SetTopLeft(10, 10)
-        .GridInit(4, 10)
-          .GridSetCellWidthAndHeight(80, 80)
-          .GridSetRowOffset(1, 15)
-          .GridSetRowOffset(2, 50)
-          .GridCellStrechAll
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('Q'))
+  procedure Keys(AControlBuilder: TControlBuilder);
+  begin
+    AControlBuilder
+      .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('Q'))
           .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('W'))
           .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('E'))
           .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('R'))
@@ -74,29 +59,57 @@ begin
           .GridSkipCells(5)
           .GridColSpan(5)
           .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('[ SPACE ]'))
+  end;
+
+procedure TForm1.FormCreate(Sender: TObject);
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(Self, Self)
+      .SetSpace(2, 2)
+      .SetTopLeft(20, 20)
+      .SubLevel(TControlInfo.Create(TPanel))
+        .SetTopLeft(10, 10)
+        .GridInit(4, 10)
+          .GridSetCellWidthAndHeight(80, 80)
+          .GridSetRowOffset(1, 15)
+          .GridSetRowOffset(2, 50)
+          .ExternalProc(procedure (ABuilder: TControlBuilder)
+            const KeyRows: array[0..2] of string = ('QWERTYUIOP', 'ASDFGHJKL', 'ZXCVBNM');
+            var Key: Char;
+            begin
+              for Key in KeyRows[0] do ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
+              for Key in KeyRows[1] do ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
+              ABuilder.GridSkipCell;
+              for Key in KeyRows[2] do ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
+              ABuilder
+                .GridSkipCells(5)
+                .GridColSpan(5)
+                .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('[ SPACE ]'));
+            end
+          )
         .GridFinish
         .IncLeft(20)
         .GridInit(4, 3)
           .GridSetCellWidthAndHeight(80, 80)
-          .GridCellStrechAll
-          .GridCellPosition(cpLeft)
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('7'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('8'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('9'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('4'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('5'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('6'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('1'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('2'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('3'))
-          .GridColSpan(2)
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('0'))
-          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption(','))
+          .ExternalProc(procedure (ABuilder: TControlBuilder)
+            const Keys = '789456123';
+            var Key: Char;
+            begin
+              for Key in Keys do ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
+              ABuilder.GridColSpan(2);
+              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption('0'));
+              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(','));
+            end
+          )
         .GridFinish
         .RecalcParentSize(10, 10)
       .SuperLevel
     ;
-
   finally
     ControlBuilder.Free;
   end;

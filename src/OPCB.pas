@@ -514,7 +514,7 @@ type
 
   TControlBuilder = class;
   TControlBuilderObjProc = procedure(const ABuiler: TControlBuilder) of object;
-  TControlBuilderProc = procedure(const ABuiler: TControlBuilder);
+  TControlBuilderProc = procedure(ABuiler: TControlBuilder);
 
   TControlBuilder = class
   private
@@ -546,7 +546,7 @@ type
     function GetControl(const AName: string): TControl; overload;
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
     function External(const AProc: TControlBuilderObjProc): TControlBuilder; overload;
-    function External(const AProc: TControlBuilderProc): TControlBuilder; overload;
+    function ExternalProc(AProc: TControlBuilderProc): TControlBuilder; overload;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlBuilder;
     function SubLevel(AGroupName: string=''): TControlBuilder; overload;  // xx
     function SubLevel(ADirection: TControlBuilderDirection;
@@ -2350,7 +2350,7 @@ begin
     AProc(Self);
 end;
 
-function TControlBuilder.External(const AProc: TControlBuilderProc): TControlBuilder;
+function TControlBuilder.ExternalProc(AProc: TControlBuilderProc): TControlBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
