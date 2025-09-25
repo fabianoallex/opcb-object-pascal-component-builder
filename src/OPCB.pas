@@ -344,8 +344,10 @@ type
     FOriginTop: Single;
     FCurrentCol: Integer;
     FCurrentRow: Integer;
-    FColWidths:  TIntSingleDictionary;
+    FColWidths: TIntSingleDictionary;
     FRowHeights: TIntSingleDictionary;
+    FColOffsets: TIntSingleDictionary;
+    FRowOffsets: TIntSingleDictionary;
     FOccupation: TCellCordStatusDictionary;
     FRowSpan: Integer;
     FDirection: TGridFillDirection;
@@ -369,8 +371,12 @@ type
     destructor Destroy; override;
     procedure SetColWidth(ACol: Integer; AWidth: Single);
     procedure SetRowHeight(ARow: Integer; AHeight: Single);
+    procedure SetColOffset(ACol: Integer; AOffset: Single);
+    procedure SetRowOffset(ARow: Integer; AOffset: Single);
     function GetColWidth(ACol: Integer): Single;
     function GetRowHeight(ARow: Integer): Single;
+    function GetColOffset(ACol: Integer): Single;
+    function GetRowOffset(ARow: Integer): Single;
     procedure Activate(ARows, ACols: Integer; AOriginLeft, AOriginTop: Single);
     procedure Inactivate;
     function PeekNext(out NextRow, NextCol: Integer): Boolean;
@@ -593,7 +599,6 @@ type
     function UnsetControlHeight: TControlBuilder;
     function UnsetControlWidth: TControlBuilder;
     function UnsetControlWidthAndHeight: TControlBuilder;
-
     function GridInit(ARows, ACols: Integer): TControlBuilder;
     function GridFinish: TControlBuilder;
     function GridCellSpan(ACellSpan: Integer): TControlBuilder;
@@ -602,6 +607,8 @@ type
     function GridSetCellWidthAndHeight(AWidth, AHeight: Integer): TControlBuilder;
     function GridSetColWidth(ACol: Integer; AWidth: Single): TControlBuilder;
     function GridSetRowHeight(ARow: Integer; AHeight: Single): TControlBuilder;
+    function GridSetColOffset(ACol: Integer; AOffset: Single): TControlBuilder;
+    function GridSetRowOffset(ARow: Integer; AOffset: Single): TControlBuilder;
     function GridSkipCell: TControlBuilder;
     function GridSkipCells(ANumCells: Integer): TControlBuilder;
     function GridGotoCell(ARow, ACol: Integer): TControlBuilder;
@@ -615,7 +622,6 @@ type
     function GridCellStrechVertical: TControlBuilder;
     function GridReturnNumberOfRows(out ARows: Integer): TControlBuilder;
     function GridReturnNumberOfCols(out ACols: Integer): TControlBuilder;
-
     function BreakLine: TControlBuilder; overload;
     function BreakColumn: TControlBuilder; overload;
     function Break: TControlBuilder; overload;
@@ -2149,6 +2155,18 @@ begin
   CurrentLevel.GridMode.SetRowHeight(ARow, AHeight);
 end;
 
+function TControlBuilder.GridSetColOffset(ACol: Integer; AOffset: Single): TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.GridMode.SetColOffset(ACol, AOffset);
+end;
+
+function TControlBuilder.GridSetRowOffset(ARow: Integer; AOffset: Single): TControlBuilder;
+begin
+  Result := Self;
+  CurrentLevel.GridMode.SetRowOffset(ARow, AOffset);
+end;
+
 function TControlBuilder.GridAutoExpand: TControlBuilder;
 begin
   Result := Self;
@@ -2778,6 +2796,13 @@ begin
   Result := True;
 end;
 
+procedure TGridMode.SetColOffset(ACol: Integer; AOffset: Single);
+begin
+  if not Active then
+    Exit;
+  FColOffsets.AddOrSetValue(ACol, AOffset);
+end;
+
 procedure TGridMode.SetColSpan(AValue: Integer);
 begin
   if FColSpan = AValue then Exit;
@@ -2815,6 +2840,15 @@ begin
   end;
 end;
 
+
+function TGridMode.GetColOffset(ACol: Integer): Single;
+begin
+  Result := 0;
+  if not Active then
+    Exit;
+  if not FColOffsets.TryGetValue(ACol, Result) then
+    Result := 0;
+end;
 
 function TGridMode.GetColSpanForFill: Integer;
 var
@@ -3034,12 +3068,12 @@ begin
       Exit;
 
   // calcula Left: soma larguras+espacos das colunas anteriores
-  leftPos := FOriginLeft;
+  leftPos := FOriginLeft + GetRowOffset(ARow);
   for Col := 0 to ACol - 1 do
     LeftPos := LeftPos + GetColWidth(col) + AHorizontalSpace;
 
   // calcula Top: soma alturas+espacos das linhas anteriores
-  TopPos := FOriginTop;
+  TopPos := FOriginTop + GetColOffset(ACol);
   for Row := 0 to ARow - 1 do
     TopPos := TopPos + GetRowHeight(row) + AVerticalSpace;
 
@@ -3067,12 +3101,14 @@ end;
 destructor TGridMode.Destroy;
 begin
   FOccupation.Free;
-
   if Assigned(FColWidths) then
     FColWidths.Free;
   if Assigned(FRowHeights) then
     FRowHeights.Free;
-
+  if Assigned(FColOffsets) then
+    FColOffsets.Free;
+  if Assigned(FRowOffsets) then
+    FRowOffsets.Free;
   inherited;
 end;
 
@@ -3088,6 +3124,13 @@ begin
   if not Active then
     Exit;
   FRowHeights.AddOrSetValue(ARow, AHeight);
+end;
+
+procedure TGridMode.SetRowOffset(ARow: Integer; AOffset: Single);
+begin
+  if not Active then
+    Exit;
+  FRowOffsets.AddOrSetValue(ARow, AOffset);
 end;
 
 function TGridMode.GetColWidth(ACol: Integer): Single;
@@ -3108,6 +3151,15 @@ begin
     Result := CellHeight;
 end;
 
+function TGridMode.GetRowOffset(ARow: Integer): Single;
+begin
+  Result := 0;
+  if not Active then
+    Exit;
+  if not FRowOffsets.TryGetValue(ARow, Result) then
+    Result := 0;
+end;
+
 procedure TGridMode.Activate(ARows, ACols: Integer; AOriginLeft, AOriginTop: Single);
 begin
   if Active then
@@ -3125,6 +3177,8 @@ begin
   FCurrentCol := 0;
   FColWidths := TIntSingleDictionary.Create;
   FRowHeights := TIntSingleDictionary.Create;
+  FColOffsets := TIntSingleDictionary.Create;
+  FRowOffsets := TIntSingleDictionary.Create;
   ResetOccupation;
 end;
 
