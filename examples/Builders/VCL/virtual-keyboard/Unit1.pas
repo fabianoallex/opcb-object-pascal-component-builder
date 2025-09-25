@@ -86,10 +86,9 @@ begin
               for Key in KeyRows[1] do ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
               ABuilder.GridSkipCell;
               for Key in KeyRows[2] do ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
-              ABuilder
-                .GridSkipCells(5)
-                .GridColSpan(5)
-                .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('[ SPACE ]'));
+              ABuilder.GridSkipCells(5);
+              ABuilder.GridColSpan(5);
+              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption('[ SPACE ]'));
             end
           )
         .GridFinish

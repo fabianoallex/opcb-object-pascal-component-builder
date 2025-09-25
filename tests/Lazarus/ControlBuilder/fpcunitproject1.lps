@@ -18,17 +18,17 @@
         <Filename Value="ucontrolbuildertests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlBuilderTests"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="1863"/>
-        <CursorPos X="35" Y="1882"/>
+        <CursorPos X="101" Y="1880"/>
         <UsageCount Value="211"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="646"/>
-        <CursorPos X="14" Y="611"/>
+        <TopLine Value="498"/>
+        <CursorPos X="59" Y="517"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
@@ -44,7 +44,7 @@
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
         <EditorIndex Value="4"/>
         <CursorPos X="4" Y="27"/>
-        <UsageCount Value="46"/>
+        <UsageCount Value="47"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -53,7 +53,7 @@
         <EditorIndex Value="5"/>
         <TopLine Value="68"/>
         <CursorPos X="3" Y="87"/>
-        <UsageCount Value="46"/>
+        <UsageCount Value="47"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -61,7 +61,7 @@
         <EditorIndex Value="6"/>
         <TopLine Value="55"/>
         <CursorPos X="3" Y="62"/>
-        <UsageCount Value="46"/>
+        <UsageCount Value="47"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -70,19 +70,11 @@
         <EditorIndex Value="3"/>
         <TopLine Value="1307"/>
         <CursorPos X="102" Y="1329"/>
-        <UsageCount Value="23"/>
+        <UsageCount Value="24"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\..\..\src\OPCB.pas"/>
-        <Caret Line="609" Column="14" TopLine="592"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\src\OPCB.pas"/>
-        <Caret Line="2156" TopLine="2151"/>
-      </Position>
       <Position>
         <Filename Value="..\..\..\src\OPCB.pas"/>
         <Caret Line="612" Column="14" TopLine="592"/>
@@ -194,6 +186,14 @@
       <Position>
         <Filename Value="ucontrolbuildertests.pas"/>
         <Caret Line="1872" Column="61" TopLine="1848"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="611" Column="14" TopLine="646"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="517" Column="30" TopLine="498"/>
       </Position>
     </JumpHistory>
     <RunParams>
