@@ -100,7 +100,7 @@ begin
 end;  
 
 ```
-![Exemplo 01](docs/img/img-02.png)
+![Exemplo 02](docs/img/img-02.png)
 
 ---
 
@@ -161,4 +161,108 @@ begin
   end;
 end;   
 ```
-![Exemplo 01](docs/img/img-03.png)
+![Exemplo 03](docs/img/img-03.png)
+
+
+## 🚀 Exemplo: Construindo um Teclado Virtual
+
+O exemplo abaixo demonstra como montar um **teclado virtual** completo usando a biblioteca.
+
+```pascal
+procedure TForm1.FormCreate(Sender: TObject);
+var
+  ControlBuilder: TControlBuilder;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(Self, Self)
+      .SetSpace(2, 2)
+      .SetTopLeft(20, 20)
+      .SubLevel(TControlInfo.Create(TPanel))
+        .SetTopLeft(10, 10)
+        .GridInit(4, 10)
+          .GridSetCellWidthAndHeight(80, 80)
+          .GridSetRowOffset(1, 22)
+          .GridSetRowOffset(2, 65)
+          .External(procedure (ABuilder: TControlBuilder)
+            const KeyRows: array[0..1] of string = ('QWERTYUIOPASDFGHJKL', 'ZXCVBNM');
+            var Key: Char;
+            begin
+              for Key in KeyRows[0] do
+                ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
+              ABuilder.Break;
+              for Key in KeyRows[1] do
+                ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
+              ABuilder.Break;
+              ABuilder.GridSkipCells(2);
+              ABuilder.GridColSpan(5);
+              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption('[ SPACE ]'));
+            end
+          )
+        .GridFinish
+        .IncLeft(20)
+        .GridInit(4, 3)
+          .GridSetCellWidthAndHeight(80, 80)
+          .External(procedure(ABuilder: TControlBuilder)
+            const Keys = '789456123';
+            var Key: Char;
+            begin
+              for Key in Keys do
+                ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
+              ABuilder.GridColSpan(2);
+              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption('0'));
+              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(','));
+            end
+          )
+        .GridFinish
+        .RecalcParentSize(10, 10)
+      .SuperLevel
+    ;
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+```
+![Exemplo 04](docs/img/img-04.png)
+
+---
+
+## 🔑 Funcionalidades Demonstradas
+
+- **Criação fluente de controles**
+  - `.WithOwnerAndParent(Self, Self)` define o owner e parent.
+  - `.SetSpace(2, 2)` / `.SetTopLeft(20, 20)` controlam espaçamento e posição inicial.
+
+- **Hierarquia de níveis**
+  - `.SubLevel(...)` abre um novo escopo de construção (ex.: um `TPanel`).
+  - `.SuperLevel` retorna ao nível anterior.
+
+- **Layouts em grid**
+  - `.GridInit(Cols, Rows)` inicia um grid.
+  - `.GridSetCellWidthAndHeight(W, H)` define as dimensões das células.
+  - `.GridSetRowOffset(Row, Offset)` aplica deslocamento em linhas específicas.
+
+- **Inserção dinâmica de controles**
+  - `.External(procedure(ABuilder: TControlBuilder) ...)`  
+    permite criar controles em lote, como teclas, a partir de arrays/strings.
+
+- **Controle de posicionamento no grid**
+  - `.Break` → quebra de linha/coluna.  
+  - `.GridSkipCells(N)` → pula células.  
+  - `.GridColSpan(N)` → mescla colunas (ex.: tecla **SPACE**).
+
+- **Ajuste automático de container**
+  - `.RecalcParentSize(PaddingX, PaddingY)` redimensiona automaticamente o container pai.
+
+---
+
+## 🎹 Resultado
+
+O exemplo cria:
+
+- Um **teclado QWERTY** com duas linhas de letras e a tecla **[ SPACE ]** expandida.  
+- Um **teclado numérico** com dígitos `0–9` e vírgula.  
+- Ambos organizados dentro de um painel (`TPanel`) que se ajusta automaticamente ao conteúdo.
+
+
