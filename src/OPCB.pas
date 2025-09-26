@@ -943,9 +943,16 @@ end;
 function TControlBuilder.BreakLine: TControlBuilder;
 begin
   Result := Self;
-  CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + CurrentLevel.MaxControlHeight;
-  CurrentLevel.CurrentLeft := CurrentLevel.InitialLeft;
-  CurrentLevel.MaxControlHeight := 0;
+  if CurrentLevel.GridMode.Active then
+  begin
+    Self.GridGotoCell(CurrentLevel.GridMode.CurrentRow + 1, 0);
+  end
+  else
+  begin
+    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + CurrentLevel.MaxControlHeight;
+    CurrentLevel.CurrentLeft := CurrentLevel.InitialLeft;
+    CurrentLevel.MaxControlHeight := 0;
+  end;
 end;
 
 function TControlBuilder.Break: TControlBuilder;
@@ -977,9 +984,16 @@ end;
 function TControlBuilder.BreakColumn: TControlBuilder;
 begin
   Result := Self;
-  CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + CurrentLevel.MaxControlWidth;
-  CurrentLevel.CurrentTop := CurrentLevel.InitialTop;
-  CurrentLevel.MaxControlWidth := 0;
+  if CurrentLevel.GridMode.Active then
+  begin
+    Self.GridGotoCell(0, CurrentLevel.GridMode.CurrentCol + 1);
+  end
+  else
+  begin
+    CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + CurrentLevel.MaxControlWidth;
+    CurrentLevel.CurrentTop := CurrentLevel.InitialTop;
+    CurrentLevel.MaxControlWidth := 0;
+  end;
 end;
 
 function TControlBuilder.CenterControlsVertically(const AControlNames,

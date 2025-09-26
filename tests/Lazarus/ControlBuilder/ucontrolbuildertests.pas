@@ -81,6 +81,8 @@ type
     procedure TestCellNoStrechTopLeft;
     procedure TestGridRowOffset;
     procedure TestGridColOffset;
+    procedure TestGridBreakLine;
+    procedure TestGridBreakColumn;
   end;
 
 implementation
@@ -1880,6 +1882,58 @@ begin
     AssertEquals('propriedade Top de P3 diferente da esperada', 60*2, P3.Top);
     AssertEquals('propriedade Top de P6 diferente da esperada', 60*2 + 15, P6.Top);  // coluna com offset
     AssertEquals('propriedade Top de P9 diferente da esperada', 60*2, P9.Top);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGridBreakLine;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdHorizontal)
+      .GridInit(2, 4)
+        .GridSetCellWidthAndHeight(10, 15)
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .BreakLine
+        .AddControl(TControlInfo.Create(TPanel, P)) // segunda linha, primeira coluna
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Top diferente da esperada', 15, P.Top);
+    AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGridBreakColumn;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdVertical)
+      .GridInit(4, 2)
+        .GridSetCellWidthAndHeight(10, 15)
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .BreakColumn
+        .AddControl(TControlInfo.Create(TPanel, P)) // segunda coluna, primeira linha
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
+    AssertEquals('Propriedade Left diferente da esperada', 10, P.Left);
   finally
     ControlBuilder.Free;
   end;
