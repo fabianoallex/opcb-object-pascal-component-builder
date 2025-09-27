@@ -47,6 +47,7 @@ type
     FComponentClass: TComponentClass;
     FSetupProc: TComponentSetupProc;
     FName: string;
+    FTag: NativeInt;
     FTargetField: Pointer;
   public
     constructor Create(AComponent: TComponent); overload;
@@ -56,6 +57,7 @@ type
     function Assign(out Reference): TComponentInfo; overload;
     function Setup(AProc: TComponentSetupProc): TComponentInfo;
     function WithName(AName: string): TComponentInfo;
+    function WithTag(ATag: NativeInt): TComponentInfo;
     function CreateComponent(AOwner: TComponent; const AComponentName: string): TComponent;
     property Component: TComponent read FComponent;
     property ComponentClass: TComponentClass read FComponentClass;
@@ -78,6 +80,7 @@ type
     FMenuClass: TMenuClass;
     FSetupProc: TMenuSetupProc;
     FName: string;
+    FTag: NativeInt;
     FTargetField: Pointer;
   public
     constructor Create(AMenu: TMenu); overload;
@@ -87,6 +90,7 @@ type
     function Assign(out Reference): TMenuInfo; overload;
     function Setup(AProc: TMenuSetupProc): TMenuInfo;
     function WithName(AName: string): TMenuInfo;
+    function WithTag(ATag: NativeInt): TMenuInfo;
     function CreateMenu(AOwner: TComponent; const AMenuName: string): TMenu;
     property Menu: TMenu read FMenu;
     property MenuClass: TMenuClass read FMenuClass;
@@ -104,6 +108,7 @@ type
     FOnClick: TNotifyEvent;
     FSetupProc: TMenuItemSetupProc;
     FName: string;
+    FTag: NativeInt;
     FCaption: TOptionalString;
     FImageIndex: TOptionalInteger;
     FTargetField: Pointer;
@@ -117,6 +122,7 @@ type
     function Assign(out Reference): TMenuItemInfo; overload;
     function Setup(AProc: TMenuItemSetupProc): TMenuItemInfo;
     function WithName(AName: string): TMenuItemInfo;
+    function WithTag(ATag: NativeInt): TMenuItemInfo;
     function WithCaption(ACaption: string): TMenuItemInfo;
     function WithImageIndex(AImageIndex: Integer): TMenuItemInfo;
     function WithOnClick(AOnClick: TNotifyEvent): TMenuItemInfo;
@@ -138,6 +144,7 @@ type
     FControlClass: TControlClass;
     FSetupProcList: TControlSetupProcList;
     FName: string;
+    FTag: NativeInt;
     FCaption: TOptionalString;
     FText: TOptionalString;
     FAlign: TOptionalAlign;
@@ -159,6 +166,7 @@ type
     function WithAlign(
       AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TControlInfo;
     function WithName(AName: string): TControlInfo;
+    function WithTag(ATag: NativeInt): TControlInfo;
     function WithWidth(AWidth: Single): TControlInfo;
     function WithHeight(AHeight: Single): TControlInfo;
     function WithWidthAndHeight(AWidth: Single; AHeight: Single): TControlInfo;
@@ -171,7 +179,6 @@ type
       const AControlName: string): TControl;
     property Control: TControl read FControl;
     property ControlClass: TControlClass read FControlClass;
-    // property SetupProc: TControlSetupProc read FSetupProc;
     property Name: string read FName;
     property Caption: TOptionalString read FCaption;
     property Text: TOptionalString read FText;
@@ -719,6 +726,7 @@ begin
   FControl := nil;
   FControlClass := AClass;
   FName := AName;
+  FTag := 0;
   FHeight := -1;
   FWidth := -1;
   FAlign := TOptionalAlign.None;
@@ -749,6 +757,7 @@ begin
   FControl := AControl;
   FControlClass := TControlClass(AControl.ClassType);
   FName := AControl.Name;
+  FTag := 0;
   FHeight := -1;
   FWidth := -1;
   FAlign := TOptionalAlign.None;
@@ -775,6 +784,7 @@ begin
     if not AControlName.IsEmpty then
       Result.Name := AControlName;
 
+    Result.Tag := FTag;
     Result.Parent := AParent;
 
     if Caption.HasValue then
@@ -910,6 +920,12 @@ begin
   for Proc in AProcs do
     FSetupProcList.Add(Proc);
   Result := Self;
+end;
+
+function TControlInfo.WithTag(ATag: NativeInt): TControlInfo;
+begin
+  Result := Self;
+  FTag := ATag;
 end;
 
 function TControlInfo.WithText(AText: string): TControlInfo;
@@ -3687,6 +3703,8 @@ begin
     if not AComponentName.IsEmpty then
       Result.Name := AComponentName;
 
+    Result.Tag := FTag;
+
     if Assigned(FTargetField) then
       PPointer(FTargetField)^ := Result;
 
@@ -3702,6 +3720,7 @@ begin
   FComponent := nil;
   FComponentClass := AClass;
   FName := AName;
+  FTag := 0;
   FSetupProc := nil;
 end;
 
@@ -3717,6 +3736,7 @@ begin
   FComponent := AComponent;
   FComponentClass := TComponentClass(AComponent.ClassType);
   FName := AComponent.Name;
+  FTag := 0;
   FSetupProc := nil;
 end;
 
@@ -3742,6 +3762,12 @@ function TComponentInfo.WithName(AName: string): TComponentInfo;
 begin
   Result := Self;
   FName := AName;
+end;
+
+function TComponentInfo.WithTag(ATag: NativeInt): TComponentInfo;
+begin
+  Result := Self;
+  FTag := ATag;
 end;
 
 { TRegistryNotifier }
@@ -4016,6 +4042,8 @@ begin
     if not AMenuName.IsEmpty then
       Result.Name := AMenuName;
 
+    Result.Tag := FTag;
+
     if Assigned(FTargetField) then
       PPointer(FTargetField)^ := Result;
 
@@ -4031,6 +4059,7 @@ begin
   FMenu := nil;
   FMenuClass := AClass;
   FName := AName;
+  FTag := 0;
   FSetupProc := nil;
   FTargetField := nil;
 end;
@@ -4047,6 +4076,7 @@ begin
   FMenu := AMenu;
   FMenuClass := TMenuClass(AMenu.ClassType);
   FName := AMenu.Name;
+  FTag := 0;
   FSetupProc := nil;
   FTargetField := nil;
 end;
@@ -4069,6 +4099,12 @@ begin
   FName := AName;
 end;
 
+function TMenuInfo.WithTag(ATag: NativeInt): TMenuInfo;
+begin
+  Result := Self;
+  FTag := ATag;
+end;
+
 function TMenuInfo.Assign(out Reference): TMenuInfo;
 begin
   Result := Self;
@@ -4082,6 +4118,7 @@ begin
   FMenuItem := AMenuItem;
   FMenuItemClass := TMenuItemClass(AMenuItem.ClassType);
   FName := AMenuItem.Name;
+  FTag := 0;
   FCaption := TOptionalString.None;
   FImageIndex := TOptionalInteger.None;
   FSetupProc := nil;
@@ -4109,6 +4146,7 @@ begin
   FMenuItem := nil;
   FMenuItemClass := AClass;
   FName := AName;
+  FTag := 0;
   FCaption := TOptionalString.None;;
   FImageIndex := TOptionalInteger.None;
   FSetupProc := nil;
@@ -4133,6 +4171,8 @@ begin
 
     if not AMenuItemName.IsEmpty then
       Result.Name := AMenuItemName;
+
+    Result.Tag := FTag;
 
     if Caption.HasValue then
       {$IFDEF FRAMEWORK_FMX}
@@ -4178,6 +4218,12 @@ function TMenuItemInfo.WithOnClick(AOnClick: TNotifyEvent): TMenuItemInfo;
 begin
   Result := Self;
   FOnClick := AOnClick;
+end;
+
+function TMenuItemInfo.WithTag(ATag: NativeInt): TMenuItemInfo;
+begin
+  Result := Self;
+  FTag := ATag;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
