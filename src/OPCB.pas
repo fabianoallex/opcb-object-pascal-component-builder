@@ -136,6 +136,8 @@ type
     property OnClick: TNotifyEvent read FOnClick;
   end;
 
+
+
   { TControlInfo }
 
   TControlInfo = class

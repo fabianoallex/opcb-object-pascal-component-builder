@@ -52,6 +52,7 @@ type
     procedure TestGridModeAutoExpandCols;
     procedure TestGridModeAutoExpandOnlyRows;
     procedure TestGridModeAutoExpandOnlyCols;
+    procedure TestGridModeWithSubLevel;
     procedure TestGridSkipCell;
     procedure TestGridRowHeight;
     procedure TestGridColWidth;
@@ -626,11 +627,14 @@ begin
       .AddControl(TControlInfo.Create(TPanel).WithHeight(50).WithLeft(60))
       .SubLevel;
 
-    NewLevel_01 := ControlBuilder.CurrentLevel;
+    NewLevel_01 := ControlBuilder
+      .CurrentLevel;
 
-    ControlBuilder.SubLevel;
+    ControlBuilder
+        .SubLevel;
 
-    NewLevel_02 := ControlBuilder.CurrentLevel;
+    NewLevel_02 := ControlBuilder
+        .CurrentLevel;
 
     AssertNotSame(
       Format('Level inicial deve ser difente do novo level 01. [%s, %s]',
@@ -1089,6 +1093,43 @@ begin
     AssertEquals('O número de linhas do grid depois de expandir está diferente do esperado', 2, RowsAfterExpand);
 
     AssertNull('P deveria ser nil, pois o grid pode expandir apenas linhas e não colunas', P);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestGridModeWithSubLevel;
+var
+  ControlBuilder: TControlBuilder;
+  P1, P2: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdHorizontal)
+      .GridInit(4, 4)
+        .GridSetCellWidthAndHeight(20, 25)
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        .AddControl(TControlInfo.Create(TPanel))
+        // sublevel na segunda linha e na segunda coluna
+        .SubLevel
+          // P1 e P2 estão em um sublevel dentro de uma celula, mas eles
+          // não devem se comportar como conteudo da celula
+          .AddControl(TControlInfo.Create(TPanel, P1).WithWidthAndHeight(6, 7))
+          .AddControl(TControlInfo.Create(TPanel, P2))
+        .SuperLevel
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Top de P1 diferente da esperada', 25, P1.Top);
+    AssertEquals('Propriedade Left de P1 diferente da esperada', 20, P1.Left);
+
+    AssertEquals('Propriedade Top de P2 diferente da esperada', 25, P2.Top);
+    AssertEquals('Propriedade Left de P2 diferente da esperada', 20 + 6, P2.Left);
   finally
     ControlBuilder.Free;
   end;
