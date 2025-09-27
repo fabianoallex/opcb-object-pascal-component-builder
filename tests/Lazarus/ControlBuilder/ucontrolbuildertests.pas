@@ -43,6 +43,8 @@ type
     procedure TestSubLevelSuperLevel;  // testa se volta ao nivel inicial
     procedure TestSubLevelEmpty;       // testa sublevel vazio. deve permitir sem mover top/left.
     procedure TestSubLevelDirectionSuperLevelDirection;
+    procedure TestRecalcParentSize;
+    procedure TestRecalcParentSizeWithExtraSizes;
     procedure TestGridMode;
     procedure TestGridModeIgnoreAddAfterEndOfGrid;
     procedure TestGridModeNotIgnoreAddAfterEndOfGridWhenAutoExpand;
@@ -749,6 +751,70 @@ begin
     AssertEquals('Propriedade Top do Panel diferente da esperada', 50, P1.Top);
 
     AssertEquals('Propriedade Left do Panel diferente da esperada', 80 + 80, P2.Left);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestRecalcParentSize;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SubLevel(TControlInfo.Create(TPanel, P).WithHeight(10).WithLeft(15))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Break
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .RecalcParentSize
+      .SuperLevel
+    ;
+
+    AssertEquals('Propriedade Hight diferente da esperada', 25 * 2, P.Height);
+    AssertEquals('Propriedade Width diferente da esperada', 20 * 5, P.Width);
+  finally
+    ControlBuilder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestRecalcParentSizeWithExtraSizes;
+var
+  ControlBuilder: TControlBuilder;
+  P: TPanel;
+begin
+  ControlBuilder := TControlBuilder.Create;
+  try
+    ControlBuilder
+      .WithOwnerAndParent(FForm, FForm)
+      .SubLevel(TControlInfo.Create(TPanel, P).WithHeight(10).WithLeft(15))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Break
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .AddControl(TControlInfo.Create(TPanel).WithWidthAndHeight(20, 25))
+        .RecalcParentSize(12, 17)
+      .SuperLevel
+    ;
+
+    AssertEquals('Propriedade Hight diferente da esperada', 25 * 2 + 12, P.Height);
+    AssertEquals('Propriedade Width diferente da esperada', 20 * 5 + 17, P.Width);
   finally
     ControlBuilder.Free;
   end;
