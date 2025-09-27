@@ -1301,10 +1301,8 @@ var
       AControl.Height
     );
 
-    AControl.Left := RControl.Left;
-    AControl.Top := RControl.Top;
-    // AControlInfo.WithHeight(RCell.Bottom - RCell.Top);
-    // AControlInfo.WithWidth(RCell.Right - RCell.Left);
+    TProtectedControl(AControl).Left := RControl.Left;
+    TProtectedControl(AControl).Top := RControl.Top;
   end;
 
   function GetRectFromControlInfo(AControlInfo: TControlInfo): TRect;
@@ -1698,7 +1696,7 @@ begin
   Result := Self;
   {$IFDEF FRAMEWORK_FMX}
   CurrentLevel.Parent.Height :=
-    GetControlsBounds([CurrentLevel.GroupName]).Height
+    GetControlsBounds([CurrentLevel.GroupName]).Bottom
     + AExtraHeight;
   {$ELSE}
   CurrentLevel.Parent.Height := Trunc(
@@ -1722,7 +1720,7 @@ begin
   Result := Self;
   {$IFDEF FRAMEWORK_FMX}
   CurrentLevel.Parent.Width :=
-    GetControlsBounds([CurrentLevel.GroupName]).Width
+    GetControlsBounds([CurrentLevel.GroupName]).Right
     + AExtraWidth;
   {$ELSE}
   CurrentLevel.Parent.Width := Trunc(
