@@ -42,7 +42,8 @@ begin
           .GridSetCellWidthAndHeight(80, 80)
           .GridSetRowOffset(1, 22)
           .GridSetRowOffset(2, 65)
-          .External(procedure (ABuilder: TControlBuilder)
+          .External(
+            procedure(ABuilder: TControlBuilder)
             const KeyRows: array[0..1] of string = ('QWERTYUIOPASDFGHJKL', 'ZXCVBNM');
             var Key: Char;
             begin
@@ -55,23 +56,23 @@ begin
               ABuilder.GridSkipCells(2);
               ABuilder.GridColSpan(5);
               ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption('[ SPACE ]'));
-            end
-          )
+            end)
         .GridFinish
         .IncLeft(20)
         .GridInit(4, 3)
           .GridSetCellWidthAndHeight(80, 80)
-          .External(procedure(ABuilder: TControlBuilder)
-            const Keys = '789456123';
-            var Key: Char;
-            begin
-              for Key in Keys do
-                ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
-              ABuilder.GridColSpan(2);
-              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption('0'));
-              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(','));
-            end
-          )
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('7'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('8'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('9'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('4'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('5'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('6'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('1'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('2'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('3'))
+          .GridColSpan(2)
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption('0'))
+          .AddControl(TControlInfo.Create(TSpeedButton).WithCaption(','))
         .GridFinish
         .RecalcParentSize(10, 10)
       .SuperLevel
