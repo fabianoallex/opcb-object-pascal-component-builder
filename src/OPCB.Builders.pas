@@ -1,4 +1,4 @@
-unit OPCB.Controls;
+unit OPCB.Builders;
 
 interface
 
@@ -15,32 +15,32 @@ uses
   Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults, OPCB.Optionals;
 
 type
-  { TButtonInfo }
+  { TButtonBuilder }
 
   TButtonBuilder = class;
-  TButtonInfo = class({$IFDEF FPC}specialize{$ENDIF} TControlBuilderBase<TButtonInfo>)
+  TButtonBuilder = class({$IFDEF FPC}specialize{$ENDIF} TControlBuilderBase<TButtonBuilder>)
   private
     FModalResult: Integer;
   public
-    function WithModalResult(AModalResult: Integer): TButtonInfo;
-    function CreateControl(AOwner: TComponent; AParent: TWinControl;
+    function WithModalResult(AModalResult: Integer): TButtonBuilder;
+    function Build(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl; override;
   end;
 
 implementation
 
-{ TButtonInfo }
+{ TButtonBuilder }
 
-function TButtonInfo.WithModalResult(AModalResult: Integer): TButtonInfo;
+function TButtonBuilder.WithModalResult(AModalResult: Integer): TButtonBuilder;
 begin
   Result := Self;
   FModalResult := AModalResult;
 end;
 
-function TButtonInfo.CreateControl(AOwner: TComponent; AParent: TWinControl;
+function TButtonBuilder.Build(AOwner: TComponent; AParent: TWinControl;
   const AControlName: string): TControl;
 begin
-  Result := inherited CreateControl(AOwner, AParent, AControlName);
+  Result := inherited Build(AOwner, AParent, AControlName);
   (Result as TButton).ModalResult := FModalResult;
 end;
 
