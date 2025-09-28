@@ -43,17 +43,17 @@ end;
 
 constructor TDBEntity.Create;
 var
-  ComponentBuilder: TComponentBuilder;
+  ComponentsBuilder: TComponentsBuilder;
 begin
-  ComponentBuilder := TComponentBuilder.Create;
+  ComponentsBuilder := TComponentsBuilder.Create;
   try
-    ComponentBuilder
+    ComponentsBuilder
       .WithOwner(DMDatabase)
       .Add(TComponentInfo.Create(TSQLQuery, FQueryCRUD).Setup(@SetupQueryCRUD))
       .Add(TComponentInfo.Create(TSQLQuery, FQuerySearch).Setup(@SetupQuerySearch))
     ;
   finally
-    ComponentBuilder.Free;
+    ComponentsBuilder.Free;
   end;
 end;
 

@@ -3,7 +3,7 @@ object DMDatabase: TDMDatabase
   OnDestroy = DataModuleDestroy
   OldCreateOrder = False
   Height = 150
-  HorizontalOffset = 2253
+  HorizontalOffset = 1622
   VerticalOffset = 134
   Width = 248
 end

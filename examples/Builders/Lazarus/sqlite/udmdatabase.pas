@@ -109,17 +109,17 @@ end;
 
 procedure TDMDatabase.DataModuleCreate(Sender: TObject);
 var
-  ComponentBuilder: TComponentBuilder;
+  ComponentsBuilder: TComponentsBuilder;
 begin
-  ComponentBuilder := TComponentBuilder.Create(Self.Name);
+  ComponentsBuilder := TComponentsBuilder.Create(Self.Name);
   try
-    ComponentBuilder
+    ComponentsBuilder
       .WithOwner(Self)
       .Add(TComponentInfo.Create(TSQLTransaction).Setup(@SetupTransaction))
       .Add(TComponentInfo.Create(TSQLite3Connection).Setup(@SetupConnection))
     ;
   finally
-    ComponentBuilder.Free;
+    ComponentsBuilder.Free;
   end;
 end;
 

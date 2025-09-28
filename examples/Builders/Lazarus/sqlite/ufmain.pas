@@ -125,12 +125,12 @@ begin
   Builders := TOPCBBuilders.Create;
 
   try
-    Builders.AsComponentBuilder
+    Builders.AsComponentsBuilder
       .WithOwner(Self)
       .Add(TComponentInfo.Create(TImageList, FMenuImages).Setup(@SetupMenuImages))
     ;
 
-    Builders.AsMenuBuilder
+    Builders.AsMenusBuilder
       .WithOwner(Self)
       .AddMenu(TMenuInfo.Create(TMainMenu).Setup(@SetupMainMenu))
         .SubLevel(TMenuItemInfo.Create.WithCaption('Aplicação'))

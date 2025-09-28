@@ -462,7 +462,7 @@ type
 
   TControlsBuilderLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TControlsBuilderLevel>;
 
-  TMenuBuilderLevel = class
+  TMenusBuilderLevel = class
   public
     {$IFDEF FRAMEWORK_FMX}
     Parent: TFmxObject;
@@ -471,13 +471,13 @@ type
     {$ENDIF}
   end;
 
-  TMenuBuilderLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TMenuBuilderLevel>;
+  TMenusBuilderLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TMenusBuilderLevel>;
 
-  TComponentBuilder = class;
-  TComponentBuilderObjProc = procedure(const ABuiler: TComponentBuilder) of object;
-  TComponentBuilderProc = procedure(const ABuiler: TComponentBuilder);
+  TComponentsBuilder = class;
+  TComponentsBuilderObjProc = procedure(const ABuiler: TComponentsBuilder) of object;
+  TComponentsBuilderProc = procedure(const ABuiler: TComponentsBuilder);
 
-  TComponentBuilder = class
+  TComponentsBuilder = class
   private
     FOwner: TComponent;
     FRegistryContextHandle: IRegistryContextHandle;
@@ -488,47 +488,47 @@ type
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
-    function External(const AProc: TComponentBuilderObjProc): TComponentBuilder; overload;
-    function External(const AProc: TComponentBuilderProc): TComponentBuilder; overload;
+    function External(const AProc: TComponentsBuilderObjProc): TComponentsBuilder; overload;
+    function External(const AProc: TComponentsBuilderProc): TComponentsBuilder; overload;
     {$IFDEF FPC}generic{$ENDIF}
     function GetComponent<T: TComponent>(const AName: string): T; overload;
     function GetComponent(const AName: string): TComponent; overload;
-    function WithOwner(AOwner: TComponent): TComponentBuilder;
-    function Add(AComponentInfo: TComponentInfo): TComponentBuilder; overload;
-    function Add(AComponentInfos: TComponentInfoArray): TComponentBuilder; overload;
+    function WithOwner(AOwner: TComponent): TComponentsBuilder;
+    function Add(AComponentInfo: TComponentInfo): TComponentsBuilder; overload;
+    function Add(AComponentInfos: TComponentInfoArray): TComponentsBuilder; overload;
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TComponent read GetItem; default;
   end;
 
-  TMenuBuilder = class;
-  TMenuBuilderObjProc = procedure(const ABuiler: TMenuBuilder) of object;
-  TMenuBuilderProc = procedure(const ABuiler: TMenuBuilder);
+  TMenusBuilder = class;
+  TMenusBuilderObjProc = procedure(const ABuiler: TMenusBuilder) of object;
+  TMenusBuilderProc = procedure(const ABuiler: TMenusBuilder);
 
-  TMenuBuilder = class
+  TMenusBuilder = class
   private
     FOwner: TComponent;
     FRegistryContextHandle: IRegistryContextHandle;
-    FLevelStack: TMenuBuilderLevelStack;
+    FLevelStack: TMenusBuilderLevelStack;
     function GetComponentRegistry: TComponentRegistry;
-    function GetCurrenteLevel: TMenuBuilderLevel;
+    function GetCurrenteLevel: TMenusBuilderLevel;
   public
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
-    function WithOwner(AOwner: TComponent): TMenuBuilder;
-    function External(const AProc: TMenuBuilderObjProc): TMenuBuilder; overload;
-    function External(const AProc: TMenuBuilderProc): TMenuBuilder; overload;
-    function AddMenu(AMenuInfo: TMenuInfo): TMenuBuilder;
-    function AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
-    function SubLevel(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
-    function SuperLevel: TMenuBuilder;
+    function WithOwner(AOwner: TComponent): TMenusBuilder;
+    function External(const AProc: TMenusBuilderObjProc): TMenusBuilder; overload;
+    function External(const AProc: TMenusBuilderProc): TMenusBuilder; overload;
+    function AddMenu(AMenuInfo: TMenuInfo): TMenusBuilder;
+    function AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenusBuilder;
+    function SubLevel(AMenuItemInfo: TMenuItemInfo): TMenusBuilder;
+    function SuperLevel: TMenusBuilder;
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenu<T: TMenu>(const AName: string): T; overload;
     function GetMenu(const AName: string): TMenu; overload;
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenuItem<T: TMenuItem>(const AName: string): T; overload;
     function GetMenuItem(const AName: string): TMenuItem; overload;
-    property CurrentLevel: TMenuBuilderLevel read GetCurrenteLevel;
+    property CurrentLevel: TMenusBuilderLevel read GetCurrenteLevel;
     property Registry: TComponentRegistry read GetComponentRegistry;
   end;
 
@@ -705,15 +705,15 @@ type
   TOPCBBuilders = class
   private
     FRegistryContextHandle: IRegistryContextHandle;
-    FComponentBuilder: TComponentBuilder;
+    FComponentsBuilder: TComponentsBuilder;
     FControlsBuilder: TControlsBuilder;
-    FMenuBuilder: TMenuBuilder;
+    FMenusBuilder: TMenusBuilder;
   public
     constructor Create(const ARegistryContextKey: string='');
     destructor Destroy; override;
-    function AsComponentBuilder: TComponentBuilder;
+    function AsComponentsBuilder: TComponentsBuilder;
     function AsControlsBuilder: TControlsBuilder;
-    function AsMenuBuilder: TMenuBuilder;
+    function AsMenusBuilder: TMenusBuilder;
   end;
 
 implementation
@@ -3607,10 +3607,10 @@ begin
   end;
 end;
 
-{ TComponentBuilder }
+{ TComponentsBuilder }
 
-function TComponentBuilder.Add(
-  AComponentInfo: TComponentInfo): TComponentBuilder;
+function TComponentsBuilder.Add(
+  AComponentInfo: TComponentInfo): TComponentsBuilder;
 var
   Component: TComponent;
   ComponentName: string;
@@ -3623,8 +3623,8 @@ begin
   Registry.AddComponent(Component, Component.Name);
 end;
 
-function TComponentBuilder.Add(
-  AComponentInfos: TComponentInfoArray): TComponentBuilder;
+function TComponentsBuilder.Add(
+  AComponentInfos: TComponentInfoArray): TComponentsBuilder;
 var
   I: Integer;
 begin
@@ -3633,34 +3633,34 @@ begin
     Add(AComponentInfos[I]);
 end;
 
-constructor TComponentBuilder.Create(ARegistryContextKey: string);
+constructor TComponentsBuilder.Create(ARegistryContextKey: string);
 begin
   Create(TRegistryContextHandle.Create(ARegistryContextKey))
 end;
 
-constructor TComponentBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
+constructor TComponentsBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
 begin
   FRegistryContextHandle := ARegistryContextHandle;
 end;
 
-destructor TComponentBuilder.Destroy;
+destructor TComponentsBuilder.Destroy;
 begin
   inherited;
 end;
 
-function TComponentBuilder.GetComponent(const AName: string): TComponent;
+function TComponentsBuilder.GetComponent(const AName: string): TComponent;
 begin
   Result := Registry.GetComponent(AName);
 end;
 
-function TComponentBuilder.External(const AProc: TComponentBuilderObjProc): TComponentBuilder;
+function TComponentsBuilder.External(const AProc: TComponentsBuilderObjProc): TComponentsBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TComponentBuilder.External(const AProc: TComponentBuilderProc): TComponentBuilder;
+function TComponentsBuilder.External(const AProc: TComponentsBuilderProc): TComponentsBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
@@ -3668,27 +3668,27 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TComponentBuilder.GetComponent<T>(const AName: string): T;
+function TComponentsBuilder.GetComponent<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
-function TComponentBuilder.GetComponentRegistry: TComponentRegistry;
+function TComponentsBuilder.GetComponentRegistry: TComponentRegistry;
 begin
   Result := FRegistryContextHandle.GetRegistry;
 end;
 
-function TComponentBuilder.GetComponents: TComponentList;
+function TComponentsBuilder.GetComponents: TComponentList;
 begin
   Result := Registry.FComponents;
 end;
 
-function TComponentBuilder.GetItem(const AName: string): TComponent;
+function TComponentsBuilder.GetItem(const AName: string): TComponent;
 begin
   Result := Self.GetComponent(AName);
 end;
 
-function TComponentBuilder.WithOwner(AOwner: TComponent): TComponentBuilder;
+function TComponentsBuilder.WithOwner(AOwner: TComponent): TComponentsBuilder;
 begin
   Result := Self;
   FOwner := AOwner;
@@ -3833,12 +3833,12 @@ end;
 
 { TOPCBBuilders }
 
-function TOPCBBuilders.AsComponentBuilder: TComponentBuilder;
+function TOPCBBuilders.AsComponentsBuilder: TComponentsBuilder;
 begin
-  if not Assigned(FComponentBuilder) then
-    FComponentBuilder := TComponentBuilder.Create(FRegistryContextHandle);
+  if not Assigned(FComponentsBuilder) then
+    FComponentsBuilder := TComponentsBuilder.Create(FRegistryContextHandle);
 
-  Result := FComponentBuilder;
+  Result := FComponentsBuilder;
 end;
 
 function TOPCBBuilders.AsControlsBuilder: TControlsBuilder;
@@ -3849,31 +3849,31 @@ begin
   Result := FControlsBuilder;
 end;
 
-function TOPCBBuilders.AsMenuBuilder: TMenuBuilder;
+function TOPCBBuilders.AsMenusBuilder: TMenusBuilder;
 begin
-  if not Assigned(FMenuBuilder) then
-    FMenuBuilder := TMenuBuilder.Create(FRegistryContextHandle);
-  Result := FMenuBuilder;
+  if not Assigned(FMenusBuilder) then
+    FMenusBuilder := TMenusBuilder.Create(FRegistryContextHandle);
+  Result := FMenusBuilder;
 end;
 
 constructor TOPCBBuilders.Create(const ARegistryContextKey: string);
 begin
   FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContextKey);
-  FComponentBuilder := nil;
+  FComponentsBuilder := nil;
   FControlsBuilder := nil;
-  FMenuBuilder := nil;
+  FMenusBuilder := nil;
 end;
 
 destructor TOPCBBuilders.Destroy;
 begin
-  if Assigned(FComponentBuilder) then
-    FComponentBuilder.Free;
+  if Assigned(FComponentsBuilder) then
+    FComponentsBuilder.Free;
 
   if Assigned(FControlsBuilder) then
     FControlsBuilder.Free;
 
-  if Assigned(FMenuBuilder) then
-    FMenuBuilder.Free;
+  if Assigned(FMenusBuilder) then
+    FMenusBuilder.Free;
 
   inherited;
 end;
@@ -3891,9 +3891,9 @@ begin
     Result[I] := TComponentInfo.Create(AClass, ANames[I]);
 end;
 
-{ TMenuBuilder }
+{ TMenusBuilder }
 
-function TMenuBuilder.AddMenu(AMenuInfo: TMenuInfo): TMenuBuilder;
+function TMenusBuilder.AddMenu(AMenuInfo: TMenuInfo): TMenusBuilder;
 var
   Menu: TMenu;
   MenuName: string;
@@ -3914,7 +3914,7 @@ begin
   {$ENDIF}
 end;
 
-function TMenuBuilder.AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
+function TMenusBuilder.AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenusBuilder;
 var
   MenuItem: TMenuItem;
   MenuItemName: string;
@@ -3933,57 +3933,57 @@ begin
   {$ENDIF}
 end;
 
-constructor TMenuBuilder.Create(ARegistryContextKey: string);
+constructor TMenusBuilder.Create(ARegistryContextKey: string);
 begin
   Create(TRegistryContextHandle.Create(ARegistryContextKey));
 end;
 
-constructor TMenuBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
+constructor TMenusBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
 begin
   FRegistryContextHandle := ARegistryContextHandle;
-  FLevelStack := TMenuBuilderLevelStack.Create(True);
-  FLevelStack.Add(TMenuBuilderLevel.Create);
+  FLevelStack := TMenusBuilderLevelStack.Create(True);
+  FLevelStack.Add(TMenusBuilderLevel.Create);
 end;
 
-destructor TMenuBuilder.Destroy;
+destructor TMenusBuilder.Destroy;
 begin
   FLevelStack.Free;
   inherited;
 end;
 
-function TMenuBuilder.GetComponentRegistry: TComponentRegistry;
+function TMenusBuilder.GetComponentRegistry: TComponentRegistry;
 begin
   Result := FRegistryContextHandle.GetRegistry;
 end;
 
-function TMenuBuilder.GetCurrenteLevel: TMenuBuilderLevel;
+function TMenusBuilder.GetCurrenteLevel: TMenusBuilderLevel;
 begin
   Result := FLevelStack.Last;
 end;
 
-function TMenuBuilder.GetMenu(const AName: string): TMenu;
+function TMenusBuilder.GetMenu(const AName: string): TMenu;
 begin
   Result := Registry.GetComponent(AName) as TMenu;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TMenuBuilder.GetMenu<T>(const AName: string): T;
+function TMenusBuilder.GetMenu<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
-function TMenuBuilder.GetMenuItem(const AName: string): TMenuItem;
+function TMenusBuilder.GetMenuItem(const AName: string): TMenuItem;
 begin
   Result := Registry.GetComponent(AName) as TMenuItem;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TMenuBuilder.GetMenuItem<T>(const AName: string): T;
+function TMenusBuilder.GetMenuItem<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
-function TMenuBuilder.SubLevel(AMenuItemInfo: TMenuItemInfo): TMenuBuilder;
+function TMenusBuilder.SubLevel(AMenuItemInfo: TMenuItemInfo): TMenusBuilder;
 var
   MenuItem: TMenuItem;
   MenuItemName: string;
@@ -4001,11 +4001,11 @@ begin
   CurrentLevel.Parent.Add(MenuItem);
   {$ENDIF}
 
-  FLevelStack.Add(TMenuBuilderLevel.Create);
+  FLevelStack.Add(TMenusBuilderLevel.Create);
   CurrentLevel.Parent := MenuItem;
 end;
 
-function TMenuBuilder.SuperLevel: TMenuBuilder;
+function TMenusBuilder.SuperLevel: TMenusBuilder;
 begin
   if FLevelStack.Count <= 1 then
     raise Exception.Create('PreviousLevel chamado no nível raiz');
@@ -4014,20 +4014,20 @@ begin
   Result := Self;
 end;
 
-function TMenuBuilder.WithOwner(AOwner: TComponent): TMenuBuilder;
+function TMenusBuilder.WithOwner(AOwner: TComponent): TMenusBuilder;
 begin
   Result := Self;
   FOwner := AOwner;
 end;
 
-function TMenuBuilder.External(const AProc: TMenuBuilderObjProc): TMenuBuilder;
+function TMenusBuilder.External(const AProc: TMenusBuilderObjProc): TMenusBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TMenuBuilder.External(const AProc: TMenuBuilderProc): TMenuBuilder;
+function TMenusBuilder.External(const AProc: TMenusBuilderProc): TMenusBuilder;
 begin
   Result := Self;
   if Assigned(AProc) then

@@ -191,7 +191,7 @@ begin
   Builders := TOPCBBuilders.Create;
 
   try
-    Builders.AsComponentBuilder
+    Builders.AsComponentsBuilder
       .WithOwner(Self)
       .Add(TComponentInfo.Create(TDataSource, FDataSourceCRUD).Setup(@SetupDataSourceCRUD))
     ;

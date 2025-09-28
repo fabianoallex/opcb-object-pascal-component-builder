@@ -477,7 +477,7 @@ var
   begin
     Builders := TOPCBBuilders.Create(ControlDialog.ControlsBuilder.Registry.ContextKey); // usa o mesmo context do dialog
     try
-      Builders.AsComponentBuilder
+      Builders.AsComponentsBuilder
         .WithOwner(ControlDialog)
         .Add(TComponentInfo.Create(TMemDataset, 'MDS').Setup(@SetupMDS))
         .Add(TComponentInfo.Create(TDataSource, 'DS').Setup(@SetupDS))

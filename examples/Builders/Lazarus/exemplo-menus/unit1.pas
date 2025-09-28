@@ -85,7 +85,7 @@ begin
 
   Builders := TOPCBBuilders.Create(Self.Name);
   try
-    Builders.AsMenuBuilder
+    Builders.AsMenusBuilder
       .WithOwner(Self)
       .AddMenu(TMenuInfo.Create(TMainMenu, 'MainMenu')) // menu principal por primeiro
         .SubLevel(TMenuItemInfo.Create(TMenuItem, 'FileMenu'))
