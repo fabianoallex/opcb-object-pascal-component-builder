@@ -35,7 +35,7 @@ type
     procedure SetupDataSourceCRUD(AComponent: TComponent);
   protected
     procedure SetupDBGrid(AControl: TControl); virtual;
-    procedure BuildContents(const ABuiler: TControlsBuilder); virtual; abstract;
+    procedure BuildContents(const ABuiler: TControlCreator); virtual; abstract;
     procedure DataSourceStateChange(Sender: TObject);
   public
     constructor CreateNew(AOwner: TComponent; AEntity: TDBEntity);
@@ -196,7 +196,7 @@ begin
       .Add(TComponentBuilder.Create(TDataSource, FDataSourceCRUD).Setup(@SetupDataSourceCRUD))
     ;
 
-    Builders.AsControlsBuilder
+    Builders.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(2, 5)
       .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alTop))

@@ -328,7 +328,7 @@ type
     function Height: Single;
   end;
 
-  TControlsBuilderDirection = (cpdHorizontal, cpdVertical);
+  TControlCreatorDirection = (cpdHorizontal, cpdVertical);
   TRelativePosition = (rpRight, rpBelow);
   TGridFillDirection = (gfdRowFirst, gfdColFirst);
   TGridCellStatus = (csEmpty, csOccupied);
@@ -435,15 +435,15 @@ type
     property CellPosition: TCellPosition read FCellPosition write SetCellPosition;
   end;
 
-  { TControlsBuilderLevel }
+  { TControlCreatorLevel }
 
-  TControlsBuilderLevel = class
+  TControlCreatorLevel = class
   private
     class var FGroupCounter: Integer;
   public
     Parent: TWinControl;
     GroupName: string;
-    Direction: TControlsBuilderDirection;
+    Direction: TControlCreatorDirection;
     InitialTop: Single;
     InitialLeft: Single;
     CurrentTop: Single;
@@ -457,10 +457,10 @@ type
     GridMode: TGridMode;
     constructor Create;
     destructor Destroy; override;
-    function Clone: TControlsBuilderLevel;
+    function Clone: TControlCreatorLevel;
   end;
 
-  TControlsBuilderLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TControlsBuilderLevel>;
+  TControlCreatorLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TControlCreatorLevel>;
 
   TMenusBuilderLevel = class
   public
@@ -532,16 +532,16 @@ type
     property Registry: TComponentRegistry read GetComponentRegistry;
   end;
 
-  TControlsBuilder = class;
-  TControlsBuilderObjProc = procedure(const ABuiler: TControlsBuilder) of object;
-  TControlsBuilderProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(ABuiler: TControlsBuilder);
+  TControlCreator = class;
+  TControlCreatorObjProc = procedure(const ABuiler: TControlCreator) of object;
+  TControlCreatorProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(ABuiler: TControlCreator);
 
-  TControlsBuilder = class
+  TControlCreator = class
   private
     FOwner: TComponent;
     FRegistryContextHandle: IRegistryContextHandle;
     FGroups: TControlGroupMap;
-    FLevelStack: TControlsBuilderLevelStack;
+    FLevelStack: TControlCreatorLevelStack;
     function GetControls: TControlList;
     procedure MoveTopLeftAfterControl(AControl: TControl);
     procedure MoveTopLeftAfterRect(
@@ -550,7 +550,7 @@ type
     procedure MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
     procedure AddControlToGroups(AControl: TControl; const AGroups: array of string);
     function GetGroupBounds(const AGroupName: string): TControlGroupBounds;
-    function GetCurrenteLevel: TControlsBuilderLevel;
+    function GetCurrenteLevel: TControlCreatorLevel;
     function GetContentWidth: Single;
     function GetFContentHeight: Single;
     function GetComponentRegistry: TComponentRegistry;
@@ -565,138 +565,138 @@ type
     function GetControl<T: TControl>(const AName: string): T; overload;
     function GetControl(const AName: string): TControl; overload;
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
-    function External(const AProc: TControlsBuilderObjProc): TControlsBuilder; overload;
-    function External(const AProc: TControlsBuilderProc): TControlsBuilder; overload;
-    function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlsBuilder;
-    function SubLevel(AGroupName: string=''): TControlsBuilder; overload;  // xx
-    function SubLevel(ADirection: TControlsBuilderDirection;
-      AGroupName: string=''): TControlsBuilder; overload;
-    function SuperLevel: TControlsBuilder;
+    function External(const AProc: TControlCreatorObjProc): TControlCreator; overload;
+    function External(const AProc: TControlCreatorProc): TControlCreator; overload;
+    function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlCreator;
+    function SubLevel(AGroupName: string=''): TControlCreator; overload;  // xx
+    function SubLevel(ADirection: TControlCreatorDirection;
+      AGroupName: string=''): TControlCreator; overload;
+    function SuperLevel: TControlCreator;
     function SiblingSubLevel(AGroupName: string='';
-      ABreak: Boolean=False): TControlsBuilder; overload;
-    function SiblingSubLevel(ADirection: TControlsBuilderDirection;
-      AGroupName: string=''; ABreak: Boolean=False): TControlsBuilder; overload;
-    function SiblingSubLevel(ABreak: Boolean=False): TControlsBuilder; overload;
-    function SiblingSubLevel(ADirection: TControlsBuilderDirection;
-      ABreak: Boolean): TControlsBuilder; overload;
-    function SiblingSubLevelWithBreak(AGroupName: string=''): TControlsBuilder; overload;
-    function SiblingSubLevelWithBreak(ADirection: TControlsBuilderDirection;
-      AGroupName: string=''): TControlsBuilder; overload;
+      ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel(ADirection: TControlCreatorDirection;
+      AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel(ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel(ADirection: TControlCreatorDirection;
+      ABreak: Boolean): TControlCreator; overload;
+    function SiblingSubLevelWithBreak(AGroupName: string=''): TControlCreator; overload;
+    function SiblingSubLevelWithBreak(ADirection: TControlCreatorDirection;
+      AGroupName: string=''): TControlCreator; overload;
     function SubLevel(AControlBuilder: TControlBuilder;        // main
-      AGroupName: string=''): TControlsBuilder; overload;
+      AGroupName: string=''): TControlCreator; overload;
     function SubLevel(AControlBuilder: TControlBuilder;
-      ADirection: TControlsBuilderDirection; AGroupName: string=''): TControlsBuilder; overload;
+      ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder;
-      AGroupName: string=''; ABreak: Boolean=False): TControlsBuilder; overload;
+      AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder;
-      ADirection: TControlsBuilderDirection;
-      AGroupName: string=''; ABreak: Boolean=False): TControlsBuilder; overload;
+      ADirection: TControlCreatorDirection;
+      AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder;
-      ABreak: Boolean=False): TControlsBuilder; overload;
+      ABreak: Boolean=False): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder;
-      ADirection: TControlsBuilderDirection;
-      ABreak: Boolean): TControlsBuilder; overload;
-    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlsBuilder; overload;
-    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; ADirection: TControlsBuilderDirection;
-      AGroupName: string=''): TControlsBuilder; overload;
-    function SetVerticalSpace(AVerticalSpace: Single): TControlsBuilder;
-    function SetHorizontalSpace(AHorizontalSpace: Single): TControlsBuilder;
-    function SetTopLeft(ATop, ALeft: Single): TControlsBuilder;
-    function SetTopLeftNearControl(AControlName: string; APosition: TRelativePosition): TControlsBuilder;
-    function SetTopLeftNearControls(AControlsNames: array of string; APosition: TRelativePosition): TControlsBuilder;
-    function SetTopLeftNearGroup(const AGroupName: string; APosition: TRelativePosition): TControlsBuilder;
-    function SetTop(ATop: Single): TControlsBuilder; overload;
-    function SetLeft(ALeft: Single): TControlsBuilder; overload;
-    function SetTop(AControlName: string): TControlsBuilder; overload;
-    function SetLeft(AControlName: string): TControlsBuilder; overload;
-    function IncTop(AIncTop: Single): TControlsBuilder;
-    function IncLeft(AIncLeft: Single): TControlsBuilder;
-    function IncTopLeft(AIncTop, AIncLeft: Single): TControlsBuilder;
-    function SetDirection(ADirection: TControlsBuilderDirection): TControlsBuilder;
-    function SetControlHeight(AHeight: Single): TControlsBuilder;
-    function SetControlWidth(AWidth: Single): TControlsBuilder;
-    function SetControlWidthAndHeight(AWidth, AHeight: Single): TControlsBuilder;
-    function UnsetControlHeight: TControlsBuilder;
-    function UnsetControlWidth: TControlsBuilder;
-    function UnsetControlWidthAndHeight: TControlsBuilder;
-    function GridInit(ARows, ACols: Integer): TControlsBuilder;
-    function GridFinish: TControlsBuilder;
-    function GridCellSpan(ACellSpan: Integer): TControlsBuilder;
-    function GridRowSpan(ARowSpan: Integer): TControlsBuilder;
-    function GridColSpan(AColSpan: Integer): TControlsBuilder;
-    function GridSetCellWidthAndHeight(AWidth, AHeight: Integer): TControlsBuilder;
-    function GridSetColWidth(ACol: Integer; AWidth: Single): TControlsBuilder;
-    function GridSetRowHeight(ARow: Integer; AHeight: Single): TControlsBuilder;
-    function GridSetColOffset(ACol: Integer; AOffset: Single): TControlsBuilder;
-    function GridSetRowOffset(ARow: Integer; AOffset: Single): TControlsBuilder;
-    function GridSkipCell: TControlsBuilder;
-    function GridSkipCells(ANumCells: Integer): TControlsBuilder;
-    function GridGotoCell(ARow, ACol: Integer): TControlsBuilder;
-    function GridAutoExpand: TControlsBuilder;
-    function GridAutoExpandRows: TControlsBuilder;
-    function GridAutoExpandCols: TControlsBuilder;
-    function GridCellPosition(ACellPosition: TCellPosition): TControlsBuilder;
-    function GridCellNoStrech: TControlsBuilder;
-    function GridCellStrechAll: TControlsBuilder;
-    function GridCellStrechHorizontal: TControlsBuilder;
-    function GridCellStrechVertical: TControlsBuilder;
-    function GridReturnNumberOfRows(out ARows: Integer): TControlsBuilder;
-    function GridReturnNumberOfCols(out ACols: Integer): TControlsBuilder;
-    function BreakLine: TControlsBuilder; overload;
-    function BreakColumn: TControlsBuilder; overload;
-    function Break: TControlsBuilder; overload;
-    function Break(AIncTopOrLeft: Single): TControlsBuilder; overload;
-    function BreakLine(AIncTop: Single): TControlsBuilder; overload;
-    function BreakColumn(AIncLeft: Single): TControlsBuilder; overload;
-    {$IFDEF FRAMEWORK_FMX}function WithOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlsBuilder;
-    {$ELSE}function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlsBuilder;
+      ADirection: TControlCreatorDirection;
+      ABreak: Boolean): TControlCreator; overload;
+    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator; overload;
+    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection;
+      AGroupName: string=''): TControlCreator; overload;
+    function SetVerticalSpace(AVerticalSpace: Single): TControlCreator;
+    function SetHorizontalSpace(AHorizontalSpace: Single): TControlCreator;
+    function SetTopLeft(ATop, ALeft: Single): TControlCreator;
+    function SetTopLeftNearControl(AControlName: string; APosition: TRelativePosition): TControlCreator;
+    function SetTopLeftNearControls(AControlsNames: array of string; APosition: TRelativePosition): TControlCreator;
+    function SetTopLeftNearGroup(const AGroupName: string; APosition: TRelativePosition): TControlCreator;
+    function SetTop(ATop: Single): TControlCreator; overload;
+    function SetLeft(ALeft: Single): TControlCreator; overload;
+    function SetTop(AControlName: string): TControlCreator; overload;
+    function SetLeft(AControlName: string): TControlCreator; overload;
+    function IncTop(AIncTop: Single): TControlCreator;
+    function IncLeft(AIncLeft: Single): TControlCreator;
+    function IncTopLeft(AIncTop, AIncLeft: Single): TControlCreator;
+    function SetDirection(ADirection: TControlCreatorDirection): TControlCreator;
+    function SetControlHeight(AHeight: Single): TControlCreator;
+    function SetControlWidth(AWidth: Single): TControlCreator;
+    function SetControlWidthAndHeight(AWidth, AHeight: Single): TControlCreator;
+    function UnsetControlHeight: TControlCreator;
+    function UnsetControlWidth: TControlCreator;
+    function UnsetControlWidthAndHeight: TControlCreator;
+    function GridInit(ARows, ACols: Integer): TControlCreator;
+    function GridFinish: TControlCreator;
+    function GridCellSpan(ACellSpan: Integer): TControlCreator;
+    function GridRowSpan(ARowSpan: Integer): TControlCreator;
+    function GridColSpan(AColSpan: Integer): TControlCreator;
+    function GridSetCellWidthAndHeight(AWidth, AHeight: Integer): TControlCreator;
+    function GridSetColWidth(ACol: Integer; AWidth: Single): TControlCreator;
+    function GridSetRowHeight(ARow: Integer; AHeight: Single): TControlCreator;
+    function GridSetColOffset(ACol: Integer; AOffset: Single): TControlCreator;
+    function GridSetRowOffset(ARow: Integer; AOffset: Single): TControlCreator;
+    function GridSkipCell: TControlCreator;
+    function GridSkipCells(ANumCells: Integer): TControlCreator;
+    function GridGotoCell(ARow, ACol: Integer): TControlCreator;
+    function GridAutoExpand: TControlCreator;
+    function GridAutoExpandRows: TControlCreator;
+    function GridAutoExpandCols: TControlCreator;
+    function GridCellPosition(ACellPosition: TCellPosition): TControlCreator;
+    function GridCellNoStrech: TControlCreator;
+    function GridCellStrechAll: TControlCreator;
+    function GridCellStrechHorizontal: TControlCreator;
+    function GridCellStrechVertical: TControlCreator;
+    function GridReturnNumberOfRows(out ARows: Integer): TControlCreator;
+    function GridReturnNumberOfCols(out ACols: Integer): TControlCreator;
+    function BreakLine: TControlCreator; overload;
+    function BreakColumn: TControlCreator; overload;
+    function Break: TControlCreator; overload;
+    function Break(AIncTopOrLeft: Single): TControlCreator; overload;
+    function BreakLine(AIncTop: Single): TControlCreator; overload;
+    function BreakColumn(AIncLeft: Single): TControlCreator; overload;
+    {$IFDEF FRAMEWORK_FMX}function WithOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlCreator;
+    {$ELSE}function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlCreator;
     {$ENDIF}
-    function WithParent(AParent: TWinControl): TControlsBuilder;
+    function WithParent(AParent: TWinControl): TControlCreator;
     function AddControl(AControlBuilder: TCustomControlBuilder; // main
-      const AGroups: array of string): TControlsBuilder; overload;
-    function AddControl(AControlBuilder: TCustomControlBuilder): TControlsBuilder; overload;
-    function AddControls(AControlCreateBuilders: array of TCustomControlBuilder): TControlsBuilder; overload;
+      const AGroups: array of string): TControlCreator; overload;
+    function AddControl(AControlBuilder: TCustomControlBuilder): TControlCreator; overload;
+    function AddControls(AControlCreateBuilders: array of TCustomControlBuilder): TControlCreator; overload;
     function AddControls(AControlCreateBuilders: array of TCustomControlBuilder;
-      const AGroups: array of string): TControlsBuilder; overload;
-    function AddControl(AClass: TControlClass; const AName: string=''): TControlsBuilder; overload;
-    function AddControl(AClass: TControlClass; const AName: string; out Reference): TControlsBuilder; overload;
-    function AddControl(AClass: TControlClass; out Reference): TControlsBuilder; overload;
-    function AddControl(AClass: TControlClass; const AName: string; AProc: TControlSetupProc): TControlsBuilder; overload;
-    function AddControl(AClass: TControlClass; const AName: string; out Reference; AProc: TControlSetupProc): TControlsBuilder; overload;
-    function AddControl(AClass: TControlClass; out Reference; AProc: TControlSetupProc): TControlsBuilder; overload;
+      const AGroups: array of string): TControlCreator; overload;
+    function AddControl(AClass: TControlClass; const AName: string=''): TControlCreator; overload;
+    function AddControl(AClass: TControlClass; const AName: string; out Reference): TControlCreator; overload;
+    function AddControl(AClass: TControlClass; out Reference): TControlCreator; overload;
+    function AddControl(AClass: TControlClass; const AName: string; AProc: TControlSetupProc): TControlCreator; overload;
+    function AddControl(AClass: TControlClass; const AName: string; out Reference; AProc: TControlSetupProc): TControlCreator; overload;
+    function AddControl(AClass: TControlClass; out Reference; AProc: TControlSetupProc): TControlCreator; overload;
     function AddInLevel(const AControls: array of TCustomControlBuilder;
-      ADirection: TControlsBuilderDirection): TControlsBuilder;
+      ADirection: TControlCreatorDirection): TControlCreator;
     function GetNamedControl(const AName: string): TControl;
     function MoveControls(const AControl: TControl; const ADX,
-      ADY: Single): TControlsBuilder; overload;
+      ADY: Single): TControlCreator; overload;
     function MoveControls(const AControlNames: array of string;
-      const ADX, ADY: Single): TControlsBuilder; overload;
+      const ADX, ADY: Single): TControlCreator; overload;
     function AlignControlsRight(const AControlNames, AReferenceGroup: array of string;
-      const ARightPadding: Single = 0): TControlsBuilder;
+      const ARightPadding: Single = 0): TControlCreator;
     function CenterControlsHorizontally(const AControlNames, AReferenceGroup:
-      array of string): TControlsBuilder;
+      array of string): TControlCreator;
     function CenterControlsVertically(const AControlNames, AReferenceGroup:
-      array of string): TControlsBuilder;
+      array of string): TControlCreator;
     function CenterControlsInParentVertically(
-      const AControlNames: array of string): TControlsBuilder;
+      const AControlNames: array of string): TControlCreator;
     function CenterControlsInParentHorizontally(
-      const AControlNames: array of string): TControlsBuilder;
-    function CenterControlInParentHorizontally: TControlsBuilder;
-    function RecalcParentHeight(AExtraHeight: Single = 0): TControlsBuilder;
-    function RecalcParentWidth(AExtraWidth: Single = 0): TControlsBuilder;
-    function RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0): TControlsBuilder;
+      const AControlNames: array of string): TControlCreator;
+    function CenterControlInParentHorizontally: TControlCreator;
+    function RecalcParentHeight(AExtraHeight: Single = 0): TControlCreator;
+    function RecalcParentWidth(AExtraWidth: Single = 0): TControlCreator;
+    function RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0): TControlCreator;
     function CopyHeight(const AControlNames,
-      AReferenceGroup: array of string): TControlsBuilder;
+      AReferenceGroup: array of string): TControlCreator;
     function CopyWidth(const AControlNames,
-      AReferenceGroup: array of string): TControlsBuilder;
+      AReferenceGroup: array of string): TControlCreator;
     function CopySize(const AControlNames,
-      AReferenceGroup: array of string): TControlsBuilder;
-    function ReturnCurrentLevel(var ACurrentLevel: TControlsBuilderLevel): TControlsBuilder;
-    function ReturnLastControl(out AControl: TControl): TControlsBuilder;
+      AReferenceGroup: array of string): TControlCreator;
+    function ReturnCurrentLevel(var ACurrentLevel: TControlCreatorLevel): TControlCreator;
+    function ReturnLastControl(out AControl: TControl): TControlCreator;
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property ContentWidth: Single read GetContentWidth;
     property ContentHeight: Single read GetFContentHeight;
-    property CurrentLevel: TControlsBuilderLevel read GetCurrenteLevel;
+    property CurrentLevel: TControlCreatorLevel read GetCurrenteLevel;
     property Controls: TControlList read GetControls;
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TControl read GetItem; default;
@@ -706,13 +706,13 @@ type
   private
     FRegistryContextHandle: IRegistryContextHandle;
     FComponentsBuilder: TComponentsBuilder;
-    FControlsBuilder: TControlsBuilder;
+    FControlCreator: TControlCreator;
     FMenusBuilder: TMenusBuilder;
   public
     constructor Create(const ARegistryContextKey: string='');
     destructor Destroy; override;
     function AsComponentsBuilder: TComponentsBuilder;
-    function AsControlsBuilder: TControlsBuilder;
+    function AsControlCreator: TControlCreator;
     function AsMenusBuilder: TMenusBuilder;
   end;
 
@@ -967,9 +967,9 @@ begin
   FHeight := AHeight;
 end;
 
-{ TControlsBuilder }
+{ TControlCreator }
 
-function TControlsBuilder.BreakLine: TControlsBuilder;
+function TControlCreator.BreakLine: TControlCreator;
 begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
@@ -984,7 +984,7 @@ begin
   end;
 end;
 
-function TControlsBuilder.Break: TControlsBuilder;
+function TControlCreator.Break: TControlCreator;
 begin
   Result := Self;
   if CurrentLevel.Direction = cpdHorizontal then
@@ -993,7 +993,7 @@ begin
     BreakColumn;
 end;
 
-function TControlsBuilder.Break(AIncTopOrLeft: Single): TControlsBuilder;
+function TControlCreator.Break(AIncTopOrLeft: Single): TControlCreator;
 begin
   Result := Self;
   Self.Break;
@@ -1003,14 +1003,14 @@ begin
     IncLeft(AIncTopOrLeft);
 end;
 
-function TControlsBuilder.BreakColumn(AIncLeft: Single): TControlsBuilder;
+function TControlCreator.BreakColumn(AIncLeft: Single): TControlCreator;
 begin
   Result := Self;
   Self.BreakColumn;
   IncLeft(AIncLeft);
 end;
 
-function TControlsBuilder.BreakColumn: TControlsBuilder;
+function TControlCreator.BreakColumn: TControlCreator;
 begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
@@ -1025,8 +1025,8 @@ begin
   end;
 end;
 
-function TControlsBuilder.CenterControlsVertically(const AControlNames,
-  AReferenceGroup: array of string): TControlsBuilder;
+function TControlCreator.CenterControlsVertically(const AControlNames,
+  AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
   TargetBounds: TControlGroupBounds;
@@ -1044,8 +1044,8 @@ begin
   MoveControls(AControlNames, 0, DeltaY);
 end;
 
-function TControlsBuilder.CenterControlsInParentVertically(
-  const AControlNames: array of string): TControlsBuilder;
+function TControlCreator.CenterControlsInParentVertically(
+  const AControlNames: array of string): TControlCreator;
 var
   TargetBounds: TControlGroupBounds;
   ParentCtrl: TControl;
@@ -1093,8 +1093,8 @@ begin
   MoveControls(AControlNames, 0, DeltaY);
 end;
 
-function TControlsBuilder.CenterControlsInParentHorizontally(
-  const AControlNames: array of string): TControlsBuilder;
+function TControlCreator.CenterControlsInParentHorizontally(
+  const AControlNames: array of string): TControlCreator;
 var
   TargetBounds: TControlGroupBounds;
   ParentCtrl: TControl;
@@ -1141,7 +1141,7 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-function TControlsBuilder.CenterControlInParentHorizontally: TControlsBuilder;
+function TControlCreator.CenterControlInParentHorizontally: TControlCreator;
 var
   ParentCtrl: TControl;
   ParentWidth: Single;
@@ -1183,20 +1183,20 @@ begin
   MoveControls(ParentCtrl, DeltaX, 0);
 end;
 
-constructor TControlsBuilder.Create(ARegistryContextKey: string);
+constructor TControlCreator.Create(ARegistryContextKey: string);
 begin
   Create(TRegistryContextHandle.Create(ARegistryContextKey));
 end;
 
-constructor TControlsBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
+constructor TControlCreator.Create(ARegistryContextHandle: IRegistryContextHandle);
 begin
   FRegistryContextHandle := ARegistryContextHandle;
   FGroups := TControlGroupMap.Create;
-  FLevelStack := TControlsBuilderLevelStack.Create(True);
-  FLevelStack.Add(TControlsBuilderLevel.Create);
+  FLevelStack := TControlCreatorLevelStack.Create(True);
+  FLevelStack.Add(TControlCreatorLevel.Create);
 end;
 
-procedure TControlsBuilder.SetupControlBuilderForGridMode(AControlBuilder: TCustomControlBuilder);
+procedure TControlCreator.SetupControlBuilderForGridMode(AControlBuilder: TCustomControlBuilder);
 var
   Row, Col: Integer;
   RowSpan, ColSpan: Integer;
@@ -1234,7 +1234,7 @@ begin
   CurrentLevel.GridMode.ResetSpans;
 end;
 
-function TControlsBuilder.CreateControl(Builder: TCustomControlBuilder; AOwner: TComponent = nil): TControl;
+function TControlCreator.CreateControl(Builder: TCustomControlBuilder; AOwner: TComponent = nil): TControl;
 var
   ControlName: string;
 begin
@@ -1254,11 +1254,11 @@ begin
   Result := Builder.Build(AOwner, CurrentLevel.Parent, ControlName);
 end;
 
-function TControlsBuilder.AddControl(AControlBuilder: TCustomControlBuilder;
-  const AGroups: array of string): TControlsBuilder;
+function TControlCreator.AddControl(AControlBuilder: TCustomControlBuilder;
+  const AGroups: array of string): TControlCreator;
 var
   Control: TControl;
-  Level: TControlsBuilderLevel;
+  Level: TControlCreatorLevel;
 
   procedure ApplyDefaultControlSize;
   begin
@@ -1370,49 +1370,49 @@ begin
   MoveTopLeftAfterControl(Control);
 end;
 
-function TControlsBuilder.AddControl(AClass: TControlClass;
-  const AName: string=''): TControlsBuilder;
+function TControlCreator.AddControl(AClass: TControlClass;
+  const AName: string=''): TControlCreator;
 begin
   Result := AddControl(TControlBuilder.Create(AClass, AName));
 end;
 
-function TControlsBuilder.AddControl(AClass: TControlClass; const AName: string;
-  out Reference): TControlsBuilder;
+function TControlCreator.AddControl(AClass: TControlClass; const AName: string;
+  out Reference): TControlCreator;
 begin
   Result := AddControl(TControlBuilder.Create(AClass, AName, Reference));
 end;
 
-function TControlsBuilder.AddControl(AClass: TControlClass;
-  out Reference): TControlsBuilder;
+function TControlCreator.AddControl(AClass: TControlClass;
+  out Reference): TControlCreator;
 begin
   Result := AddControl(TControlBuilder.Create(AClass, Reference));
 end;
 
-function TControlsBuilder.AddControl(AClass: TControlClass; const AName: string;
-  AProc: TControlSetupProc): TControlsBuilder;
+function TControlCreator.AddControl(AClass: TControlClass; const AName: string;
+  AProc: TControlSetupProc): TControlCreator;
 begin
   Result := AddControl(TControlBuilder.Create(AClass, AName).Setup(AProc));
 end;
 
-function TControlsBuilder.AddControl(AClass: TControlClass; const AName: string;
-  out Reference; AProc: TControlSetupProc): TControlsBuilder;
+function TControlCreator.AddControl(AClass: TControlClass; const AName: string;
+  out Reference; AProc: TControlSetupProc): TControlCreator;
 begin
   Result := AddControl(TControlBuilder.Create(AClass, AName, Reference).Setup(AProc));
 end;
 
-function TControlsBuilder.AddControl(AClass: TControlClass; out Reference;
-  AProc: TControlSetupProc): TControlsBuilder;
+function TControlCreator.AddControl(AClass: TControlClass; out Reference;
+  AProc: TControlSetupProc): TControlCreator;
 begin
   Result := AddControl(TControlBuilder.Create(AClass, Reference).Setup(AProc));
 end;
 
-function TControlsBuilder.AddControl(AControlBuilder: TCustomControlBuilder): TControlsBuilder;
+function TControlCreator.AddControl(AControlBuilder: TCustomControlBuilder): TControlCreator;
 begin
   Result := AddControl(AControlBuilder, []);
 end;
 
-function TControlsBuilder.AddControls(AControlCreateBuilders: array of TCustomControlBuilder;
-  const AGroups: array of string): TControlsBuilder;
+function TControlCreator.AddControls(AControlCreateBuilders: array of TCustomControlBuilder;
+  const AGroups: array of string): TControlCreator;
 var
   I: Integer;
 begin
@@ -1421,8 +1421,8 @@ begin
     AddControl(AControlCreateBuilders[I], AGroups);
 end;
 
-function TControlsBuilder.AddControls(
-  AControlCreateBuilders: array of TCustomControlBuilder): TControlsBuilder;
+function TControlCreator.AddControls(
+  AControlCreateBuilders: array of TCustomControlBuilder): TControlCreator;
 var
   I: Integer;
 begin
@@ -1431,7 +1431,7 @@ begin
     AddControl(AControlCreateBuilders[I], []);
 end;
 
-procedure TControlsBuilder.AddControlToGroups(AControl: TControl;
+procedure TControlCreator.AddControlToGroups(AControl: TControl;
   const AGroups: array of string);
 var
   Group: string;
@@ -1448,8 +1448,8 @@ begin
   end;
 end;
 
-function TControlsBuilder.AddInLevel(const AControls: array of TCustomControlBuilder;
-  ADirection: TControlsBuilderDirection): TControlsBuilder;
+function TControlCreator.AddInLevel(const AControls: array of TCustomControlBuilder;
+  ADirection: TControlCreatorDirection): TControlCreator;
 begin
   Result := Self;
   SubLevel(ADirection);
@@ -1457,8 +1457,8 @@ begin
   SuperLevel;
 end;
 
-function TControlsBuilder.CenterControlsHorizontally(const AControlNames,
-  AReferenceGroup: array of string): TControlsBuilder;
+function TControlCreator.CenterControlsHorizontally(const AControlNames,
+  AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
   TargetBounds: TControlGroupBounds;
@@ -1476,8 +1476,8 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-function TControlsBuilder.AlignControlsRight(const AControlNames,
-  AReferenceGroup: array of string; const ARightPadding: Single = 0): TControlsBuilder;
+function TControlCreator.AlignControlsRight(const AControlNames,
+  AReferenceGroup: array of string; const ARightPadding: Single = 0): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
   GroupBounds: TControlGroupBounds;
@@ -1496,7 +1496,7 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-function TControlsBuilder.SubLevel(AGroupName: string): TControlsBuilder;
+function TControlCreator.SubLevel(AGroupName: string): TControlCreator;
 var
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
@@ -1532,45 +1532,45 @@ begin
     CurrentLevel.GroupName := AGroupName;
 end;
 
-function TControlsBuilder.SubLevel(
-  ADirection: TControlsBuilderDirection; AGroupName: string): TControlsBuilder;
+function TControlCreator.SubLevel(
+  ADirection: TControlCreatorDirection; AGroupName: string): TControlCreator;
 begin
   Result := SubLevel(AGroupName);
   SetDirection(ADirection);
 end;
 
-function TControlsBuilder.SiblingSubLevel(ADirection: TControlsBuilderDirection;
-  ABreak: Boolean): TControlsBuilder;
+function TControlCreator.SiblingSubLevel(ADirection: TControlCreatorDirection;
+  ABreak: Boolean): TControlCreator;
 begin
   Result := SiblingSubLevel(ADirection, '', ABreak);
 end;
 
-function TControlsBuilder.SiblingSubLevelWithBreak(
-  ADirection: TControlsBuilderDirection;
-  AGroupName: string): TControlsBuilder;
+function TControlCreator.SiblingSubLevelWithBreak(
+  ADirection: TControlCreatorDirection;
+  AGroupName: string): TControlCreator;
 begin
   Result := SiblingSubLevel(ADirection, AGroupName, True);
 end;
 
-function TControlsBuilder.SiblingSubLevelWithBreak(
-  AGroupName: string): TControlsBuilder;
+function TControlCreator.SiblingSubLevelWithBreak(
+  AGroupName: string): TControlCreator;
 begin
   Result := SiblingSubLevel(AGroupName, True);
 end;
 
-function TControlsBuilder.SiblingSubLevel(ABreak: Boolean): TControlsBuilder;
+function TControlCreator.SiblingSubLevel(ABreak: Boolean): TControlCreator;
 begin
   Result := SiblingSubLevel('', ABreak);
 end;
 
-function TControlsBuilder.BreakLine(AIncTop: Single): TControlsBuilder;
+function TControlCreator.BreakLine(AIncTop: Single): TControlCreator;
 begin
   Result := Self;
   Self.BreakLine;
   IncTop(AIncTop);
 end;
 
-destructor TControlsBuilder.Destroy;
+destructor TControlCreator.Destroy;
 var
   GroupList: TControlList;
 begin
@@ -1581,9 +1581,9 @@ begin
   inherited;
 end;
 
-function TControlsBuilder.SuperLevel: TControlsBuilder;
+function TControlCreator.SuperLevel: TControlCreator;
 var
-  SubL, SuperL: TControlsBuilderLevel;
+  SubL, SuperL: TControlCreatorLevel;
   Bounds: TControlGroupBounds;
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
   Row, Col, RowSpan, ColSpan: Integer;
@@ -1698,7 +1698,7 @@ begin
 end;
 
 
-function TControlsBuilder.RecalcParentHeight(AExtraHeight: Single): TControlsBuilder;
+function TControlCreator.RecalcParentHeight(AExtraHeight: Single): TControlCreator;
 begin
   Result := Self;
   {$IFDEF FRAMEWORK_FMX}
@@ -1713,16 +1713,16 @@ begin
   {$ENDIF}
 end;
 
-function TControlsBuilder.RecalcParentSize(AExtraHeight,
-  AExtraWidth: Single): TControlsBuilder;
+function TControlCreator.RecalcParentSize(AExtraHeight,
+  AExtraWidth: Single): TControlCreator;
 begin
   Result := Self;
   RecalcParentHeight(AExtraHeight);
   RecalcParentWidth(AExtraWidth);
 end;
 
-function TControlsBuilder.RecalcParentWidth(
-  AExtraWidth: Single): TControlsBuilder;
+function TControlCreator.RecalcParentWidth(
+  AExtraWidth: Single): TControlCreator;
 begin
   Result := Self;
   {$IFDEF FRAMEWORK_FMX}
@@ -1737,8 +1737,8 @@ begin
   {$ENDIF}
 end;
 
-function TControlsBuilder.CopyHeight(const AControlNames,
-  AReferenceGroup: array of string): TControlsBuilder;
+function TControlCreator.CopyHeight(const AControlNames,
+  AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
   Name: string;
@@ -1765,8 +1765,8 @@ begin
   end;
 end;
 
-function TControlsBuilder.CopyWidth(const AControlNames,
-  AReferenceGroup: array of string): TControlsBuilder;
+function TControlCreator.CopyWidth(const AControlNames,
+  AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
   Name: string;
@@ -1793,8 +1793,8 @@ begin
   end;
 end;
 
-function TControlsBuilder.CopySize(const AControlNames,
-  AReferenceGroup: array of string): TControlsBuilder;
+function TControlCreator.CopySize(const AControlNames,
+  AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
   Name: string;
@@ -1823,13 +1823,13 @@ begin
   end;
 end;
 
-function TControlsBuilder.ReturnCurrentLevel(var ACurrentLevel: TControlsBuilderLevel): TControlsBuilder;
+function TControlCreator.ReturnCurrentLevel(var ACurrentLevel: TControlCreatorLevel): TControlCreator;
 begin
   Result := Self;
   ACurrentLevel := Self.CurrentLevel;
 end;
 
-function TControlsBuilder.ReturnLastControl(out AControl: TControl): TControlsBuilder;
+function TControlCreator.ReturnLastControl(out AControl: TControl): TControlCreator;
 begin
   Result := Self;
   AControl := nil;
@@ -1837,59 +1837,59 @@ begin
     AControl := Self.Controls.Last;
 end;
 
-function TControlsBuilder.GetNamedControl(const AName: string): TControl;
+function TControlCreator.GetNamedControl(const AName: string): TControl;
 begin
   if not Registry.NamedComponents.TryGetValue(AName, TComponent(Result)) then
     Result := nil;
 end;
 
-function TControlsBuilder.IncLeft(AIncLeft: Single): TControlsBuilder;
+function TControlCreator.IncLeft(AIncLeft: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + AIncLeft;
 end;
 
-function TControlsBuilder.IncTop(AIncTop: Single): TControlsBuilder;
+function TControlCreator.IncTop(AIncTop: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + AIncTop;
 end;
 
-function TControlsBuilder.IncTopLeft(AIncTop,
-  AIncLeft: Single): TControlsBuilder;
+function TControlCreator.IncTopLeft(AIncTop,
+  AIncLeft: Single): TControlCreator;
 begin
   Result := Self;
   IncTop(AIncTop);
   IncLeft(AIncLeft);
 end;
 
-function TControlsBuilder.GetComponentRegistry: TComponentRegistry;
+function TControlCreator.GetComponentRegistry: TComponentRegistry;
 begin
   Result := FRegistryContextHandle.GetRegistry;
 end;
 
-function TControlsBuilder.GetContentWidth: Single;
+function TControlCreator.GetContentWidth: Single;
 begin
   Result := GetGroupBounds(FLevelStack.First.GroupName).Width;
 end;
 
-function TControlsBuilder.GetControl(const AName: string): TControl;
+function TControlCreator.GetControl(const AName: string): TControl;
 begin
   Result := Registry.GetControl(AName);
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TControlsBuilder.GetControl<T>(const AName: string): T;
+function TControlCreator.GetControl<T>(const AName: string): T;
 begin
   Result := Registry.GetControl<T>(AName);
 end;
 
-function TControlsBuilder.GetControls: TControlList;
+function TControlCreator.GetControls: TControlList;
 begin
   Result := Registry.Controls;
 end;
 
-function TControlsBuilder.GetControlsBounds(
+function TControlCreator.GetControlsBounds(
   AControlsNames: array of string): TControlGroupBounds;
 var
   I: Integer;
@@ -1911,17 +1911,17 @@ begin
   end;
 end;
 
-function TControlsBuilder.GetCurrenteLevel: TControlsBuilderLevel;
+function TControlCreator.GetCurrenteLevel: TControlCreatorLevel;
 begin
   Result := FLevelStack.Last;
 end;
 
-function TControlsBuilder.GetFContentHeight: Single;
+function TControlCreator.GetFContentHeight: Single;
 begin
   Result := GetGroupBounds(FLevelStack.First.GroupName).Height;
 end;
 
-function TControlsBuilder.GetGroupBounds(
+function TControlCreator.GetGroupBounds(
   const AGroupName: string): TControlGroupBounds;
 var
   Control: TControl;
@@ -1935,13 +1935,13 @@ begin
     Result.Include(Control);
 end;
 
-function TControlsBuilder.GetItem(const AName: string): TControl;
+function TControlCreator.GetItem(const AName: string): TControl;
 begin
   Result := Self.GetControl(AName);
 end;
 
-function TControlsBuilder.MoveControls(const AControl: TControl;
-  const ADX, ADY: Single): TControlsBuilder;
+function TControlCreator.MoveControls(const AControl: TControl;
+  const ADX, ADY: Single): TControlCreator;
 var
     L, T: Single;
 begin
@@ -1967,8 +1967,8 @@ begin
   {$ENDIF}
 end;
 
-function TControlsBuilder.MoveControls(const AControlNames: array of string;
-  const ADX, ADY: Single): TControlsBuilder;
+function TControlCreator.MoveControls(const AControlNames: array of string;
+  const ADX, ADY: Single): TControlCreator;
 var
   Name: string;
   Ctrl: TControl;
@@ -1984,7 +1984,7 @@ begin
   end;
 end;
 
-procedure TControlsBuilder.MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
+procedure TControlCreator.MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
 begin
   if CurrentLevel.Direction = cpdHorizontal then
   begin
@@ -2005,7 +2005,7 @@ begin
   end;
 end;
 
-procedure TControlsBuilder.MoveTopLeftAfterRect(
+procedure TControlCreator.MoveTopLeftAfterRect(
   const ARect: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
   AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}
 );
@@ -2063,7 +2063,7 @@ begin
     );
 end;
 
-procedure TControlsBuilder.MoveTopLeftAfterControl(AControl: TControl);
+procedure TControlCreator.MoveTopLeftAfterControl(AControl: TControl);
 var
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
@@ -2076,8 +2076,8 @@ begin
   MoveTopLeftAfterRect(R, AControl.Align);
 end;
 
-function TControlsBuilder.SiblingSubLevel(ADirection: TControlsBuilderDirection;
-  AGroupName: string; ABreak: Boolean): TControlsBuilder;
+function TControlCreator.SiblingSubLevel(ADirection: TControlCreatorDirection;
+  AGroupName: string; ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
   if ABreak then
@@ -2085,8 +2085,8 @@ begin
   SubLevel(ADirection, AGroupName);
 end;
 
-function TControlsBuilder.SiblingSubLevel(AGroupName: string;
-  ABreak: Boolean): TControlsBuilder;
+function TControlCreator.SiblingSubLevel(AGroupName: string;
+  ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
   if ABreak then
@@ -2094,46 +2094,46 @@ begin
   SubLevel(AGroupName);
 end;
 
-function TControlsBuilder.SetControlHeight(AHeight: Single): TControlsBuilder;
+function TControlCreator.SetControlHeight(AHeight: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlHeight := AHeight;
 end;
 
-function TControlsBuilder.SetControlWidth(AWidth: Single): TControlsBuilder;
+function TControlCreator.SetControlWidth(AWidth: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlWidth := AWidth;
 end;
 
-function TControlsBuilder.SetControlWidthAndHeight(AWidth,
-  AHeight: Single): TControlsBuilder;
+function TControlCreator.SetControlWidthAndHeight(AWidth,
+  AHeight: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlHeight := AHeight;
   CurrentLevel.ControlWidth := AWidth;
 end;
 
-function TControlsBuilder.UnsetControlHeight: TControlsBuilder;
+function TControlCreator.UnsetControlHeight: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlHeight := TOptionalSingle.None;
 end;
 
-function TControlsBuilder.UnsetControlWidth: TControlsBuilder;
+function TControlCreator.UnsetControlWidth: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlWidth := TOptionalSingle.None;
 end;
 
-function TControlsBuilder.UnsetControlWidthAndHeight: TControlsBuilder;
+function TControlCreator.UnsetControlWidthAndHeight: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlHeight := TOptionalSingle.None;
   CurrentLevel.ControlWidth := TOptionalSingle.None;
 end;
 
-function TControlsBuilder.GridInit(ARows, ACols: Integer): TControlsBuilder;
+function TControlCreator.GridInit(ARows, ACols: Integer): TControlCreator;
 begin
   Result := Self;
   SubLevel;
@@ -2145,7 +2145,7 @@ begin
   );
 end;
 
-function TControlsBuilder.GridCellSpan(ACellSpan: Integer): TControlsBuilder;
+function TControlCreator.GridCellSpan(ACellSpan: Integer): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.ResetSpans;
@@ -2156,113 +2156,113 @@ begin
     CurrentLevel.GridMode.RowSpan := ACellSpan;
 end;
 
-function TControlsBuilder.GridRowSpan(ARowSpan: Integer): TControlsBuilder;
+function TControlCreator.GridRowSpan(ARowSpan: Integer): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.RowSpan := ARowSpan;
 end;
 
-function TControlsBuilder.GridColSpan(AColSpan: Integer): TControlsBuilder;
+function TControlCreator.GridColSpan(AColSpan: Integer): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.ColSpan := AColSpan;
 end;
 
-function TControlsBuilder.GridSetCellWidthAndHeight(AWidth,
-  AHeight: Integer): TControlsBuilder;
+function TControlCreator.GridSetCellWidthAndHeight(AWidth,
+  AHeight: Integer): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.CellWidth := AWidth;
   CurrentLevel.GridMode.CellHeight := AHeight;
 end;
 
-function TControlsBuilder.GridSetColWidth(ACol: Integer;
-  AWidth: Single): TControlsBuilder;
+function TControlCreator.GridSetColWidth(ACol: Integer;
+  AWidth: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.SetColWidth(ACol, AWidth);
 end;
 
-function TControlsBuilder.GridSetRowHeight(ARow: Integer;
-  AHeight: Single): TControlsBuilder;
+function TControlCreator.GridSetRowHeight(ARow: Integer;
+  AHeight: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.SetRowHeight(ARow, AHeight);
 end;
 
-function TControlsBuilder.GridSetColOffset(ACol: Integer; AOffset: Single): TControlsBuilder;
+function TControlCreator.GridSetColOffset(ACol: Integer; AOffset: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.SetColOffset(ACol, AOffset);
 end;
 
-function TControlsBuilder.GridSetRowOffset(ARow: Integer; AOffset: Single): TControlsBuilder;
+function TControlCreator.GridSetRowOffset(ARow: Integer; AOffset: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.SetRowOffset(ARow, AOffset);
 end;
 
-function TControlsBuilder.GridAutoExpand: TControlsBuilder;
+function TControlCreator.GridAutoExpand: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.AutoExpand := [gaeRows, gaeCols];
 end;
 
-function TControlsBuilder.GridAutoExpandRows: TControlsBuilder;
+function TControlCreator.GridAutoExpandRows: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.AutoExpand := [gaeRows];
 end;
 
-function TControlsBuilder.GridAutoExpandCols: TControlsBuilder;
+function TControlCreator.GridAutoExpandCols: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.AutoExpand := [gaeCols];
 end;
 
-function TControlsBuilder.GridCellPosition(ACellPosition: TCellPosition): TControlsBuilder;
+function TControlCreator.GridCellPosition(ACellPosition: TCellPosition): TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellPosition := ACellPosition;
 end;
 
-function TControlsBuilder.GridCellNoStrech: TControlsBuilder;
+function TControlCreator.GridCellNoStrech: TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellStrech := [];
 end;
 
-function TControlsBuilder.GridCellStrechAll: TControlsBuilder;
+function TControlCreator.GridCellStrechAll: TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellStrech := [csVertical, csHorizontal];
 end;
 
-function TControlsBuilder.GridCellStrechHorizontal: TControlsBuilder;
+function TControlCreator.GridCellStrechHorizontal: TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellStrech := [csHorizontal];
 end;
 
-function TControlsBuilder.GridCellStrechVertical: TControlsBuilder;
+function TControlCreator.GridCellStrechVertical: TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellStrech := [csVertical];
 end;
 
-function TControlsBuilder.GridReturnNumberOfRows(out ARows: Integer): TControlsBuilder;
+function TControlCreator.GridReturnNumberOfRows(out ARows: Integer): TControlCreator;
 begin
   Result := Self;
   ARows := Self.CurrentLevel.GridMode.Rows;
 end;
 
-function TControlsBuilder.GridReturnNumberOfCols(out ACols: Integer): TControlsBuilder;
+function TControlCreator.GridReturnNumberOfCols(out ACols: Integer): TControlCreator;
 begin
   Result := Self;
   ACols := Self.CurrentLevel.GridMode.Cols;
 end;
 
-function TControlsBuilder.GridSkipCell: TControlsBuilder;
+function TControlCreator.GridSkipCell: TControlCreator;
 var
   Row, Col, RowSpan, ColSpan: Integer;
   Dir: TGridFillDirection;
@@ -2291,7 +2291,7 @@ begin
   end;
 end;
 
-function TControlsBuilder.GridSkipCells(ANumCells: Integer): TControlsBuilder;
+function TControlCreator.GridSkipCells(ANumCells: Integer): TControlCreator;
 var
   I: Integer;
 begin
@@ -2306,7 +2306,7 @@ begin
     GridSkipCell;
 end;
 
-function TControlsBuilder.GridGotoCell(ARow, ACol: Integer): TControlsBuilder;
+function TControlCreator.GridGotoCell(ARow, ACol: Integer): TControlCreator;
 var
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
@@ -2332,7 +2332,7 @@ begin
   end;
 end;
 
-function TControlsBuilder.GridFinish: TControlsBuilder;
+function TControlCreator.GridFinish: TControlCreator;
 begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
@@ -2342,21 +2342,21 @@ begin
   end;
 end;
 
-function TControlsBuilder.SetDirection(
-  ADirection: TControlsBuilderDirection): TControlsBuilder;
+function TControlCreator.SetDirection(
+  ADirection: TControlCreatorDirection): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.Direction := ADirection;
 end;
 
-function TControlsBuilder.SetHorizontalSpace(
-  AHorizontalSpace: Single): TControlsBuilder;
+function TControlCreator.SetHorizontalSpace(
+  AHorizontalSpace: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.HorizontalSpace := AHorizontalSpace;
 end;
 
-function TControlsBuilder.SetLeft(AControlName: string): TControlsBuilder;
+function TControlCreator.SetLeft(AControlName: string): TControlCreator;
 var
   L: Single;
 begin
@@ -2369,7 +2369,7 @@ begin
   Result := SetLeft(L);
 end;
 
-function TControlsBuilder.SetLeft(ALeft: Single): TControlsBuilder;
+function TControlCreator.SetLeft(ALeft: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.CurrentLeft := ALeft;
@@ -2378,29 +2378,29 @@ begin
   CurrentLevel.MaxControlWidth := 0;
 end;
 
-function TControlsBuilder.External(const AProc: TControlsBuilderObjProc): TControlsBuilder;
+function TControlCreator.External(const AProc: TControlCreatorObjProc): TControlCreator;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TControlsBuilder.External(const AProc: TControlsBuilderProc): TControlsBuilder;
+function TControlCreator.External(const AProc: TControlCreatorProc): TControlCreator;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TControlsBuilder.SetSpace(AVerticalSpace,
-  AHorizontalSpace: Single): TControlsBuilder;
+function TControlCreator.SetSpace(AVerticalSpace,
+  AHorizontalSpace: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.VerticalSpace := AVerticalSpace;
   CurrentLevel.HorizontalSpace := AHorizontalSpace;
 end;
 
-function TControlsBuilder.SetTop(ATop: Single): TControlsBuilder;
+function TControlCreator.SetTop(ATop: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.CurrentTop := ATop;
@@ -2409,7 +2409,7 @@ begin
   CurrentLevel.MaxControlWidth := 0;
 end;
 
-function TControlsBuilder.SetTop(AControlName: string): TControlsBuilder;
+function TControlCreator.SetTop(AControlName: string): TControlCreator;
 var
   T: Single;
 begin
@@ -2422,15 +2422,15 @@ begin
   Result := SetTop(T);
 end;
 
-function TControlsBuilder.SetTopLeft(ATop, ALeft: Single): TControlsBuilder;
+function TControlCreator.SetTopLeft(ATop, ALeft: Single): TControlCreator;
 begin
   Result := Self;
   SetTop(ATop);
   SetLeft(ALeft);
 end;
 
-function TControlsBuilder.SetTopLeftNearControl(AControlName: string;
-  APosition: TRelativePosition): TControlsBuilder;
+function TControlCreator.SetTopLeftNearControl(AControlName: string;
+  APosition: TRelativePosition): TControlCreator;
 var
   Control: TControl;
   L, T, W, H: Single;
@@ -2461,9 +2461,9 @@ begin
     SetLeft(CurrentLevel.CurrentLeft + W + CurrentLevel.HorizontalSpace);
 end;
 
-function TControlsBuilder.SetTopLeftNearControls(
+function TControlCreator.SetTopLeftNearControls(
   AControlsNames: array of string;
-  APosition: TRelativePosition): TControlsBuilder;
+  APosition: TRelativePosition): TControlCreator;
 var
   I: Integer;
   Ctrl: TControl;
@@ -2493,8 +2493,8 @@ begin
   end;
 end;
 
-function TControlsBuilder.SetTopLeftNearGroup(const AGroupName: string;
-  APosition: TRelativePosition): TControlsBuilder;
+function TControlCreator.SetTopLeftNearGroup(const AGroupName: string;
+  APosition: TRelativePosition): TControlCreator;
 var
   Bounds: TControlGroupBounds;
 begin
@@ -2511,16 +2511,16 @@ begin
     SetLeft(CurrentLevel.CurrentLeft + Bounds.Width + CurrentLevel.HorizontalSpace);
 end;
 
-function TControlsBuilder.SetVerticalSpace(
-  AVerticalSpace: Single): TControlsBuilder;
+function TControlCreator.SetVerticalSpace(
+  AVerticalSpace: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.VerticalSpace := AVerticalSpace
 end;
 
 {$IFNDEF FRAMEWORK_FMX}
-function TControlsBuilder.WithOwnerAndParent(AOwner: TComponent;
-  AParent: TWinControl): TControlsBuilder;
+function TControlCreator.WithOwnerAndParent(AOwner: TComponent;
+  AParent: TWinControl): TControlCreator;
 begin
   Result := Self;
   FOwner := AOwner;
@@ -2529,8 +2529,8 @@ end;
 {$ENDIF}
 
 {$IFDEF FRAMEWORK_FMX}
-function TControlsBuilder.WithOwnerAndParent(AOwner: TComponent;
-  AParent: TFmxObject): TControlsBuilder;
+function TControlCreator.WithOwnerAndParent(AOwner: TComponent;
+  AParent: TFmxObject): TControlCreator;
 begin
   Result := Self;
   FOwner := AOwner;
@@ -2538,16 +2538,16 @@ begin
 end;
 {$ENDIF}
 
-function TControlsBuilder.WithParent(AParent: TWinControl): TControlsBuilder;
+function TControlCreator.WithParent(AParent: TWinControl): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.Parent := AParent;
 end;
 
-function TControlsBuilder.SubLevel(
+function TControlCreator.SubLevel(
   AControlBuilder: TControlBuilder;
   AGroupName: string
-): TControlsBuilder;
+): TControlCreator;
 var
   Control: TControl;
   OwnerToUse: TComponent;
@@ -2589,15 +2589,15 @@ begin
   SetTopLeft(0, 0);
 end;
 
-function TControlsBuilder.SubLevel(AControlBuilder: TControlBuilder;
-  ADirection: TControlsBuilderDirection; AGroupName: string): TControlsBuilder;
+function TControlCreator.SubLevel(AControlBuilder: TControlBuilder;
+  ADirection: TControlCreatorDirection; AGroupName: string): TControlCreator;
 begin
   Result := SubLevel(AControlBuilder, AGroupName);
   SetDirection(ADirection);
 end;
 
-function TControlsBuilder.SiblingSubLevel(AControlBuilder: TControlBuilder;
-  AGroupName: string; ABreak: Boolean): TControlsBuilder;
+function TControlCreator.SiblingSubLevel(AControlBuilder: TControlBuilder;
+  AGroupName: string; ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
   if ABreak then
@@ -2605,9 +2605,9 @@ begin
   SubLevel(AControlBuilder, AGroupName);
 end;
 
-function TControlsBuilder.SiblingSubLevel(AControlBuilder: TControlBuilder;
-  ADirection: TControlsBuilderDirection; AGroupName: string;
-  ABreak: Boolean): TControlsBuilder;
+function TControlCreator.SiblingSubLevel(AControlBuilder: TControlBuilder;
+  ADirection: TControlCreatorDirection; AGroupName: string;
+  ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
   if ABreak then
@@ -2615,28 +2615,28 @@ begin
   SubLevel(AControlBuilder, ADirection, AGroupName);
 end;
 
-function TControlsBuilder.SiblingSubLevel(AControlBuilder: TControlBuilder;
-  ABreak: Boolean): TControlsBuilder;
+function TControlCreator.SiblingSubLevel(AControlBuilder: TControlBuilder;
+  ABreak: Boolean): TControlCreator;
 begin
   Result := SiblingSubLevel(AControlBuilder, '', ABreak);
 end;
 
-function TControlsBuilder.SiblingSubLevel(AControlBuilder: TControlBuilder;
-  ADirection: TControlsBuilderDirection;
-  ABreak: Boolean): TControlsBuilder;
+function TControlCreator.SiblingSubLevel(AControlBuilder: TControlBuilder;
+  ADirection: TControlCreatorDirection;
+  ABreak: Boolean): TControlCreator;
 begin
   Result := SiblingSubLevel(AControlBuilder, ADirection, '', ABreak);
 end;
 
-function TControlsBuilder.SiblingSubLevelWithBreak(
-  AControlBuilder: TControlBuilder; ADirection: TControlsBuilderDirection;
-  AGroupName: string): TControlsBuilder;
+function TControlCreator.SiblingSubLevelWithBreak(
+  AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection;
+  AGroupName: string): TControlCreator;
 begin
   Result := SiblingSubLevel(AControlBuilder, ADirection, AGroupName, True);
 end;
 
-function TControlsBuilder.SiblingSubLevelWithBreak(
-  AControlBuilder: TControlBuilder; AGroupName: string): TControlsBuilder;
+function TControlCreator.SiblingSubLevelWithBreak(
+  AControlBuilder: TControlBuilder; AGroupName: string): TControlCreator;
 begin
   Result := SiblingSubLevel(AControlBuilder, AGroupName, True);
 end;
@@ -3228,11 +3228,11 @@ begin
     FreeAndNil(FRowHeights);
 end;
 
-{ TControlsBuilderLevel }
+{ TControlCreatorLevel }
 
-function TControlsBuilderLevel.Clone: TControlsBuilderLevel;
+function TControlCreatorLevel.Clone: TControlCreatorLevel;
 begin
-  Result := TControlsBuilderLevel.Create;
+  Result := TControlCreatorLevel.Create;
   Result.Parent := Parent;
   Result.Direction := Direction;
   Result.InitialTop := InitialTop;
@@ -3247,7 +3247,7 @@ begin
   Result.ControlHeight := TOptionalSingle.None;
 end;
 
-constructor TControlsBuilderLevel.Create;
+constructor TControlCreatorLevel.Create;
 begin
   Direction := cpdHorizontal;
   InitialTop := 0;
@@ -3266,7 +3266,7 @@ begin
   GroupName := '__LEVEL_GROUP_' + IntToStr(FGroupCounter - 1) + '__';
 end;
 
-destructor TControlsBuilderLevel.Destroy;
+destructor TControlCreatorLevel.Destroy;
 begin
   GridMode.Free;
   inherited Destroy;
@@ -3841,12 +3841,12 @@ begin
   Result := FComponentsBuilder;
 end;
 
-function TOPCBBuilders.AsControlsBuilder: TControlsBuilder;
+function TOPCBBuilders.AsControlCreator: TControlCreator;
 begin
-  if not Assigned(FControlsBuilder) then
-    FControlsBuilder := TControlsBuilder.Create(FRegistryContextHandle);
+  if not Assigned(FControlCreator) then
+    FControlCreator := TControlCreator.Create(FRegistryContextHandle);
 
-  Result := FControlsBuilder;
+  Result := FControlCreator;
 end;
 
 function TOPCBBuilders.AsMenusBuilder: TMenusBuilder;
@@ -3860,7 +3860,7 @@ constructor TOPCBBuilders.Create(const ARegistryContextKey: string);
 begin
   FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContextKey);
   FComponentsBuilder := nil;
-  FControlsBuilder := nil;
+  FControlCreator := nil;
   FMenusBuilder := nil;
 end;
 
@@ -3869,8 +3869,8 @@ begin
   if Assigned(FComponentsBuilder) then
     FComponentsBuilder.Free;
 
-  if Assigned(FControlsBuilder) then
-    FControlsBuilder.Free;
+  if Assigned(FControlCreator) then
+    FControlCreator.Free;
 
   if Assigned(FMenusBuilder) then
     FMenusBuilder.Free;

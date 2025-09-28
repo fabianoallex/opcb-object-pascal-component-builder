@@ -21,8 +21,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFMain"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="116"/>
-        <CursorPos X="40" Y="145"/>
+        <TopLine Value="196"/>
+        <CursorPos X="19" Y="227"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -64,8 +64,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormLogin"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="49"/>
-        <CursorPos X="34" Y="75"/>
+        <TopLine Value="30"/>
+        <CursorPos X="36" Y="61"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
@@ -74,8 +74,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormUsers"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="55"/>
-        <CursorPos X="32" Y="79"/>
+        <TopLine Value="20"/>
+        <CursorPos X="67" Y="51"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
@@ -84,8 +84,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormCRUD"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="177"/>
-        <CursorPos X="29" Y="196"/>
+        <TopLine Value="168"/>
+        <CursorPos X="30" Y="199"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
       </Unit>
@@ -178,49 +178,6 @@
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="ufmain.pas"/>
-        <Caret Line="222" Column="34" TopLine="191"/>
-      </Position>
-      <Position>
-        <Filename Value="udbentity.pas"/>
-        <Caret Line="46" Column="21" TopLine="27"/>
-      </Position>
-      <Position>
-        <Filename Value="udbentity.pas"/>
-        <Caret Line="56" Column="22" TopLine="27"/>
-      </Position>
-      <Position>
-        <Filename Value="udbentity.pas"/>
-        <Caret Line="48" Column="3" TopLine="29"/>
-      </Position>
-      <Position>
-        <Filename Value="udbentity.pas"/>
-      </Position>
-      <Position>
-        <Filename Value="udbentity.pas"/>
-        <Caret Line="47" Column="20" TopLine="21"/>
-      </Position>
-      <Position>
-        <Filename Value="udbentity.pas"/>
-        <Caret Line="46" Column="3" TopLine="21"/>
-      </Position>
-      <Position>
-        <Filename Value="udmdatabase.pas"/>
-        <Caret Line="112" Column="22" TopLine="93"/>
-      </Position>
-      <Position>
-        <Filename Value="udmdatabase.pas"/>
-        <Caret Line="122" Column="22" TopLine="93"/>
-      </Position>
-      <Position>
-        <Filename Value="udmdatabase.pas"/>
-        <Caret Line="113" Column="3" TopLine="95"/>
-      </Position>
-      <Position>
-        <Filename Value="udmdatabase.pas"/>
-        <Caret Line="111" Column="12" TopLine="95"/>
-      </Position>
-      <Position>
         <Filename Value="udmdatabase.pas"/>
         <Caret Line="112" Column="20" TopLine="95"/>
       </Position>
@@ -294,6 +251,47 @@
       <Position>
         <Filename Value="ufmain.pas"/>
         <Caret Line="145" Column="40" TopLine="116"/>
+      </Position>
+      <Position>
+        <Filename Value="ufmain.pas"/>
+        <Caret Line="135" Column="72" TopLine="116"/>
+      </Position>
+      <Position>
+        <Filename Value="uformcrud.pas"/>
+        <Caret Line="38" Column="44" TopLine="20"/>
+      </Position>
+      <Position>
+        <Filename Value="uformcrud.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="uformcrud.pas"/>
+        <Caret Line="199" Column="30" TopLine="168"/>
+      </Position>
+      <Position>
+        <Filename Value="uformusers.pas"/>
+        <Caret Line="22" Column="44" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="uformusers.pas"/>
+        <Caret Line="51" Column="67" TopLine="20"/>
+      </Position>
+      <Position>
+        <Filename Value="uformlogin.pas"/>
+        <Caret Line="53" Column="19" TopLine="34"/>
+      </Position>
+      <Position>
+        <Filename Value="uformlogin.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="uformlogin.pas"/>
+        <Caret Line="61" Column="36" TopLine="30"/>
+      </Position>
+      <Position>
+        <Filename Value="ufmain.pas"/>
+        <Caret Line="149" Column="14" TopLine="131"/>
+      </Position>
+      <Position>
+        <Filename Value="ufmain.pas"/>
       </Position>
     </JumpHistory>
     <RunParams>

@@ -20,7 +20,7 @@ type
     procedure SetupLabelLogin(AControl: TControl);
     procedure SetupSenha(AControl: TControl);
     procedure SetupLoginButton(AControl: TControl);
-    procedure PopulateLoginControls(Builder: TControlsBuilder);
+    procedure PopulateLoginControls(Builder: TControlCreator);
     procedure SetButtonLogin(const Value: TButton);
     procedure SetCheckBoxConnected(const Value: TCheckBox);
     procedure SetEditEmail(const Value: TEdit);
@@ -112,7 +112,7 @@ begin
   CheckBox.Width := CaptionWidth + 20;
 end;
 
-procedure TForm1.PopulateLoginControls(Builder: TControlsBuilder);
+procedure TForm1.PopulateLoginControls(Builder: TControlCreator);
 begin
   Builder
     .SubLevel(TControlBuilder.Create(TPanel, 'PanelLogin').WithCaption(''), cpdVertical)
@@ -151,9 +151,9 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  Builder: TControlsBuilder;
+  Builder: TControlCreator;
 begin
-  Builder := TControlsBuilder.Create(Self.Name);
+  Builder := TControlCreator.Create(Self.Name);
 
   try
     Builder

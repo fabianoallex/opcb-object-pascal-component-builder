@@ -11,13 +11,13 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-    FBuilderCards: TControlsBuilder;
+    FBuilderCards: TControlCreator;
     procedure SetupImage(AControl: TControl);
     procedure AddCard;
     procedure ButtonAddCardClick(ASender: TObject);
-    procedure SetBuilderCards(const Value: TControlsBuilder);
+    procedure SetBuilderCards(const Value: TControlCreator);
   public
-    property BuilderCards: TControlsBuilder read FBuilderCards write SetBuilderCards;
+    property BuilderCards: TControlCreator read FBuilderCards write SetBuilderCards;
   end;
 
 var
@@ -61,7 +61,7 @@ begin
   end;
 end;
 
-procedure TForm1.SetBuilderCards(const Value: TControlsBuilder);
+procedure TForm1.SetBuilderCards(const Value: TControlCreator);
 begin
   FBuilderCards := Value;
 end;
@@ -103,7 +103,7 @@ var
 begin
   OPCBBuilders := TOPCBBuilders.Create(Self.Name);
   try
-    OPCBBuilders.AsControlsBuilder
+    OPCBBuilders.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
@@ -119,12 +119,12 @@ begin
       .AddControl(TControlBuilder.Create(TFlowPanel, 'FlowCards').WithAlign(alClient).WithCaption(''))
     ;
 
-    BuilderCards := TControlsBuilder.Create(Self.Name);
+    BuilderCards := TControlCreator.Create(Self.Name);
 
     BuilderCards
       .WithOwnerAndParent(
         Self,
-        OPCBBuilders.AsControlsBuilder.GetControl<TFlowPanel>('FlowCards')
+        OPCBBuilders.AsControlCreator.GetControl<TFlowPanel>('FlowCards')
       )
     ;
   finally

@@ -14,14 +14,14 @@ uses
 type
   TControlDialog = class(TForm)
   private
-    FControlsBuilder: TControlsBuilder;
+    FControlCreator: TControlCreator;
     FControlInfo: TControlBuilder;
-    procedure SeTControlsBuilder(const Value: TControlsBuilder);
+    procedure SeTControlCreator(const Value: TControlCreator);
     procedure SetupButton(AControl: TControl);
   public
     constructor CreateNew(AOwner: TComponent; AMsg: string; AControlBuilder: TControlBuilder; AContextKey: string='');
     destructor Destroy; override;
-    property ControlsBuilder: TControlsBuilder read FControlsBuilder write SeTControlsBuilder;
+    property ControlCreator: TControlCreator read FControlCreator write SeTControlCreator;
   end;
 
 implementation
@@ -41,14 +41,14 @@ begin
   if AContextKey = '' then
     AContextKey := 'DIALOGS';
 
-  ControlsBuilder := TControlsBuilder.Create(AContextKey);
+  ControlCreator := TControlCreator.Create(AContextKey);
 
   if AControlBuilder.Name = '' then
     AControlBuilder.WithName('Control');
 
   ControlName := AControlBuilder.Name;
 
-  ControlsBuilder
+  ControlCreator
     .WithOwnerAndParent(Self, Self)
     .SetSpace(5, 5)
     .SetTopLeft(20, 20)
@@ -63,8 +63,8 @@ begin
     .AlignControlsRight(['ButtonOk', 'ButtonCancel'], [ControlName])
   ;
 
-  Self.Width := Trunc(ControlsBuilder.ContentWidth) + 50;
-  Self.Height := Trunc(ControlsBuilder.ContentHeight) + 75;
+  Self.Width := Trunc(ControlCreator.ContentWidth) + 50;
+  Self.Height := Trunc(ControlCreator.ContentHeight) + 75;
 end;
 
 procedure TControlDialog.SetupButton(AControl: TControl);
@@ -85,13 +85,13 @@ end;
 
 destructor TControlDialog.Destroy;
 begin
-  FControlsBuilder.Free;
+  FControlCreator.Free;
   inherited;
 end;
 
-procedure TControlDialog.SeTControlsBuilder(const Value: TControlsBuilder);
+procedure TControlDialog.SeTControlCreator(const Value: TControlCreator);
 begin
-  FControlsBuilder := Value;
+  FControlCreator := Value;
 end;
 
 end.

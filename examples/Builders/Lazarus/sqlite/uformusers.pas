@@ -19,7 +19,7 @@ type
     procedure SetupDBEditUserName(AControl: TControl);
   protected
     procedure SetupDBGrid(AControl: TControl); override;
-    procedure BuildContents(const ABuiler: TControlsBuilder); override;
+    procedure BuildContents(const ABuiler: TControlCreator); override;
   public
     constructor CreateNew(AOwner: TComponent);
   end;
@@ -48,7 +48,7 @@ begin
   end;
 end;
 
-procedure TFormUsers2.BuildContents(const ABuiler: TControlsBuilder);
+procedure TFormUsers2.BuildContents(const ABuiler: TControlCreator);
 begin
   ABuiler
     .SetTopLeft(5, 5)

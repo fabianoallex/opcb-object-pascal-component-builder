@@ -146,7 +146,7 @@ begin
         .SuperLevel
     ;
 
-    Builders.AsControlsBuilder
+    Builders.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
@@ -213,18 +213,18 @@ end;
 
 function TFMain.AddTabSheet: TTabSheet;
 var
-  ControlsBuilder: TControlsBuilder;
+  ControlCreator: TControlCreator;
 begin
-  ControlsBuilder := TControlsBuilder.Create(Self.Name);
+  ControlCreator := TControlCreator.Create(Self.Name);
   try
-    ControlsBuilder
+    ControlCreator
       .WithOwnerAndParent(Self, PageControl)
       .AddControl(TControlBuilder.Create(TTabSheet).WithCaption('Nova aba'))
     ;
-    Result := ControlsBuilder.Controls.Last as TTabSheet;
+    Result := ControlCreator.Controls.Last as TTabSheet;
     PageControl.ActivePage := Result;
   finally
-    ControlsBuilder.Free;
+    ControlCreator.Free;
   end;
 end;
 

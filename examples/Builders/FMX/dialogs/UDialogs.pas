@@ -9,16 +9,16 @@ uses
 type
   TControlDialog = class(TForm)
   private
-    FControlBuilder: TControlsBuilder;
+    FControlBuilder: TControlCreator;
     FControlInfo: TControlBuilder;
-    procedure SeTControlsBuilder(const Value: TControlsBuilder);
+    procedure SeTControlCreator(const Value: TControlCreator);
     procedure SetupButton(AControl: TControl);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure SetupLabel(AControl: TControl);
   public
     constructor CreateNew(AOwner: TComponent; AMsg: string; AControlBuilder: TControlBuilder; AContextKey: string='');
     destructor Destroy; override;
-    property ControlBuilder: TControlsBuilder read FControlBuilder write SeTControlsBuilder;
+    property ControlBuilder: TControlCreator read FControlBuilder write SeTControlCreator;
   end;
 
 implementation
@@ -42,7 +42,7 @@ begin
   if AContextKey = '' then
     AContextKey := 'DIALOGS';
 
-  ControlBuilder := TControlsBuilder.Create(AContextKey);
+  ControlBuilder := TControlCreator.Create(AContextKey);
 
   if AControlBuilder.Name = '' then
     AControlBuilder.WithName('Control');
@@ -108,7 +108,7 @@ begin
   inherited;
 end;
 
-procedure TControlDialog.SeTControlsBuilder(const Value: TControlsBuilder);
+procedure TControlDialog.SeTControlCreator(const Value: TControlCreator);
 begin
   FControlBuilder := Value;
 end;

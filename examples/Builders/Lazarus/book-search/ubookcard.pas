@@ -218,11 +218,11 @@ end;
 
 constructor TBookCard.Create(AOwner: TComponent);
 var
-  ControlBuilder: TControlsBuilder;
+  ControlBuilder: TControlCreator;
 begin
   inherited Create(AOwner);
   Self.HorzScrollBar.Visible := False;
-  ControlBuilder := TControlsBuilder.Create;
+  ControlBuilder := TControlCreator.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(Self, Self)

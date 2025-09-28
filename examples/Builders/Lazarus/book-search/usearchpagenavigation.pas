@@ -199,10 +199,10 @@ end;
 
 constructor TSearchPageNavigation.Create(AOwner: TComponent);
 var
-  ControlBuilder: TControlsBuilder;
+  ControlBuilder: TControlCreator;
 begin
   inherited Create(AOwner);
-  ControlBuilder := TControlsBuilder.Create;
+  ControlBuilder := TControlCreator.Create;
 
   try
     ControlBuilder

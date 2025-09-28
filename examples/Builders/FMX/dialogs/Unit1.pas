@@ -240,9 +240,9 @@ var
 
   procedure ConfigPanelMain;
   var
-    ControlBuilder: TControlsBuilder;
+    ControlBuilder: TControlCreator;
   begin
-    ControlBuilder := TControlsBuilder.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
+    ControlBuilder := TControlCreator.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
     try
       ControlBuilder
         .WithOwnerAndParent(
