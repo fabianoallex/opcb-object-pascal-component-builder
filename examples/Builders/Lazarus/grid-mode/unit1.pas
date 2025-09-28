@@ -31,9 +31,9 @@ implementation
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(Self, Self)

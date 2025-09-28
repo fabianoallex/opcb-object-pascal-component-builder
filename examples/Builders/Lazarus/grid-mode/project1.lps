@@ -22,7 +22,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <CursorPos X="9" Y="82"/>
+        <TopLine Value="15"/>
+        <CursorPos X="37" Y="36"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -54,13 +55,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="343" Column="21" TopLine="309"/>
-      </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <Caret Line="344" Column="21" TopLine="310"/>
@@ -172,6 +166,14 @@
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <Caret Line="353" Column="17" TopLine="333"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="82" Column="9"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="34" Column="19" TopLine="15"/>
       </Position>
     </JumpHistory>
     <RunParams>

@@ -27,10 +27,10 @@ uses
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(Self, Self)
@@ -43,7 +43,7 @@ begin
           .GridSetRowOffset(1, 22)
           .GridSetRowOffset(2, 65)
           .External(
-            procedure(ABuilder: TControlBuilder)
+            procedure(ABuilder: TControlsBuilder)
             const KeyRows: array[0..1] of string = ('QWERTYUIOPASDFGHJKL', 'ZXCVBNM');
             var Key: Char;
             begin

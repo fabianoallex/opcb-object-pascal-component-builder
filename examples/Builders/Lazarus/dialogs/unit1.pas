@@ -347,9 +347,9 @@ var
 
   procedure ConfigPanelMain;
   var
-    ControlBuilder: TControlBuilder;
+    ControlBuilder: TControlsBuilder;
   begin
-    ControlBuilder := TControlBuilder.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
+    ControlBuilder := TControlsBuilder.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
     try
       ControlBuilder
         .WithOwnerAndParent(

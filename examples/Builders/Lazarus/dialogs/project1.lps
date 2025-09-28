@@ -21,18 +21,19 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="472"/>
-        <CursorPos X="13" Y="492"/>
+        <TopLine Value="332"/>
+        <CursorPos X="39" Y="352"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="udialogs.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDialogs"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="37"/>
-        <CursorPos X="11" Y="64"/>
+        <TopLine Value="66"/>
+        <CursorPos X="74" Y="98"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
       </Unit>
@@ -63,22 +64,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="457" TopLine="431"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="466" Column="5" TopLine="448"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="465" TopLine="442"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="468" TopLine="450"/>
-      </Position>
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="519" Column="39" TopLine="492"/>
@@ -181,6 +166,22 @@
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="497" Column="15" TopLine="473"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="492" Column="13" TopLine="473"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="19" Column="22"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="98" Column="74" TopLine="66"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="350" Column="21" TopLine="332"/>
       </Position>
     </JumpHistory>
     <RunParams>

@@ -16,7 +16,7 @@ type
   TForm1 = class(TForm)
   private
     FComboBoxPageSize: TComboBox;
-    FControlBuilderPage: TControlBuilder;
+    FControlBuilderPage: TControlsBuilder;
     FEditSearch: TEdit;
     FMemo: TMemo;
     FOpenLibrarySearch: TOpenLibrarySearch;
@@ -28,7 +28,7 @@ type
     procedure OnFinish(Sender: TObject; const ATotal: Integer);
     procedure OnStart(Sender: TObject; const AQuery: string);
     procedure OnReturn(Sender: TObject; const AFound: Integer);
-    procedure SetControlBuilderPage(AValue: TControlBuilder);
+    procedure SeTControlsBuilderPage(AValue: TControlsBuilder);
     procedure SetOpenLibrarySearch(AValue: TOpenLibrarySearch);
     procedure SetupComboBoxPageSize(AControl: TControl);
     procedure SetupProgressBar(AControl: TControl);
@@ -43,7 +43,7 @@ type
     property PanelCards: TPanel read FPanelCards;
     property ScrollboxPage: TScrollbox read FScrollboxPage;
     property ProgressBar: TProgressBar read FProgressBar;
-    property ControlBuilderPage: TControlBuilder read FControlBuilderPage write SetControlBuilderPage;
+    property ControlBuilderPage: TControlsBuilder read FControlBuilderPage write SeTControlsBuilderPage;
   private
     procedure ButtonSearchClick(ASender: TObject);
     procedure SearchNavigationPageChange(ANavigation: TSearchPageNavigation);
@@ -127,7 +127,7 @@ begin
   // e destruido no evento OnSearchFinished.
   // Durante os eventos OnDocFound serão instanciados os Cards
 
-  ControlBuilderPage := TControlBuilder.Create;
+  ControlBuilderPage := TControlsBuilder.Create;
   ControlBuilderPage
     .WithOwnerAndParent(Self, FPanelCards)
     .SubLevel(TControlInfo.Create(TScrollBox, FScrollboxPage).WithAlign(alClient).Setup(@SetupScrollBoxPage))
@@ -199,7 +199,7 @@ begin
   ProgressBar.Visible := False;
 end;
 
-procedure TForm1.SetControlBuilderPage(AValue: TControlBuilder);
+procedure TForm1.SeTControlsBuilderPage(AValue: TControlsBuilder);
 begin
   if FControlBuilderPage = AValue then Exit;
   FControlBuilderPage := AValue;
@@ -227,7 +227,7 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
 begin
   OpenLibrarySearch := TOpenLibrarySearch.Create(Self);
   OpenLibrarySearch.OnSearchStart := @OnStart;
@@ -235,7 +235,7 @@ begin
   OpenLibrarySearch.OnSearchFinished := @OnFinish;
   OpenLibrarySearch.OnSearchReturn := @OnReturn;
 
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(Self, Self)

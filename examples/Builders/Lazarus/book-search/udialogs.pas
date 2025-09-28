@@ -16,14 +16,14 @@ uses
 type
   TControlDialog = class(TForm)
   private
-    FControlBuilder: TControlBuilder;
+    FControlBuilder: TControlsBuilder;
     FControlInfo: TControlInfo;
-    procedure SetControlBuilder(const Value: TControlBuilder);
+    procedure SeTControlsBuilder(const Value: TControlsBuilder);
     procedure SetupButton(AControl: TControl);
   public
     constructor CreateNew(AOwner: TComponent; AMsg: string; AControlInfo: TControlInfo; AContextKey: string='');
     destructor Destroy; override;
-    property ControlBuilder: TControlBuilder read FControlBuilder write SetControlBuilder;
+    property ControlBuilder: TControlsBuilder read FControlBuilder write SeTControlsBuilder;
   end;
 
 implementation
@@ -43,7 +43,7 @@ begin
   if AContextKey = '' then
     AContextKey := 'DIALOGS';
 
-  ControlBuilder := TControlBuilder.Create(AContextKey);
+  ControlBuilder := TControlsBuilder.Create(AContextKey);
 
   if AControlInfo.Name = '' then
     AControlInfo.WithName('Control');
@@ -95,7 +95,7 @@ begin
   inherited;
 end;
 
-procedure TControlDialog.SetControlBuilder(const Value: TControlBuilder);
+procedure TControlDialog.SeTControlsBuilder(const Value: TControlsBuilder);
 begin
   FControlBuilder := Value;
 end;

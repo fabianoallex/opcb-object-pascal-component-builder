@@ -43,9 +43,9 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  Builder: TControlBuilder;
+  Builder: TControlsBuilder;
 begin
-  Builder := TControlBuilder.Create(Self.Name);
+  Builder := TControlsBuilder.Create(Self.Name);
 
   try
     Builder

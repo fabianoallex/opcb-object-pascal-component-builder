@@ -18,15 +18,17 @@
         <Filename Value="ucontrolbuildertests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlBuilderTests"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="2065"/>
+        <CursorPos X="32" Y="2099"/>
         <UsageCount Value="211"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1246"/>
-        <CursorPos X="66" Y="1254"/>
+        <TopLine Value="1245"/>
+        <CursorPos X="72" Y="1265"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
@@ -73,18 +75,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\..\..\src\OPCB.pas"/>
-        <Caret Line="898" Column="54" TopLine="879"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\src\OPCB.pas"/>
-        <Caret Line="968" Column="36" TopLine="838"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\src\OPCB.pas"/>
-        <Caret Line="160" Column="21" TopLine="138"/>
-      </Position>
       <Position>
         <Filename Value="..\..\..\src\OPCB.pas"/>
         <Caret Line="737" Column="3" TopLine="735"/>
@@ -191,6 +181,17 @@
       <Position>
         <Filename Value="..\..\..\src\OPCB.pas"/>
         <Caret Line="188" Column="62" TopLine="171"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="1265" Column="72" TopLine="1245"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
+        <Caret Line="16" Column="60"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolbuildertests.pas"/>
       </Position>
     </JumpHistory>
     <RunParams>

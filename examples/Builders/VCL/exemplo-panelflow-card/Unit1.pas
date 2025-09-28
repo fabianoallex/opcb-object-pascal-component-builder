@@ -11,13 +11,13 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-    FBuilderCards: TControlBuilder;
+    FBuilderCards: TControlsBuilder;
     procedure SetupImage(AControl: TControl);
     procedure AddCard;
     procedure ButtonAddCardClick(ASender: TObject);
-    procedure SetBuilderCards(const Value: TControlBuilder);
+    procedure SetBuilderCards(const Value: TControlsBuilder);
   public
-    property BuilderCards: TControlBuilder read FBuilderCards write SetBuilderCards;
+    property BuilderCards: TControlsBuilder read FBuilderCards write SetBuilderCards;
   end;
 
 var
@@ -61,7 +61,7 @@ begin
   end;
 end;
 
-procedure TForm1.SetBuilderCards(const Value: TControlBuilder);
+procedure TForm1.SetBuilderCards(const Value: TControlsBuilder);
 begin
   FBuilderCards := Value;
 end;
@@ -119,7 +119,7 @@ begin
       .AddControl(TControlInfo.Create(TFlowPanel, 'FlowCards').WithAlign(alClient).WithCaption(''))
     ;
 
-    BuilderCards := TControlBuilder.Create(Self.Name);
+    BuilderCards := TControlsBuilder.Create(Self.Name);
 
     BuilderCards
       .WithOwnerAndParent(

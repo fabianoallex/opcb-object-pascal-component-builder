@@ -50,7 +50,7 @@ end;
 
 constructor TFormLogin.CreateNew(AOwner: TComponent);
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
 begin
   inherited CreateNew(AOwner, 0);
   Self.Name := 'FormLogin';
@@ -58,7 +58,7 @@ begin
   Self.BorderStyle := bsDialog;
   Self.Position := poMainFormCenter;
 
-  ControlBuilder := TControlBuilder.Create(Self.Name);
+  ControlBuilder := TControlsBuilder.Create(Self.Name);
   try
     ControlBuilder
       .WithOwnerAndParent(Self, Self)

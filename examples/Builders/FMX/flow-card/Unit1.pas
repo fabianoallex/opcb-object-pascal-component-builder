@@ -12,14 +12,14 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-    FBuilderCards: TControlBuilder;
-    procedure SetBuilderCards(const Value: TControlBuilder);
+    FBuilderCards: TControlsBuilder;
+    procedure SetBuilderCards(const Value: TControlsBuilder);
     procedure SetupImage(AControl: TControl);
     procedure AddCard;
     procedure ButtonAddCardClick(ASender: TObject);
     procedure SetupLabel(AControl: TControl);
   public
-    property BuilderCards: TControlBuilder read FBuilderCards write SetBuilderCards;
+    property BuilderCards: TControlsBuilder read FBuilderCards write SetBuilderCards;
   end;
 
 var
@@ -112,7 +112,7 @@ begin
       .AddControl(TControlInfo.Create(TFlowLayout, 'FlowCards').WithAlign(TAlignLayout.Client).WithCaption(''))
     ;
 
-    BuilderCards := TControlBuilder.Create(Self.Name);
+    BuilderCards := TControlsBuilder.Create(Self.Name);
 
     BuilderCards
       .WithOwnerAndParent(
@@ -130,7 +130,7 @@ begin
   BuilderCards.Free;
 end;
 
-procedure TForm1.SetBuilderCards(const Value: TControlBuilder);
+procedure TForm1.SetBuilderCards(const Value: TControlsBuilder);
 begin
   FBuilderCards := Value;
 end;

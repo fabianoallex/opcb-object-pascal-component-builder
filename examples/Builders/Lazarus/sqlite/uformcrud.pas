@@ -35,7 +35,7 @@ type
     procedure SetupDataSourceCRUD(AComponent: TComponent);
   protected
     procedure SetupDBGrid(AControl: TControl); virtual;
-    procedure BuildContents(const ABuiler: TControlBuilder); virtual; abstract;
+    procedure BuildContents(const ABuiler: TControlsBuilder); virtual; abstract;
     procedure DataSourceStateChange(Sender: TObject);
   public
     constructor CreateNew(AOwner: TComponent; AEntity: TDBEntity);

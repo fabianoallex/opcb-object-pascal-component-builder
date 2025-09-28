@@ -9,11 +9,11 @@ uses
 
 type
 
-  { TControlBuilderTests }
+  { TControlsBuilderTests }
 
-  TControlBuilderTests = class(TTestCase)
+  TControlsBuilderTests = class(TTestCase)
   private
-    procedure ExternalMethod(const ABuiler: TControlBuilder);
+    procedure ExternalMethod(const ABuiler: TControlsBuilder);
   protected
     FForm: TForm;
     procedure SetUp; override;
@@ -93,28 +93,28 @@ implementation
 uses
   ExtCtrls;
 
-procedure TControlBuilderTests.ExternalMethod(const ABuiler: TControlBuilder);
+procedure TControlsBuilderTests.ExternalMethod(const ABuiler: TControlsBuilder);
 begin
   ABuiler.AddControl(TControlInfo.Create(TPanel, 'PanelTest').WithCaption('EXTERNAL-TEST'));
 end;
 
-procedure TControlBuilderTests.SetUp;
+procedure TControlsBuilderTests.SetUp;
 begin
   FForm := TForm.Create(nil);
 end;
 
-procedure TControlBuilderTests.TearDown;
+procedure TControlsBuilderTests.TearDown;
 begin
   FForm.Free;
 end;
 
-procedure TControlBuilderTests.TestTopLeft;
+procedure TControlsBuilderTests.TestTopLeft;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
   ci: TControlInfo;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     with ControlBuilder do
     begin
@@ -142,12 +142,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestTopLeftHorizontally;
+procedure TControlsBuilderTests.TestTopLeftHorizontally;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -163,12 +163,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestTopLeftVertically;
+procedure TControlsBuilderTests.TestTopLeftVertically;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -184,12 +184,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestIncTop;
+procedure TControlsBuilderTests.TestIncTop;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -205,12 +205,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestIncLeft;
+procedure TControlsBuilderTests.TestIncLeft;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -226,12 +226,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestBreakHorizontally;
+procedure TControlsBuilderTests.TestBreakHorizontally;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -247,12 +247,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestBreakVertically;
+procedure TControlsBuilderTests.TestBreakVertically;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -269,12 +269,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestBreakAfterTopLeft;
+procedure TControlsBuilderTests.TestBreakAfterTopLeft;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -293,7 +293,7 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestTopAfterDiferentControlsHightsAndBreak;
+procedure TControlsBuilderTests.TestTopAfterDiferentControlsHightsAndBreak;
 {
   ---  ---
   | |  | |
@@ -306,10 +306,10 @@ procedure TControlBuilderTests.TestTopAfterDiferentControlsHightsAndBreak;
   . --- top of P2
 }
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -332,7 +332,7 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestLeftAfterDiferentControlsWidthsAndBreak;
+procedure TControlsBuilderTests.TestLeftAfterDiferentControlsWidthsAndBreak;
 {
         +-> Left P1
         |     +-> Left P2
@@ -350,10 +350,10 @@ procedure TControlBuilderTests.TestLeftAfterDiferentControlsWidthsAndBreak;
         ---
 }
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -377,12 +377,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSpaceHorizontally;
+procedure TControlsBuilderTests.TestSpaceHorizontally;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -397,12 +397,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSpaceVertically;
+procedure TControlsBuilderTests.TestSpaceVertically;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -418,12 +418,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSetControlHeight;
+procedure TControlsBuilderTests.TestSetControlHeight;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -440,12 +440,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestUnsetControlHeight;
+procedure TControlsBuilderTests.TestUnsetControlHeight;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -465,12 +465,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSetControlWidth;
+procedure TControlsBuilderTests.TestSetControlWidth;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -487,12 +487,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestUnsetControlWidth;
+procedure TControlsBuilderTests.TestUnsetControlWidth;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -512,12 +512,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestExternal;
+procedure TControlsBuilderTests.TestExternal;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     P := nil;
 
@@ -535,11 +535,11 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestAddControlToRegistry;
+procedure TControlsBuilderTests.TestAddControlToRegistry;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     AssertEquals('A quantidade de controles no registro diferente do esperado',
       0, ControlBuilder.Controls.Count);
@@ -556,12 +556,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestRemoveControlFromRegistryOnDestroy;
+procedure TControlsBuilderTests.TestRemoveControlFromRegistryOnDestroy;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     AssertEquals('A quantidade de controles no registro diferente do esperado',
       0, ControlBuilder.Controls.Count);
@@ -587,12 +587,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSubLevel;
+procedure TControlsBuilderTests.TestSubLevel;
 var
-  ControlBuilder: TControlBuilder;
-  InitialLevel, NewLevel: TControlBuilderLevel;
+  ControlBuilder: TControlsBuilder;
+  InitialLevel, NewLevel: TControlsBuilderLevel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     InitialLevel := ControlBuilder.CurrentLevel;
 
@@ -613,12 +613,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSubLevelSubLevel;
+procedure TControlsBuilderTests.TestSubLevelSubLevel;
 var
-  ControlBuilder: TControlBuilder;
-  InitialLevel, NewLevel_01, NewLevel_02: TControlBuilderLevel;
+  ControlBuilder: TControlsBuilder;
+  InitialLevel, NewLevel_01, NewLevel_02: TControlsBuilderLevel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     InitialLevel := ControlBuilder.CurrentLevel;
 
@@ -652,12 +652,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSubLevelSuperLevel;
+procedure TControlsBuilderTests.TestSubLevelSuperLevel;
 var
-  ControlBuilder: TControlBuilder;
-  InitialLevel, InitialLevelBack: TControlBuilderLevel;
+  ControlBuilder: TControlsBuilder;
+  InitialLevel, InitialLevelBack: TControlsBuilderLevel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     InitialLevel := ControlBuilder.CurrentLevel;
 
@@ -678,12 +678,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSubLevelEmpty;
+procedure TControlsBuilderTests.TestSubLevelEmpty;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -704,13 +704,13 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestSubLevelDirectionSuperLevelDirection;
+procedure TControlsBuilderTests.TestSubLevelDirectionSuperLevelDirection;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
-  InitialDirection, SubLevelDirection, SuperLevelDirection: TControlBuilderDirection;
+  InitialDirection, SubLevelDirection, SuperLevelDirection: TControlsBuilderDirection;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     InitialDirection := ControlBuilder.CurrentLevel.Direction;
 
@@ -760,12 +760,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestRecalcParentSize;
+procedure TControlsBuilderTests.TestRecalcParentSize;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -792,12 +792,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestRecalcParentSizeWithExtraSizes;
+procedure TControlsBuilderTests.TestRecalcParentSizeWithExtraSizes;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -824,12 +824,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridMode;
+procedure TControlsBuilderTests.TestGridMode;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2, P3, P4: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -868,9 +868,9 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridModeIgnoreAddAfterEndOfGrid;
+procedure TControlsBuilderTests.TestGridModeIgnoreAddAfterEndOfGrid;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2, P3, P4, P5: TPanel;
 begin
   P1 := nil;
@@ -879,7 +879,7 @@ begin
   P4 := nil;
   P5 := nil;
 
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -905,9 +905,9 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridModeNotIgnoreAddAfterEndOfGridWhenAutoExpand;
+procedure TControlsBuilderTests.TestGridModeNotIgnoreAddAfterEndOfGridWhenAutoExpand;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2, P3, P4, P5: TPanel;
 begin
   P1 := nil;
@@ -916,7 +916,7 @@ begin
   P4 := nil;
   P5 := nil;
 
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -942,13 +942,13 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridModeAutoExpandRows;
+procedure TControlsBuilderTests.TestGridModeAutoExpandRows;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   RowsBeforeExpand: Integer;
   RowsAfterExpand: Integer;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -972,13 +972,13 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridModeAutoExpandCols;
+procedure TControlsBuilderTests.TestGridModeAutoExpandCols;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   ColsBeforeExpand: Integer;
   ColsAfterExpand: Integer;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1002,16 +1002,16 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridModeAutoExpandOnlyRows;
+procedure TControlsBuilderTests.TestGridModeAutoExpandOnlyRows;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   RowsBeforeExpand: Integer;
   RowsAfterExpand: Integer;
   ColsBeforeExpand: Integer;
   ColsAfterExpand: Integer;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   P := nil;
   try
     ControlBuilder
@@ -1049,9 +1049,9 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridModeAutoExpandOnlyCols;
+procedure TControlsBuilderTests.TestGridModeAutoExpandOnlyCols;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   RowsBeforeExpand: Integer;
   RowsAfterExpand: Integer;
 
@@ -1060,7 +1060,7 @@ var
 
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   P := nil;
   try
     ControlBuilder
@@ -1098,12 +1098,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridModeWithSubLevel;
+procedure TControlsBuilderTests.TestGridModeWithSubLevel;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1135,12 +1135,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridSkipCell;
+procedure TControlsBuilderTests.TestGridSkipCell;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1160,12 +1160,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridRowHeight;
+procedure TControlsBuilderTests.TestGridRowHeight;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1193,12 +1193,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridColWidth;
+procedure TControlsBuilderTests.TestGridColWidth;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1226,12 +1226,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridRowSpan;
+procedure TControlsBuilderTests.TestGridRowSpan;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1259,12 +1259,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridColSpan;
+procedure TControlsBuilderTests.TestGridColSpan;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1291,12 +1291,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridRowSpanOnlyOnce;
+procedure TControlsBuilderTests.TestGridRowSpanOnlyOnce;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2, P3: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1325,12 +1325,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridColSpanOnlyOnce;
+procedure TControlsBuilderTests.TestGridColSpanOnlyOnce;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2, P3: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1358,12 +1358,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridRowSpanOutOfBounds;
+procedure TControlsBuilderTests.TestGridRowSpanOutOfBounds;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1394,12 +1394,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridColSpanOutOfBounds;
+procedure TControlsBuilderTests.TestGridColSpanOutOfBounds;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1430,12 +1430,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridRowSpanExpandGridRows;
+procedure TControlsBuilderTests.TestGridRowSpanExpandGridRows;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1467,12 +1467,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridColSpanExpandGridCols;
+procedure TControlsBuilderTests.TestGridColSpanExpandGridCols;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1504,12 +1504,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridGotoCell;
+procedure TControlsBuilderTests.TestGridGotoCell;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1528,12 +1528,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridRowSpanWithSpace;
+procedure TControlsBuilderTests.TestGridRowSpanWithSpace;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1561,12 +1561,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridColSpanWithSpace;
+procedure TControlsBuilderTests.TestGridColSpanWithSpace;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1593,12 +1593,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellStrechHorizontal;
+procedure TControlsBuilderTests.TestCellStrechHorizontal;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1616,12 +1616,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellStrechVertical;
+procedure TControlsBuilderTests.TestCellStrechVertical;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1639,12 +1639,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellStrechAll;
+procedure TControlsBuilderTests.TestCellStrechAll;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1662,12 +1662,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrech;
+procedure TControlsBuilderTests.TestCellNoStrech;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1685,12 +1685,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechCenter;
+procedure TControlsBuilderTests.TestCellNoStrechCenter;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1709,12 +1709,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechTop;
+procedure TControlsBuilderTests.TestCellNoStrechTop;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1733,12 +1733,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechTopRight;
+procedure TControlsBuilderTests.TestCellNoStrechTopRight;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1757,12 +1757,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechRight;
+procedure TControlsBuilderTests.TestCellNoStrechRight;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1781,12 +1781,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechBottomRight;
+procedure TControlsBuilderTests.TestCellNoStrechBottomRight;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1805,12 +1805,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechBottom;
+procedure TControlsBuilderTests.TestCellNoStrechBottom;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1829,12 +1829,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechBottomLeft;
+procedure TControlsBuilderTests.TestCellNoStrechBottomLeft;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1853,12 +1853,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechLeft;
+procedure TControlsBuilderTests.TestCellNoStrechLeft;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1877,12 +1877,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestCellNoStrechTopLeft;
+procedure TControlsBuilderTests.TestCellNoStrechTopLeft;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1901,12 +1901,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridRowOffset;
+procedure TControlsBuilderTests.TestGridRowOffset;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2, P3, P4, P5, P6, P7, P8, P9: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1948,12 +1948,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridColOffset;
+procedure TControlsBuilderTests.TestGridColOffset;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P1, P2, P3, P4, P5, P6, P7, P8, P9: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -1994,12 +1994,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridBreakLine;
+procedure TControlsBuilderTests.TestGridBreakLine;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -2020,12 +2020,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridBreakColumn;
+procedure TControlsBuilderTests.TestGridBreakColumn;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     ControlBuilder
       .WithOwnerAndParent(FForm, FForm)
@@ -2046,13 +2046,13 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGrid1x1;
+procedure TControlsBuilderTests.TestGrid1x1;
 { testa bug corrigido. não incluia controle em grid 1x1 }
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     P := nil;
     ControlBuilder
@@ -2070,13 +2070,13 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestGridGoToLastCell;
+procedure TControlsBuilderTests.TestGridGoToLastCell;
 { testa bug corrigido. não incluia controle ao posicionar na última celula. }
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
   P: TPanel;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  ControlBuilder := TControlsBuilder.Create;
   try
     P := nil;
     ControlBuilder
@@ -2096,7 +2096,7 @@ begin
 end;
 
 initialization
-  RegisterTest(TControlBuilderTests);
+  RegisterTest(TControlsBuilderTests);
 
 end.
 

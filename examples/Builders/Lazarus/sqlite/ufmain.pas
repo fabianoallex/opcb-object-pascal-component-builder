@@ -213,9 +213,9 @@ end;
 
 function TFMain.AddTabSheet: TTabSheet;
 var
-  ControlBuilder: TControlBuilder;
+  ControlBuilder: TControlsBuilder;
 begin
-  ControlBuilder := TControlBuilder.Create(Self.Name);
+  ControlBuilder := TControlsBuilder.Create(Self.Name);
   try
     ControlBuilder
       .WithOwnerAndParent(Self, PageControl)

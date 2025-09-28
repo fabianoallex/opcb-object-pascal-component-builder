@@ -20,7 +20,7 @@ type
     procedure SetupLabelLogin(AControl: TControl);
     procedure SetupSenha(AControl: TControl);
     procedure SetupLoginButton(AControl: TControl);
-    procedure PopulateLoginControls(Builder: TControlBuilder);
+    procedure PopulateLoginControls(Builder: TControlsBuilder);
     procedure SetButtonLogin(const Value: TButton);
     procedure SetCheckBoxConnected(const Value: TCheckBox);
     procedure SetEditEmail(const Value: TEdit);
@@ -112,25 +112,19 @@ begin
   CheckBox.Width := CaptionWidth + 20;
 end;
 
-procedure TForm1.PopulateLoginControls(Builder: TControlBuilder);
-var
-  CILabel: TControlInfo;
-  CIEdit: TControlInfo;
+procedure TForm1.PopulateLoginControls(Builder: TControlsBuilder);
 begin
-  CILabel := TControlInfo.Create(TLabel);
-  CIEdit := TControlInfo.Create(TEdit).WithWidth(250);
-
   Builder
     .SubLevel(TControlInfo.Create(TPanel, 'PanelLogin').WithCaption(''), cpdVertical)
       .SetTopLeft(10, 10)
-      .AddControl(CILabel.Setup(SetupLabelLogin).WithName('LabelLogin'))
+      .AddControl(TControlInfo.Create(TLabel).Setup(SetupLabelLogin).WithName('LabelLogin'))
       .IncTop(20)
       .AddControl(TControlInfo.Create(TBevel).Setup(SetupBevel))
       .IncTop(20)
-      .AddControl(CILabel.WithCaption('e-mail'))
-      .AddControl(CIEdit.WithName('EditEmail').WithText(''))
-      .AddControl(CILabel.WithCaption('Senha'))
-      .AddControl(CIEdit.WithName('EditPassword').WithText('').Setup(SetupSenha))
+      .AddControl(TControlInfo.Create(TLabel).WithCaption('e-mail'))
+      .AddControl(TControlInfo.Create(TEdit).WithWidth(250).WithName('EditEmail').WithText(''))
+      .AddControl(TControlInfo.Create(TLabel).WithCaption('Senha'))
+      .AddControl(TControlInfo.Create(TEdit).WithWidth(250).WithName('EditPassword').WithText('').Setup(SetupSenha))
       .AddControl(TControlInfo.Create(TCheckBox, 'CheckBoxConnected').Setup(SetupCheckBox))
       .IncTop(20)
       .AddControl(TControlInfo.Create(TButton).WithName('LoginButton').Setup(SetupLoginButton))
@@ -141,7 +135,7 @@ begin
           .WithCaption(''),
           cpdHorizontal
         )
-         .AddControl(CILabel.WithName('LabelConta').WithCaption('Ainda não tem conta?'))
+         .AddControl(TControlInfo.Create(TLabel).WithName('LabelConta').WithCaption('Ainda não tem conta?'))
          .AddControl(TControlInfo.Create(TButton, 'ButtonConta').WithCaption('Cadastra-se'))
       .SuperLevel
 
@@ -157,9 +151,9 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  Builder: TControlBuilder;
+  Builder: TControlsBuilder;
 begin
-  Builder := TControlBuilder.Create(Self.Name);
+  Builder := TControlsBuilder.Create(Self.Name);
 
   try
     Builder

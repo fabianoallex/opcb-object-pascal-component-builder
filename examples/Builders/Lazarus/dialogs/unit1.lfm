@@ -1,91 +1,90 @@
 object Form1: TForm1
   Left = 2829
-  Height = 434
+  Height = 347
   Top = 387
-  Width = 599
+  Width = 479
   Caption = 'Form1'
-  ClientHeight = 434
-  ClientWidth = 599
-  DesignTimePPI = 120
+  ClientHeight = 347
+  ClientWidth = 479
   LCLVersion = '4.0.0.4'
   object Panel1: TPanel
     Left = 0
-    Height = 434
+    Height = 347
     Top = 0
-    Width = 137
+    Width = 110
     Align = alLeft
-    ClientHeight = 434
-    ClientWidth = 137
+    ClientHeight = 347
+    ClientWidth = 110
     ParentBackground = False
     TabOrder = 0
     object Button1: TButton
-      Left = 8
-      Height = 25
-      Top = 24
-      Width = 105
+      Left = 6
+      Height = 20
+      Top = 19
+      Width = 84
       Caption = 'TListBox'
       TabOrder = 0
       OnClick = Button1Click
     end
     object Button2: TButton
-      Left = 8
-      Height = 25
-      Top = 55
-      Width = 105
+      Left = 6
+      Height = 20
+      Top = 44
+      Width = 84
       Caption = 'TMaskEdit'
       TabOrder = 1
       OnClick = Button2Click
     end
     object Button3: TButton
-      Left = 8
-      Height = 25
-      Top = 86
-      Width = 105
+      Left = 6
+      Height = 20
+      Top = 69
+      Width = 84
       Caption = 'TColorBox'
       TabOrder = 2
       OnClick = Button3Click
     end
     object Button4: TButton
-      Left = 8
-      Height = 25
-      Top = 117
-      Width = 105
+      Left = 6
+      Height = 20
+      Top = 94
+      Width = 84
       Caption = 'TFloatSpinEdit'
       TabOrder = 3
       OnClick = Button4Click
     end
     object Button5: TButton
-      Left = 8
-      Height = 25
-      Top = 148
-      Width = 105
+      Left = 6
+      Height = 20
+      Top = 118
+      Width = 84
       Caption = 'TStringGrid'
       TabOrder = 4
       OnClick = Button5Click
     end
     object Button6: TButton
-      Left = 8
-      Height = 25
-      Top = 179
-      Width = 105
+      Left = 6
+      Height = 20
+      Top = 143
+      Width = 84
       Caption = 'TTrackBar'
       TabOrder = 5
       OnClick = Button6Click
     end
     object Button7: TButton
-      Left = 8
-      Height = 25
-      Top = 210
-      Width = 105
+      Left = 6
+      Height = 20
+      Top = 168
+      Width = 84
       Caption = 'Custom'
       TabOrder = 6
       OnClick = Button7Click
     end
     object Button8: TButton
-      Left = 8
-      Height = 25
-      Top = 244
-      Width = 105
+      Left = 6
+      Height = 20
+      Top = 195
+      Width = 84
       Caption = 'TDBGrid'
       TabOrder = 7
       OnClick = Button8Click
