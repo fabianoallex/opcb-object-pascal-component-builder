@@ -79,13 +79,13 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  Builders: TOPCBBuilders;
+  Creators: TOPCBCreators;
 begin
   ContextHandle := TComponentRegistry.GetContextHandle(Self.Name);
 
-  Builders := TOPCBBuilders.Create(Self.Name);
+  Creators := TOPCBCreators.Create(Self.Name);
   try
-    Builders.AsMenusBuilder
+    Creators.AsMenusBuilder
       .WithOwner(Self)
       .AddMenu(TMenuBuilder.Create(TMainMenu, 'MainMenu')) // menu principal por primeiro
         .SubLevel(TMenuItemBuilder.Create(TMenuItem, 'FileMenu'))
@@ -109,13 +109,13 @@ begin
         .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'Popup3').WithCaption('Popup3'))
     ;
 
-    Builders.AsControlCreator
+    Creators.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
     ;
   finally
-    Builders.Free;
+    Creators.Free;
   end;
 
   ConfigMenus;

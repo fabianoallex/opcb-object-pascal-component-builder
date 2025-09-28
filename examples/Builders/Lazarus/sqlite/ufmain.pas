@@ -120,17 +120,17 @@ end;
 
 procedure TFMain.BuildForm;
 var
-  Builders: TOPCBBuilders;
+  Creators: TOPCBCreators;
 begin
-  Builders := TOPCBBuilders.Create;
+  Creators := TOPCBCreators.Create;
 
   try
-    Builders.AsComponentsBuilder
+    Creators.AsComponentsBuilder
       .WithOwner(Self)
       .Add(TComponentBuilder.Create(TImageList, FMenuImages).Setup(@SetupMenuImages))
     ;
 
-    Builders.AsMenusBuilder
+    Creators.AsMenusBuilder
       .WithOwner(Self)
       .AddMenu(TMenuBuilder.Create(TMainMenu).Setup(@SetupMainMenu))
         .SubLevel(TMenuItemBuilder.Create.WithCaption('Aplicação'))
@@ -146,7 +146,7 @@ begin
         .SuperLevel
     ;
 
-    Builders.AsControlCreator
+    Creators.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
@@ -157,7 +157,7 @@ begin
       .SuperLevel
     ;
   finally
-    Builders.Free;
+    Creators.Free;
   end;
 end;
 

@@ -25,16 +25,16 @@ implementation
 
 procedure TForm3.FormCreate(Sender: TObject);
 var
-  Builders: TOPCBBuilders;
+  Creators: TOPCBCreators;
 begin
-  Builders := TOPCBBuilders.Create(Self.Name);
+  Creators := TOPCBCreators.Create(Self.Name);
 
   try
-    Builders.AsComponentsBuilder
+    Creators.AsComponentsBuilder
       .WithOwner(Self)
     ;
 
-    Builders.AsControlCreator
+    Creators.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .AddControls([
@@ -43,7 +43,7 @@ begin
       ])
     ;
   finally
-    Builders.Free;
+    Creators.Free;
   end;
 end;
 

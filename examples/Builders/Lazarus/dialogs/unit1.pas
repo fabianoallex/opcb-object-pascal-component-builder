@@ -473,16 +473,16 @@ var
 
   procedure ConfigPanelMain;
   var
-    Builders: TOPCBBuilders;
+    Creators: TOPCBCreators;
   begin
-    Builders := TOPCBBuilders.Create(ControlDialog.ControlCreator.Registry.ContextKey); // usa o mesmo context do dialog
+    Creators := TOPCBCreators.Create(ControlDialog.ControlCreator.Registry.ContextKey); // usa o mesmo context do dialog
     try
-      Builders.AsComponentsBuilder
+      Creators.AsComponentsBuilder
         .WithOwner(ControlDialog)
         .Add(TComponentBuilder.Create(TMemDataset, 'MDS').Setup(@SetupMDS))
         .Add(TComponentBuilder.Create(TDataSource, 'DS').Setup(@SetupDS))
       ;
-      Builders.AsControlCreator
+      Creators.AsControlCreator
         .WithOwnerAndParent(
           ControlDialog,
           ControlDialog.ControlCreator.GetControl('PanelMain') as TPanel
@@ -497,7 +497,7 @@ var
         .SuperLevel
         .AddControl(TControlBuilder.Create(TDBGrid).WithAlign(alClient).Setup(@SetupDBGrid))
     finally
-      Builders.Free;
+      Creators.Free;
     end;
   end;
 

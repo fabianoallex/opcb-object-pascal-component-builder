@@ -702,7 +702,7 @@ type
     property Items[const AName: string]: TControl read GetItem; default;
   end;
 
-  TOPCBBuilders = class
+  TOPCBCreators = class
   private
     FRegistryContextHandle: IRegistryContextHandle;
     FComponentsBuilder: TComponentsBuilder;
@@ -3831,9 +3831,9 @@ begin
     FRegistry.ReleaseContext(FContextKey)
 end;
 
-{ TOPCBBuilders }
+{ TOPCBCreators }
 
-function TOPCBBuilders.AsComponentsBuilder: TComponentsBuilder;
+function TOPCBCreators.AsComponentsBuilder: TComponentsBuilder;
 begin
   if not Assigned(FComponentsBuilder) then
     FComponentsBuilder := TComponentsBuilder.Create(FRegistryContextHandle);
@@ -3841,7 +3841,7 @@ begin
   Result := FComponentsBuilder;
 end;
 
-function TOPCBBuilders.AsControlCreator: TControlCreator;
+function TOPCBCreators.AsControlCreator: TControlCreator;
 begin
   if not Assigned(FControlCreator) then
     FControlCreator := TControlCreator.Create(FRegistryContextHandle);
@@ -3849,14 +3849,14 @@ begin
   Result := FControlCreator;
 end;
 
-function TOPCBBuilders.AsMenusBuilder: TMenusBuilder;
+function TOPCBCreators.AsMenusBuilder: TMenusBuilder;
 begin
   if not Assigned(FMenusBuilder) then
     FMenusBuilder := TMenusBuilder.Create(FRegistryContextHandle);
   Result := FMenusBuilder;
 end;
 
-constructor TOPCBBuilders.Create(const ARegistryContextKey: string);
+constructor TOPCBCreators.Create(const ARegistryContextKey: string);
 begin
   FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContextKey);
   FComponentsBuilder := nil;
@@ -3864,7 +3864,7 @@ begin
   FMenusBuilder := nil;
 end;
 
-destructor TOPCBBuilders.Destroy;
+destructor TOPCBCreators.Destroy;
 begin
   if Assigned(FComponentsBuilder) then
     FComponentsBuilder.Free;

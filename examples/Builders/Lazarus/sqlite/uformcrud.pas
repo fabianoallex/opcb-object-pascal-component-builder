@@ -177,7 +177,7 @@ end;
 
 constructor TFormCRUDBase.CreateNew(AOwner: TComponent; AEntity: TDBEntity);
 var
-  Builders: TOPCBBuilders;
+  Creators: TOPCBCreators;
 begin
   inherited CreateNew(AOwner);
 
@@ -188,15 +188,15 @@ begin
   Self.OnShow := @FormShow;
   Self.FEntity := AEntity;
 
-  Builders := TOPCBBuilders.Create;
+  Creators := TOPCBCreators.Create;
 
   try
-    Builders.AsComponentsBuilder
+    Creators.AsComponentsBuilder
       .WithOwner(Self)
       .Add(TComponentBuilder.Create(TDataSource, FDataSourceCRUD).Setup(@SetupDataSourceCRUD))
     ;
 
-    Builders.AsControlCreator
+    Creators.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(2, 5)
       .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alTop))
@@ -224,7 +224,7 @@ begin
 
     FEntity.QueryCRUD.Open;
   finally
-    Builders.Free;
+    Creators.Free;
   end;
 end;
 

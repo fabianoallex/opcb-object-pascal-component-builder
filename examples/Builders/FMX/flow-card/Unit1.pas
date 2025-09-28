@@ -12,14 +12,14 @@ type
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
   private
-    FBuilderCards: TControlCreator;
-    procedure SetBuilderCards(const Value: TControlCreator);
+    FCardsCreator: TControlCreator;
+    procedure SetCardsCreator(const Value: TControlCreator);
     procedure SetupImage(AControl: TControl);
     procedure AddCard;
     procedure ButtonAddCardClick(ASender: TObject);
     procedure SetupLabel(AControl: TControl);
   public
-    property BuilderCards: TControlCreator read FBuilderCards write SetBuilderCards;
+    property CardsCreator: TControlCreator read FCardsCreator write SetCardsCreator;
   end;
 
 var
@@ -72,7 +72,7 @@ end;
 
 procedure TForm1.AddCard;
 begin
-  BuilderCards
+  CardsCreator
     .SubLevel(TControlBuilder.Create(TPanel).WithWidthAndHeight(250, 350), cpdVertical)
       .SetVerticalSpace(2)
       .AddControl(TControlBuilder.Create(TImage).Setup(SetupImage))
@@ -92,11 +92,11 @@ end;
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  OPCBBuilders: TOPCBBuilders;
+  Creators: TOPCBCreators;
 begin
-  OPCBBuilders := TOPCBBuilders.Create(Self.Name);
+  Creators := TOPCBCreators.Create(Self.Name);
   try
-    OPCBBuilders.AsControlCreator
+    Creators.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
@@ -112,27 +112,27 @@ begin
       .AddControl(TControlBuilder.Create(TFlowLayout, 'FlowCards').WithAlign(TAlignLayout.Client).WithCaption(''))
     ;
 
-    BuilderCards := TControlCreator.Create(Self.Name);
+    CardsCreator := TControlCreator.Create(Self.Name);
 
-    BuilderCards
+    CardsCreator
       .WithOwnerAndParent(
         Self,
-        OPCBBuilders.AsControlCreator.GetControl<TFlowLayout>('FlowCards')
+        Creators.AsControlCreator.GetControl<TFlowLayout>('FlowCards')
       )
     ;
   finally
-    OPCBBuilders.Free;
+    Creators.Free;
   end;
 end;
 
 procedure TForm1.FormDestroy(Sender: TObject);
 begin
-  BuilderCards.Free;
+  CardsCreator.Free;
 end;
 
-procedure TForm1.SetBuilderCards(const Value: TControlCreator);
+procedure TForm1.SetCardsCreator(const Value: TControlCreator);
 begin
-  FBuilderCards := Value;
+  FCardsCreator := Value;
 end;
 
 end.
