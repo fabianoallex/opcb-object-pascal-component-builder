@@ -37,9 +37,9 @@
         <IsPartOfProject Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="ucontrolbuildertests.pas"/>
+        <Filename Value="ucontrolcreatortests.pas"/>
         <IsPartOfProject Value="True"/>
-        <UnitName Value="UControlBuilderTests"/>
+        <UnitName Value="UControlCreatorTests"/>
       </Unit>
     </Units>
   </ProjectOptions>
