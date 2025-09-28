@@ -26,28 +26,28 @@ uses
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  ControlBuilder: TControlBuilder;
+  Creator: TControlCreator;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  Creator := TControlCreator.Create;
   try
-    ControlBuilder
+    Creator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
       .SetDirection(cpdVertical)
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('Nome'))
-      .AddControl(TControlInfo.Create(TEdit, 'edit_name').WithWidth(250).WithCaption(''))
+      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Nome'))
+      .AddControl(TControlBuilder.Create(TEdit, 'edit_name').WithWidth(250).WithCaption(''))
       .IncTop(15)
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('Idade'))
-      .AddControl(TControlInfo.Create(TNumberBox).WithWidth(50))
+      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Idade'))
+      .AddControl(TControlBuilder.Create(TNumberBox).WithWidth(50))
       .IncTop(20)
       .SetDirection(cpdHorizontal)
-      .AddControl(TControlInfo.Create(TButton, 'button_enviar').WithCaption('Enviar'))
-      .AddControl(TControlInfo.Create(TButton, 'button_cancelar').WithCaption('Cancelar'))
+      .AddControl(TControlBuilder.Create(TButton, 'button_enviar').WithCaption('Enviar'))
+      .AddControl(TControlBuilder.Create(TButton, 'button_cancelar').WithCaption('Cancelar'))
       .AlignControlsRight(['button_enviar', 'button_cancelar'], ['edit_name'])
     ;
   finally
-    ControlBuilder.Free;;
+    Creator.Free;;
   end;
 end;
 ```
@@ -63,39 +63,39 @@ uses
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  ControlBuilder: TControlBuilder;
+  Creator: TControlCreator;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  Creator := TControlCreator.Create;
   try
-    ControlBuilder
+    Creator
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
-      .SubLevel(TControlInfo.Create(TGroupBox).WithCaption('Opções').WithWidthAndHeight(250, 250))
+      .SubLevel(TControlBuilder.Create(TGroupBox).WithCaption('Opções').WithWidthAndHeight(250, 250))
         .SetDirection(cpdVertical)
         .SetTopLeft(20, 20)
-        .AddControl(TControlInfo.Create(TCheckBox).WithCaption('Opção 1'))
-        .AddControl(TControlInfo.Create(TCheckBox).WithCaption('Opção 2'))
-        .AddControl(TControlInfo.Create(TCheckBox).WithCaption('Opção 3'))
-        .AddControl(TControlInfo.Create(TCheckBox).WithCaption('Opção 4'))
-        .AddControl(TControlInfo.Create(TCheckBox).WithCaption('Opção 5'))
-        .AddControl(TControlInfo.Create(TCheckBox).WithCaption('Opção 6'))
+        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 1'))
+        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 2'))
+        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 3'))
+        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 4'))
+        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 5'))
+        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 6'))
       .SuperLevel
-      .SubLevel(TControlInfo.Create(TPanel).WithWidthAndHeight(250, 250))
+      .SubLevel(TControlBuilder.Create(TPanel).WithWidthAndHeight(250, 250))
         .SetDirection(cpdVertical)
         .SetTopLeft(20, 20)
-        .AddControl(TControlInfo.Create(TLabel).WithCaption('Informação 1'))
-        .AddControl(TControlInfo.Create(TLabel).WithCaption('Informação 2'))
-        .AddControl(TControlInfo.Create(TLabel).WithCaption('Informação 3'))
-        .AddControl(TControlInfo.Create(TLabel).WithCaption('Informação 4'))
-        .AddControl(TControlInfo.Create(TLabel).WithCaption('Informação 5'))
-        .AddControl(TControlInfo.Create(TLabel).WithCaption('Informação 6'))
+        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 1'))
+        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 2'))
+        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 3'))
+        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 4'))
+        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 5'))
+        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 6'))
         .IncTop(50)
-        .AddControl(TControlInfo.Create(TButton).WithCaption('Copiar'))
+        .AddControl(TControlBuilder.Create(TButton).WithCaption('Copiar'))
       .SuperLevel
     ;
   finally
-    ControlBuilder.Free;
+    Creator.Free;
   end;
 end;  
 
@@ -112,11 +112,11 @@ uses
 
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  ControlBuilder: TControlBuilder;
+  Creator: TControlCreator;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  Creator := TControlCreator.Create;
   try
-    ControlBuilder
+    Creator
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(20, 20)
       .SetSpace(5, 5)
@@ -125,39 +125,39 @@ begin
         .GridSetCellWidthAndHeight(70, 70)
         .GridSetColWidth(0, 200)
         .GridSetRowHeight(1, 150)
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('1'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('2'))
-        .SubLevel(TControlInfo.Create(TPanel).WithCaption('3'))
-          .AddControl(TControlInfo.Create(TButton).WithCaption('B1'))
-          .AddControl(TControlInfo.Create(TButton).WithCaption('B2'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('1'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('2'))
+        .SubLevel(TControlBuilder.Create(TPanel).WithCaption('3'))
+          .AddControl(TControlBuilder.Create(TButton).WithCaption('B1'))
+          .AddControl(TControlBuilder.Create(TButton).WithCaption('B2'))
         .SuperLevel
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('4'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('5'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('4'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('5'))
         .SetDirection(cpdHorizontal)
         .GridColSpan(2)
         .GridRowSpan(2)
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('6'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('7'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('8'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('9'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('10'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('11'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('6'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('7'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('8'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('9'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('10'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('11'))
         .GridSkipCell
         .GridColSpan(1)
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('12'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('13'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('12'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('13'))
         .GridRowSpan(2)
         .GridColSpan(1)
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('14'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('15'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('16'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('17'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('18'))
-        .AddControl(TControlInfo.Create(TPanel).WithCaption('19'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('14'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('15'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('16'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('17'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('18'))
+        .AddControl(TControlBuilder.Create(TPanel).WithCaption('19'))
       .GridFinish
     ;
   finally
-    ControlBuilder.Free;
+    Creator.Free;
   end;
 end;   
 ```
@@ -171,48 +171,48 @@ O exemplo abaixo demonstra como montar um **teclado virtual** completo usando a 
 ```pascal
 procedure TForm1.FormCreate(Sender: TObject);
 var
-  ControlBuilder: TControlBuilder;
+  Creator: TControlCreator;
 begin
-  ControlBuilder := TControlBuilder.Create;
+  Creator := TControlCreator.Create;
   try
-    ControlBuilder
+    Creator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(2, 2)
       .SetTopLeft(20, 20)
-      .SubLevel(TControlInfo.Create(TPanel))
+      .SubLevel(TControlBuilder.Create(TPanel))
         .SetTopLeft(10, 10)
         .GridInit(4, 10)
           .GridSetCellWidthAndHeight(80, 80)
           .GridSetRowOffset(1, 22)
           .GridSetRowOffset(2, 65)
-          .External(procedure (ABuilder: TControlBuilder)
+          .External(procedure (ACreator: TControlCreator)
             const KeyRows: array[0..1] of string = ('QWERTYUIOPASDFGHJKL', 'ZXCVBNM');
             var Key: Char;
             begin
               for Key in KeyRows[0] do
-                ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
-              ABuilder.Break;
+                ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
+              ACreator.Break;
               for Key in KeyRows[1] do
-                ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
-              ABuilder.Break;
-              ABuilder.GridSkipCells(2);
-              ABuilder.GridColSpan(5);
-              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption('[ SPACE ]'));
+                ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
+              ACreator.Break;
+              ACreator.GridSkipCells(2);
+              ACreator.GridColSpan(5);
+              ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('[ SPACE ]'));
             end
           )
         .GridFinish
         .IncLeft(20)
         .GridInit(4, 3)
           .GridSetCellWidthAndHeight(80, 80)
-          .External(procedure(ABuilder: TControlBuilder)
+          .External(procedure(ACreator: TControlCreator)
             const Keys = '789456123';
             var Key: Char;
             begin
               for Key in Keys do
-                ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(Key));
-              ABuilder.GridColSpan(2);
-              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption('0'));
-              ABuilder.AddControl(TControlInfo.Create(TSpeedButton).WithCaption(','));
+                ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
+              ACreator.GridColSpan(2);
+              ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('0'));
+              ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(','));
             end
           )
         .GridFinish
@@ -220,7 +220,7 @@ begin
       .SuperLevel
     ;
   finally
-    ControlBuilder.Free;
+    Creator.Free;
   end;
 end;
 ```
@@ -244,7 +244,7 @@ end;
   - `.GridSetRowOffset(Row, Offset)` aplica deslocamento em linhas específicas.
 
 - **Inserção dinâmica de controles**
-  - `.External(procedure(ABuilder: TControlBuilder) ...)`  
+  - `.External(procedure(ACreator: TControlCreator) ...)`  
     permite criar controles em lote, como teclas, a partir de arrays/strings.
 
 - **Controle de posicionamento no grid**
