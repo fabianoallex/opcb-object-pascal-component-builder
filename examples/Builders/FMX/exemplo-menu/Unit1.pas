@@ -116,7 +116,7 @@ begin
         .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'Popup3').WithCaption('Popup3'))
     ;
 
-    Builders.AsControlBuilder
+    Builders.AsControlsBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)

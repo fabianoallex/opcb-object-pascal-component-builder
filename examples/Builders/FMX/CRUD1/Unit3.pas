@@ -34,7 +34,7 @@ begin
       .WithOwner(Self)
     ;
 
-    Builders.AsControlBuilder
+    Builders.AsControlsBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .AddControls([

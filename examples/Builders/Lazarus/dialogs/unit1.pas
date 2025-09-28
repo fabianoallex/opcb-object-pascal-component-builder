@@ -109,7 +109,7 @@ begin
   try
     if ControlDialog.ShowModal = mrOk then
     begin
-      ListBoxCidades := ControlDialog.ControlBuilder.GetControl('ListBoxCidades') as TListBox;
+      ListBoxCidades := ControlDialog.ControlsBuilder.GetControl('ListBoxCidades') as TListBox;
       if ListBoxCidades.ItemIndex >= 0 then
         ShowMessage('Selecionou ' + ListBoxCidades.Items[ListBoxCidades.ItemIndex]);
     end;
@@ -141,7 +141,7 @@ begin
   try
     if ControlDialog.ShowModal = mrOk then
     begin
-      MaskEdit := ControlDialog.ControlBuilder.GetControl('MaskEditCelular') as TMaskEdit;
+      MaskEdit := ControlDialog.ControlsBuilder.GetControl('MaskEditCelular') as TMaskEdit;
       ShowMessage('Informou ' + MaskEdit.Text);
     end;
   finally
@@ -163,7 +163,7 @@ begin
   try
     if ControlDialog.ShowModal = mrOk then
     begin
-      ColorBox := ControlDialog.ControlBuilder.GetControl('ColorBox') as TColorBox;
+      ColorBox := ControlDialog.ControlsBuilder.GetControl('ColorBox') as TColorBox;
       Panel1.Color := ColorBox.Selected;
     end;
   finally
@@ -185,7 +185,7 @@ begin
   try
     if ControlDialog.ShowModal = mrOk then
     begin
-      FloatSpinEdit := ControlDialog.ControlBuilder.GetControl('FloatSpinEdit') as TFloatSpinEdit;
+      FloatSpinEdit := ControlDialog.ControlsBuilder.GetControl('FloatSpinEdit') as TFloatSpinEdit;
       ShowMessage('Informou ' + FloatSpinEdit.Value.ToString);
     end;
   finally
@@ -247,7 +247,7 @@ begin
   try
     if ControlDialog.ShowModal = mrOk then
     begin
-      StringGrid := ControlDialog.ControlBuilder.GetControl('StringGrid') as TStringGrid;
+      StringGrid := ControlDialog.ControlsBuilder.GetControl('StringGrid') as TStringGrid;
 
       ACol := StringGrid.Col;
       ARow := StringGrid.Row;
@@ -283,7 +283,7 @@ begin
   try
     if ControlDialog.ShowModal = mrOk then
     begin
-      TrackBar := ControlDialog.ControlBuilder.GetControl('TrackBar') as TTrackBar;
+      TrackBar := ControlDialog.ControlsBuilder.GetControl('TrackBar') as TTrackBar;
       ShowMessage('Selecionou a posição' + TrackBar.Position.ToString);
     end;
   finally
@@ -347,14 +347,14 @@ var
 
   procedure ConfigPanelMain;
   var
-    ControlBuilder: TControlsBuilder;
+    ControlsBuilder: TControlsBuilder;
   begin
-    ControlBuilder := TControlsBuilder.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
+    ControlsBuilder := TControlsBuilder.Create(ControlDialog.ControlsBuilder.Registry.ContextKey); // usa o mesmo context do dialog
     try
-      ControlBuilder
+      ControlsBuilder
         .WithOwnerAndParent(
           ControlDialog,
-          ControlDialog.ControlBuilder.GetControl('PanelMain') as TPanel
+          ControlDialog.ControlsBuilder.GetControl('PanelMain') as TPanel
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
@@ -366,7 +366,7 @@ var
         .AddControl(TControlInfo.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(180, 280).Setup(@SetupListBoxRight))
         .CenterControlsInParentVertically(['ButtonMoveToRight', 'ButtonMoveToLeft'])
     finally
-      ControlBuilder.Free;
+      ControlsBuilder.Free;
     end;
   end;
 
@@ -374,7 +374,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Mova os itens',
-    TControlInfo.Create(TPanel, 'PanelMain').WithWidthAndHeight(400, 250).WithCaption(''),
+    TControlInfo.Create(TPanel, 'PanelMain').WithWidthAndHeight(500, 300).WithCaption(''),
     'ContextKey-Exemplo-Panel'
   );
 
@@ -384,8 +384,8 @@ begin
     if ControlDialog.ShowModal = mrOk then
     begin
       ShowMessage(
-        'Left: ' + #13 + (ControlDialog.ControlBuilder.GetControl('ListBoxLeft') as TListBox).Items.Text + #13 +
-        'Right: ' + #13 + (ControlDialog.ControlBuilder.GetControl('ListBoxRight') as TListBox).Items.Text
+        'Left: ' + #13 + (ControlDialog.ControlsBuilder.GetControl('ListBoxLeft') as TListBox).Items.Text + #13 +
+        'Right: ' + #13 + (ControlDialog.ControlsBuilder.GetControl('ListBoxRight') as TListBox).Items.Text
       );
     end;
   finally
@@ -475,17 +475,17 @@ var
   var
     Builders: TOPCBBuilders;
   begin
-    Builders := TOPCBBuilders.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
+    Builders := TOPCBBuilders.Create(ControlDialog.ControlsBuilder.Registry.ContextKey); // usa o mesmo context do dialog
     try
       Builders.AsComponentBuilder
         .WithOwner(ControlDialog)
         .Add(TComponentInfo.Create(TMemDataset, 'MDS').Setup(@SetupMDS))
         .Add(TComponentInfo.Create(TDataSource, 'DS').Setup(@SetupDS))
       ;
-      Builders.AsControlBuilder
+      Builders.AsControlsBuilder
         .WithOwnerAndParent(
           ControlDialog,
-          ControlDialog.ControlBuilder.GetControl('PanelMain') as TPanel
+          ControlDialog.ControlsBuilder.GetControl('PanelMain') as TPanel
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
@@ -513,7 +513,7 @@ begin
   try
     if ControlDialog.ShowModal = mrOk then
     begin
-      MDS := ControlDialog.ControlBuilder.Registry.GetComponent('MDS') as TMemDataSet;
+      MDS := ControlDialog.ControlsBuilder.Registry.GetComponent('MDS') as TMemDataSet;
       if not MDS.Eof then
         ShowMessage('Selecionou: ' + MDS.FieldByName('Cidade').AsString);
     end;

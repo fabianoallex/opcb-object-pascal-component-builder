@@ -196,7 +196,7 @@ begin
       .Add(TComponentInfo.Create(TDataSource, FDataSourceCRUD).Setup(@SetupDataSourceCRUD))
     ;
 
-    Builders.AsControlBuilder
+    Builders.AsControlsBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(2, 5)
       .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alTop))

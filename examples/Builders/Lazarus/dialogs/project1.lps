@@ -21,8 +21,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="332"/>
-        <CursorPos X="39" Y="352"/>
+        <TopLine Value="344"/>
+        <CursorPos X="72" Y="377"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -32,8 +32,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDialogs"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="66"/>
-        <CursorPos X="74" Y="98"/>
+        <TopLine Value="30"/>
+        <CursorPos X="74" Y="72"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
       </Unit>
@@ -66,109 +66,6 @@
     <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="unit1.pas"/>
-        <Caret Line="519" Column="39" TopLine="492"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="484" Column="51" TopLine="470"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="457" Column="85" TopLine="428"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="405" Column="16" TopLine="399"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="58" Column="60" TopLine="44"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="68" Column="58" TopLine="44"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="485" Column="55" TopLine="322"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="101" Column="27" TopLine="98"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="24" Column="20"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="37" Column="3" TopLine="33"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="24" Column="17" TopLine="6"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="101" Column="27" TopLine="98"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="141" Column="58" TopLine="127"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="68" Column="4" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="485" Column="14" TopLine="470"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="1024" Column="3" TopLine="1019"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="485" Column="14" TopLine="469"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="1024" Column="3" TopLine="1019"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="486" Column="14" TopLine="469"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="1043" Column="3" TopLine="1036"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="483" Column="20" TopLine="473"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="51" Column="14" TopLine="42"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="64" Column="11" TopLine="37"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="365" Column="15" TopLine="342"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="497" Column="15" TopLine="473"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
         <Caret Line="492" Column="13" TopLine="473"/>
       </Position>
       <Position>
@@ -182,6 +79,106 @@
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="350" Column="21" TopLine="332"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="352" Column="39" TopLine="332"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="485" Column="18" TopLine="466"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="516" Column="43" TopLine="486"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="478" Column="67" TopLine="447"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="112" Column="39" TopLine="92"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="112" Column="39" TopLine="93"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="516" Column="43" TopLine="486"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="112" Column="39" TopLine="93"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="100" Column="3" TopLine="93"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="17" Column="3"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="98" Column="74" TopLine="66"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="112" Column="39" TopLine="93"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="100" Column="3" TopLine="93"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="17" Column="3"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="112" Column="39" TopLine="93"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="19" Column="6"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="361" Column="43" TopLine="335"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="33" Column="15" TopLine="49"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="361" Column="59" TopLine="368"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="24" Column="22" TopLine="4"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="361" Column="59" TopLine="368"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="103" Column="3" TopLine="98"/>
       </Position>
     </JumpHistory>
     <RunParams>

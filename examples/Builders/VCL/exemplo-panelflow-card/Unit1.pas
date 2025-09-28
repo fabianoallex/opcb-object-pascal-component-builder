@@ -103,7 +103,7 @@ var
 begin
   OPCBBuilders := TOPCBBuilders.Create(Self.Name);
   try
-    OPCBBuilders.AsControlBuilder
+    OPCBBuilders.AsControlsBuilder
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
@@ -124,7 +124,7 @@ begin
     BuilderCards
       .WithOwnerAndParent(
         Self,
-        OPCBBuilders.AsControlBuilder.GetControl<TFlowPanel>('FlowCards')
+        OPCBBuilders.AsControlsBuilder.GetControl<TFlowPanel>('FlowCards')
       )
     ;
   finally

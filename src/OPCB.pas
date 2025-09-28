@@ -691,11 +691,8 @@ type
       AReferenceGroup: array of string): TControlsBuilder;
     function CopySize(const AControlNames,
       AReferenceGroup: array of string): TControlsBuilder;
-
     function ReturnCurrentLevel(var ACurrentLevel: TControlsBuilderLevel): TControlsBuilder;
     function ReturnLastControl(out AControl: TControl): TControlsBuilder;
-
-
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property ContentWidth: Single read GetContentWidth;
     property ContentHeight: Single read GetFContentHeight;
@@ -709,13 +706,13 @@ type
   private
     FRegistryContextHandle: IRegistryContextHandle;
     FComponentBuilder: TComponentBuilder;
-    FControlBuilder: TControlsBuilder;
+    FControlsBuilder: TControlsBuilder;
     FMenuBuilder: TMenuBuilder;
   public
     constructor Create(const ARegistryContextKey: string='');
     destructor Destroy; override;
     function AsComponentBuilder: TComponentBuilder;
-    function AsControlBuilder: TControlsBuilder;
+    function AsControlsBuilder: TControlsBuilder;
     function AsMenuBuilder: TMenuBuilder;
   end;
 
@@ -3844,12 +3841,12 @@ begin
   Result := FComponentBuilder;
 end;
 
-function TOPCBBuilders.AsControlBuilder: TControlsBuilder;
+function TOPCBBuilders.AsControlsBuilder: TControlsBuilder;
 begin
-  if not Assigned(FControlBuilder) then
-    FControlBuilder := TControlsBuilder.Create(FRegistryContextHandle);
+  if not Assigned(FControlsBuilder) then
+    FControlsBuilder := TControlsBuilder.Create(FRegistryContextHandle);
 
-  Result := FControlBuilder;
+  Result := FControlsBuilder;
 end;
 
 function TOPCBBuilders.AsMenuBuilder: TMenuBuilder;
@@ -3863,7 +3860,7 @@ constructor TOPCBBuilders.Create(const ARegistryContextKey: string);
 begin
   FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContextKey);
   FComponentBuilder := nil;
-  FControlBuilder := nil;
+  FControlsBuilder := nil;
   FMenuBuilder := nil;
 end;
 
@@ -3872,8 +3869,8 @@ begin
   if Assigned(FComponentBuilder) then
     FComponentBuilder.Free;
 
-  if Assigned(FControlBuilder) then
-    FControlBuilder.Free;
+  if Assigned(FControlsBuilder) then
+    FControlsBuilder.Free;
 
   if Assigned(FMenuBuilder) then
     FMenuBuilder.Free;
