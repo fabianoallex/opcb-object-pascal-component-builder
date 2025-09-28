@@ -199,26 +199,26 @@ begin
     Builders.AsControlsBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(2, 5)
-      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alTop))
+      .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alTop))
         .SetTopLeft(5, 5)
-        .AddControl(TControlInfo.Create(TButton, FButtonAdd).WithCaption('Novo').WithOnClick(@ButtonAddClick))
-        .AddControl(TControlInfo.Create(TButton, FButtonEdit).WithCaption('Alterar').WithOnClick(@ButtonEditClick))
-        .AddControl(TControlInfo.Create(TButton, FButtonRemove).WithCaption('Excluir').WithOnClick(@ButtonRemoveClick))
-        .AddControl(TControlInfo.Create(TButton, FButtonPost).WithCaption('Gravar').WithOnClick(@ButtonPostClick))
-        .AddControl(TControlInfo.Create(TButton, FButtonCancel).WithCaption('Cancelar').WithOnClick(@ButtonCancelClick))
-        .AddControl(TControlInfo.Create(TButton, FButtonRefresh).WithCaption('Recarregar').WithOnClick(@ButtonRefreshClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonAdd).WithCaption('Novo').WithOnClick(@ButtonAddClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonEdit).WithCaption('Alterar').WithOnClick(@ButtonEditClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonRemove).WithCaption('Excluir').WithOnClick(@ButtonRemoveClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonPost).WithCaption('Gravar').WithOnClick(@ButtonPostClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonCancel).WithCaption('Cancelar').WithOnClick(@ButtonCancelClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonRefresh).WithCaption('Recarregar').WithOnClick(@ButtonRefreshClick))
         .IncLeft(20)
-        .AddControl(TControlInfo.Create(TButton, FButtonPrevious).WithCaption('Anterior').WithOnClick(@ButtonPreviousClick))
-        .AddControl(TControlInfo.Create(TButton, FButtonNext).WithCaption('Próximo').WithOnClick(@ButtonNextClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonPrevious).WithCaption('Anterior').WithOnClick(@ButtonPreviousClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonNext).WithCaption('Próximo').WithOnClick(@ButtonNextClick))
         .IncLeft(20)
-        .AddControl(TControlInfo.Create(TButton, FButtonClose).WithCaption('Fechar').WithOnClick(@ButtonCloseClick))
+        .AddControl(TControlBuilder.Create(TButton, FButtonClose).WithCaption('Fechar').WithOnClick(@ButtonCloseClick))
         .RecalcParentHeight(10)
       .SuperLevel
-      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(altop))
+      .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(altop))
          .External(@BuildContents) // aqui injeta a continuacao do build
       .SuperLevel
-      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alClient))
-        .AddControl(TControlInfo.Create(TDBGrid, FDBGrid).Setup(@SetupDBGrid))
+      .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alClient))
+        .AddControl(TControlBuilder.Create(TDBGrid, FDBGrid).Setup(@SetupDBGrid))
       .SuperLevel
     ;
 

@@ -17,8 +17,8 @@ uses
 type
   { TButtonInfo }
 
-  TButtonInfo = class;
-  TButtonInfo = class({$IFDEF FPC}specialize{$ENDIF} TControlInfoBase<TButtonInfo>)
+  TButtonBuilder = class;
+  TButtonInfo = class({$IFDEF FPC}specialize{$ENDIF} TControlBuilderBase<TButtonInfo>)
   private
     FModalResult: Integer;
   public

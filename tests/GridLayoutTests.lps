@@ -16,15 +16,16 @@
         <Filename Value="ugridlayouttest.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UGridLayoutTest"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <CursorPos X="39" Y="11"/>
+        <CursorPos X="54" Y="8"/>
         <UsageCount Value="213"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="..\src\ULayout.pas"/>
+        <Filename Value="..\src\ulayout.pas"/>
         <IsPartOfProject Value="True"/>
-        <IsVisibleTab Value="True"/>
+        <UnitName Value="ULayout"/>
         <EditorIndex Value="2"/>
         <TopLine Value="11"/>
         <CursorPos X="63" Y="11"/>
@@ -155,13 +156,12 @@
       </Unit>
       <Unit>
         <Filename Value="..\src\ulayout.controls.pas"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="-1"/>
         <CursorPos X="52" Y="10"/>
         <UsageCount Value="114"/>
-        <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="28">
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="..\src\ulayout.pas"/>
         <Caret Line="469" Column="15" TopLine="448"/>
@@ -277,6 +277,10 @@
       <Position>
         <Filename Value="..\src\ugridlayoutbuilder.pas"/>
         <Caret Line="167" TopLine="158"/>
+      </Position>
+      <Position>
+        <Filename Value="..\src\ulayout.pas"/>
+        <Caret Line="11" Column="63" TopLine="11"/>
       </Position>
     </JumpHistory>
     <RunParams>

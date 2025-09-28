@@ -228,16 +228,16 @@ begin
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
-      .SubLevel(TControlInfo.Create(TPanel).WithAlign(alLeft).WithWidth(150))
-        .AddControl(TControlInfo.Create(TImage, 'Image', FImage).Setup(@SetupImage))
+      .SubLevel(TControlBuilder.Create(TPanel).WithAlign(alLeft).WithWidth(150))
+        .AddControl(TControlBuilder.Create(TImage, 'Image', FImage).Setup(@SetupImage))
       .SuperLevel
-      .SubLevel(TControlInfo.Create(TPanel, 'PanelClient').WithAlign(alClient).WithCaption(''))
+      .SubLevel(TControlBuilder.Create(TPanel, 'PanelClient').WithAlign(alClient).WithCaption(''))
         .SetTopLeftNearControl('Image', rpRight)
         .SetDirection(cpdVertical)
-        .AddControl(TControlInfo.Create(TLabel, FLabelTitle).WithAlign(alTop).Setup(@SetupLabel))
-        .AddControl(TControlInfo.Create(TLabel, FLabelAuthor).WithAlign(alTop).Setup(@SetupLabel))
-        .AddControl(TControlInfo.Create(TLabel, FLabelFirstEditionYear).WithAlign(alTop).Setup(@SetupLabel))
-        .AddControl(TControlInfo.Create(TLabel, FLabelBookURL).WithAlign(alTop).Setup(@SetupLabel))
+        .AddControl(TControlBuilder.Create(TLabel, FLabelTitle).WithAlign(alTop).Setup(@SetupLabel))
+        .AddControl(TControlBuilder.Create(TLabel, FLabelAuthor).WithAlign(alTop).Setup(@SetupLabel))
+        .AddControl(TControlBuilder.Create(TLabel, FLabelFirstEditionYear).WithAlign(alTop).Setup(@SetupLabel))
+        .AddControl(TControlBuilder.Create(TLabel, FLabelBookURL).WithAlign(alTop).Setup(@SetupLabel))
         .RecalcParentHeight()
       .SuperLevel
     ;

@@ -103,7 +103,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Selecione um estado:',
-    TControlInfo.Create(TListBox, 'ListBoxCidades').WithWidthAndHeight(350, 400).Setup(@SetupListBox)
+    TControlBuilder.Create(TListBox, 'ListBoxCidades').WithWidthAndHeight(350, 400).Setup(@SetupListBox)
   );
 
   try
@@ -135,7 +135,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Informe o Celular',
-    TControlInfo.Create(TMaskEdit, 'MaskEditCelular').WithWidth(250).Setup(@SetupMaskEdit)
+    TControlBuilder.Create(TMaskEdit, 'MaskEditCelular').WithWidth(250).Setup(@SetupMaskEdit)
   );
 
   try
@@ -157,7 +157,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Selecione uma cor',
-    TControlInfo.Create(TColorBox, 'ColorBox').WithWidth(250)
+    TControlBuilder.Create(TColorBox, 'ColorBox').WithWidth(250)
   );
 
   try
@@ -179,7 +179,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Informe o valor',
-    TControlInfo.Create(TFloatSpinEdit, 'FloatSpinEdit').WithWidth(250)
+    TControlBuilder.Create(TFloatSpinEdit, 'FloatSpinEdit').WithWidth(250)
   );
 
   try
@@ -241,7 +241,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Selecione uma data',
-    TControlInfo.Create(TStringGrid, 'StringGrid').WithWidthAndHeight(350, 400).Setup(@SetupStringGrid)
+    TControlBuilder.Create(TStringGrid, 'StringGrid').WithWidthAndHeight(350, 400).Setup(@SetupStringGrid)
   );
 
   try
@@ -277,7 +277,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Selecione a posição',
-    TControlInfo.Create(TTrackBar, 'TrackBar').WithWidth(500).Setup(@SetupTrackBar)
+    TControlBuilder.Create(TTrackBar, 'TrackBar').WithWidth(500).Setup(@SetupTrackBar)
   );
 
   try
@@ -358,12 +358,12 @@ var
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
-        .AddControl(TControlInfo.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(180, 280).Setup(@SetupListBoxLeft))
+        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(180, 280).Setup(@SetupListBoxLeft))
         .SubLevel(cpdVertical)
-          .AddControl(TControlInfo.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(@ButtonMoveToRightClick))
-          .AddControl(TControlInfo.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(@ButtonMoveToLeftClick))
+          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(@ButtonMoveToRightClick))
+          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(@ButtonMoveToLeftClick))
         .SuperLevel
-        .AddControl(TControlInfo.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(180, 280).Setup(@SetupListBoxRight))
+        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(180, 280).Setup(@SetupListBoxRight))
         .CenterControlsInParentVertically(['ButtonMoveToRight', 'ButtonMoveToLeft'])
     finally
       ControlsBuilder.Free;
@@ -374,7 +374,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Mova os itens',
-    TControlInfo.Create(TPanel, 'PanelMain').WithWidthAndHeight(500, 300).WithCaption(''),
+    TControlBuilder.Create(TPanel, 'PanelMain').WithWidthAndHeight(500, 300).WithCaption(''),
     'ContextKey-Exemplo-Panel'
   );
 
@@ -489,13 +489,13 @@ var
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
-        .SubLevel(TControlInfo.Create(TPanel).WithAlign(alTop).WithHeight(70).WithCaption(''), cpdVertical)
+        .SubLevel(TControlBuilder.Create(TPanel).WithAlign(alTop).WithHeight(70).WithCaption(''), cpdVertical)
           .SetTopLeft(5, 5)
           .SetSpace(5, 5)
-          .AddControl(TControlInfo.Create(TLabel).WithCaption('Buscar por cidade').WithWidth(460))
-          .AddControl(TControlInfo.Create(TEdit).WithWidth(480).Setup(@SetupEditSearch))
+          .AddControl(TControlBuilder.Create(TLabel).WithCaption('Buscar por cidade').WithWidth(460))
+          .AddControl(TControlBuilder.Create(TEdit).WithWidth(480).Setup(@SetupEditSearch))
         .SuperLevel
-        .AddControl(TControlInfo.Create(TDBGrid).WithAlign(alClient).Setup(@SetupDBGrid))
+        .AddControl(TControlBuilder.Create(TDBGrid).WithAlign(alClient).Setup(@SetupDBGrid))
     finally
       Builders.Free;
     end;
@@ -504,7 +504,7 @@ var
 begin
   ControlDialog := TControlDialog.CreateNew(
     Self, '',
-    TControlInfo.Create(TPanel, 'PanelMain').WithWidthAndHeight(500, 300).WithCaption(''),
+    TControlBuilder.Create(TPanel, 'PanelMain').WithWidthAndHeight(500, 300).WithCaption(''),
     'ContextKey-Exemplo-Panel'
   );
 

@@ -10,13 +10,13 @@ type
   TControlDialog = class(TForm)
   private
     FControlBuilder: TControlsBuilder;
-    FControlInfo: TControlInfo;
+    FControlInfo: TControlBuilder;
     procedure SeTControlsBuilder(const Value: TControlsBuilder);
     procedure SetupButton(AControl: TControl);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
     procedure SetupLabel(AControl: TControl);
   public
-    constructor CreateNew(AOwner: TComponent; AMsg: string; AControlInfo: TControlInfo; AContextKey: string='');
+    constructor CreateNew(AOwner: TComponent; AMsg: string; AControlBuilder: TControlBuilder; AContextKey: string='');
     destructor Destroy; override;
     property ControlBuilder: TControlsBuilder read FControlBuilder write SeTControlsBuilder;
   end;
@@ -28,7 +28,7 @@ uses
 
 { TControlDialog }
 
-constructor TControlDialog.CreateNew(AOwner: TComponent; AMsg: string; AControlInfo: TControlInfo; AContextKey: string='');
+constructor TControlDialog.CreateNew(AOwner: TComponent; AMsg: string; AControlBuilder: TControlBuilder; AContextKey: string='');
 var
   ControlName: string;
 begin
@@ -44,24 +44,24 @@ begin
 
   ControlBuilder := TControlsBuilder.Create(AContextKey);
 
-  if AControlInfo.Name = '' then
-    AControlInfo.WithName('Control');
+  if AControlBuilder.Name = '' then
+    AControlBuilder.WithName('Control');
 
-  ControlName := AControlInfo.Name;
+  ControlName := AControlBuilder.Name;
 
   ControlBuilder
     .WithOwnerAndParent(Self, Self)
     .SetSpace(5, 5)
     .SetTopLeft(20, 20)
-    .SubLevel(TControlInfo.Create(TLayout))
+    .SubLevel(TControlBuilder.Create(TLayout))
       .SubLevel(cpdVertical)
-        .AddControl(TControlInfo.Create(TLabel, 'LabelMessage').WithCaption(AMsg).Setup(SetupLabel))
-        .AddControl(AControlInfo)
+        .AddControl(TControlBuilder.Create(TLabel, 'LabelMessage').WithCaption(AMsg).Setup(SetupLabel))
+        .AddControl(AControlBuilder)
       .SuperLevel
       .Break
       .IncTop(10)
-      .AddControl(TControlInfo.Create(TButton, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(SetupButton))
-      .AddControl(TControlInfo.Create(TButton, 'ButtonCancel').WithCaption('Cancelar').WithWidthAndHeight(100, 30).Setup(SetupButton))
+      .AddControl(TControlBuilder.Create(TButton, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(SetupButton))
+      .AddControl(TControlBuilder.Create(TButton, 'ButtonCancel').WithCaption('Cancelar').WithWidthAndHeight(100, 30).Setup(SetupButton))
       .AlignControlsRight(['ButtonOk', 'ButtonCancel'], [ControlName])
     .SuperLevel
   ;

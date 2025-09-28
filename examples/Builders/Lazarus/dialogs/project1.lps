@@ -21,8 +21,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
-        <TopLine Value="344"/>
-        <CursorPos X="72" Y="377"/>
+        <TopLine Value="477"/>
+        <CursorPos X="20" Y="507"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -32,8 +32,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDialogs"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="30"/>
-        <CursorPos X="74" Y="72"/>
+        <TopLine Value="38"/>
+        <CursorPos X="32" Y="68"/>
         <UsageCount Value="71"/>
         <Loaded Value="True"/>
       </Unit>
@@ -64,10 +64,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="492" Column="13" TopLine="473"/>
-      </Position>
       <Position>
         <Filename Value="udialogs.pas"/>
         <Caret Line="19" Column="22"/>
@@ -161,24 +157,28 @@
         <Caret Line="361" Column="43" TopLine="335"/>
       </Position>
       <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="33" Column="15" TopLine="49"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="361" Column="59" TopLine="368"/>
-      </Position>
-      <Position>
         <Filename Value="udialogs.pas"/>
         <Caret Line="24" Column="22" TopLine="4"/>
       </Position>
       <Position>
         <Filename Value="unit1.pas"/>
-        <Caret Line="361" Column="59" TopLine="368"/>
+        <Caret Line="103" Column="3" TopLine="98"/>
       </Position>
       <Position>
         <Filename Value="unit1.pas"/>
-        <Caret Line="103" Column="3" TopLine="98"/>
+        <Caret Line="377" Column="72" TopLine="344"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="20" Column="19"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="68" Column="32" TopLine="38"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="106" Column="5" TopLine="87"/>
       </Position>
     </JumpHistory>
     <RunParams>

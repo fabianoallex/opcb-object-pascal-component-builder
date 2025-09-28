@@ -73,13 +73,13 @@ end;
 procedure TForm1.AddCard;
 begin
   BuilderCards
-    .SubLevel(TControlInfo.Create(TPanel).WithWidthAndHeight(250, 350), cpdVertical)
+    .SubLevel(TControlBuilder.Create(TPanel).WithWidthAndHeight(250, 350), cpdVertical)
       .SetVerticalSpace(2)
-      .AddControl(TControlInfo.Create(TImage).Setup(SetupImage))
+      .AddControl(TControlBuilder.Create(TImage).Setup(SetupImage))
       .CenterControlInParentHorizontally
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('Nome').Setup(SetupLabel))
+      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Nome').Setup(SetupLabel))
       .CenterControlInParentHorizontally
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('Contato').Setup(SetupLabel))
+      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Contato').Setup(SetupLabel))
       .CenterControlInParentHorizontally
     .SuperLevel
   ;
@@ -101,15 +101,15 @@ begin
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
       .SetDirection(cpdVertical)
-      .SubLevel(TControlInfo.Create(TPanel).WithAlign(TAlignLayout.Top).WithHeight(50))
+      .SubLevel(TControlBuilder.Create(TPanel).WithAlign(TAlignLayout.Top).WithHeight(50))
         .SetTopLeft(10, 10)
-        .AddControl(TControlInfo.Create(TButton)
+        .AddControl(TControlBuilder.Create(TButton)
           .WithCaption('Novo Card')
           .WithOnClick(ButtonAddCardClick)
         )
       .SuperLevel
       .SetDirection(cpdHorizontal)
-      .AddControl(TControlInfo.Create(TFlowLayout, 'FlowCards').WithAlign(TAlignLayout.Client).WithCaption(''))
+      .AddControl(TControlBuilder.Create(TFlowLayout, 'FlowCards').WithAlign(TAlignLayout.Client).WithCaption(''))
     ;
 
     BuilderCards := TControlsBuilder.Create(Self.Name);

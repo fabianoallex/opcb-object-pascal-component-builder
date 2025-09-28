@@ -150,9 +150,9 @@ begin
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
-      .AddControl(TControlInfo.Create(TStatusBar).Setup(@SetupStatusBar))
-      .SubLevel(TControlInfo.Create(TPageControl, FPageControl).WithAlign(alClient))
-        .SubLevel(TControlInfo.Create(TTabSheet).WithCaption('Dashboard'))
+      .AddControl(TControlBuilder.Create(TStatusBar).Setup(@SetupStatusBar))
+      .SubLevel(TControlBuilder.Create(TPageControl, FPageControl).WithAlign(alClient))
+        .SubLevel(TControlBuilder.Create(TTabSheet).WithCaption('Dashboard'))
         .SuperLevel
       .SuperLevel
     ;
@@ -219,7 +219,7 @@ begin
   try
     ControlsBuilder
       .WithOwnerAndParent(Self, PageControl)
-      .AddControl(TControlInfo.Create(TTabSheet).WithCaption('Nova aba'))
+      .AddControl(TControlBuilder.Create(TTabSheet).WithCaption('Nova aba'))
     ;
     Result := ControlsBuilder.Controls.Last as TTabSheet;
     PageControl.ActivePage := Result;

@@ -38,8 +38,8 @@ begin
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .AddControls([
-        TControlInfo.Create(TButton, 'B1'), TControlInfo.Create(TButton, 'B2'),
-        TControlInfo.Create(TButton, 'B3'), TControlInfo.Create(TButton, 'B4')
+        TControlBuilder.Create(TButton, 'B1'), TControlBuilder.Create(TButton, 'B2'),
+        TControlBuilder.Create(TButton, 'B3'), TControlBuilder.Create(TButton, 'B4')
       ])
     ;
   finally

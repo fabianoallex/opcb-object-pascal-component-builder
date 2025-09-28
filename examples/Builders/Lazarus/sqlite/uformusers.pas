@@ -70,13 +70,13 @@ begin
 
     .SetDirection(cpdVertical)
     .SetVerticalSpace(5)
-    .AddControl(TControlInfo.Create(TLabel).WithCaption('ID').WithWidth(50))
-    .AddControl(TControlInfo.Create(TLabel).WithCaption('Nome').WithWidth(50))
-    .AddControl(TControlInfo.Create(TLabel).WithCaption('Senha').WithWidth(50))
+    .AddControl(TControlBuilder.Create(TLabel).WithCaption('ID').WithWidth(50))
+    .AddControl(TControlBuilder.Create(TLabel).WithCaption('Nome').WithWidth(50))
+    .AddControl(TControlBuilder.Create(TLabel).WithCaption('Senha').WithWidth(50))
     .Break
-    .AddControl(TControlInfo.Create(TDBEdit).Setup(@SetupDBEditID))
-    .AddControl(TControlInfo.Create(TDBEdit).WithWidth(250).Setup(@SetupDBEditUserName))
-    .AddControl(TControlInfo.Create(TDBEdit).WithWidth(250).Setup(@SetupDBEditPassword))
+    .AddControl(TControlBuilder.Create(TDBEdit).Setup(@SetupDBEditID))
+    .AddControl(TControlBuilder.Create(TDBEdit).WithWidth(250).Setup(@SetupDBEditUserName))
+    .AddControl(TControlBuilder.Create(TDBEdit).WithWidth(250).Setup(@SetupDBEditPassword))
 
     .RecalcParentHeight(25)
   ;

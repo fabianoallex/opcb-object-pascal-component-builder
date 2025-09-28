@@ -115,28 +115,28 @@ end;
 procedure TForm1.PopulateLoginControls(Builder: TControlsBuilder);
 begin
   Builder
-    .SubLevel(TControlInfo.Create(TPanel, 'PanelLogin').WithCaption(''), cpdVertical)
+    .SubLevel(TControlBuilder.Create(TPanel, 'PanelLogin').WithCaption(''), cpdVertical)
       .SetTopLeft(10, 10)
-      .AddControl(TControlInfo.Create(TLabel).Setup(SetupLabelLogin).WithName('LabelLogin'))
+      .AddControl(TControlBuilder.Create(TLabel).Setup(SetupLabelLogin).WithName('LabelLogin'))
       .IncTop(20)
-      .AddControl(TControlInfo.Create(TBevel).Setup(SetupBevel))
+      .AddControl(TControlBuilder.Create(TBevel).Setup(SetupBevel))
       .IncTop(20)
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('e-mail'))
-      .AddControl(TControlInfo.Create(TEdit).WithWidth(250).WithName('EditEmail').WithText(''))
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('Senha'))
-      .AddControl(TControlInfo.Create(TEdit).WithWidth(250).WithName('EditPassword').WithText('').Setup(SetupSenha))
-      .AddControl(TControlInfo.Create(TCheckBox, 'CheckBoxConnected').Setup(SetupCheckBox))
+      .AddControl(TControlBuilder.Create(TLabel).WithCaption('e-mail'))
+      .AddControl(TControlBuilder.Create(TEdit).WithWidth(250).WithName('EditEmail').WithText(''))
+      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Senha'))
+      .AddControl(TControlBuilder.Create(TEdit).WithWidth(250).WithName('EditPassword').WithText('').Setup(SetupSenha))
+      .AddControl(TControlBuilder.Create(TCheckBox, 'CheckBoxConnected').Setup(SetupCheckBox))
       .IncTop(20)
-      .AddControl(TControlInfo.Create(TButton).WithName('LoginButton').Setup(SetupLoginButton))
+      .AddControl(TControlBuilder.Create(TButton).WithName('LoginButton').Setup(SetupLoginButton))
       .SubLevel(
-        TControlInfo.Create(TPanel, 'PanelRodape')
+        TControlBuilder.Create(TPanel, 'PanelRodape')
           .WithAlign(alBottom)
           .WithHeight(100)
           .WithCaption(''),
           cpdHorizontal
         )
-         .AddControl(TControlInfo.Create(TLabel).WithName('LabelConta').WithCaption('Ainda não tem conta?'))
-         .AddControl(TControlInfo.Create(TButton, 'ButtonConta').WithCaption('Cadastra-se'))
+         .AddControl(TControlBuilder.Create(TLabel).WithName('LabelConta').WithCaption('Ainda não tem conta?'))
+         .AddControl(TControlBuilder.Create(TButton, 'ButtonConta').WithCaption('Cadastra-se'))
       .SuperLevel
 
       .RecalcParentSize(20, 10)
@@ -165,7 +165,7 @@ begin
     PopulateLoginControls(Builder);
 
     Builder
-      .AddControl(TControlInfo.Create(TPanel, 'PanelRight'))
+      .AddControl(TControlBuilder.Create(TPanel, 'PanelRight'))
       .CopySize(['PanelRight'], ['PanelLogin'])
     ;
 

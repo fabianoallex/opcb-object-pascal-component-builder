@@ -57,7 +57,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Informe a senha',
-    TControlInfo.Create(TEdit, 'EditSenha').WithWidth(250).Setup(SetupEdit)
+    TControlBuilder.Create(TEdit, 'EditSenha').WithWidth(250).Setup(SetupEdit)
   );
 
   ControlDialog.ShowModal(
@@ -134,7 +134,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Selecione uma data',
-    TControlInfo.Create(TStringGrid, 'StringGrid').WithWidthAndHeight(350, 400).Setup(SetupStringGrid)
+    TControlBuilder.Create(TStringGrid, 'StringGrid').WithWidthAndHeight(350, 400).Setup(SetupStringGrid)
   );
 
   ControlDialog.ShowModal(
@@ -171,7 +171,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Selecione a posição',
-    TControlInfo.Create(TTrackBar, 'TrackBar').WithWidth(300).Setup(SetupTrackBar)
+    TControlBuilder.Create(TTrackBar, 'TrackBar').WithWidth(300).Setup(SetupTrackBar)
   );
 
   ControlDialog.ShowModal(
@@ -251,12 +251,12 @@ var
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
-        .AddControl(TControlInfo.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(80, 280).Setup(SetupListBoxLeft))
+        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(80, 280).Setup(SetupListBoxLeft))
         .SubLevel(cpdVertical)
-          .AddControl(TControlInfo.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(ButtonMoveToRightClick))
-          .AddControl(TControlInfo.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(ButtonMoveToLeftClick))
+          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(ButtonMoveToRightClick))
+          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(ButtonMoveToLeftClick))
         .SuperLevel
-        .AddControl(TControlInfo.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(80, 280).Setup(SetupListBoxRight))
+        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(80, 280).Setup(SetupListBoxRight))
         .CenterControlsInParentVertically(['ButtonMoveToRight', 'ButtonMoveToLeft'])
     finally
       ControlBuilder.Free;
@@ -267,7 +267,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Mova os itens',
-    TControlInfo.Create(TPanel, 'PanelMain').WithWidthAndHeight(300, 300).WithCaption(''),
+    TControlBuilder.Create(TPanel, 'PanelMain').WithWidthAndHeight(300, 300).WithCaption(''),
     'ContextKey-Exemplo-Panel'
   );
 
@@ -330,7 +330,7 @@ begin
   ControlDialog := TControlDialog.CreateNew(
     Self,
     'Selecione um estado:',
-    TControlInfo.Create(TListBox, 'ListBoxCidades').WithWidthAndHeight(350, 400).Setup(SetupListBox)
+    TControlBuilder.Create(TListBox, 'ListBoxCidades').WithWidthAndHeight(350, 400).Setup(SetupListBox)
   );
 
   ControlDialog.ShowModal(

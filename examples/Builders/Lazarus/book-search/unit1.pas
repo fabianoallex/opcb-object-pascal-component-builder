@@ -130,7 +130,7 @@ begin
   ControlBuilderPage := TControlsBuilder.Create;
   ControlBuilderPage
     .WithOwnerAndParent(Self, FPanelCards)
-    .SubLevel(TControlInfo.Create(TScrollBox, FScrollboxPage).WithAlign(alClient).Setup(@SetupScrollBoxPage))
+    .SubLevel(TControlBuilder.Create(TScrollBox, FScrollboxPage).WithAlign(alClient).Setup(@SetupScrollBoxPage))
   ;
 end;
 
@@ -180,7 +180,7 @@ var
 begin
   Memo.Lines.Add('📚 Livro: ' + ADoc.FindPath('title').AsString);
   ControlBuilderPage
-    .SubLevel(TControlInfo.Create(TBookCard, Card).WithCaption(ADoc.FindPath('title').AsString).WithAlign(alTop).WithHeight(180))
+    .SubLevel(TControlBuilder.Create(TBookCard, Card).WithCaption(ADoc.FindPath('title').AsString).WithAlign(alTop).WithHeight(180))
     .SuperLevel
   ;
   ConfiguCard;
@@ -240,23 +240,23 @@ begin
     ControlBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
-      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alTop))
+      .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alTop))
         .SetTopLeft(10, 10)
         .SubLevel(cpdVertical)
-          .AddControl(TControlInfo.Create(TLabel).WithCaption('Pesquisa de Livros na Open Library'))
+          .AddControl(TControlBuilder.Create(TLabel).WithCaption('Pesquisa de Livros na Open Library'))
           .SetDirection(cpdHorizontal)
-          .AddControl(TControlInfo.Create(TEdit, FEditSearch).WithWidth(220).WithText('Object Pascal'))
-          .AddControl(TControlInfo.Create(TComboBox, FComboBoxPageSize).WithWidth(70).Setup(@SetupComboBoxPageSize))
-          .AddControl(TControlInfo.Create(TButton).WithCaption('Pesquisar').Setup(@SetupButtonSearch))
+          .AddControl(TControlBuilder.Create(TEdit, FEditSearch).WithWidth(220).WithText('Object Pascal'))
+          .AddControl(TControlBuilder.Create(TComboBox, FComboBoxPageSize).WithWidth(70).Setup(@SetupComboBoxPageSize))
+          .AddControl(TControlBuilder.Create(TButton).WithCaption('Pesquisar').Setup(@SetupButtonSearch))
         .SuperLevel
         .IncLeft(50)
-        .AddControl(TControlInfo.Create(TSearchPageNavigation, FSearchPageNavigation).WithWidth(300).Setup(@SetupSearchNavigation))
+        .AddControl(TControlBuilder.Create(TSearchPageNavigation, FSearchPageNavigation).WithWidth(300).Setup(@SetupSearchNavigation))
         .RecalcParentHeight(10)
       .SuperLevel
-      .SubLevel(TControlInfo.Create(TPanel).WithCaption('').WithAlign(alClient))
-        .AddControl(TControlInfo.Create(TPanel, FPanelCards).WithAlign(alClient))
-        .AddControl(TControlInfo.Create(TMemo, FMemo).WithAlign(alBottom))
-        .AddControl(TControlInfo.Create(TProgressBar, FProgressBar).WithAlign(alBottom).Setup(@SetupProgressBar))
+      .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alClient))
+        .AddControl(TControlBuilder.Create(TPanel, FPanelCards).WithAlign(alClient))
+        .AddControl(TControlBuilder.Create(TMemo, FMemo).WithAlign(alBottom))
+        .AddControl(TControlBuilder.Create(TProgressBar, FProgressBar).WithAlign(alBottom).Setup(@SetupProgressBar))
       .SuperLevel
     ;
   finally

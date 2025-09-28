@@ -142,7 +142,7 @@ begin
   Dialog := TControlDialog.CreateNew(
     Self,
     'Informe a página',
-    TControlInfo.Create(TSpinEdit, SpinEdit).WithWidth(250).Setup(@SetupSpinEdit)
+    TControlBuilder.Create(TSpinEdit, SpinEdit).WithWidth(250).Setup(@SetupSpinEdit)
   );
 
   try
@@ -208,15 +208,15 @@ begin
     ControlBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
-      .AddControl(TControlInfo.Create(TLabel, FLabelResults).WithWidth(40).WithCaption('Resultados'))
+      .AddControl(TControlBuilder.Create(TLabel, FLabelResults).WithWidth(40).WithCaption('Resultados'))
       .Break
-      .AddControl(TControlInfo.Create(TButton, FButtonFirst).WithWidth(40).WithCaption('1').Setup(@SetupButton))
-      .AddControl(TControlInfo.Create(TButton, FButtonPrior).WithWidth(40).WithCaption('<').Setup(@SetupButton))
+      .AddControl(TControlBuilder.Create(TButton, FButtonFirst).WithWidth(40).WithCaption('1').Setup(@SetupButton))
+      .AddControl(TControlBuilder.Create(TButton, FButtonPrior).WithWidth(40).WithCaption('<').Setup(@SetupButton))
       .IncLeft(10)
-      .AddControl(TControlInfo.Create(TButton, FButtonPage).WithWidth(40).WithCaption('1').Setup(@SetupButton))
+      .AddControl(TControlBuilder.Create(TButton, FButtonPage).WithWidth(40).WithCaption('1').Setup(@SetupButton))
       .IncLeft(10)
-      .AddControl(TControlInfo.Create(TButton, FButtonNext).WithWidth(40).WithCaption('>').Setup(@SetupButton))
-      .AddControl(TControlInfo.Create(TButton, FButtonLast).WithWidth(40).WithCaption('99').Setup(@SetupButton))
+      .AddControl(TControlBuilder.Create(TButton, FButtonNext).WithWidth(40).WithCaption('>').Setup(@SetupButton))
+      .AddControl(TControlBuilder.Create(TButton, FButtonLast).WithWidth(40).WithCaption('99').Setup(@SetupButton))
     ;
   finally
     ControlBuilder.Free;
