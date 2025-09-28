@@ -58,7 +58,7 @@ type
     function Setup(AProc: TComponentSetupProc): TComponentBuilder;
     function WithName(AName: string): TComponentBuilder;
     function WithTag(ATag: NativeInt): TComponentBuilder;
-    function CreateComponent(AOwner: TComponent; const AComponentName: string): TComponent;
+    function Build(AOwner: TComponent; const AComponentName: string): TComponent;
     property Component: TComponent read FComponent;
     property ComponentClass: TComponentClass read FComponentClass;
     property SetupProc: TComponentSetupProc read FSetupProc;
@@ -91,7 +91,7 @@ type
     function Setup(AProc: TMenuSetupProc): TMenuBuilder;
     function WithName(AName: string): TMenuBuilder;
     function WithTag(ATag: NativeInt): TMenuBuilder;
-    function CreateMenu(AOwner: TComponent; const AMenuName: string): TMenu;
+    function Build(AOwner: TComponent; const AMenuName: string): TMenu;
     property Menu: TMenu read FMenu;
     property MenuClass: TMenuClass read FMenuClass;
     property SetupProc: TMenuSetupProc read FSetupProc;
@@ -155,7 +155,7 @@ type
     FOnClick: TNotifyEvent;
     FTargetField: Pointer;
   public
-    function CreateControl(AOwner: TComponent; AParent: TWinControl;
+    function Build(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl; virtual; abstract;
     property Control: TControl read FControl;
     property ControlClass: TControlClass read FControlClass;
@@ -195,7 +195,7 @@ type
     function WithCaption(ACaption: string): TSelf;
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
-    function CreateControl(AOwner: TComponent; AParent: TWinControl;
+    function Build(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl; override;
   end;
 
@@ -781,7 +781,7 @@ begin
   FTargetField := nil;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.CreateControl(
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Build(
   AOwner: TComponent; AParent: TWinControl; const AControlName: string): TControl;
 var
   Proc: TControlSetupProc;
@@ -1251,7 +1251,7 @@ begin
   if not Assigned(AOwner) then
     AOwner := FOwner;
 
-  Result := Builder.CreateControl(AOwner, CurrentLevel.Parent, ControlName);
+  Result := Builder.Build(AOwner, CurrentLevel.Parent, ControlName);
 end;
 
 function TControlsBuilder.AddControl(AControlBuilder: TCustomControlBuilder;
@@ -3619,7 +3619,7 @@ begin
   ComponentName := AComponentBuilder.Name;
   if not ComponentName.IsEmpty then
     ComponentName := Registry.UniqueName(AComponentBuilder.Name);
-  Component := AComponentBuilder.CreateComponent(FOwner, ComponentName);
+  Component := AComponentBuilder.Build(FOwner, ComponentName);
   Registry.AddComponent(Component, Component.Name);
 end;
 
@@ -3696,7 +3696,7 @@ end;
 
 { TComponentBuilder }
 
-function TComponentBuilder.CreateComponent(AOwner: TComponent;
+function TComponentBuilder.Build(AOwner: TComponent;
   const AComponentName: string): TComponent;
 begin
   try
@@ -3902,7 +3902,7 @@ begin
   MenuName := AMenuBuilder.Name;
   if not MenuName.IsEmpty then
     MenuName := Registry.UniqueName(AMenuBuilder.Name);
-  Menu := AMenuBuilder.CreateMenu(FOwner, MenuName);
+  Menu := AMenuBuilder.Build(FOwner, MenuName);
   Registry.AddComponent(Menu, Menu.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -4036,7 +4036,7 @@ end;
 
 { TMenuBuilder }
 
-function TMenuBuilder.CreateMenu(AOwner: TComponent; const AMenuName: string): TMenu;
+function TMenuBuilder.Build(AOwner: TComponent; const AMenuName: string): TMenu;
 begin
   try
     if Assigned(Menu) then
