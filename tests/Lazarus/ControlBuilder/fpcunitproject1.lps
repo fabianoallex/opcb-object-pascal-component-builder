@@ -18,16 +18,16 @@
         <Filename Value="ucontrolcreatortests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlCreatorTests"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="2062"/>
+        <TopLine Value="1869"/>
         <CursorPos X="19" Y="2081"/>
         <UsageCount Value="211"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="1245"/>
+        <TopLine Value="1230"/>
         <CursorPos X="77" Y="1270"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
@@ -70,7 +70,7 @@
         <EditorIndex Value="3"/>
         <TopLine Value="1307"/>
         <CursorPos X="102" Y="1329"/>
-        <UsageCount Value="87"/>
+        <UsageCount Value="88"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
