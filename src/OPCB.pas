@@ -39,9 +39,9 @@ type
 
   TControlSetupProcList = {$IFDEF FPC}specialize{$ENDIF} TList<TControlSetupProc>;
 
-  { TComponentInfo }
+  { TComponentBuilder }
 
-  TComponentInfo = class
+  TComponentBuilder = class
   private
     FComponent: TComponent;
     FComponentClass: TComponentClass;
@@ -54,10 +54,10 @@ type
     constructor Create(AClass: TComponentClass; const AName: string=''); overload;
     constructor Create(AClass: TComponentClass; const AName: string; out Reference); overload;
     constructor Create(AComponentClass: TComponentClass; out Reference); overload;
-    function Assign(out Reference): TComponentInfo; overload;
-    function Setup(AProc: TComponentSetupProc): TComponentInfo;
-    function WithName(AName: string): TComponentInfo;
-    function WithTag(ATag: NativeInt): TComponentInfo;
+    function Assign(out Reference): TComponentBuilder; overload;
+    function Setup(AProc: TComponentSetupProc): TComponentBuilder;
+    function WithName(AName: string): TComponentBuilder;
+    function WithTag(ATag: NativeInt): TComponentBuilder;
     function CreateComponent(AOwner: TComponent; const AComponentName: string): TComponent;
     property Component: TComponent read FComponent;
     property ComponentClass: TComponentClass read FComponentClass;
@@ -65,16 +65,16 @@ type
     property Name: string read FName;
   end;
 
-  TComponentInfoArray = array of TComponentInfo;
+  TComponentBuilderArray = array of TComponentBuilder;
 
-  TComponentInfoHelper = class helper for TComponentInfo
+  TComponentBuilderHelper = class helper for TComponentBuilder
     class function CreateArray(AClass: TComponentClass;
-      const ANames: array of string): TComponentInfoArray; overload; static;
+      const ANames: array of string): TComponentBuilderArray; overload; static;
   end;
 
-  { TMenuInfo }
+  { TMenuBuilder }
 
-  TMenuInfo = class
+  TMenuBuilder = class
   private
     FMenu: TMenu;
     FMenuClass: TMenuClass;
@@ -87,10 +87,10 @@ type
     constructor Create(AClass: TMenuClass; const AName: string=''); overload;
     constructor Create(AClass: TMenuClass; const AName: string; out Reference); overload;
     constructor Create(AClass: TMenuClass; out Reference); overload;
-    function Assign(out Reference): TMenuInfo; overload;
-    function Setup(AProc: TMenuSetupProc): TMenuInfo;
-    function WithName(AName: string): TMenuInfo;
-    function WithTag(ATag: NativeInt): TMenuInfo;
+    function Assign(out Reference): TMenuBuilder; overload;
+    function Setup(AProc: TMenuSetupProc): TMenuBuilder;
+    function WithName(AName: string): TMenuBuilder;
+    function WithTag(ATag: NativeInt): TMenuBuilder;
     function CreateMenu(AOwner: TComponent; const AMenuName: string): TMenu;
     property Menu: TMenu read FMenu;
     property MenuClass: TMenuClass read FMenuClass;
@@ -99,9 +99,9 @@ type
     property TargetField: Pointer read FTargetField;
   end;
 
-  { TMenuItemInfo }
+  { TMenuItemBuilder }
 
-  TMenuItemInfo = class
+  TMenuItemBuilder = class
   private
     FMenuItem: TMenuItem;
     FMenuItemClass: TMenuItemClass;
@@ -119,13 +119,13 @@ type
     constructor Create(AClass: TMenuItemClass; out Reference); overload;
     constructor Create; overload;
     constructor Create(out Reference); overload;
-    function Assign(out Reference): TMenuItemInfo; overload;
-    function Setup(AProc: TMenuItemSetupProc): TMenuItemInfo;
-    function WithName(AName: string): TMenuItemInfo;
-    function WithTag(ATag: NativeInt): TMenuItemInfo;
-    function WithCaption(ACaption: string): TMenuItemInfo;
-    function WithImageIndex(AImageIndex: Integer): TMenuItemInfo;
-    function WithOnClick(AOnClick: TNotifyEvent): TMenuItemInfo;
+    function Assign(out Reference): TMenuItemBuilder; overload;
+    function Setup(AProc: TMenuItemSetupProc): TMenuItemBuilder;
+    function WithName(AName: string): TMenuItemBuilder;
+    function WithTag(ATag: NativeInt): TMenuItemBuilder;
+    function WithCaption(ACaption: string): TMenuItemBuilder;
+    function WithImageIndex(AImageIndex: Integer): TMenuItemBuilder;
+    function WithOnClick(AOnClick: TNotifyEvent): TMenuItemBuilder;
     function CreateMenuItem(AOwner: TComponent; const AMenuItemName: string): TMenuItem;
     property MenuItem: TMenuItem read FMenuItem;
     property MenuItemClass: TMenuItemClass read FMenuItemClass;
@@ -494,8 +494,8 @@ type
     function GetComponent<T: TComponent>(const AName: string): T; overload;
     function GetComponent(const AName: string): TComponent; overload;
     function WithOwner(AOwner: TComponent): TComponentsBuilder;
-    function Add(AComponentInfo: TComponentInfo): TComponentsBuilder; overload;
-    function Add(AComponentInfos: TComponentInfoArray): TComponentsBuilder; overload;
+    function Add(AComponentBuilder: TComponentBuilder): TComponentsBuilder; overload;
+    function Add(AComponentBuilders: TComponentBuilderArray): TComponentsBuilder; overload;
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TComponent read GetItem; default;
   end;
@@ -518,9 +518,9 @@ type
     function WithOwner(AOwner: TComponent): TMenusBuilder;
     function External(const AProc: TMenusBuilderObjProc): TMenusBuilder; overload;
     function External(const AProc: TMenusBuilderProc): TMenusBuilder; overload;
-    function AddMenu(AMenuInfo: TMenuInfo): TMenusBuilder;
-    function AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenusBuilder;
-    function SubLevel(AMenuItemInfo: TMenuItemInfo): TMenusBuilder;
+    function AddMenu(AMenuBuilder: TMenuBuilder): TMenusBuilder;
+    function AddMenuItem(AMenuItemBuilder: TMenuItemBuilder): TMenusBuilder;
+    function SubLevel(AMenuItemBuilder: TMenuItemBuilder): TMenusBuilder;
     function SuperLevel: TMenusBuilder;
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenu<T: TMenu>(const AName: string): T; overload;
@@ -556,7 +556,7 @@ type
     function GetComponentRegistry: TComponentRegistry;
     function GetItem(const AName: string): TControl;
     procedure SetupControlBuilderForGridMode(AControlBuilder: TCustomControlBuilder);
-    function CreateControl(Info: TCustomControlBuilder; AOwner: TComponent = nil): TControl;
+    function CreateControl(Builder: TCustomControlBuilder; AOwner: TComponent = nil): TControl;
   public
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
@@ -655,8 +655,8 @@ type
     function AddControl(AControlBuilder: TCustomControlBuilder; // main
       const AGroups: array of string): TControlsBuilder; overload;
     function AddControl(AControlBuilder: TCustomControlBuilder): TControlsBuilder; overload;
-    function AddControls(AControlCreateInfos: array of TCustomControlBuilder): TControlsBuilder; overload;
-    function AddControls(AControlCreateInfos: array of TCustomControlBuilder;
+    function AddControls(AControlCreateBuilders: array of TCustomControlBuilder): TControlsBuilder; overload;
+    function AddControls(AControlCreateBuilders: array of TCustomControlBuilder;
       const AGroups: array of string): TControlsBuilder; overload;
     function AddControl(AClass: TControlClass; const AName: string=''): TControlsBuilder; overload;
     function AddControl(AClass: TControlClass; const AName: string; out Reference): TControlsBuilder; overload;
@@ -1234,24 +1234,24 @@ begin
   CurrentLevel.GridMode.ResetSpans;
 end;
 
-function TControlsBuilder.CreateControl(Info: TCustomControlBuilder; AOwner: TComponent = nil): TControl;
+function TControlsBuilder.CreateControl(Builder: TCustomControlBuilder; AOwner: TComponent = nil): TControl;
 var
   ControlName: string;
 begin
   ControlName := '';
-  if not Info.Name.IsEmpty then
-    ControlName := Registry.UniqueName(Info.Name);
+  if not Builder.Name.IsEmpty then
+    ControlName := Registry.UniqueName(Builder.Name);
 
-  if not Info.Top.HasValue then
-    Info.Top := CurrentLevel.CurrentTop;
+  if not Builder.Top.HasValue then
+    Builder.Top := CurrentLevel.CurrentTop;
 
-  if not Info.Left.HasValue then
-    Info.Left := CurrentLevel.CurrentLeft;
+  if not Builder.Left.HasValue then
+    Builder.Left := CurrentLevel.CurrentLeft;
 
   if not Assigned(AOwner) then
     AOwner := FOwner;
 
-  Result := Info.CreateControl(AOwner, CurrentLevel.Parent, ControlName);
+  Result := Builder.CreateControl(AOwner, CurrentLevel.Parent, ControlName);
 end;
 
 function TControlsBuilder.AddControl(AControlBuilder: TCustomControlBuilder;
@@ -1411,24 +1411,24 @@ begin
   Result := AddControl(AControlBuilder, []);
 end;
 
-function TControlsBuilder.AddControls(AControlCreateInfos: array of TCustomControlBuilder;
+function TControlsBuilder.AddControls(AControlCreateBuilders: array of TCustomControlBuilder;
   const AGroups: array of string): TControlsBuilder;
 var
   I: Integer;
 begin
   Result := Self;
-  for I := Low(AControlCreateInfos) to High(AControlCreateInfos) do
-    AddControl(AControlCreateInfos[I], AGroups);
+  for I := Low(AControlCreateBuilders) to High(AControlCreateBuilders) do
+    AddControl(AControlCreateBuilders[I], AGroups);
 end;
 
 function TControlsBuilder.AddControls(
-  AControlCreateInfos: array of TCustomControlBuilder): TControlsBuilder;
+  AControlCreateBuilders: array of TCustomControlBuilder): TControlsBuilder;
 var
   I: Integer;
 begin
   Result := Self;
-  for I := Low(AControlCreateInfos) to High(AControlCreateInfos) do
-    AddControl(AControlCreateInfos[I], []);
+  for I := Low(AControlCreateBuilders) to High(AControlCreateBuilders) do
+    AddControl(AControlCreateBuilders[I], []);
 end;
 
 procedure TControlsBuilder.AddControlToGroups(AControl: TControl;
@@ -3610,27 +3610,27 @@ end;
 { TComponentsBuilder }
 
 function TComponentsBuilder.Add(
-  AComponentInfo: TComponentInfo): TComponentsBuilder;
+  AComponentBuilder: TComponentBuilder): TComponentsBuilder;
 var
   Component: TComponent;
   ComponentName: string;
 begin
   Result := Self;
-  ComponentName := AComponentInfo.Name;
+  ComponentName := AComponentBuilder.Name;
   if not ComponentName.IsEmpty then
-    ComponentName := Registry.UniqueName(AComponentInfo.Name);
-  Component := AComponentInfo.CreateComponent(FOwner, ComponentName);
+    ComponentName := Registry.UniqueName(AComponentBuilder.Name);
+  Component := AComponentBuilder.CreateComponent(FOwner, ComponentName);
   Registry.AddComponent(Component, Component.Name);
 end;
 
 function TComponentsBuilder.Add(
-  AComponentInfos: TComponentInfoArray): TComponentsBuilder;
+  AComponentBuilders: TComponentBuilderArray): TComponentsBuilder;
 var
   I: Integer;
 begin
   Result := Self;
-  for I := 0 to High(AComponentInfos) do
-    Add(AComponentInfos[I]);
+  for I := 0 to High(AComponentBuilders) do
+    Add(AComponentBuilders[I]);
 end;
 
 constructor TComponentsBuilder.Create(ARegistryContextKey: string);
@@ -3694,9 +3694,9 @@ begin
   FOwner := AOwner;
 end;
 
-{ TComponentInfo }
+{ TComponentBuilder }
 
-function TComponentInfo.CreateComponent(AOwner: TComponent;
+function TComponentBuilder.CreateComponent(AOwner: TComponent;
   const AComponentName: string): TComponent;
 begin
   try
@@ -3720,7 +3720,7 @@ begin
   end;
 end;
 
-constructor TComponentInfo.Create(AClass: TComponentClass; const AName: string);
+constructor TComponentBuilder.Create(AClass: TComponentClass; const AName: string);
 begin
   FComponent := nil;
   FComponentClass := AClass;
@@ -3729,14 +3729,14 @@ begin
   FSetupProc := nil;
 end;
 
-constructor TComponentInfo.Create(AClass: TComponentClass; const AName: string;
+constructor TComponentBuilder.Create(AClass: TComponentClass; const AName: string;
   out Reference);
 begin
   Create(AClass, AName);
   Assign(Reference);
 end;
 
-constructor TComponentInfo.Create(AComponent: TComponent);
+constructor TComponentBuilder.Create(AComponent: TComponent);
 begin
   FComponent := AComponent;
   FComponentClass := TComponentClass(AComponent.ClassType);
@@ -3745,31 +3745,31 @@ begin
   FSetupProc := nil;
 end;
 
-constructor TComponentInfo.Create(AComponentClass: TComponentClass; out Reference);
+constructor TComponentBuilder.Create(AComponentClass: TComponentClass; out Reference);
 begin
   Create(AComponentClass);
   Assign(Reference);
 end;
 
-function TComponentInfo.Assign(out Reference): TComponentInfo;
+function TComponentBuilder.Assign(out Reference): TComponentBuilder;
 begin
   Result := Self;
   FTargetField := @Reference;
 end;
 
-function TComponentInfo.Setup(AProc: TComponentSetupProc): TComponentInfo;
+function TComponentBuilder.Setup(AProc: TComponentSetupProc): TComponentBuilder;
 begin
   Result := Self;
   FSetupProc := AProc;
 end;
 
-function TComponentInfo.WithName(AName: string): TComponentInfo;
+function TComponentBuilder.WithName(AName: string): TComponentBuilder;
 begin
   Result := Self;
   FName := AName;
 end;
 
-function TComponentInfo.WithTag(ATag: NativeInt): TComponentInfo;
+function TComponentBuilder.WithTag(ATag: NativeInt): TComponentBuilder;
 begin
   Result := Self;
   FTag := ATag;
@@ -3878,31 +3878,31 @@ begin
   inherited;
 end;
 
-{ TComponentInfoHelper }
+{ TComponentBuilderHelper }
 
-class function TComponentInfoHelper.CreateArray(AClass: TComponentClass;
-  const ANames: array of string): TComponentInfoArray;
+class function TComponentBuilderHelper.CreateArray(AClass: TComponentClass;
+  const ANames: array of string): TComponentBuilderArray;
 var
   I: Integer;
 begin
   Result := [];
   SetLength(Result, Length(ANames));
   for I := 0 to High(ANames) do
-    Result[I] := TComponentInfo.Create(AClass, ANames[I]);
+    Result[I] := TComponentBuilder.Create(AClass, ANames[I]);
 end;
 
 { TMenusBuilder }
 
-function TMenusBuilder.AddMenu(AMenuInfo: TMenuInfo): TMenusBuilder;
+function TMenusBuilder.AddMenu(AMenuBuilder: TMenuBuilder): TMenusBuilder;
 var
   Menu: TMenu;
   MenuName: string;
 begin
   Result := Self;
-  MenuName := AMenuInfo.Name;
+  MenuName := AMenuBuilder.Name;
   if not MenuName.IsEmpty then
-    MenuName := Registry.UniqueName(AMenuInfo.Name);
-  Menu := AMenuInfo.CreateMenu(FOwner, MenuName);
+    MenuName := Registry.UniqueName(AMenuBuilder.Name);
+  Menu := AMenuBuilder.CreateMenu(FOwner, MenuName);
   Registry.AddComponent(Menu, Menu.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -3914,16 +3914,16 @@ begin
   {$ENDIF}
 end;
 
-function TMenusBuilder.AddMenuItem(AMenuItemInfo: TMenuItemInfo): TMenusBuilder;
+function TMenusBuilder.AddMenuItem(AMenuItemBuilder: TMenuItemBuilder): TMenusBuilder;
 var
   MenuItem: TMenuItem;
   MenuItemName: string;
 begin
   Result := Self;
-  MenuItemName := AMenuItemInfo.Name;
+  MenuItemName := AMenuItemBuilder.Name;
   if not MenuItemName.IsEmpty then
-    MenuItemName := Registry.UniqueName(AMenuItemInfo.Name);
-  MenuItem := AMenuItemInfo.CreateMenuItem(FOwner, MenuItemName);
+    MenuItemName := Registry.UniqueName(AMenuItemBuilder.Name);
+  MenuItem := AMenuItemBuilder.CreateMenuItem(FOwner, MenuItemName);
   Registry.AddComponent(MenuItem, MenuItem.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -3983,16 +3983,16 @@ begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
-function TMenusBuilder.SubLevel(AMenuItemInfo: TMenuItemInfo): TMenusBuilder;
+function TMenusBuilder.SubLevel(AMenuItemBuilder: TMenuItemBuilder): TMenusBuilder;
 var
   MenuItem: TMenuItem;
   MenuItemName: string;
 begin
   Result := Self;
-  MenuItemName := AMenuItemInfo.Name;
+  MenuItemName := AMenuItemBuilder.Name;
   if not MenuItemName.IsEmpty then
-    MenuItemName := Registry.UniqueName(AMenuItemInfo.Name);
-  MenuItem := AMenuItemInfo.CreateMenuItem(FOwner, MenuItemName);
+    MenuItemName := Registry.UniqueName(AMenuItemBuilder.Name);
+  MenuItem := AMenuItemBuilder.CreateMenuItem(FOwner, MenuItemName);
   Registry.AddComponent(MenuItem, MenuItem.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -4034,9 +4034,9 @@ begin
     AProc(Self);
 end;
 
-{ TMenuInfo }
+{ TMenuBuilder }
 
-function TMenuInfo.CreateMenu(AOwner: TComponent; const AMenuName: string): TMenu;
+function TMenuBuilder.CreateMenu(AOwner: TComponent; const AMenuName: string): TMenu;
 begin
   try
     if Assigned(Menu) then
@@ -4059,7 +4059,7 @@ begin
   end;
 end;
 
-constructor TMenuInfo.Create(AClass: TMenuClass; const AName: string);
+constructor TMenuBuilder.Create(AClass: TMenuClass; const AName: string);
 begin
   FMenu := nil;
   FMenuClass := AClass;
@@ -4069,14 +4069,14 @@ begin
   FTargetField := nil;
 end;
 
-constructor TMenuInfo.Create(AClass: TMenuClass; const AName: string; out
+constructor TMenuBuilder.Create(AClass: TMenuClass; const AName: string; out
   Reference);
 begin
   Create(AClass, AName);
   Assign(Reference);
 end;
 
-constructor TMenuInfo.Create(AMenu: TMenu);
+constructor TMenuBuilder.Create(AMenu: TMenu);
 begin
   FMenu := AMenu;
   FMenuClass := TMenuClass(AMenu.ClassType);
@@ -4086,39 +4086,39 @@ begin
   FTargetField := nil;
 end;
 
-constructor TMenuInfo.Create(AClass: TMenuClass; out Reference);
+constructor TMenuBuilder.Create(AClass: TMenuClass; out Reference);
 begin
   Create(AClass, '');
   Assign(Reference);
 end;
 
-function TMenuInfo.Setup(AProc: TMenuSetupProc): TMenuInfo;
+function TMenuBuilder.Setup(AProc: TMenuSetupProc): TMenuBuilder;
 begin
   Result := Self;
   FSetupProc := AProc;
 end;
 
-function TMenuInfo.WithName(AName: string): TMenuInfo;
+function TMenuBuilder.WithName(AName: string): TMenuBuilder;
 begin
   Result := Self;
   FName := AName;
 end;
 
-function TMenuInfo.WithTag(ATag: NativeInt): TMenuInfo;
+function TMenuBuilder.WithTag(ATag: NativeInt): TMenuBuilder;
 begin
   Result := Self;
   FTag := ATag;
 end;
 
-function TMenuInfo.Assign(out Reference): TMenuInfo;
+function TMenuBuilder.Assign(out Reference): TMenuBuilder;
 begin
   Result := Self;
   FTargetField := @Reference;
 end;
 
-{ TMenuItemInfo }
+{ TMenuItemBuilder }
 
-constructor TMenuItemInfo.Create(AMenuItem: TMenuItem);
+constructor TMenuItemBuilder.Create(AMenuItem: TMenuItem);
 begin
   FMenuItem := AMenuItem;
   FMenuItemClass := TMenuItemClass(AMenuItem.ClassType);
@@ -4130,23 +4130,23 @@ begin
   FTargetField := nil;
 end;
 
-constructor TMenuItemInfo.Create(AClass: TMenuItemClass; out Reference);
+constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; out Reference);
 begin
   Create(AClass, '');
   Assign(Reference);
 end;
 
-constructor TMenuItemInfo.Create;
+constructor TMenuItemBuilder.Create;
 begin
   Create(TMenuItem);
 end;
 
-constructor TMenuItemInfo.Create(out Reference);
+constructor TMenuItemBuilder.Create(out Reference);
 begin
   Create(TMenuItem, Reference);
 end;
 
-constructor TMenuItemInfo.Create(AClass: TMenuItemClass; const AName: string);
+constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; const AName: string);
 begin
   FMenuItem := nil;
   FMenuItemClass := AClass;
@@ -4158,14 +4158,14 @@ begin
   FTargetField := nil;
 end;
 
-constructor TMenuItemInfo.Create(AClass: TMenuItemClass; const AName: string;
+constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; const AName: string;
   out Reference);
 begin
   Create(AClass, AName);
   Assign(Reference);
 end;
 
-function TMenuItemInfo.CreateMenuItem(AOwner: TComponent;
+function TMenuItemBuilder.CreateMenuItem(AOwner: TComponent;
   const AMenuItemName: string): TMenuItem;
 begin
   try
@@ -4201,44 +4201,44 @@ begin
   end;
 end;
 
-function TMenuItemInfo.Setup(AProc: TMenuItemSetupProc): TMenuItemInfo;
+function TMenuItemBuilder.Setup(AProc: TMenuItemSetupProc): TMenuItemBuilder;
 begin
   Result := Self;
   FSetupProc := AProc;
 end;
 
-function TMenuItemInfo.WithCaption(ACaption: string): TMenuItemInfo;
+function TMenuItemBuilder.WithCaption(ACaption: string): TMenuItemBuilder;
 begin
   Result := Self;
   FCaption := ACaption;
 end;
 
-function TMenuItemInfo.WithImageIndex(AImageIndex: Integer): TMenuItemInfo;
+function TMenuItemBuilder.WithImageIndex(AImageIndex: Integer): TMenuItemBuilder;
 begin
   Result := Self;
   FImageIndex := AImageIndex;
 end;
 
-function TMenuItemInfo.WithOnClick(AOnClick: TNotifyEvent): TMenuItemInfo;
+function TMenuItemBuilder.WithOnClick(AOnClick: TNotifyEvent): TMenuItemBuilder;
 begin
   Result := Self;
   FOnClick := AOnClick;
 end;
 
-function TMenuItemInfo.WithTag(ATag: NativeInt): TMenuItemInfo;
+function TMenuItemBuilder.WithTag(ATag: NativeInt): TMenuItemBuilder;
 begin
   Result := Self;
   FTag := ATag;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TMenuItemInfo.Assign(out Reference): TMenuItemInfo;
+function TMenuItemBuilder.Assign(out Reference): TMenuItemBuilder;
 begin
   Result := Self;
   FTargetField := @Reference;
 end;
 
-function TMenuItemInfo.WithName(AName: string): TMenuItemInfo;
+function TMenuItemBuilder.WithName(AName: string): TMenuItemBuilder;
 begin
   Result := Self;
   FName := AName;

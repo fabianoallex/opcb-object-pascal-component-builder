@@ -115,8 +115,8 @@ begin
   try
     ComponentsBuilder
       .WithOwner(Self)
-      .Add(TComponentInfo.Create(TSQLTransaction).Setup(@SetupTransaction))
-      .Add(TComponentInfo.Create(TSQLite3Connection).Setup(@SetupConnection))
+      .Add(TComponentBuilder.Create(TSQLTransaction).Setup(@SetupTransaction))
+      .Add(TComponentBuilder.Create(TSQLite3Connection).Setup(@SetupConnection))
     ;
   finally
     ComponentsBuilder.Free;

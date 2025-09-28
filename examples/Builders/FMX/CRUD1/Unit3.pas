@@ -30,7 +30,7 @@ begin
   Builders := TOPCBBuilders.Create(Self.Name);
 
   try
-    Builders.AsComponentBuilder
+    Builders.AsComponentsBuilder
       .WithOwner(Self)
     ;
 

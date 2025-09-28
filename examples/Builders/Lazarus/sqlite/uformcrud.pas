@@ -193,7 +193,7 @@ begin
   try
     Builders.AsComponentsBuilder
       .WithOwner(Self)
-      .Add(TComponentInfo.Create(TDataSource, FDataSourceCRUD).Setup(@SetupDataSourceCRUD))
+      .Add(TComponentBuilder.Create(TDataSource, FDataSourceCRUD).Setup(@SetupDataSourceCRUD))
     ;
 
     Builders.AsControlsBuilder

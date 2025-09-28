@@ -424,10 +424,10 @@ var
   begin
     Builders := TOPCBBuilders.Create(ControlDialog.ControlsBuilder.Registry.ContextKey); // usa o mesmo context do dialog
     try
-      Builders.AsComponentBuilder
+      Builders.AsComponentsBuilder
         .WithOwner(ControlDialog)
-        .Add(TComponentInfo.Create(TClientDataSet, 'CDS').Setup(SetupCDS))
-        .Add(TComponentInfo.Create(TDataSource, 'DS').Setup(SetupDS))
+        .Add(TComponentBuilder.Create(TClientDataSet, 'CDS').Setup(SetupCDS))
+        .Add(TComponentBuilder.Create(TDataSource, 'DS').Setup(SetupDS))
       ;
       Builders.AsControlsBuilder
         .WithOwnerAndParent(

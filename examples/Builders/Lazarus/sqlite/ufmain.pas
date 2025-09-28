@@ -127,22 +127,22 @@ begin
   try
     Builders.AsComponentsBuilder
       .WithOwner(Self)
-      .Add(TComponentInfo.Create(TImageList, FMenuImages).Setup(@SetupMenuImages))
+      .Add(TComponentBuilder.Create(TImageList, FMenuImages).Setup(@SetupMenuImages))
     ;
 
     Builders.AsMenusBuilder
       .WithOwner(Self)
-      .AddMenu(TMenuInfo.Create(TMainMenu).Setup(@SetupMainMenu))
-        .SubLevel(TMenuItemInfo.Create.WithCaption('Aplicação'))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Logoff').WithOnClick(@MenuItemLogoffClick).WithImageIndex(1))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('-'))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Fechar').WithOnClick(@MenuItemCloseClick).WithImageIndex(2))
+      .AddMenu(TMenuBuilder.Create(TMainMenu).Setup(@SetupMainMenu))
+        .SubLevel(TMenuItemBuilder.Create.WithCaption('Aplicação'))
+          .AddMenuItem(TMenuItemBuilder.Create.WithCaption('Logoff').WithOnClick(@MenuItemLogoffClick).WithImageIndex(1))
+          .AddMenuItem(TMenuItemBuilder.Create.WithCaption('-'))
+          .AddMenuItem(TMenuItemBuilder.Create.WithCaption('Fechar').WithOnClick(@MenuItemCloseClick).WithImageIndex(2))
         .SuperLevel
-        .SubLevel(TMenuItemInfo.Create.WithCaption('Cadastros'))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Usuários').WithOnClick(@MenuItemUsersClick).WithImageIndex(0))
+        .SubLevel(TMenuItemBuilder.Create.WithCaption('Cadastros'))
+          .AddMenuItem(TMenuItemBuilder.Create.WithCaption('Usuários').WithOnClick(@MenuItemUsersClick).WithImageIndex(0))
         .SuperLevel
-        .SubLevel(TMenuItemInfo.Create.WithCaption('Ajuda'))
-          .AddMenuItem(TMenuItemInfo.Create.WithCaption('Sobre').WithImageIndex(3))
+        .SubLevel(TMenuItemBuilder.Create.WithCaption('Ajuda'))
+          .AddMenuItem(TMenuItemBuilder.Create.WithCaption('Sobre').WithImageIndex(3))
         .SuperLevel
     ;
 

@@ -18,14 +18,14 @@
         <Filename Value="ucontrolbuildertests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlBuilderTests"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="2057"/>
-        <CursorPos X="60" Y="2078"/>
+        <TopLine Value="1972"/>
+        <CursorPos X="50" Y="2069"/>
         <UsageCount Value="211"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="1245"/>
         <CursorPos X="52" Y="1265"/>

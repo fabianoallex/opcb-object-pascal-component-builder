@@ -49,8 +49,8 @@ begin
   try
     ComponentsBuilder
       .WithOwner(DMDatabase)
-      .Add(TComponentInfo.Create(TSQLQuery, FQueryCRUD).Setup(@SetupQueryCRUD))
-      .Add(TComponentInfo.Create(TSQLQuery, FQuerySearch).Setup(@SetupQuerySearch))
+      .Add(TComponentBuilder.Create(TSQLQuery, FQueryCRUD).Setup(@SetupQueryCRUD))
+      .Add(TComponentBuilder.Create(TSQLQuery, FQuerySearch).Setup(@SetupQuerySearch))
     ;
   finally
     ComponentsBuilder.Free;

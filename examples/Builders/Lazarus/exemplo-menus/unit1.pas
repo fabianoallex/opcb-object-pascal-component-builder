@@ -87,26 +87,26 @@ begin
   try
     Builders.AsMenusBuilder
       .WithOwner(Self)
-      .AddMenu(TMenuInfo.Create(TMainMenu, 'MainMenu')) // menu principal por primeiro
-        .SubLevel(TMenuItemInfo.Create(TMenuItem, 'FileMenu'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'FileNewMenu'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'FileOpenMenu'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'FileCloseMenu'))
+      .AddMenu(TMenuBuilder.Create(TMainMenu, 'MainMenu')) // menu principal por primeiro
+        .SubLevel(TMenuItemBuilder.Create(TMenuItem, 'FileMenu'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'FileNewMenu'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'FileOpenMenu'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'FileCloseMenu'))
         .SuperLevel
-        .SubLevel(TMenuItemInfo.Create(TMenuItem, 'EditMenu'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'Edit1').WithCaption('Edit 1'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'Edit2').WithCaption('Edit 2'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'Edit3').WithCaption('Edit 3'))
+        .SubLevel(TMenuItemBuilder.Create(TMenuItem, 'EditMenu'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'Edit1').WithCaption('Edit 1'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'Edit2').WithCaption('Edit 2'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'Edit3').WithCaption('Edit 3'))
         .SuperLevel
-        .SubLevel(TMenuItemInfo.Create(TMenuItem, 'SearchMenu'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'SearchMenu1').WithCaption('SearchMenu 1'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'SearchMenu2').WithCaption('SearchMenu 2'))
-          .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'SearchMenu3').WithCaption('SearchMenu 3'))
+        .SubLevel(TMenuItemBuilder.Create(TMenuItem, 'SearchMenu'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'SearchMenu1').WithCaption('SearchMenu 1'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'SearchMenu2').WithCaption('SearchMenu 2'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'SearchMenu3').WithCaption('SearchMenu 3'))
         .SuperLevel
-      .AddMenu(TMenuInfo.Create(TPopupMenu, 'PopupMenu'))
-        .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'Popup1').WithCaption('Popup1'))
-        .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'Popup2').WithCaption('Popup2'))
-        .AddMenuItem(TMenuItemInfo.Create(TMenuItem, 'Popup3').WithCaption('Popup3'))
+      .AddMenu(TMenuBuilder.Create(TPopupMenu, 'PopupMenu'))
+        .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'Popup1').WithCaption('Popup1'))
+        .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'Popup2').WithCaption('Popup2'))
+        .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'Popup3').WithCaption('Popup3'))
     ;
 
     Builders.AsControlsBuilder

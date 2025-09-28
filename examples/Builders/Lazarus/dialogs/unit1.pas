@@ -479,8 +479,8 @@ var
     try
       Builders.AsComponentsBuilder
         .WithOwner(ControlDialog)
-        .Add(TComponentInfo.Create(TMemDataset, 'MDS').Setup(@SetupMDS))
-        .Add(TComponentInfo.Create(TDataSource, 'DS').Setup(@SetupDS))
+        .Add(TComponentBuilder.Create(TMemDataset, 'MDS').Setup(@SetupMDS))
+        .Add(TComponentBuilder.Create(TDataSource, 'DS').Setup(@SetupDS))
       ;
       Builders.AsControlsBuilder
         .WithOwnerAndParent(
