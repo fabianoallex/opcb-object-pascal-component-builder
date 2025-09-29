@@ -23,19 +23,13 @@ type
 
   { TButtonBuilderHelper }
 
-  { TFontSizeSetup }
-
-  TFontSizeSetup = class
+  TFontSizeSetup = class(specialize TPropertySetup<Integer>)
   public
-    Size: Integer;
-    procedure Apply(AControl: TControl);
+    procedure Apply(AControl: TControl); override;
   end;
 
-  { TButtonVisibleSetup }
-
-  TButtonVisibleSetup = class
-    Visible: Boolean;
-    procedure Apply(AControl: TControl);
+  TButtonVisibleSetup = class(specialize TPropertySetup<Boolean>)
+    procedure Apply(AControl: TControl); override;
   end;
 
   TButtonBuilderHelper = class helper for TButtonBuilder
@@ -67,7 +61,7 @@ begin
         .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 2').WithEnabled(False))
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 4'))
+        .AddControl(TButtonBuilder.Create.WithCaption('Teste 4').WithFontSize(20))
       .GridFinish
     ;
   finally
@@ -79,7 +73,7 @@ end;
 
 procedure TFontSizeSetup.Apply(AControl: TControl);
 begin
-  TButton(AControl).Font.Size := Size;
+  TButton(AControl).Font.Size := Self.FValue;
   Self.Free;
 end;
 
@@ -87,36 +81,22 @@ end;
 
 procedure TButtonVisibleSetup.Apply(AControl: TControl);
 begin
-  TButton(AControl).Visible := Visible;
+  TButton(AControl).Visible := FValue;
   Self.Free;
 end;
 
 { TButtonBuilderHelper }
 
 function TButtonBuilderHelper.WithFontSize(ASize: Integer): TButtonBuilder;
-var
-  FS: TFontSizeSetup;
 begin
-  // como no lazarus não temos opção de procedures anonimas
-  // é necessario criar uma classe e instanciar um objeto que
-  // guarde o valor da propriedade a ser setada
   Result := Self;
-  FS := TFontSizeSetup.Create;
-  FS.Size := ASize;
-  Setup(@FS.Apply);
+  with TFontSizeSetup.Create(ASize) do Setup(@Apply);
 end;
 
 function TButtonBuilderHelper.WithVisible(AVisible: Boolean): TButtonBuilder;
-var
-  SetupObj: TButtonVisibleSetup;
 begin
-  // como no lazarus não temos opção de procedures anonimas
-  // é necessario criar uma classe e instanciar um objeto que
-  // guarde o valor da propriedade a ser setada
   Result := Self;
-  SetupObj := TButtonVisibleSetup.Create;
-  SetupObj.Visible := AVisible;
-  Setup(@SetupObj.Apply);
+  with TButtonVisibleSetup.Create(AVisible) do Setup(@Apply);
 end;
 
 end.

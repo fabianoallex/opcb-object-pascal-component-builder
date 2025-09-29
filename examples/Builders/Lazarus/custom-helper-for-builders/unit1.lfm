@@ -2,16 +2,16 @@ object Form1: TForm1
   Left = 204
   Height = 240
   Top = 250
-  Width = 320
+  Width = 721
   Caption = 'Form1'
   ClientHeight = 240
-  ClientWidth = 320
+  ClientWidth = 721
   LCLVersion = '4.0.0.4'
   OnCreate = FormCreate
   object Button1: TButton
-    Left = 61
+    Left = 32
     Height = 25
-    Top = 98
+    Top = 176
     Width = 75
     Caption = 'Button1'
     ParentFont = False

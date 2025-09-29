@@ -139,6 +139,18 @@ type
     property OnClick: TNotifyEvent read FOnClick;
   end;
 
+
+  { TPropertySetup }
+
+  {$IFDEF FPC}generic{$ENDIF}
+  TPropertySetup<T> = class abstract
+  protected
+    FValue: T;
+  public
+    constructor Create(const AValue: T);
+    procedure Apply(AControl: TControl); virtual; abstract;
+  end;
+
   TPendingProp = record
     PropName: string;
     Value: TValue;
@@ -4399,6 +4411,13 @@ function TMenuItemBuilder.WithName(AName: string): TMenuItemBuilder;
 begin
   Result := Self;
   FName := AName;
+end;
+
+{ TPropertySetup }
+
+constructor TPropertySetup.Create(const AValue: T);
+begin
+  FValue := AValue;
 end;
 
 initialization
