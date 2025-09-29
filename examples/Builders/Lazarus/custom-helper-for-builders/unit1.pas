@@ -5,7 +5,7 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, OPCB,
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Menus, OPCB,
   OPCB.Builders;
 
 type
@@ -34,8 +34,9 @@ type
 
   TButtonBuilderHelper = class helper for TButtonBuilder
   public
-    function WithFontSize(ASize: Integer): TButtonBuilder;
-    function WithVisible(AVisible: Boolean): TButtonBuilder;
+    function WithFontSize(ASize: Integer): TButtonBuilder;    // usa classe auxiliar + setup
+    function WithVisible(AVisible: Boolean): TButtonBuilder;  // usa classe auxiliar + setup
+    function WithCursor(ACursor: Integer): TButtonBuilder;    // usa RTTI: recomendação. criar teste unitário para esse método.
   end;
 
 var
@@ -58,10 +59,10 @@ begin
       .WithOwnerAndParent(Self, Self)
       .GridInit(2, 2)
         .GridSetCellWidthAndHeight(250, 60)
-        .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))
+        .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // helper method: class + setup
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 2').WithEnabled(False))
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 4').WithFontSize(20))
+        .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // helper method: class + setup
+        .AddControl(TButtonBuilder.Create.WithCaption('Teste 4').WithCursor(crHandPoint))     // helper method: RTTI
       .GridFinish
     ;
   finally
@@ -97,6 +98,11 @@ function TButtonBuilderHelper.WithVisible(AVisible: Boolean): TButtonBuilder;
 begin
   Result := Self;
   with TButtonVisibleSetup.Create(AVisible) do Setup(@Apply);
+end;
+
+function TButtonBuilderHelper.WithCursor(ACursor: Integer): TButtonBuilder;
+begin
+  Result := Self.WithProp('Cursor', ACursor);
 end;
 
 end.

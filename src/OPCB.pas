@@ -153,7 +153,9 @@ type
 
   TPendingProp = record
     PropName: string;
+    IsObject: Boolean;
     Value: TValue;
+    Obj: TObject;
   end;
 
   TPendingPropList = {$IFDEF FPC}specialize{$ENDIF} TList<TPendingProp>;
@@ -199,8 +201,7 @@ type
   {$IFDEF FPC}generic{$ENDIF}
   TControlBuilderBase<TSelf: class> = class(TCustomControlBuilder)
   private
-    procedure ApplyPropPath(Instance: TObject; const PropPath: string;
-      const Value: TValue);
+    procedure ApplyPropPath(Instance: TObject; AProp: TPendingProp);
   protected
     procedure ApplyPendindProps(AControl: TControl);
   public
@@ -225,7 +226,10 @@ type
     function WithCaption(ACaption: string): TSelf;
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
-    function WithProp(const APropName: string; const AValue: TValue): TSelf;
+    function WithProp(const APropName: string; const AValue: TValue): TSelf; overload;
+    {$IFDEF FPC}
+    function WithProp(const APropName: string; AObj: TObject): TSelf; overload;
+    {$ENDIF}
     function Build(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl; override;
   end;
@@ -907,7 +911,6 @@ begin
         RefProc(Result);
 
     ApplyPendindProps(Result);
-
   finally
     Free;
   end;
@@ -936,7 +939,8 @@ begin
   FSetupRefProcList.Add(AProc);
 end;
 
-procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPropPath(Instance: TObject; const PropPath: string; const Value: TValue);
+//procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPropPath(Instance: TObject; const PropPath: string; const Value: TValue);
+procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPropPath(Instance: TObject; AProp: TPendingProp);
 var
   Context: TRttiContext;
   RType: TRttiType;
@@ -950,7 +954,7 @@ begin
   try
     Parts.Delimiter := '.';
     Parts.StrictDelimiter := True;
-    Parts.DelimitedText := PropPath;
+    Parts.DelimitedText := Aprop.PropName;
 
     Context := TRttiContext.Create;
     for i := 0 to Parts.Count - 1 do
@@ -962,16 +966,19 @@ begin
 
       if i < Parts.Count - 1 then
       begin
-        // desce um nível
         CurrentObj := RProp.GetValue(CurrentObj).AsObject;
         if not Assigned(CurrentObj) then
           Exit;
       end
       else
       begin
-        // último nível → aplica valor
         if RProp.IsWritable then
-          RProp.SetValue(CurrentObj, Value);
+        begin
+          if AProp.IsObject then
+            SetObjectProp(CurrentObj, RProp.Name, AProp.Obj)
+          else
+            RProp.SetValue(CurrentObj, AProp.Value);
+        end;
       end;
     end;
   finally
@@ -982,25 +989,12 @@ end;
 procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPendindProps(AControl: TControl);
 var
   Prop: TPendingProp;
-  //Context: TRttiContext;
-  //RType: TRttiType;
-  //RProp: TRttiProperty;
 begin
   if not Assigned(FPendingProps) then
     Exit;
 
   for Prop in FPendingProps do
-    ApplyPropPath(AControl, Prop.PropName, Prop.Value);
-  {
-  Context := TRttiContext.Create;  // record
-  RType := Context.GetType(AControl.ClassType);
-  for Prop in FPendingProps do
-  begin
-    RProp := RType.GetProperty(Prop.PropName);
-    if Assigned(RProp) and RProp.IsWritable then
-      RProp.SetValue(AControl, Prop.Value);
-  end;
-  }
+    ApplyPropPath(AControl, Prop);
 end;
 
 function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Assign(out Reference): TSelf;
@@ -1057,29 +1051,30 @@ begin
     FPendingProps := TPendingPropList.Create;
 
   P.PropName := APropName;
+  P.IsObject := False;
   P.Value := AValue;
   FPendingProps.Add(P);
 end;
-  {
+
+// método especifico para lazarus para dar compatibilidade com
+// atribuições de objetos.
+{$IFDEF FPC}
+function TControlBuilderBase.WithProp(
+  const APropName: string; AObj: TObject): TSelf;
 var
-  ctx: TRttiContext;
-  rType: TRttiType;
-  prop: TRttiProperty;
+  P: TPendingProp;
 begin
   Result := TSelf(Self);
 
-  ctx := TRttiContext.Create;
-  try
-    rType := ctx.GetType(FControlClass);
-    prop := rType.GetProperty(APropName);
+  if not Assigned(FPendingProps) then
+    FPendingProps := TPendingPropList.Create;
 
-    if Assigned(prop) and prop.IsWritable then
-      prop.SetValue(FControl, AValue);
-  finally
-    ctx.Free;
-  end;
+  P.PropName := APropName;
+  P.IsObject := True;
+  P.Obj := AObj;
+  FPendingProps.Add(P);
 end;
-}
+{$ENDIF}
 
 function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TControlSetupProcObj): TSelf;
 begin
@@ -4415,7 +4410,7 @@ end;
 
 { TPropertySetup }
 
-constructor TPropertySetup.Create(const AValue: T);
+constructor TPropertySetup{$IFNDEF FPC}<T>{$ENDIF}.Create(const AValue: T);
 begin
   FValue := AValue;
 end;

@@ -4,11 +4,11 @@ interface
 
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, OPCB, OPCB.Builders, Vcl.StdCtrls;
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, OPCB, OPCB.Builders, Vcl.StdCtrls,
+  Vcl.Menus;
 
 type
   TForm1 = class(TForm)
-    Button1: TButton;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
@@ -20,6 +20,7 @@ type
   public
     function WithFontSize(ASize: Integer): TButtonBuilder;
     function WithVisible(AVisible: Boolean): TButtonBuilder;
+    function WithCursor(ACursor: Integer): TButtonBuilder;    // usa RTTI: recomendação. criar teste unitário para esse método.
   end;
 
 var
@@ -27,8 +28,6 @@ var
 
 implementation
 
-uses
-  RTTI;
 
 {$R *.dfm}
 
@@ -43,10 +42,10 @@ begin
       .WithOwnerAndParent(Self, Self)
       .GridInit(2, 2)
         .GridSetCellWidthAndHeight(250, 60)
-        .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))
+        .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // metodo definido no helper
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 2').WithEnabled(False))
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 4').WithProp('Font.Size', 22))
+        .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // metodo definido no helper
+        .AddControl(TButtonBuilder.Create.WithCaption('Test 4').WithCursor(crHandPoint))      // medoto definido no helper (com rtti)
       .GridFinish
     ;
   finally
@@ -55,6 +54,11 @@ begin
 end;
 
 { TButtonBuilderHelper }
+
+function TButtonBuilderHelper.WithCursor(ACursor: Integer): TButtonBuilder;
+begin
+  Result := Self.WithProp('Cursor', ACursor);
+end;
 
 function TButtonBuilderHelper.WithFontSize(ASize: Integer): TButtonBuilder;
 begin

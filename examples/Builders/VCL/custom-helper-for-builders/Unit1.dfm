@@ -12,13 +12,4 @@ object Form1: TForm1
   Font.Style = []
   OnCreate = FormCreate
   TextHeight = 15
-  object Button1: TButton
-    Left = 96
-    Top = 312
-    Width = 175
-    Height = 65
-    Caption = 'Button1'
-    Style = bsCommandLink
-    TabOrder = 0
-  end
 end
