@@ -4,6 +4,17 @@ object Form1: TForm1
   Top = 250
   Width = 320
   Caption = 'Form1'
+  ClientHeight = 240
+  ClientWidth = 320
   LCLVersion = '4.0.0.4'
   OnCreate = FormCreate
+  object Button1: TButton
+    Left = 61
+    Height = 25
+    Top = 98
+    Width = 75
+    Caption = 'Button1'
+    ParentFont = False
+    TabOrder = 0
+  end
 end

@@ -8,6 +8,7 @@ uses
 
 type
   TForm1 = class(TForm)
+    Button1: TButton;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
@@ -26,6 +27,9 @@ var
 
 implementation
 
+uses
+  RTTI;
+
 {$R *.dfm}
 
 procedure TForm1.FormCreate(Sender: TObject);
@@ -42,7 +46,7 @@ begin
         .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 2').WithEnabled(False))
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 4'))
+        .AddControl(TButtonBuilder.Create.WithCaption('Teste 4').WithProp('Font.Size', 22))
       .GridFinish
     ;
   finally

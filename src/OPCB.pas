@@ -16,7 +16,8 @@ uses
     Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, Types,
     {$ENDIF}
   {$ENDIF}
-  Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults, OPCB.Optionals;
+  Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults, RTTI, TypInfo,
+  OPCB.Optionals;
 
 type
   {$IFNDEF FPC}
@@ -138,6 +139,13 @@ type
     property OnClick: TNotifyEvent read FOnClick;
   end;
 
+  TPendingProp = record
+    PropName: string;
+    Value: TValue;
+  end;
+
+  TPendingPropList = {$IFDEF FPC}specialize{$ENDIF} TList<TPendingProp>;
+
   { TCustomControlBuilder }
 
   TCustomControlBuilder = class abstract
@@ -146,6 +154,7 @@ type
     FControlClass: TControlClass;
     FSetupProcList: TControlSetupProcObjList;
     FSetupRefProcList: TControlSetupRefProcList;
+    FPendingProps: TPendingPropList;
     FName: string;
     FTag: NativeInt;
     FCaption: TOptionalString;
@@ -177,6 +186,11 @@ type
 
   {$IFDEF FPC}generic{$ENDIF}
   TControlBuilderBase<TSelf: class> = class(TCustomControlBuilder)
+  private
+    procedure ApplyPropPath(Instance: TObject; const PropPath: string;
+      const Value: TValue);
+  protected
+    procedure ApplyPendindProps(AControl: TControl);
   public
     constructor Create(AControl: TControl); overload;
     constructor Create(AClass: TControlClass; const AName: string=''); overload;
@@ -199,6 +213,7 @@ type
     function WithCaption(ACaption: string): TSelf;
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
+    function WithProp(const APropName: string; const AValue: TValue): TSelf;
     function Build(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl; override;
   end;
@@ -750,6 +765,7 @@ begin
   FLeft := TOptionalSingle.None;
   FSetupProcList := nil;
   FSetupRefProcList := nil;
+  FPendingProps := nil;
   FOnClick := nil;
   FTargetField := nil;
 end;
@@ -783,6 +799,7 @@ begin
   FLeft := TOptionalSingle.None;
   FSetupProcList := nil;
   FSetupRefProcList := nil;
+  FPendingProps := nil;
   FOnClick := nil;
   FTargetField := nil;
 end;
@@ -813,7 +830,11 @@ begin
       if Result is TTextControl then
         TTextControl(Result).Text := Caption.Value;
       {$ELSE}
+        {$IFDEF FPC}
         Result.Caption := Caption.Value;
+        {$ELSE}
+        TProtectedControl(Result).Caption := Caption.Value;
+        {$ENDIF}
       {$ENDIF}
     end;
 
@@ -872,6 +893,9 @@ begin
     if Assigned(FSetupRefProcList) then
       for RefProc in FSetupRefProcList do
         RefProc(Result);
+
+    ApplyPendindProps(Result);
+
   finally
     Free;
   end;
@@ -883,6 +907,8 @@ begin
     FSetupProcList.Free;
   if Assigned(FSetupRefProcList) then
     FSetupRefProcList.Free;
+  if Assigned(FPendingProps) then
+    FPendingProps.Free;
   inherited;
 end;
 
@@ -896,6 +922,73 @@ begin
   if not Assigned(FSetupRefProcList) then
     FSetupRefProcList := TControlSetupRefProcList.Create;
   FSetupRefProcList.Add(AProc);
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPropPath(Instance: TObject; const PropPath: string; const Value: TValue);
+var
+  Context: TRttiContext;
+  RType: TRttiType;
+  RProp: TRttiProperty;
+  Parts: TStringList;
+  i: Integer;
+  CurrentObj: TObject;
+begin
+  CurrentObj := Instance;
+  Parts := TStringList.Create;
+  try
+    Parts.Delimiter := '.';
+    Parts.StrictDelimiter := True;
+    Parts.DelimitedText := PropPath;
+
+    Context := TRttiContext.Create;
+    for i := 0 to Parts.Count - 1 do
+    begin
+      RType := Context.GetType(CurrentObj.ClassType);
+      RProp := RType.GetProperty(Parts[i]);
+      if not Assigned(RProp) then
+        Exit;
+
+      if i < Parts.Count - 1 then
+      begin
+        // desce um nível
+        CurrentObj := RProp.GetValue(CurrentObj).AsObject;
+        if not Assigned(CurrentObj) then
+          Exit;
+      end
+      else
+      begin
+        // último nível → aplica valor
+        if RProp.IsWritable then
+          RProp.SetValue(CurrentObj, Value);
+      end;
+    end;
+  finally
+    Parts.Free;
+  end;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPendindProps(AControl: TControl);
+var
+  Prop: TPendingProp;
+  //Context: TRttiContext;
+  //RType: TRttiType;
+  //RProp: TRttiProperty;
+begin
+  if not Assigned(FPendingProps) then
+    Exit;
+
+  for Prop in FPendingProps do
+    ApplyPropPath(AControl, Prop.PropName, Prop.Value);
+  {
+  Context := TRttiContext.Create;  // record
+  RType := Context.GetType(AControl.ClassType);
+  for Prop in FPendingProps do
+  begin
+    RProp := RType.GetProperty(Prop.PropName);
+    if Assigned(RProp) and RProp.IsWritable then
+      RProp.SetValue(AControl, Prop.Value);
+  end;
+  }
 end;
 
 function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Assign(out Reference): TSelf;
@@ -940,6 +1033,41 @@ begin
   Result := TSelf(Self);
   FOnClick := AOnClick;
 end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithProp(const APropName: string;
+  const AValue: TValue): TSelf;
+var
+  P: TPendingProp;
+begin
+  Result := TSelf(Self);
+
+  if not Assigned(FPendingProps) then
+    FPendingProps := TPendingPropList.Create;
+
+  P.PropName := APropName;
+  P.Value := AValue;
+  FPendingProps.Add(P);
+end;
+  {
+var
+  ctx: TRttiContext;
+  rType: TRttiType;
+  prop: TRttiProperty;
+begin
+  Result := TSelf(Self);
+
+  ctx := TRttiContext.Create;
+  try
+    rType := ctx.GetType(FControlClass);
+    prop := rType.GetProperty(APropName);
+
+    if Assigned(prop) and prop.IsWritable then
+      prop.SetValue(FControl, AValue);
+  finally
+    ctx.Free;
+  end;
+end;
+}
 
 function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TControlSetupProcObj): TSelf;
 begin
