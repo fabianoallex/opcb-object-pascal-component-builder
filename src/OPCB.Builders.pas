@@ -30,8 +30,8 @@ type
     constructor Create(AClass: TButtonClass; out Reference); overload;
     function WithModalResult(AModalResult: Integer): TButtonBuilder;
     function WithEnabled(AEnabled: Boolean): TButtonBuilder;
-    function Build(AOwner: TComponent; AParent: TWinControl;
-      const AControlName: string): TControl; override;
+    // function Build(AOwner: TComponent; AParent: TWinControl; const AControlName: string): TControl; override;
+    function Build: TControl; override;
   end;
 
 implementation
@@ -71,10 +71,11 @@ begin
   FModalResult := AModalResult;
 end;
 
-function TButtonBuilder.Build(AOwner: TComponent; AParent: TWinControl;
-  const AControlName: string): TControl;
+// function TButtonBuilder.Build(AOwner: TComponent; AParent: TWinControl; const AControlName: string): TControl;
+function TButtonBuilder.Build: TControl;
 begin
-  Result := inherited Build(AOwner, AParent, AControlName);
+  Result := inherited Build; //(AOwner, AParent, AControlName);
+
   (Result as TButton).ModalResult := FModalResult;
   if FEnabled.HasValue then
     (Result as TButton).Enabled := FEnabled.Value;
