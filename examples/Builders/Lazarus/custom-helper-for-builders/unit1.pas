@@ -5,15 +5,14 @@ unit Unit1;
 interface
 
 uses
-  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Menus, OPCB,
-  OPCB.Builders;
+  Classes, SysUtils, Forms, Controls, Graphics, Dialogs, StdCtrls, Menus,
+  ExtCtrls, OPCB, OPCB.Builders;
 
 type
 
   { TForm1 }
 
   TForm1 = class(TForm)
-    Button1: TButton;
     procedure FormCreate(Sender: TObject);
   private
 
@@ -39,10 +38,19 @@ type
     function WithCursor(ACursor: Integer): TButtonBuilder;    // usa RTTI: recomendação. criar teste unitário para esse método.
   end;
 
+  { TControlBuilderHelper }
+
+  TControlBuilderHelper = class helper for TControlBuilder
+    function WithBorderStyle(ABorderStyle: TBorderStyle): TControlBuilder;
+  end;
+
 var
   Form1: TForm1;
 
 implementation
+
+uses
+  RTTI;
 
 {$R *.lfm}
 
@@ -57,12 +65,14 @@ begin
   try
     Creator
       .WithOwnerAndParent(Self, Self)
-      .GridInit(2, 2)
+      .GridInit(4, 4)
         .GridSetCellWidthAndHeight(250, 60)
         .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // helper method: class + setup
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 2').WithEnabled(False))
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // helper method: class + setup
         .AddControl(TButtonBuilder.Create.WithCaption('Teste 4').WithCursor(crHandPoint))     // helper method: RTTI
+
+        .AddControl(TControlBuilder.Create(TPanel).WithBorderStyle(bsSingle))
       .GridFinish
     ;
   finally
@@ -103,6 +113,17 @@ end;
 function TButtonBuilderHelper.WithCursor(ACursor: Integer): TButtonBuilder;
 begin
   Result := Self.WithProp('Cursor', ACursor);
+end;
+
+{ TControlBuilderHelper }
+
+function TControlBuilderHelper.WithBorderStyle(ABorderStyle: TBorderStyle
+  ): TControlBuilder;
+begin
+  Result := Self.WithProp(
+    'BorderStyle',
+    TValue.specialize From<TBorderStyle>(ABorderStyle)
+  );
 end;
 
 end.

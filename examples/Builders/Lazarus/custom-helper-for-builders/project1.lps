@@ -21,26 +21,26 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="72"/>
-        <CursorPos Y="109"/>
+        <TopLine Value="93"/>
+        <CursorPos X="3" Y="126"/>
         <UsageCount Value="20"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="947"/>
-        <CursorPos X="26" Y="977"/>
+        <TopLine Value="4544"/>
+        <CursorPos X="51" Y="4570"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\..\src\OPCB.Builders.pas"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="3"/>
-        <CursorPos X="3" Y="22"/>
+        <TopLine Value="15"/>
+        <CursorPos X="14" Y="33"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
@@ -64,89 +64,13 @@
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-objpas\src\inc\rtti.pp"/>
         <UnitName Value="Rtti"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="98"/>
-        <CursorPos X="3" Y="105"/>
+        <TopLine Value="100"/>
+        <CursorPos X="28" Y="119"/>
         <UsageCount Value="10"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="941" Column="90" TopLine="921"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="229" Column="18" TopLine="200"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="1068" Column="5" TopLine="1041"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="204" Column="21" TopLine="190"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="975" TopLine="956"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="978" TopLine="956"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="69" Column="66" TopLine="48"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="68" Column="66" TopLine="47"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="67" Column="66" TopLine="46"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="66" Column="66" TopLine="45"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="65" Column="66" TopLine="44"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="64" Column="66" TopLine="43"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="63" Column="66" TopLine="42"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="37" Column="24" TopLine="33"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="97" Column="3" TopLine="65"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="37" Column="14" TopLine="25"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="97" Column="3" TopLine="65"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="36" Column="14" TopLine="18"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="91" Column="3" TopLine="65"/>
-      </Position>
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="37" Column="14" TopLine="17"/>
@@ -190,6 +114,82 @@
       <Position>
         <Filename Value="unit1.pas"/>
         <Caret Line="49" Column="75" TopLine="28"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="39" Column="19" TopLine="27"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.Builders.pas"/>
+        <Caret Line="33" Column="16" TopLine="19"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.Builders.pas"/>
+        <Caret Line="77" Column="3" TopLine="46"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="45" Column="7" TopLine="16"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="66" Column="21" TopLine="56"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="73" Column="45" TopLine="54"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="74" Column="45" TopLine="55"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="55" Column="8" TopLine="38"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="126" Column="3" TopLine="92"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="230" Column="14" TopLine="212"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="1066" Column="3" TopLine="1056"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="230" Column="25" TopLine="213"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="1061" Column="69" TopLine="1041"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="122" Column="57" TopLine="92"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="125" Column="63" TopLine="92"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="71" Column="71" TopLine="50"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="70" Column="71" TopLine="49"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="69" Column="71" TopLine="48"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="1061" Column="43" TopLine="1041"/>
       </Position>
     </JumpHistory>
     <RunParams>

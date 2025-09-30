@@ -11,13 +11,14 @@ uses
   {$IFDEF FPC}Controls, ExtCtrls, Menus,
   {$ELSE}
     {$IFDEF FRAMEWORK_FMX}
-    FMX.Controls, FMX.StdCtrls, Fmx.Types, FMX.ExtCtrls, FMX.TabControl, FMX.Forms, FMX.Menus, System.Types,
+    FMX.Controls, FMX.StdCtrls, Fmx.Types, FMX.ExtCtrls, FMX.TabControl,
+    FMX.Forms, FMX.Menus, System.Types,
     {$ELSE}
     Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, Types,
     {$ENDIF}
   {$ENDIF}
-  Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults, RTTI, TypInfo,
-  OPCB.Optionals;
+  Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults, RTTI,
+  TypInfo, OPCB.Optionals;
 
 type
   {$IFNDEF FPC}
@@ -32,113 +33,14 @@ type
   TWinControlClass = class of TWinControl;
   TMenuClass = class of TMenu;
   TMenuItemClass = class of TMenuItem;
+  TComponentSetupProcObj = procedure(AComponent: TComponent) of object;
+  TComponentSetupRefProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(AComponent: TComponent);
+  TMenuSetupProcObj = procedure(AMenu: TMenu) of object;
+  TMenuSetupRefProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(AMenu: TMenu);
+  TMenuItemSetupProcObj = procedure(AMenuItem: TMenuItem) of object;
+  TMenuItemSetupRefProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(AMenuItem: TMenuItem);
   TControlSetupProcObj = procedure(AControl: TControl) of object;
   TControlSetupRefProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(AControl: TControl);
-  TComponentSetupProcObj = procedure(AComponent: TComponent) of object;
-  TWinControlSetupProcObj = procedure(AWinControl: TWinControl) of object;
-  TMenuSetupProcObj = procedure(AMenu: TMenu) of object;
-  TMenuItemSetupProcObj = procedure(AMenuItem: TMenuItem) of object;
-
-  TControlSetupProcObjList = {$IFDEF FPC}specialize{$ENDIF} TList<TControlSetupProcObj>;
-  TControlSetupRefProcList = {$IFDEF FPC}specialize{$ENDIF} TList<TControlSetupRefProc>;
-
-  { TComponentBuilder }
-
-  TComponentBuilder = class
-  private
-    FComponent: TComponent;
-    FComponentClass: TComponentClass;
-    FSetupProc: TComponentSetupProcObj;
-    FName: string;
-    FTag: NativeInt;
-    FTargetField: Pointer;
-  public
-    constructor Create(AComponent: TComponent); overload;
-    constructor Create(AClass: TComponentClass; const AName: string=''); overload;
-    constructor Create(AClass: TComponentClass; const AName: string; out Reference); overload;
-    constructor Create(AComponentClass: TComponentClass; out Reference); overload;
-    function Assign(out Reference): TComponentBuilder; overload;
-    function Setup(AProc: TComponentSetupProcObj): TComponentBuilder;
-    function WithName(AName: string): TComponentBuilder;
-    function WithTag(ATag: NativeInt): TComponentBuilder;
-    function Build(AOwner: TComponent; const AComponentName: string): TComponent;
-    property Component: TComponent read FComponent;
-    property ComponentClass: TComponentClass read FComponentClass;
-    property SetupProc: TComponentSetupProcObj read FSetupProc;
-    property Name: string read FName;
-  end;
-
-  TComponentBuilderArray = array of TComponentBuilder;
-
-  TComponentBuilderHelper = class helper for TComponentBuilder
-    class function CreateArray(AClass: TComponentClass;
-      const ANames: array of string): TComponentBuilderArray; overload; static;
-  end;
-
-  { TMenuBuilder }
-
-  TMenuBuilder = class
-  private
-    FMenu: TMenu;
-    FMenuClass: TMenuClass;
-    FSetupProc: TMenuSetupProcObj;
-    FName: string;
-    FTag: NativeInt;
-    FTargetField: Pointer;
-  public
-    constructor Create(AMenu: TMenu); overload;
-    constructor Create(AClass: TMenuClass; const AName: string=''); overload;
-    constructor Create(AClass: TMenuClass; const AName: string; out Reference); overload;
-    constructor Create(AClass: TMenuClass; out Reference); overload;
-    function Assign(out Reference): TMenuBuilder; overload;
-    function Setup(AProc: TMenuSetupProcObj): TMenuBuilder;
-    function WithName(AName: string): TMenuBuilder;
-    function WithTag(ATag: NativeInt): TMenuBuilder;
-    function Build(AOwner: TComponent; const AMenuName: string): TMenu;
-    property Menu: TMenu read FMenu;
-    property MenuClass: TMenuClass read FMenuClass;
-    property SetupProc: TMenuSetupProcObj read FSetupProc;
-    property Name: string read FName;
-    property TargetField: Pointer read FTargetField;
-  end;
-
-  { TMenuItemBuilder }
-
-  TMenuItemBuilder = class
-  private
-    FMenuItem: TMenuItem;
-    FMenuItemClass: TMenuItemClass;
-    FOnClick: TNotifyEvent;
-    FSetupProc: TMenuItemSetupProcObj;
-    FName: string;
-    FTag: NativeInt;
-    FCaption: TOptionalString;
-    FImageIndex: TOptionalInteger;
-    FTargetField: Pointer;
-  public
-    constructor Create(AMenuItem: TMenuItem); overload;
-    constructor Create(AClass: TMenuItemClass; const AName: string=''); overload;
-    constructor Create(AClass: TMenuItemClass; const AName: string; out Reference); overload;
-    constructor Create(AClass: TMenuItemClass; out Reference); overload;
-    constructor Create; overload;
-    constructor Create(out Reference); overload;
-    function Assign(out Reference): TMenuItemBuilder; overload;
-    function Setup(AProc: TMenuItemSetupProcObj): TMenuItemBuilder;
-    function WithName(AName: string): TMenuItemBuilder;
-    function WithTag(ATag: NativeInt): TMenuItemBuilder;
-    function WithCaption(ACaption: string): TMenuItemBuilder;
-    function WithImageIndex(AImageIndex: Integer): TMenuItemBuilder;
-    function WithOnClick(AOnClick: TNotifyEvent): TMenuItemBuilder;
-    function CreateMenuItem(AOwner: TComponent; const AMenuItemName: string): TMenuItem;
-    property MenuItem: TMenuItem read FMenuItem;
-    property MenuItemClass: TMenuItemClass read FMenuItemClass;
-    property SetupProc: TMenuItemSetupProcObj read FSetupProc;
-    property Name: string read FName;
-    property Caption: TOptionalString read FCaption;
-    property ImageIndex: TOptionalInteger read FImageIndex;
-    property OnClick: TNotifyEvent read FOnClick;
-  end;
-
 
   { TPropertySetup }
 
@@ -160,17 +62,162 @@ type
 
   TPendingPropList = {$IFDEF FPC}specialize{$ENDIF} TList<TPendingProp>;
 
-  { TCustomControlBuilder }
-
-  TCustomControlBuilder = class abstract
+  {$IFDEF FPC}generic{$ENDIF}
+  TObjectBuilderBase<TClass, TSetupProcObj, TSetupRefProc> = class abstract
+  type
+    TSetupProcObjList = {$IFDEF FPC}specialize{$ENDIF}TList<TSetupProcObj>;
+    TSetupRefProcList = {$IFDEF FPC}specialize{$ENDIF}TList<TSetupRefProc>;
   protected
-    FControl: TControl;
-    FControlClass: TControlClass;
-    FSetupProcList: TControlSetupProcObjList;
-    FSetupRefProcList: TControlSetupRefProcList;
+    FObjectClass: TClass;
+    FTargetField: Pointer;
+    FSetupProcList: TSetupProcObjList;
+    FSetupRefProcList: TSetupRefProcList;
     FPendingProps: TPendingPropList;
     FName: string;
     FTag: NativeInt;
+    procedure ApplyPropPath(Instance: TObject; AProp: TPendingProp);
+    procedure ApplyPendindProps(Instance: TObject);
+    procedure SetupProc(AProcObj: TSetupProcObj); overload;
+    procedure SetupProc(ARefProc: TSetupRefProc); overload;
+    procedure SetupProc(const AProcs: array of TSetupProcObj);  overload;
+  public
+    destructor Destroy; override;
+    property Name: string read FName write FName;
+    property Tag: NativeInt read FTag write FTag;
+    property ObjectClass: TClass read FObjectClass;
+  end;
+
+  { TCustomComponentBuilder }
+
+  TCustomComponentBuilder = class abstract ({$IFDEF FPC}specialize{$ENDIF}
+    TObjectBuilderBase<TComponentClass, TComponentSetupProcObj, TComponentSetupRefProc>)
+  protected
+    FComponent: TComponent;
+  public
+    function Build(AOwner: TComponent; const AComponentName: string): TComponent; virtual; abstract;
+    property Component: TComponent read FComponent;
+  end;
+
+  { TComponentBuilderBase }
+
+  {$IFDEF FPC}generic{$ENDIF}
+  TComponentBuilderBase<TSelf: class> = class(TCustomComponentBuilder)
+  protected
+  public
+    constructor Create(AComponent: TComponent); overload;
+    constructor Create(AClass: TComponentClass; const AName: string=''); overload;
+    constructor Create(AClass: TComponentClass; const AName: string; out Reference); overload;
+    constructor Create(AComponentClass: TComponentClass; out Reference); overload;
+    function Assign(out Reference): TSelf; overload;
+    function Setup(AProc: TComponentSetupProcObj): TSelf; overload;
+    function Setup(AProc: TComponentSetupRefProc): TSelf; overload;
+    function Setup(const AProcs: array of TComponentSetupProcObj): TSelf;  overload;
+    function WithName(AName: string): TSelf;
+    function WithTag(ATag: NativeInt): TSelf;
+    function Build(AOwner: TComponent; const AComponentName: string): TComponent; override;
+    property Component: TComponent read FComponent;
+  end;
+
+  { TComponentBuilder }
+
+  TComponentBuilder = class;
+  TComponentBuilder =
+    class({$IFDEF FPC}specialize{$ENDIF} TComponentBuilderBase<TComponentBuilder>)
+  end;
+
+  TComponentBuilderArray = array of TComponentBuilder;
+
+  TComponentBuilderHelper = class helper for TComponentBuilder
+    class function CreateArray(AClass: TComponentClass;
+      const ANames: array of string): TComponentBuilderArray; overload; static;
+  end;
+
+  { TCustomMenuBuilder }
+
+  TCustomMenuBuilder = class abstract ({$IFDEF FPC}specialize{$ENDIF}
+    TObjectBuilderBase<TMenuClass, TMenuSetupProcObj, TMenuSetupRefProc>)
+  protected
+    FMenu: TMenu;
+  public
+    function Build(AOwner: TComponent; const AMenuName: string): TMenu; virtual; abstract;
+    property Menu: TMenu read FMenu;
+  end;
+
+  {$IFDEF FPC}generic{$ENDIF}
+  TMenuBuilderBase<TSelf: class> = class(TCustomMenuBuilder)
+  protected
+  public
+    constructor Create(AMenu: TMenu); overload;
+    constructor Create(AClass: TMenuClass; const AName: string=''); overload;
+    constructor Create(AClass: TMenuClass; const AName: string; out Reference); overload;
+    constructor Create(AClass: TMenuClass; out Reference); overload;
+    function Assign(out Reference): TSelf; overload;
+    function Setup(AProc: TMenuSetupProcObj): TSelf; overload;
+    function Setup(AProc: TMenuSetupRefProc): TSelf; overload;
+    function Setup(const AProcs: array of TMenuSetupProcObj): TSelf;  overload;
+    function WithName(AName: string): TSelf;
+    function WithTag(ATag: NativeInt): TSelf;
+    function Build(AOwner: TComponent; const AMenuName: string): TMenu; override;
+  end;
+
+  { TMenuBuilder }
+
+  TMenuBuilder = class;
+  TMenuBuilder =
+    class({$IFDEF FPC}specialize{$ENDIF} TMenuBuilderBase<TMenuBuilder>)
+  end;
+
+  TCustomMenuItemBuilder = class abstract ({$IFDEF FPC}specialize{$ENDIF}
+    TObjectBuilderBase<TMenuItemClass, TMenuItemSetupProcObj, TMenuItemSetupRefProc>)
+  protected
+    FMenuItem: TMenuItem;
+    FOnClick: TNotifyEvent;
+    FCaption: TOptionalString;
+    FImageIndex: TOptionalInteger;
+  public
+    function Build(AOwner: TComponent; const AMenuItemName: string): TMenuItem; virtual; abstract;
+    property MenuItem: TMenuItem read FMenuItem;
+    property Name: string read FName write FName;
+    property Caption: TOptionalString read FCaption write FCaption;
+    property ImageIndex: TOptionalInteger read FImageIndex write FImageIndex;
+    property OnClick: TNotifyEvent read FOnClick write FOnClick;
+  end;
+
+  {$IFDEF FPC}generic{$ENDIF}
+  TMenuItemBuilderBase<TSelf: class> = class(TCustomMenuItemBuilder)
+  protected
+  public
+    constructor Create(AMenuItem: TMenuItem); overload;
+    constructor Create(AClass: TMenuItemClass; const AName: string=''); overload;
+    constructor Create(AClass: TMenuItemClass; const AName: string; out Reference); overload;
+    constructor Create(AClass: TMenuItemClass; out Reference); overload;
+    constructor Create; overload;
+    constructor Create(out Reference); overload;
+    function Assign(out Reference): TSelf; overload;
+    function Setup(AProc: TMenuItemSetupProcObj): TSelf; overload;
+    function Setup(AProc: TMenuItemSetupRefProc): TSelf; overload;
+    function Setup(const AProcs: array of TMenuItemSetupProcObj): TSelf;  overload;
+    function WithName(AName: string): TSelf;
+    function WithTag(ATag: NativeInt): TSelf;
+    function WithCaption(ACaption: string): TSelf;
+    function WithImageIndex(AImageIndex: Integer): TSelf;
+    function WithOnClick(AOnClick: TNotifyEvent): TSelf;
+    function Build(AOwner: TComponent; const AMenuItemName: string): TMenuItem; override;
+  end;
+
+  { TMenuItemBuilder }
+
+  TMenuItemBuilder = class;
+  TMenuItemBuilder =
+    class({$IFDEF FPC}specialize{$ENDIF} TMenuItemBuilderBase<TMenuItemBuilder>)
+  end;
+
+  { TCustomControlBuilder }
+
+  TCustomControlBuilder = class abstract ({$IFDEF FPC}specialize{$ENDIF}
+    TObjectBuilderBase<TControlClass, TControlSetupProcObj, TControlSetupRefProc>)
+  protected
+    FControl: TControl;
     FCaption: TOptionalString;
     FText: TOptionalString;
     FAlign: TOptionalAlign;
@@ -179,14 +226,11 @@ type
     FTop: TOptionalSingle;
     FLeft: TOptionalSingle;
     FOnClick: TNotifyEvent;
-    FTargetField: Pointer;
   public
     function Build(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl; virtual; abstract;
     property Control: TControl read FControl;
-    property ControlClass: TControlClass read FControlClass;
-    property Name: string read FName;
-    property Caption: TOptionalString read FCaption;
+    property Caption: TOptionalString read FCaption write FCaption;
     property Text: TOptionalString read FText write FText;
     property Align: TOptionalAlign read FAlign write FAlign;
     property Width: Single read FWidth write FWidth;
@@ -200,16 +244,12 @@ type
 
   {$IFDEF FPC}generic{$ENDIF}
   TControlBuilderBase<TSelf: class> = class(TCustomControlBuilder)
-  private
-    procedure ApplyPropPath(Instance: TObject; AProp: TPendingProp);
   protected
-    procedure ApplyPendindProps(AControl: TControl);
   public
     constructor Create(AControl: TControl); overload;
     constructor Create(AClass: TControlClass; const AName: string=''); overload;
     constructor Create(AClass: TControlClass; const AName: string; out Reference); overload;
     constructor Create(AClass: TControlClass; out Reference); overload;
-    destructor Destroy; override;
     function Assign(out Reference): TSelf;
     function Setup(AProc: TControlSetupRefProc): TSelf; overload;
     function Setup(AProc: TControlSetupProcObj): TSelf; overload;
@@ -227,9 +267,7 @@ type
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
     function WithProp(const APropName: string; const AValue: TValue): TSelf; overload;
-    {$IFDEF FPC}
-    function WithProp(const APropName: string; AObj: TObject): TSelf; overload;
-    {$ENDIF}
+    function WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;  // for lazarus
     function Build(AOwner: TComponent; AParent: TWinControl;
       const AControlName: string): TControl; override;
   end;
@@ -766,10 +804,11 @@ uses
 
 { TControlBuilder }
 
-constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TControlClass; const AName: string='');
+constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
+  AClass: TControlClass; const AName: string='');
 begin
   FControl := nil;
-  FControlClass := AClass;
+  FObjectClass := AClass;
   FName := AName;
   FTag := 0;
   FHeight := -1;
@@ -800,10 +839,11 @@ begin
   Assign(Reference);
 end;
 
-constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AControl: TControl);
+constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
+  AControl: TControl);
 begin
   FControl := AControl;
-  FControlClass := TControlClass(AControl.ClassType);
+  FObjectClass := TControlClass(AControl.ClassType);
   FName := AControl.Name;
   FTag := 0;
   FHeight := -1;
@@ -830,7 +870,7 @@ begin
     if Assigned(Control) then
       Result := Control
     else
-      Result := ControlClass.Create(AOwner);
+      Result := ObjectClass.Create(AOwner);
 
     if not AControlName.IsEmpty then
       Result.Name := AControlName;
@@ -916,88 +956,15 @@ begin
   end;
 end;
 
-destructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Destroy;
-begin
-  if Assigned(FSetupProcList) then
-    FSetupProcList.Free;
-  if Assigned(FSetupRefProcList) then
-    FSetupRefProcList.Free;
-  if Assigned(FPendingProps) then
-    FPendingProps.Free;
-  inherited;
-end;
-
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TControlSetupRefProc): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
+  AProc: TControlSetupRefProc): TSelf;
 begin
   Result := TSelf(Self);
-
-  if not Assigned(aproc) then
-    Exit;
-
-  if not Assigned(FSetupRefProcList) then
-    FSetupRefProcList := TControlSetupRefProcList.Create;
-  FSetupRefProcList.Add(AProc);
+  Self.SetupProc(AProc);
 end;
 
-//procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPropPath(Instance: TObject; const PropPath: string; const Value: TValue);
-procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPropPath(Instance: TObject; AProp: TPendingProp);
-var
-  Context: TRttiContext;
-  RType: TRttiType;
-  RProp: TRttiProperty;
-  Parts: TStringList;
-  i: Integer;
-  CurrentObj: TObject;
-begin
-  CurrentObj := Instance;
-  Parts := TStringList.Create;
-  try
-    Parts.Delimiter := '.';
-    Parts.StrictDelimiter := True;
-    Parts.DelimitedText := Aprop.PropName;
-
-    Context := TRttiContext.Create;
-    for i := 0 to Parts.Count - 1 do
-    begin
-      RType := Context.GetType(CurrentObj.ClassType);
-      RProp := RType.GetProperty(Parts[i]);
-      if not Assigned(RProp) then
-        Exit;
-
-      if i < Parts.Count - 1 then
-      begin
-        CurrentObj := RProp.GetValue(CurrentObj).AsObject;
-        if not Assigned(CurrentObj) then
-          Exit;
-      end
-      else
-      begin
-        if RProp.IsWritable then
-        begin
-          if AProp.IsObject then
-            SetObjectProp(CurrentObj, RProp.Name, AProp.Obj)
-          else
-            RProp.SetValue(CurrentObj, AProp.Value);
-        end;
-      end;
-    end;
-  finally
-    Parts.Free;
-  end;
-end;
-
-procedure TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.ApplyPendindProps(AControl: TControl);
-var
-  Prop: TPendingProp;
-begin
-  if not Assigned(FPendingProps) then
-    Exit;
-
-  for Prop in FPendingProps do
-    ApplyPropPath(AControl, Prop);
-end;
-
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Assign(out Reference): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Assign(
+  out Reference): TSelf;
 begin
   Result := TSelf(Self);
   FTargetField := @Reference;
@@ -1010,38 +977,43 @@ begin
   FAlign := AAlign;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithCaption(ACaption: string): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithCaption(
+  ACaption: string): TSelf;
 begin
   Result := TSelf(Self);
   FCaption := ACaption;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithHeight(AHeight: Single): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithHeight(
+  AHeight: Single): TSelf;
 begin
   Result := TSelf(Self);
   FHeight := AHeight;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithLeft(ALeft: Single): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithLeft(
+  ALeft: Single): TSelf;
 begin
   Result := TSelf(Self);
   FLeft := ALeft;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(AName: string): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(
+  AName: string): TSelf;
 begin
   Result := TSelf(Self);
   FName := AName;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithOnClick(AOnClick: TNotifyEvent): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithOnClick(
+  AOnClick: TNotifyEvent): TSelf;
 begin
   Result := TSelf(Self);
   FOnClick := AOnClick;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithProp(const APropName: string;
-  const AValue: TValue): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithProp(
+  const APropName: string; const AValue: TValue): TSelf;
 var
   P: TPendingProp;
 begin
@@ -1058,8 +1030,8 @@ end;
 
 // método especifico para lazarus para dar compatibilidade com
 // atribuições de objetos.
-{$IFDEF FPC}
-function TControlBuilderBase.WithProp(
+{ $IFDEF FPC}
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithPropObj(
   const APropName: string; AObj: TObject): TSelf;
 var
   P: TPendingProp;
@@ -1074,57 +1046,52 @@ begin
   P.Obj := AObj;
   FPendingProps.Add(P);
 end;
-{$ENDIF}
+{ $ENDIF}
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TControlSetupProcObj): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
+  AProc: TControlSetupProcObj): TSelf;
 begin
   Result := TSelf(Self);
-
-  if not Assigned(aproc) then
-    Exit;
-
-  if not Assigned(FSetupProcList) then
-    FSetupProcList := TControlSetupProcObjList.Create;
-  FSetupProcList.Add(AProc);
+  Self.SetupProc(AProc);
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(const AProcs: array of TControlSetupProcObj): TSelf;
-var
-  Proc: TControlSetupProcObj;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
+  const AProcs: array of TControlSetupProcObj): TSelf;
 begin
-  if not Assigned(FSetupProcList) then
-    FSetupProcList := TControlSetupProcObjList.Create;
-  for Proc in AProcs do
-    FSetupProcList.Add(Proc);
   Result := TSelf(Self);
+  Self.SetupProc(AProcs);
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(
+  ATag: NativeInt): TSelf;
 begin
   Result := TSelf(Self);
   FTag := ATag;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithText(AText: string): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithText(
+  AText: string): TSelf;
 begin
   Result := TSelf(Self);
   FText := AText;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTop(ATop: Single): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTop(
+  ATop: Single): TSelf;
 begin
   Result := TSelf(Self);
   FTop := ATop;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithWidth(AWidth: Single): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithWidth(
+  AWidth: Single): TSelf;
 begin
   Result := TSelf(Self);
   FWidth := AWidth;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithWidthAndHeight(AWidth: Single; AHeight: Single
-  ): TSelf;
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithWidthAndHeight(
+  AWidth: Single; AHeight: Single): TSelf;
 begin
   Result := TSelf(Self);
   FWidth := AWidth;
@@ -1142,7 +1109,8 @@ begin
   end
   else
   begin
-    CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + CurrentLevel.MaxControlHeight;
+    CurrentLevel.CurrentTop :=
+      CurrentLevel.CurrentTop + CurrentLevel.MaxControlHeight;
     CurrentLevel.CurrentLeft := CurrentLevel.InitialLeft;
     CurrentLevel.MaxControlHeight := 0;
   end;
@@ -1183,7 +1151,8 @@ begin
   end
   else
   begin
-    CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + CurrentLevel.MaxControlWidth;
+    CurrentLevel.CurrentLeft :=
+      CurrentLevel.CurrentLeft + CurrentLevel.MaxControlWidth;
     CurrentLevel.CurrentTop := CurrentLevel.InitialTop;
     CurrentLevel.MaxControlWidth := 0;
   end;
@@ -1360,7 +1329,8 @@ begin
   FLevelStack.Add(TControlCreatorLevel.Create);
 end;
 
-procedure TControlCreator.SetupControlBuilderForGridMode(AControlBuilder: TCustomControlBuilder);
+procedure TControlCreator.SetupControlBuilderForGridMode(
+  AControlBuilder: TCustomControlBuilder);
 var
   Row, Col: Integer;
   RowSpan, ColSpan: Integer;
@@ -1398,7 +1368,8 @@ begin
   CurrentLevel.GridMode.ResetSpans;
 end;
 
-function TControlCreator.CreateControl(Builder: TCustomControlBuilder; AOwner: TComponent = nil): TControl;
+function TControlCreator.CreateControl(Builder: TCustomControlBuilder;
+  AOwner: TComponent = nil): TControl;
 var
   ControlName: string;
 begin
@@ -1453,7 +1424,6 @@ var
       Result := True;
       Exit;
     end;
-
 
     if (CurrentLevel.GridMode.Direction = gfdRowFirst) and (gaeRows in CurrentLevel.GridMode.AutoExpand)
        or
@@ -1860,7 +1830,6 @@ begin
   FLevelStack.Delete(FLevelStack.Count - 1); // remove nível atual
   Result := Self;
 end;
-
 
 function TControlCreator.RecalcParentHeight(AExtraHeight: Single): TControlCreator;
 begin
@@ -2720,7 +2689,7 @@ begin
   Result := Self;
 
   IsTabChild :=
-    AControlBuilder.ControlClass.InheritsFrom(
+    AControlBuilder.ObjectClass.InheritsFrom(
       {$IFDEF FRAMEWORK_FMX}TTabItem{$ELSE}TTabSheet{$ENDIF}
     ) and
     (CurrentLevel.Parent is
@@ -2955,7 +2924,6 @@ begin
   end;
 end;
 
-
 procedure TGridMode.ExpandForSpan(ARow, ACol, ARowSpan, AColSpan: Integer);
 var
   RequiredRows, RequiredCols: Integer;
@@ -2972,7 +2940,6 @@ begin
   if (gaeCols in AutoExpand) and (RequiredCols > FCols) then
     FCols := RequiredCols;
 end;
-
 
 function TGridMode.Next: Boolean;
 var
@@ -3039,7 +3006,6 @@ begin
   end;
 end;
 
-
 function TGridMode.GetColOffset(ACol: Integer): Single;
 begin
   Result := 0;
@@ -3062,7 +3028,6 @@ begin
   end
   else
   begin
-
     MaxSpan := (FCols - CurrentCol);
 
     if FColSpan > MaxSpan then
@@ -3105,7 +3070,6 @@ begin
 
   ExpandForSpan(CurrentRow, CurrentCol, ARowSpan, AColSpan);
 
-
   if FDirection = gfdRowFirst then
     AdvanceSpan := AColSpan
   else
@@ -3134,10 +3098,9 @@ begin
   Result := True;
 end;
 
-
 function TGridMode.CalcSpanRect(ARow, ACol, ARowSpan, AColSpan: Integer;
-      AHorizontalSpace, AVerticalSpace: Single;
-      out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}): Boolean;
+  AHorizontalSpace, AVerticalSpace: Single;
+  out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}): Boolean;
 var
   W, H: Single;
   I: Integer;
@@ -3858,87 +3821,6 @@ begin
   FOwner := AOwner;
 end;
 
-{ TComponentBuilder }
-
-function TComponentBuilder.Build(AOwner: TComponent;
-  const AComponentName: string): TComponent;
-begin
-  try
-    if Assigned(Component) then
-      Result := Component
-    else
-      Result := ComponentClass.Create(AOwner);
-
-    if not AComponentName.IsEmpty then
-      Result.Name := AComponentName;
-
-    Result.Tag := FTag;
-
-    if Assigned(FTargetField) then
-      PPointer(FTargetField)^ := Result;
-
-    if Assigned(SetupProc) then
-      SetupProc(Result);
-  finally
-    Free;
-  end;
-end;
-
-constructor TComponentBuilder.Create(AClass: TComponentClass; const AName: string);
-begin
-  FComponent := nil;
-  FComponentClass := AClass;
-  FName := AName;
-  FTag := 0;
-  FSetupProc := nil;
-end;
-
-constructor TComponentBuilder.Create(AClass: TComponentClass; const AName: string;
-  out Reference);
-begin
-  Create(AClass, AName);
-  Assign(Reference);
-end;
-
-constructor TComponentBuilder.Create(AComponent: TComponent);
-begin
-  FComponent := AComponent;
-  FComponentClass := TComponentClass(AComponent.ClassType);
-  FName := AComponent.Name;
-  FTag := 0;
-  FSetupProc := nil;
-end;
-
-constructor TComponentBuilder.Create(AComponentClass: TComponentClass; out Reference);
-begin
-  Create(AComponentClass);
-  Assign(Reference);
-end;
-
-function TComponentBuilder.Assign(out Reference): TComponentBuilder;
-begin
-  Result := Self;
-  FTargetField := @Reference;
-end;
-
-function TComponentBuilder.Setup(AProc: TComponentSetupProcObj): TComponentBuilder;
-begin
-  Result := Self;
-  FSetupProc := AProc;
-end;
-
-function TComponentBuilder.WithName(AName: string): TComponentBuilder;
-begin
-  Result := Self;
-  FName := AName;
-end;
-
-function TComponentBuilder.WithTag(ATag: NativeInt): TComponentBuilder;
-begin
-  Result := Self;
-  FTag := ATag;
-end;
-
 { TRegistryNotifier }
 
 constructor TRegistryNotifier.Create(AOwner: TComponentRegistry);
@@ -4087,7 +3969,7 @@ begin
   MenuItemName := AMenuItemBuilder.Name;
   if not MenuItemName.IsEmpty then
     MenuItemName := Registry.UniqueName(AMenuItemBuilder.Name);
-  MenuItem := AMenuItemBuilder.CreateMenuItem(FOwner, MenuItemName);
+  MenuItem := AMenuItemBuilder.Build(FOwner, MenuItemName);
   Registry.AddComponent(MenuItem, MenuItem.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -4156,7 +4038,7 @@ begin
   MenuItemName := AMenuItemBuilder.Name;
   if not MenuItemName.IsEmpty then
     MenuItemName := Registry.UniqueName(AMenuItemBuilder.Name);
-  MenuItem := AMenuItemBuilder.CreateMenuItem(FOwner, MenuItemName);
+  MenuItem := AMenuItemBuilder.Build(FOwner, MenuItemName);
   Registry.AddComponent(MenuItem, MenuItem.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -4198,15 +4080,239 @@ begin
     AProc(Self);
 end;
 
-{ TMenuBuilder }
+{ TPropertySetup }
 
-function TMenuBuilder.Build(AOwner: TComponent; const AMenuName: string): TMenu;
+constructor TPropertySetup{$IFNDEF FPC}<T>{$ENDIF}.Create(const AValue: T);
+begin
+  FValue := AValue;
+end;
+
+{ TObjectBuilderBase }
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TClass, TSetupProcObj, TSetupRefProc>{$ENDIF}
+  .ApplyPendindProps(Instance: TObject);
+var
+  Prop: TPendingProp;
+begin
+  if not Assigned(FPendingProps) then
+    Exit;
+
+  for Prop in FPendingProps do
+    ApplyPropPath(Instance, Prop);
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TClass, TSetupProcObj, TSetupRefProc>{$ENDIF}
+  .ApplyPropPath(Instance: TObject; AProp: TPendingProp);
+var
+  Context: TRttiContext;
+  RType: TRttiType;
+  RProp: TRttiProperty;
+  Parts: TStringList;
+  i: Integer;
+  CurrentObj: TObject;
+begin
+  CurrentObj := Instance;
+  Parts := TStringList.Create;
+  try
+    Parts.Delimiter := '.';
+    Parts.StrictDelimiter := True;
+    Parts.DelimitedText := Aprop.PropName;
+
+    Context := TRttiContext.Create;
+    for i := 0 to Parts.Count - 1 do
+    begin
+      RType := Context.GetType(CurrentObj.ClassType);
+      RProp := RType.GetProperty(Parts[i]);
+      if not Assigned(RProp) then
+        Exit;
+
+      if i < Parts.Count - 1 then
+      begin
+        CurrentObj := RProp.GetValue(CurrentObj).AsObject;
+        if not Assigned(CurrentObj) then
+          Exit;
+      end
+      else
+      begin
+        if RProp.IsWritable then
+        begin
+          if AProp.IsObject then
+            SetObjectProp(CurrentObj, RProp.Name, AProp.Obj)
+          else
+            RProp.SetValue(CurrentObj, AProp.Value);
+        end;
+      end;
+    end;
+  finally
+    Parts.Free;
+  end;
+end;
+
+destructor TObjectBuilderBase{$IFNDEF FPC}<TClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Destroy;
+begin
+  if Assigned(FSetupProcList) then
+    FSetupProcList.Free;
+  if Assigned(FSetupRefProcList) then
+    FSetupRefProcList.Free;
+  if Assigned(FPendingProps) then
+    FPendingProps.Free;
+  inherited;
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.SetupProc(
+  AProcObj: TSetupProcObj);
+begin
+  if not Assigned(FSetupProcList) then
+    FSetupProcList := TSetupProcObjList.Create;
+  FSetupProcList.Add(AProcObj);
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.SetupProc(
+  ARefProc: TSetupRefProc);
+begin
+  if not Assigned(FSetupRefProcList) then
+    FSetupRefProcList := TSetupRefProcList.Create;
+  FSetupRefProcList.Add(ARefProc);
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.SetupProc(
+  const AProcs: array of TSetupProcObj);
+var
+  Proc: TSetupProcObj;
+begin
+  for Proc in AProcs do
+    SetupProc(Proc);
+end;
+
+{ TComponentBuilderBase<TSelf> }
+
+function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Assign(out Reference): TSelf;
+begin
+  Result := TSelf(Self);
+  FTargetField := @Reference;
+end;
+
+function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Build(AOwner: TComponent;
+  const AComponentName: string): TComponent;
+var
+  Proc: TComponentSetupProcObj;
+  RefProc: TComponentSetupRefProc;
+begin
+  try
+    if Assigned(Component) then
+      Result := Component
+    else
+      Result := ObjectClass.Create(AOwner); // ComponentClass.Create(AOwner);
+
+    if not AComponentName.IsEmpty then
+      Result.Name := AComponentName;
+
+    Result.Tag := FTag;
+
+    if Assigned(FTargetField) then
+      PPointer(FTargetField)^ := Result;
+
+    if Assigned(FSetupProcList) then
+      for Proc in FSetupProcList do
+        Proc(Result);
+
+    if Assigned(FSetupRefProcList) then
+      for RefProc in FSetupRefProcList do
+        RefProc(Result);
+
+    ApplyPendindProps(Result);
+  finally
+    Free;
+  end;
+end;
+
+constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
+  AComponentClass: TComponentClass; out Reference);
+begin
+  Create(AComponentClass);
+  Assign(Reference);
+end;
+
+function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
+  const AProcs: array of TComponentSetupProcObj): TSelf;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(AProcs);
+end;
+
+function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
+  AProc: TComponentSetupRefProc): TSelf;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(AProc);
+end;
+
+constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AComponent: TComponent);
+begin
+  FComponent := AComponent;
+  FObjectClass := TComponentClass(AComponent.ClassType);
+  FName := AComponent.Name;
+  FTag := 0;
+  FSetupProcList := nil;
+  FSetupRefProcList := nil;
+end;
+
+constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TComponentClass;
+  const AName: string; out Reference);
+begin
+  Create(AClass, AName);
+  Assign(Reference);
+end;
+
+constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TComponentClass;
+  const AName: string);
+begin
+  FComponent := nil;
+  FObjectClass := AClass;
+  FName := AName;
+  FTag := 0;
+  FSetupProcList := nil;
+  FSetupRefProcList := nil;
+end;
+
+function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
+  AProc: TComponentSetupProcObj): TSelf;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(AProc);
+end;
+
+function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(AName: string): TSelf;
+begin
+  Result := TSelf(Self);
+  FName := AName;
+end;
+
+function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
+begin
+  Result := TSelf(Self);
+  FTag := ATag;
+end;
+
+{ TMenuBuilderBase<TSelf> }
+
+function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Assign(out Reference): TSelf;
+begin
+  Result := TSelf(Self);
+  FTargetField := @Reference;
+end;
+
+function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Build(AOwner: TComponent;
+  const AMenuName: string): TMenu;
+var
+  Proc: TMenuSetupProcObj;
+  RefProc: TMenuSetupRefProc;
 begin
   try
     if Assigned(Menu) then
       Result := Menu
     else
-      Result := MenuClass.Create(AOwner);
+      Result := ObjectClass.Create(AOwner);
 
     if not AMenuName.IsEmpty then
       Result.Name := AMenuName;
@@ -4216,127 +4322,106 @@ begin
     if Assigned(FTargetField) then
       PPointer(FTargetField)^ := Result;
 
-    if Assigned(SetupProc) then
-      SetupProc(Result);
+    if Assigned(FSetupProcList) then
+      for Proc in FSetupProcList do
+        Proc(Result);
+
+    if Assigned(FSetupRefProcList) then
+      for RefProc in FSetupRefProcList do
+        RefProc(Result);
+
+    ApplyPendindProps(Result);
   finally
     Free;
   end;
 end;
 
-constructor TMenuBuilder.Create(AClass: TMenuClass; const AName: string);
-begin
-  FMenu := nil;
-  FMenuClass := AClass;
-  FName := AName;
-  FTag := 0;
-  FSetupProc := nil;
-  FTargetField := nil;
-end;
-
-constructor TMenuBuilder.Create(AClass: TMenuClass; const AName: string; out
-  Reference);
-begin
-  Create(AClass, AName);
-  Assign(Reference);
-end;
-
-constructor TMenuBuilder.Create(AMenu: TMenu);
+constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AMenu: TMenu);
 begin
   FMenu := AMenu;
-  FMenuClass := TMenuClass(AMenu.ClassType);
+  FObjectClass := TMenuClass(AMenu.ClassType);
   FName := AMenu.Name;
   FTag := 0;
-  FSetupProc := nil;
+  FSetupProcList := nil;
+  FSetupRefProcList := nil;
   FTargetField := nil;
 end;
 
-constructor TMenuBuilder.Create(AClass: TMenuClass; out Reference);
+constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuClass; out Reference);
 begin
   Create(AClass, '');
   Assign(Reference);
 end;
 
-function TMenuBuilder.Setup(AProc: TMenuSetupProcObj): TMenuBuilder;
+constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuClass;
+  const AName: string; out Reference);
 begin
-  Result := Self;
-  FSetupProc := AProc;
+  Create(AClass, AName);
+  Assign(Reference);
 end;
 
-function TMenuBuilder.WithName(AName: string): TMenuBuilder;
+constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuClass;
+  const AName: string);
 begin
-  Result := Self;
+  FMenu := nil;
+  FObjectClass := AClass;
+  FName := AName;
+  FTag := 0;
+  FSetupProcList := nil;
+  FSetupRefProcList := nil;
+  FTargetField := nil;
+end;
+
+function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TMenuSetupProcObj): TSelf;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(AProc);
+end;
+
+function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TMenuSetupRefProc): TSelf;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(Aproc);
+end;
+
+function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
+  const AProcs: array of TMenuSetupProcObj): TSelf;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(AProcs);
+end;
+
+function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(AName: string): TSelf;
+begin
+  Result := TSelf(Self);
   FName := AName;
 end;
 
-function TMenuBuilder.WithTag(ATag: NativeInt): TMenuBuilder;
+function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
 begin
-  Result := Self;
+  Result := TSelf(Self);
   FTag := ATag;
 end;
 
-function TMenuBuilder.Assign(out Reference): TMenuBuilder;
+{ TMenuItemBuilderBase<TSelf> }
+
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Assign(out Reference): TSelf;
 begin
-  Result := Self;
+  Result := TSelf(Self);
   FTargetField := @Reference;
 end;
 
-{ TMenuItemBuilder }
-
-constructor TMenuItemBuilder.Create(AMenuItem: TMenuItem);
-begin
-  FMenuItem := AMenuItem;
-  FMenuItemClass := TMenuItemClass(AMenuItem.ClassType);
-  FName := AMenuItem.Name;
-  FTag := 0;
-  FCaption := TOptionalString.None;
-  FImageIndex := TOptionalInteger.None;
-  FSetupProc := nil;
-  FTargetField := nil;
-end;
-
-constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; out Reference);
-begin
-  Create(AClass, '');
-  Assign(Reference);
-end;
-
-constructor TMenuItemBuilder.Create;
-begin
-  Create(TMenuItem);
-end;
-
-constructor TMenuItemBuilder.Create(out Reference);
-begin
-  Create(TMenuItem, Reference);
-end;
-
-constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; const AName: string);
-begin
-  FMenuItem := nil;
-  FMenuItemClass := AClass;
-  FName := AName;
-  FTag := 0;
-  FCaption := TOptionalString.None;;
-  FImageIndex := TOptionalInteger.None;
-  FSetupProc := nil;
-  FTargetField := nil;
-end;
-
-constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; const AName: string;
-  out Reference);
-begin
-  Create(AClass, AName);
-  Assign(Reference);
-end;
-
-function TMenuItemBuilder.CreateMenuItem(AOwner: TComponent;
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Build(AOwner: TComponent;
   const AMenuItemName: string): TMenuItem;
+var
+  Proc: TMenuItemSetupProcObj;
+  RefProc: TMenuItemSetupRefProc;
 begin
   try
     if Assigned(MenuItem) then
       Result := MenuItem
     else
-      Result := MenuItemClass.Create(AOwner);
+      Result := ObjectClass.Create(AOwner);
 
     if not AMenuItemName.IsEmpty then
       Result.Name := AMenuItemName;
@@ -4358,61 +4443,121 @@ begin
     if Assigned(FTargetField) then
       PPointer(FTargetField)^ := Result;
 
-    if Assigned(SetupProc) then
-      SetupProc(Result);
+    if Assigned(FSetupProcList) then
+      for Proc in FSetupProcList do
+        Proc(Result);
+
+    if Assigned(FSetupRefProcList) then
+      for RefProc in FSetupRefProcList do
+        RefProc(Result);
+
+    ApplyPendindProps(Result);
   finally
     Free;
   end;
 end;
 
-function TMenuItemBuilder.Setup(AProc: TMenuItemSetupProcObj): TMenuItemBuilder;
+constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuItemClass;
+  const AName: string);
 begin
-  Result := Self;
-  FSetupProc := AProc;
+  FMenuItem := nil;
+  FObjectClass := AClass;
+  FName := AName;
+  FTag := 0;
+  FCaption := TOptionalString.None;;
+  FImageIndex := TOptionalInteger.None;
+  FSetupProcList := nil;
+  FSetupRefProcList := nil;
+  FTargetField := nil;
 end;
 
-function TMenuItemBuilder.WithCaption(ACaption: string): TMenuItemBuilder;
+constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(out Reference);
 begin
-  Result := Self;
+  Create(TMenuItem, Reference);
+end;
+
+constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AMenuItem: TMenuItem);
+begin
+  FMenuItem := AMenuItem;
+  FObjectClass := TMenuItemClass(AMenuItem.ClassType);
+  FName := AMenuItem.Name;
+  FTag := 0;
+  FCaption := TOptionalString.None;
+  FImageIndex := TOptionalInteger.None;
+  FSetupProcList := nil;
+  FSetupRefProcList := nil;
+  FTargetField := nil;
+end;
+
+constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create;
+begin
+  Create(TMenuItem);
+end;
+
+constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuItemClass;
+  const AName: string; out Reference);
+begin
+  Create(AClass, AName);
+  Assign(Reference);
+end;
+
+constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuItemClass;
+  out Reference);
+begin
+  Create(AClass, '');
+  Assign(Reference);
+end;
+
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
+  const AProcs: array of TMenuItemSetupProcObj): TSelf;
+var
+  Proc: TMenuItemSetupProcObj;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(AProcs);
+end;
+
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TMenuItemSetupRefProc): TSelf;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(AProc);
+end;
+
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TMenuItemSetupProcObj): TSelf;
+begin
+  Result := TSelf(Self);
+  Self.SetupProc(Aproc);
+end;
+
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithCaption(ACaption: string): TSelf;
+begin
+  Result := TSelf(Self);
   FCaption := ACaption;
 end;
 
-function TMenuItemBuilder.WithImageIndex(AImageIndex: Integer): TMenuItemBuilder;
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithImageIndex(
+  AImageIndex: Integer): TSelf;
 begin
-  Result := Self;
+  Result := TSelf(Self);
   FImageIndex := AImageIndex;
 end;
 
-function TMenuItemBuilder.WithOnClick(AOnClick: TNotifyEvent): TMenuItemBuilder;
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(AName: string): TSelf;
 begin
-  Result := Self;
-  FOnClick := AOnClick;
-end;
-
-function TMenuItemBuilder.WithTag(ATag: NativeInt): TMenuItemBuilder;
-begin
-  Result := Self;
-  FTag := ATag;
-end;
-
-{$IFDEF FPC}generic{$ENDIF}
-function TMenuItemBuilder.Assign(out Reference): TMenuItemBuilder;
-begin
-  Result := Self;
-  FTargetField := @Reference;
-end;
-
-function TMenuItemBuilder.WithName(AName: string): TMenuItemBuilder;
-begin
-  Result := Self;
+  Result := TSelf(Self);
   FName := AName;
 end;
 
-{ TPropertySetup }
-
-constructor TPropertySetup{$IFNDEF FPC}<T>{$ENDIF}.Create(const AValue: T);
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithOnClick(AOnClick: TNotifyEvent): TSelf;
 begin
-  FValue := AValue;
+  Result := TSelf(Self);
+  FOnClick := AOnClick;
+end;
+
+function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
+begin
+  Result := TSelf(Self);
+  FTag := ATag;
 end;
 
 initialization
