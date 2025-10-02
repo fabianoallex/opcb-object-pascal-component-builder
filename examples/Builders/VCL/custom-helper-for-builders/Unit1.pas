@@ -43,6 +43,9 @@ var
   Creator: TControlCreator;
   B: TButton;
 begin
+  var C := TControl.Create(Panel1);
+  C.Parent := Panel1;
+
   Creator := TControlCreator.Create;
   try
     Creator
