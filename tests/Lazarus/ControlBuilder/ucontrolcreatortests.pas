@@ -123,17 +123,8 @@ begin
 
       ci := TControlBuilder.Create(TPanel, P);
 
-      AddControl(
-        ci
-      );
+      AddControl(ci);
     end;
-     {
-    ControlBuilder
-      .WithOwnerAndParent(FForm, FForm)
-      .SetTopLeft(10, 20)
-      .AddControl(TControlBuilder.Create(TPanel, P))
-    ;
-    }
 
     AssertEquals('Propriedade Top diferente da esperada', 10, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 20, P.Left);

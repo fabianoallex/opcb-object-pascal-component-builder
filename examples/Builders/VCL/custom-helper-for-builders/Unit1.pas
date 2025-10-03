@@ -9,7 +9,6 @@ uses
 
 type
   TForm1 = class(TForm)
-    Panel1: TPanel;
     procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
@@ -43,9 +42,6 @@ var
   Creator: TControlCreator;
   B: TButton;
 begin
-  var C := TControl.Create(Panel1);
-  C.Parent := Panel1;
-
   Creator := TControlCreator.Create;
   try
     Creator

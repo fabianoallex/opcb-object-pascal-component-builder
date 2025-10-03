@@ -53,20 +53,19 @@ type
     procedure Apply(AControl: TControl); virtual; abstract;
   end;
 
-  TPendingProp = record
+  { TPropValue }
+
+  TPropValue = record
     PropName: string;
-    IsObject: Boolean;
     Value: TValue;
-    Obj: TObject;
+    {$IFDEF FPC}generic{$ENDIF} class function Create<E>(const APropName: string; const AValue: E): TPropValue; static;
   end;
 
-  TPendingPropList = {$IFDEF FPC}specialize{$ENDIF} TList<TPendingProp>;
-
-  {$IFDEF FPC}
+  TPropValueList = {$IFDEF FPC}specialize{$ENDIF} TList<TPropValue>;
 
   { TObjectBuilderBase }
 
-generic{$ENDIF}
+  {$IFDEF FPC}generic{$ENDIF}
   TObjectBuilderBase<T: class; TObjClass, TSetupProcObj, TSetupRefProc> = class abstract
   type
     TSetupProcObjList = {$IFDEF FPC}specialize{$ENDIF}TList<TSetupProcObj>;
@@ -78,12 +77,12 @@ generic{$ENDIF}
     FTargetFields: TPointerList;
     FSetupProcList: TSetupProcObjList;
     FSetupRefProcList: TSetupRefProcList;
-    FPendingProps: TPendingPropList;
+    FProperties: TPropValueList;
     FName: string;
     FTag: NativeInt;
     FOwner: TComponent;
     FParent: TWinControl;
-    procedure ApplyPropPath(Instance: TObject; AProp: TPendingProp);
+    procedure ApplyPropPath(Instance: TObject; AProp: TPropValue);
     procedure ApplyPendindProps(Instance: TObject);
     procedure SetupProc(AProcObj: TSetupProcObj); overload;
     procedure SetupProc(ARefProc: TSetupRefProc); overload;
@@ -277,7 +276,9 @@ generic{$ENDIF}
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
     function WithProp(const APropName: string; const AValue: TValue): TSelf; overload;
+    function WithProp(const APropValue: TPropValue): TSelf; overload;
     function WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;  // for lazarus
+    function WithPropSet(const APropName: string; const AValue: Integer): TSelf;
     function Build: TControl; override;
   end;
 
@@ -828,11 +829,7 @@ begin
   FText := TOptionalString.None;
   FTop := TOptionalSingle.None;
   FLeft := TOptionalSingle.None;
-  FSetupProcList := nil;
-  FSetupRefProcList := nil;
-  FPendingProps := nil;
   FOnClick := nil;
-  FTargetFields := TPointerList.Create;
 end;
 
 constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
@@ -864,9 +861,6 @@ begin
   FText := TOptionalString.None;
   FTop := TOptionalSingle.None;
   FLeft := TOptionalSingle.None;
-  FSetupProcList := nil;
-  FSetupRefProcList := nil;
-  FPendingProps := nil;
   FOnClick := nil;
   // FTargetField := nil;
 end;
@@ -953,13 +947,11 @@ begin
     for Ref in FTargetFields do
       PPointer(Ref)^ := Result;
 
-    if Assigned(FSetupProcList) then
-      for Proc in FSetupProcList do
-        Proc(Result);
+    for Proc in FSetupProcList do
+      Proc(Result);
 
-    if Assigned(FSetupRefProcList) then
-      for RefProc in FSetupRefProcList do
-        RefProc(Result);
+    for RefProc in FSetupRefProcList do
+      RefProc(Result);
 
     ApplyPendindProps(Result);
   finally
@@ -1027,36 +1019,30 @@ end;
 function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithProp(
   const APropName: string; const AValue: TValue): TSelf;
 var
-  P: TPendingProp;
+  P: TPropValue;
 begin
   Result := TSelf(Self);
-
-  if not Assigned(FPendingProps) then
-    FPendingProps := TPendingPropList.Create;
-
   P.PropName := APropName;
-  P.IsObject := False;
   P.Value := AValue;
-  FPendingProps.Add(P);
+  FProperties.Add(P);
 end;
 
-// método especifico para lazarus para dar compatibilidade com
-// atribuições de objetos.
-// em delphi WithProp também aceita objetos
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithProp(const APropValue: TPropValue): TSelf;
+begin
+  Result := Self.WithProp(APropValue.PropName, APropValue.Value);
+end;
+
 function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithPropObj(
   const APropName: string; AObj: TObject): TSelf;
-var
-  P: TPendingProp;
 begin
-  Result := TSelf(Self);
+  Result := WithProp(
+    TPropValue.{$IFDEF FPC}specialize{$ENDIF}Create<TObject>(APropName, AObj)
+  );
+end;
 
-  if not Assigned(FPendingProps) then
-    FPendingProps := TPendingPropList.Create;
-
-  P.PropName := APropName;
-  P.IsObject := True;
-  P.Obj := AObj;
-  FPendingProps.Add(P);
+function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithPropSet(const APropName: string; const AValue: Integer): TSelf;
+begin
+  Result := WithProp(APropName, TValue.{$IFDEF FPC}specialize{$ENDIF}From<NativeInt>(AValue));
 end;
 
 function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
@@ -4110,22 +4096,28 @@ begin
   FValue := AValue;
 end;
 
+{ TPropEnum }
+
+{$IFDEF FPC}generic{$ENDIF}
+class function TPropValue.Create<E>(const APropName: string; const AValue: E): TPropValue;
+begin
+  Result.PropName := APropName;
+  Result.Value := TValue.{$IFDEF FPC}specialize{$ENDIF}From<E>(AValue);
+end;
+
 { TObjectBuilderBase }
 
 procedure TObjectBuilderBase{$IFNDEF FPC}<T, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}
   .ApplyPendindProps(Instance: TObject);
 var
-  Prop: TPendingProp;
+  Prop: TPropValue;
 begin
-  if not Assigned(FPendingProps) then
-    Exit;
-
-  for Prop in FPendingProps do
+  for Prop in FProperties do
     ApplyPropPath(Instance, Prop);
 end;
 
 procedure TObjectBuilderBase{$IFNDEF FPC}<T, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}
-  .ApplyPropPath(Instance: TObject; AProp: TPendingProp);
+  .ApplyPropPath(Instance: TObject; AProp: TPropValue);
 var
   Context: TRttiContext;
   RType: TRttiType;
@@ -4133,6 +4125,7 @@ var
   Parts: TStringList;
   i: Integer;
   CurrentObj: TObject;
+  PropInfo: PPropInfo;
 begin
   CurrentObj := Instance;
   Parts := TStringList.Create;
@@ -4147,7 +4140,8 @@ begin
       RType := Context.GetType(CurrentObj.ClassType);
       RProp := RType.GetProperty(Parts[i]);
       if not Assigned(RProp) then
-        Exit;
+        raise EPropertyError.CreateFmt('Propriedade "%s" não encontrada em %s',
+          [Parts[i], CurrentObj.ClassName]);
 
       if i < Parts.Count - 1 then
       begin
@@ -4156,15 +4150,14 @@ begin
           Exit;
       end
       else
-      begin
         if RProp.IsWritable then
         begin
-          if AProp.IsObject then
-            SetObjectProp(CurrentObj, RProp.Name, AProp.Obj)
+          PropInfo := GetPropInfo(CurrentObj.ClassInfo, Parts[i]);
+          if RProp.PropertyType.TypeKind = tkSet then
+            SetOrdProp(CurrentObj, PropInfo, Integer(AProp.Value.AsOrdinal))
           else
             RProp.SetValue(CurrentObj, AProp.Value);
         end;
-      end;
     end;
   finally
     Parts.Free;
@@ -4174,42 +4167,36 @@ end;
 constructor TObjectBuilderBase{$IFNDEF FPC}<T, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Create;
 begin
   FAutoFree := True;
+  FSetupProcList := TSetupProcObjList.Create;
+  FSetupRefProcList := TSetupRefProcList.Create;
+  FProperties := TPropValueList.Create;
   FTargetFields := TPointerList.Create;
 end;
 
 destructor TObjectBuilderBase{$IFNDEF FPC}<T, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Destroy;
 begin
-  if Assigned(FSetupProcList) then
-    FSetupProcList.Free;
-  if Assigned(FSetupRefProcList) then
-    FSetupRefProcList.Free;
-  if Assigned(FPendingProps) then
-    FPendingProps.Free;
-  if Assigned(FTargetFields) then
-    FTargetFields.Free;
+  FSetupProcList.Free;
+  FSetupRefProcList.Free;
+  FProperties.Free;
+  FTargetFields.Free;
   inherited;
 end;
 
 procedure TObjectBuilderBase{$IFNDEF FPC}<T, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}
   .ResetReferences;
 begin
-  if Assigned(FTargetFields) then
-    FTargetFields.Clear;
+  FTargetFields.Clear;
 end;
 
 procedure TObjectBuilderBase{$IFNDEF FPC}<T, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.SetupProc(
   AProcObj: TSetupProcObj);
 begin
-  if not Assigned(FSetupProcList) then
-    FSetupProcList := TSetupProcObjList.Create;
   FSetupProcList.Add(AProcObj);
 end;
 
 procedure TObjectBuilderBase{$IFNDEF FPC}<T, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.SetupProc(
   ARefProc: TSetupRefProc);
 begin
-  if not Assigned(FSetupRefProcList) then
-    FSetupRefProcList := TSetupRefProcList.Create;
   FSetupRefProcList.Add(ARefProc);
 end;
 
@@ -4250,13 +4237,11 @@ begin
     for Ref in FTargetFields do
       PPointer(Ref)^ := Result;
 
-    if Assigned(FSetupProcList) then
-      for Proc in FSetupProcList do
-        Proc(Result);
+    for Proc in FSetupProcList do
+      Proc(Result);
 
-    if Assigned(FSetupRefProcList) then
-      for RefProc in FSetupRefProcList do
-        RefProc(Result);
+    for RefProc in FSetupRefProcList do
+      RefProc(Result);
 
     ApplyPendindProps(Result);
   finally
@@ -4292,8 +4277,6 @@ begin
   FObjectClass := TComponentClass(AComponent.ClassType);
   FName := AComponent.Name;
   FTag := 0;
-  FSetupProcList := nil;
-  FSetupRefProcList := nil;
 end;
 
 constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TComponentClass;
@@ -4311,8 +4294,6 @@ begin
   FObjectClass := AClass;
   FName := AName;
   FTag := 0;
-  FSetupProcList := nil;
-  FSetupRefProcList := nil;
 end;
 
 function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(
@@ -4362,13 +4343,11 @@ begin
     for Ref in FTargetFields do
       PPointer(Ref)^ := Result;
 
-    if Assigned(FSetupProcList) then
-      for Proc in FSetupProcList do
-        Proc(Result);
+    for Proc in FSetupProcList do
+      Proc(Result);
 
-    if Assigned(FSetupRefProcList) then
-      for RefProc in FSetupRefProcList do
-        RefProc(Result);
+    for RefProc in FSetupRefProcList do
+      RefProc(Result);
 
     ApplyPendindProps(Result);
   finally
@@ -4384,8 +4363,6 @@ begin
   FObjectClass := TMenuClass(AMenu.ClassType);
   FName := AMenu.Name;
   FTag := 0;
-  FSetupProcList := nil;
-  FSetupRefProcList := nil;
 end;
 
 constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuClass; out Reference);
@@ -4409,9 +4386,6 @@ begin
   FObjectClass := AClass;
   FName := AName;
   FTag := 0;
-  FSetupProcList := nil;
-  FSetupRefProcList := nil;
-  FTargetFields := nil;
 end;
 
 function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Setup(AProc: TMenuSetupProcObj): TSelf;
@@ -4485,13 +4459,11 @@ begin
     for Ref in FTargetFields do
       PPointer(Ref)^ := Result;
 
-    if Assigned(FSetupProcList) then
-      for Proc in FSetupProcList do
-        Proc(Result);
+    for Proc in FSetupProcList do
+      Proc(Result);
 
-    if Assigned(FSetupRefProcList) then
-      for RefProc in FSetupRefProcList do
-        RefProc(Result);
+    for RefProc in FSetupRefProcList do
+      RefProc(Result);
 
     ApplyPendindProps(Result);
   finally
@@ -4510,8 +4482,6 @@ begin
   FTag := 0;
   FCaption := TOptionalString.None;;
   FImageIndex := TOptionalInteger.None;
-  FSetupProcList := nil;
-  FSetupRefProcList := nil;
 end;
 
 constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(out Reference);
@@ -4528,8 +4498,6 @@ begin
   FTag := 0;
   FCaption := TOptionalString.None;
   FImageIndex := TOptionalInteger.None;
-  FSetupProcList := nil;
-  FSetupRefProcList := nil;
 end;
 
 constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create;

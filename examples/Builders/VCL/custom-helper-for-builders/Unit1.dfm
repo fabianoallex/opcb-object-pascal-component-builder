@@ -12,12 +12,4 @@ object Form1: TForm1
   Font.Style = []
   OnCreate = FormCreate
   TextHeight = 15
-  object Panel1: TPanel
-    Left = 48
-    Top = 256
-    Width = 329
-    Height = 105
-    Caption = 'Panel1'
-    TabOrder = 0
-  end
 end
