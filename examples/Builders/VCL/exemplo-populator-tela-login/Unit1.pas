@@ -117,7 +117,7 @@ begin
   Builder
     .SubLevel(TControlBuilder.Create(TPanel, 'PanelLogin').WithCaption(''), cpdVertical)
       .SetTopLeft(10, 10)
-      .AddControl(TControlBuilder.Create(TLabel).Setup(SetupLabelLogin).WithName('LabelLogin'))
+      .AddControl(TControlBuilder.Create(TLabel).WithName('LabelLogin').Setup(SetupLabelLogin).WithName('LabelLogin'))
       .IncTop(20)
       .AddControl(TControlBuilder.Create(TBevel).Setup(SetupBevel))
       .IncTop(20)

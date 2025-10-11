@@ -424,11 +424,12 @@ var
   begin
     Creators := TOPCBCreators.Create(ControlDialog.ControlCreator.Registry.ContextKey); // usa o mesmo context do dialog
     try
-      Creators.AsComponentsBuilder
+      Creators.AsComponentCreator
         .WithOwner(ControlDialog)
         .Add(TComponentBuilder.Create(TClientDataSet, 'CDS').Setup(SetupCDS))
         .Add(TComponentBuilder.Create(TDataSource, 'DS').Setup(SetupDS))
       ;
+
       Creators.AsControlCreator
         .WithOwnerAndParent(
           ControlDialog,
@@ -436,9 +437,9 @@ var
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
-        .SubLevel(TControlBuilder.Create(TPanel).WithAlign(alTop).WithCaption(''))
+        .SubLevel(TControlBuilder.Create(TPanel, 'Px').WithAlign(alTop).WithCaption(''))
           .SetTopLeft(5, 5)
-          .AddControl(TControlBuilder.Create(TEdit).WithWidth(480).Setup(SetupEditSearch))
+          .AddControl(TControlBuilder.Create(TEdit, 'eee').WithWidth(480).Setup(SetupEditSearch))
         .SuperLevel
         .AddControl(TControlBuilder.Create(TDBGrid).WithAlign(alClient).Setup(SetupDBGrid))
     finally

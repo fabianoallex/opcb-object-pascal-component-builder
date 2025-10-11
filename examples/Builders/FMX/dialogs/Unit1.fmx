@@ -70,14 +70,4 @@ object Form1: TForm1
       OnClick = Button5Click
     end
   end
-  object SpeedButton1: TSpeedButton
-    Position.X = 352.000000000000000000
-    Position.Y = 216.000000000000000000
-    Size.Width = 73.000000000000000000
-    Size.Height = 49.000000000000000000
-    Size.PlatformDefault = False
-    StyleLookup = 'SpeedButton1Style1'
-    Text = 'SpeedButton1'
-    TextSettings.Trimming = None
-  end
 end

@@ -1,11 +1,15 @@
 unit UControlCreatorTests;
 
+{$IFDEF FPC}
 {$mode objfpc}{$H+}
+{$LONGSTRINGS ON}{$MODESWITCH TYPEHELPERS}{$MODESWITCH ADVANCEDRECORDS}
+{$ENDIF}
+
 
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testutils, testregistry, Forms, OPCB;
+  Classes, SysUtils, fpcunit, testregistry, Forms, OPCB;
 
 type
 
@@ -13,7 +17,7 @@ type
 
   TControlCreatorTests = class(TTestCase)
   private
-    procedure ExternalMethod(const ABuiler: TControlCreator);
+    procedure ExternalMethod(const ACreator: TControlCreator);
   protected
     FForm: TForm;
     procedure SetUp; override;
@@ -91,11 +95,15 @@ type
 implementation
 
 uses
-  ExtCtrls;
+  ExtCtrls, Controls;
 
-procedure TControlCreatorTests.ExternalMethod(const ABuiler: TControlCreator);
+procedure TControlCreatorTests.ExternalMethod(const ACreator: TControlCreator);
+var
+  ControlBuilder: TControlBuilder;
 begin
-  ABuiler.AddControl(TControlBuilder.Create(TPanel, 'PanelTest').WithCaption('EXTERNAL-TEST'));
+  ControlBuilder := TControlBuilder.Create(TPanel, 'PanelTest');
+  ControlBuilder.WithCaption('EXTERNAL-TEST');
+  ACreator.specialize AddControl<TControl>(ControlBuilder);
 end;
 
 procedure TControlCreatorTests.SetUp;
@@ -112,7 +120,6 @@ procedure TControlCreatorTests.TestTopLeft;
 var
   ControlCreator: TControlCreator;
   P: TPanel;
-  ci: TControlBuilder;
 begin
   ControlCreator := TControlCreator.Create;
   try
@@ -120,10 +127,7 @@ begin
     begin
       WithOwnerAndParent(FForm, FForm);
       SetTopLeft(10, 20);
-
-      ci := TControlBuilder.Create(TPanel, P);
-
-      AddControl(ci);
+      AddControl(TControlBuilder.Create(TPanel, P));
     end;
 
     AssertEquals('Propriedade Top diferente da esperada', 10, P.Top);

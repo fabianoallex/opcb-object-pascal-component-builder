@@ -8,8 +8,9 @@
       <Unit>
         <Filename Value="project1.lpr"/>
         <IsPartOfProject Value="True"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <CursorPos X="23" Y="14"/>
+        <CursorPos X="43" Y="14"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
@@ -108,10 +109,9 @@
       </Unit>
       <Unit>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="11"/>
         <TopLine Value="4548"/>
-        <CursorPos X="56" Y="4571"/>
+        <CursorPos X="25" Y="4557"/>
         <UsageCount Value="108"/>
         <Loaded Value="True"/>
       </Unit>
@@ -176,10 +176,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="ufmain.pas"/>
-        <Caret Line="130" Column="29" TopLine="111"/>
-      </Position>
       <Position>
         <Filename Value="ufmain.pas"/>
         <Caret Line="135" Column="28" TopLine="116"/>
@@ -291,6 +287,10 @@
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <Caret Line="211" Column="49" TopLine="187"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\..\src\OPCB.pas"/>
+        <Caret Line="4557" Column="25" TopLine="4548"/>
       </Position>
     </JumpHistory>
     <RunParams>

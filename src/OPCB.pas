@@ -29,18 +29,26 @@ type
   {$ENDIF}
 
   TProtectedControl = class(TControl);
+
+  TObjectClass = class of TObject;
   TControlClass = class of TControl;
   TWinControlClass = class of TWinControl;
   TMenuClass = class of TMenu;
   TMenuItemClass = class of TMenuItem;
-  TComponentSetupProcObj = procedure(AComponent: TComponent) of object;
-  TComponentSetupRefProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(AComponent: TComponent);
-  TMenuSetupProcObj = procedure(AMenu: TMenu) of object;
-  TMenuSetupRefProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(AMenu: TMenu);
-  TMenuItemSetupProcObj = procedure(AMenuItem: TMenuItem) of object;
-  TMenuItemSetupRefProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(AMenuItem: TMenuItem);
-  TControlSetupProcObj = procedure(AControl: TControl) of object;
-  TControlSetupRefProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(AControl: TControl);
+
+  {$IFDEF FPC}generic{$ENDIF} TSetupProcObj<TBuild> = procedure(AObj: TBuild) of object;
+  {$IFDEF FPC}generic{$ENDIF} TSetupRefProc<TBuild> = {$IFNDEF FPC}reference to{$ENDIF} procedure(AObj: TBuild);
+
+  TObjectSetupProcObj = {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TObject>;
+  TObjectSetupRefProc = {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TObject>;
+  TComponentSetupProcObj = {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TComponent>;
+  TComponentSetupRefProc = {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TComponent>;
+  TMenuSetupProcObj = {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TMenu>;
+  TMenuSetupRefProc = {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TMenu>;
+  TMenuItemSetupProcObj = {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TMenuItem>;
+  TMenuItemSetupRefProc = {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TMenuItem>;
+  TControlSetupProcObj = {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TControl>;
+  TControlSetupRefProc = {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TControl>;
 
   { TPropertySetup }
 
@@ -55,213 +63,285 @@ type
 
   { TPropValue }
 
-  TPropValue = record
+  TPropertyValue = record
     PropName: string;
     Value: TValue;
     {$IFDEF FPC}generic{$ENDIF}
-    class function Create<E>(const APropName: string; const AValue: E): TPropValue; static;
+    class function Create<E>(const APropName: string; const AValue: E): TPropertyValue; static;
   end;
 
-  TPropValueList = {$IFDEF FPC}specialize{$ENDIF} TList<TPropValue>;
+  TPropValueList = {$IFDEF FPC}specialize{$ENDIF} TList<TPropertyValue>;
+
+  {$IFDEF FPC}generic{$ENDIF}
+  IObjectBuilder<TBuild> = interface
+    ['{1FD2411F-05F7-4132-A10D-C06A2CA95781}']
+    function Build: TBuild;
+    procedure AssignReference(out Reference);
+  end;
 
   { TObjectBuilderBase }
 
   {$IFDEF FPC}generic{$ENDIF}
-  TObjectBuilderBase<TBuild: class; TObjClass, TSelf, TSetupProcObj, TSetupRefProc> = class abstract
+  TObjectBuilderBase<TBuild: {$IFDEF FPC}TObject{$ELSE}class{$ENDIF}; TSelf: class> =
+    class abstract(TInterfacedObject, {$IFDEF FPC}specialize{$ENDIF} IObjectBuilder<TBuild>)
   type
-    TSetupProcObjList = {$IFDEF FPC}specialize{$ENDIF}TList<TSetupProcObj>;
-    TSetupRefProcList = {$IFDEF FPC}specialize{$ENDIF}TList<TSetupRefProc>;
-    TPointerList = {$IFDEF FPC}specialize{$ENDIF}TList<Pointer>;
+    TSetupProcObjBuild = {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TBuild>;
+    TSetupRefProcBuild = {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TBuild>;
+    TSetupProcObjList = {$IFDEF FPC}specialize{$ENDIF} TList<TSetupProcObjBuild>;
+    TSetupRefProcList = {$IFDEF FPC}specialize{$ENDIF} TList<TSetupRefProcBuild>;
+    TPointerList = {$IFDEF FPC}specialize{$ENDIF} TList<Pointer>;
   protected
-    FAutoFree: Boolean;
-    FObjectClass: TObjClass;
+    FObject: TObject;
+    FObjectClass: TObjectClass;
     FTargetFields: TPointerList;
     FSetupProcList: TSetupProcObjList;
     FSetupRefProcList: TSetupRefProcList;
     FProperties: TPropValueList;
-    FName: string;
-    FTag: NativeInt;
-    FOwner: TComponent;
-    FParent: TWinControl;
-    procedure ApplyPropPath(Instance: TObject; AProp: TPropValue);
+    function CreateObject: TBuild; virtual; abstract;
+    procedure ConfigureObject(AObject: TBuild); virtual;
+    procedure ApplyPropPath(Instance: TObject; AProp: TPropertyValue);
     procedure ApplyPendindProps(Instance: TObject);
-    procedure SetupProc(AProcObj: TSetupProcObj); overload;
-    procedure SetupProc(ARefProc: TSetupRefProc); overload;
-    procedure SetupProc(const AProcs: array of TSetupProcObj);  overload;
+    procedure SetupProc(AProcObj: {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TBuild>); overload;
+    procedure SetupProc(ARefProc: {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TBuild>); overload;
   public
-    constructor Create;
+    constructor Create; overload;
+    constructor Create(AClass: TObjectClass); overload;
+    constructor Create(AClass: TObjectClass; out Reference); overload;
     destructor Destroy; override;
+    procedure AssignReference(out Reference);
     procedure ResetReferences;
     function Assign(out Reference): TSelf; overload;
     function WithProp(const APropName: string; const AValue: TValue): TSelf; overload;
-    function WithProp(const APropValue: TPropValue): TSelf; overload;
+    function WithProp(const APropValue: TPropertyValue): TSelf; overload;
     function WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;  // for lazarus
     function WithPropSet(const APropName: string; const AValue: Integer): TSelf;
-    function Setup(AProc: TSetupProcObj): TSelf; overload;
-    function Setup(AProc: TSetupRefProc): TSelf; overload;
-    function Setup(const AProcs: array of TSetupProcObj): TSelf;  overload;
-    function Build: TBuild; virtual; abstract;
-    property AutoFree: Boolean read FAutoFree write FAutoFree;
-    property Name: string read FName write FName;
-    property Tag: NativeInt read FTag write FTag;
-    property Owner: TComponent read FOwner write FOwner;
-    property Parent: TWinControl read FParent write FParent;
-    property ObjectClass: TObjClass read FObjectClass;
+    function Setup(AProc: TSetupProcObjBuild): TSelf; overload;
+    function Setup(AProc: TSetupRefProcBuild): TSelf; overload;
+    function Build: TBuild;
+    property ObjectClass: TObjectClass read FObjectClass;
   end;
 
-  { TCustomComponentBuilder }
+  { TComponentBuilder }
 
-  TCustomComponentBuilder = class;
-  TCustomComponentBuilder = class abstract ({$IFDEF FPC}specialize{$ENDIF}
-    TObjectBuilderBase<TComponent, TComponentClass, TCustomComponentBuilder, TComponentSetupProcObj, TComponentSetupRefProc>)
+  TObjectBuilder = class;
+  TObjectBuilder = class({$IFDEF FPC}specialize{$ENDIF} TObjectBuilderBase<TObject, TObjectBuilder>)
   protected
-    FComponent: TComponent;
+    function CreateObject: TObject; override;
   public
-    property Component: TComponent read FComponent;
+    constructor Create; overload;
+    constructor Create(out Reference); overload;
+    constructor Create(AClass: TObjectClass); overload;
+    constructor Create(AClass: TObjectClass; out Reference); overload;
+  end;
+
+  { IComponentBuilder }
+
+  {$IFDEF FPC}generic{$ENDIF}
+  IComponentBuilder<TBuild> = interface({$IFDEF FPC}specialize{$ENDIF} IObjectBuilder<TBuild>)
+    function GetName: string;
+    function GetOwner: TComponent;
+    function GetTag: NativeInt;
+    procedure SetName(AValue: string);
+    procedure SetOwner(AValue: TComponent);
+    procedure SetTag(AValue: NativeInt);
+    property Name: string read GetName write SetName;
+    property Tag: NativeInt read GetTag write SetTag;
+    property Owner: TComponent read GetOwner write SetOwner;
   end;
 
   { TComponentBuilderBase }
 
   {$IFDEF FPC}generic{$ENDIF}
-  TComponentBuilderBase<TSelf: class> = class(TCustomComponentBuilder)
+  TComponentBuilderBase<TBuild: TComponent; TSelf: class> = class abstract (
+    {$IFDEF FPC}specialize{$ENDIF} TObjectBuilderBase<TBuild, TSelf>,
+    {$IFDEF FPC}specialize{$ENDIF} IComponentBuilder<TBuild>
+  )
+  private
   protected
+    FName: string;
+    FTag: NativeInt;
+    FOwner: TComponent;
+    procedure ConfigureObject(AObject: TBuild); override;
   public
-    constructor Create(AComponent: TComponent); overload;
     constructor Create(AClass: TComponentClass; const AName: string=''); overload;
     constructor Create(AClass: TComponentClass; const AName: string; out Reference); overload;
-    constructor Create(AComponentClass: TComponentClass; out Reference); overload;
+    constructor Create(AClass: TComponentClass; out Reference); overload;
+    function GetName: string;
+    function GetOwner: TComponent;
+    function GetTag: NativeInt;
+    procedure SetName(AValue: string);
+    procedure SetOwner(AValue: TComponent);
+    procedure SetTag(AValue: NativeInt);
     function WithName(AName: string): TSelf;
     function WithTag(ATag: NativeInt): TSelf;
-    function Build: TComponent; override;
-    property Component;
+    property Name: string read FName write FName;
+    property Tag: NativeInt read FTag write FTag;
+    property Owner: TComponent read FOwner write FOwner;
   end;
 
   { TComponentBuilder }
 
   TComponentBuilder = class;
-  TComponentBuilder =
-    class({$IFDEF FPC}specialize{$ENDIF} TComponentBuilderBase<TComponentBuilder>)
-  end;
-
-  TComponentBuilderArray = array of TComponentBuilder;
-
-  TComponentBuilderHelper = class helper for TComponentBuilder
-    class function CreateArray(AClass: TComponentClass;
-      const ANames: array of string): TComponentBuilderArray; overload; static;
-  end;
-
-  { TCustomMenuBuilder }
-
-  TCustomMenuBuilder = class;
-  TCustomMenuBuilder = class abstract ({$IFDEF FPC}specialize{$ENDIF}
-    TObjectBuilderBase<TMenu, TMenuClass, TCustomMenuBuilder, TMenuSetupProcObj, TMenuSetupRefProc>)
+  TComponentBuilder = class({$IFDEF FPC}specialize{$ENDIF} TComponentBuilderBase<TComponent, TComponentBuilder>)
   protected
-    FMenu: TMenu;
+    function CreateObject: TComponent; override;
   public
-    property Menu: TMenu read FMenu;
+    constructor Create; overload;
+    constructor Create(AClass: TComponentClass; const AName: string=''); overload;
+    constructor Create(AClass: TComponentClass; const AName: string; out Reference); overload;
+    constructor Create(AClass: TComponentClass; out Reference); overload;
   end;
 
   {$IFDEF FPC}generic{$ENDIF}
-  TMenuBuilderBase<TSelf: class> = class(TCustomMenuBuilder)
-  protected
-  public
-    constructor Create(AMenu: TMenu); overload;
-    constructor Create(AClass: TMenuClass; const AName: string=''); overload;
-    constructor Create(AClass: TMenuClass; const AName: string; out Reference); overload;
-    constructor Create(AClass: TMenuClass; out Reference); overload;
-    function WithName(AName: string): TSelf;
-    function WithTag(ATag: NativeInt): TSelf;
-    function Build: TMenu; override;
+  IMenuBuilder<TBuild> = interface({$IFDEF FPC}specialize{$ENDIF} IComponentBuilder<TBuild>)
+  end;
+
+  { TMenuBuilderBase }
+
+  {$IFDEF FPC}generic{$ENDIF}
+  TMenuBuilderBase<TBuild: TMenu; TSelf: class> =
+    class abstract (
+       {$IFDEF FPC}specialize{$ENDIF}
+       TComponentBuilderBase<TBuild, TSelf>,
+       {$IFDEF FPC}specialize{$ENDIF} IMenuBuilder<TBuild>
+     )
   end;
 
   { TMenuBuilder }
 
   TMenuBuilder = class;
-  TMenuBuilder =
-    class({$IFDEF FPC}specialize{$ENDIF} TMenuBuilderBase<TMenuBuilder>)
+  TMenuBuilder = class({$IFDEF FPC}specialize{$ENDIF} TMenuBuilderBase<TMenu, TMenuBuilder>)
+  protected
+    function CreateObject: TMenu; override;
   end;
 
-  TCustomMenuItemBuilder = class;
-  TCustomMenuItemBuilder = class abstract ({$IFDEF FPC}specialize{$ENDIF}
-    TObjectBuilderBase<TMenuItem, TMenuItemClass, TCustomMenuItemBuilder, TMenuItemSetupProcObj, TMenuItemSetupRefProc>)
+  { IMenuItemBuilder }
+
+  {$IFDEF FPC}generic{$ENDIF}
+  IMenuItemBuilder<TBuild> = interface({$IFDEF FPC}specialize{$ENDIF} IObjectBuilder<TBuild>)
+    function GetCaption: TOptionalString;
+    function GetImageIndex: TOptionalInteger;
+    function GetOnClick: TNotifyEvent;
+    procedure SetCaption(AValue: TOptionalString);
+    procedure SetImageIndex(AValue: TOptionalInteger);
+    procedure SetOnClick(AValue: TNotifyEvent);
+    property Caption: TOptionalString read GetCaption write SetCaption;
+    property ImageIndex: TOptionalInteger read GetImageIndex write SetImageIndex;
+    property OnClick: TNotifyEvent read GetOnClick write SetOnClick;
+  end;
+
+  { TMenuItemBuilderBase }
+
+  {$IFDEF FPC}generic{$ENDIF}
+  TMenuItemBuilderBase<TBuild: TMenuItem; TSelf: class> = class abstract (
+    {$IFDEF FPC}specialize{$ENDIF}
+    TComponentBuilderBase<TBuild, TSelf>,
+    {$IFDEF FPC}specialize{$ENDIF} IMenuItemBuilder<TBuild>
+  )
   protected
-    FMenuItem: TMenuItem;
     FOnClick: TNotifyEvent;
     FCaption: TOptionalString;
     FImageIndex: TOptionalInteger;
+    procedure ConfigureObject(AObject: TBuild); override;
   public
-    property MenuItem: TMenuItem read FMenuItem;
-    property Name: string read FName write FName;
-    property Caption: TOptionalString read FCaption write FCaption;
-    property ImageIndex: TOptionalInteger read FImageIndex write FImageIndex;
-    property OnClick: TNotifyEvent read FOnClick write FOnClick;
-  end;
-
-  {$IFDEF FPC}generic{$ENDIF}
-  TMenuItemBuilderBase<TSelf: class> = class(TCustomMenuItemBuilder)
-  protected
-  public
-    constructor Create(AMenuItem: TMenuItem); overload;
-    constructor Create(AClass: TMenuItemClass; const AName: string=''); overload;
-    constructor Create(AClass: TMenuItemClass; const AName: string; out Reference); overload;
-    constructor Create(AClass: TMenuItemClass; out Reference); overload;
     constructor Create; overload;
-    constructor Create(out Reference); overload;
-    function WithName(AName: string): TSelf;
-    function WithTag(ATag: NativeInt): TSelf;
     function WithCaption(ACaption: string): TSelf;
     function WithImageIndex(AImageIndex: Integer): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
-    function Build: TMenuItem; override;
+    function GetCaption: TOptionalString;
+    function GetImageIndex: TOptionalInteger;
+    function GetOnClick: TNotifyEvent;
+    procedure SetCaption(AValue: TOptionalString);
+    procedure SetImageIndex(AValue: TOptionalInteger);
+    procedure SetOnClick(AValue: TNotifyEvent);
+    property Caption: TOptionalString read GetCaption write SetCaption;
+    property ImageIndex: TOptionalInteger read GetImageIndex write SetImageIndex;
+    property OnClick: TNotifyEvent read GetOnClick write SetOnClick;
   end;
 
   { TMenuItemBuilder }
 
   TMenuItemBuilder = class;
-  TMenuItemBuilder =
-    class({$IFDEF FPC}specialize{$ENDIF} TMenuItemBuilderBase<TMenuItemBuilder>)
+  TMenuItemBuilder = class({$IFDEF FPC}specialize{$ENDIF} TMenuItemBuilderBase<TMenuItem, TMenuItemBuilder>)
+  protected
+    function CreateObject: TMenuItem; override;
   end;
 
-  { TCustomControlBuilder }
+  { IControlBuilder }
 
-  TCustomControlBuilder = class;
-  TCustomControlBuilder = class abstract ({$IFDEF FPC}specialize{$ENDIF}
-    TObjectBuilderBase<TControl, TControlClass, TCustomControlBuilder, TControlSetupProcObj, TControlSetupRefProc>)
-  protected
-    FControl: TControl;
-    FCaption: TOptionalString;
-    FText: TOptionalString;
-    FAlign: TOptionalAlign;
-    FWidth: Single;
-    FHeight: Single;
-    FTop: TOptionalSingle;
-    FLeft: TOptionalSingle;
-    FOnClick: TNotifyEvent;
-  public
-    property Control: TControl read FControl;
-    property Caption: TOptionalString read FCaption write FCaption;
-    property Text: TOptionalString read FText write FText;
-    property Align: TOptionalAlign read FAlign write FAlign;
-    property Width: Single read FWidth write FWidth;
-    property Height: Single read FHeight write FHeight;
-    property Top: TOptionalSingle read FTop write FTop;
-    property Left: TOptionalSingle read FLeft write FLeft;
-    property OnClick: TNotifyEvent read FOnClick write FOnClick;
+  {$IFDEF FPC}generic{$ENDIF}
+  IControlBuilder<TBuild> = interface({$IFDEF FPC}specialize{$ENDIF} IComponentBuilder<TBuild>)
+    ['{96747920-C27C-4846-BE48-76D1763D45B3}']
+    function GetAlign: TOptionalAlign;
+    function GetCaption: TOptionalString;
+    function GetHeight: TOptionalSingle;
+    function GetLeft: TOptionalSingle;
+    function GetOnClick: TNotifyEvent;
+    function GetParent: TWinControl;
+    function GetText: TOptionalString;
+    function GetTop: TOptionalSingle;
+    function GetWidth: TOptionalSingle;
+    procedure SetAlign(AValue: TOptionalAlign);
+    procedure SetCaption(AValue: TOptionalString);
+    procedure SetHeight(AValue: TOptionalSingle);
+    procedure SetLeft(AValue: TOptionalSingle);
+    procedure SetOnClick(AValue: TNotifyEvent);
+    procedure SetParent(AValue: TWinControl);
+    procedure SetText(AValue: TOptionalString);
+    procedure SetTop(AValue: TOptionalSingle);
+    procedure SetWidth(AValue: TOptionalSingle);
+    property Caption: TOptionalString read GetCaption write SetCaption;
+    property Text: TOptionalString read GetText write SetText;
+    property Align: TOptionalAlign read GetAlign write SetAlign;
+    property Width: TOptionalSingle read GetWidth write SetWidth;
+    property Height: TOptionalSingle read GetHeight write SetHeight;
+    property Top: TOptionalSingle read GetTop write SetTop;
+    property Left: TOptionalSingle read GetLeft write SetLeft;
+    property OnClick: TNotifyEvent read GetOnClick write SetOnClick;
+    property Parent: TWinControl read GetParent write SetParent;
   end;
 
   { TControlBuilderBase }
 
   {$IFDEF FPC}generic{$ENDIF}
-  TControlBuilderBase<TSelf: class> = class(TCustomControlBuilder)
+  TControlBuilderBase<TBuild: TControl; TSelf: class> =
+    class abstract (
+      {$IFDEF FPC}specialize{$ENDIF}
+      TComponentBuilderBase<TBuild, TSelf>,
+      {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>
+    )
   protected
+    FParent: TWinControl;
+    FCaption: TOptionalString;
+    FText: TOptionalString;
+    FAlign: TOptionalAlign;
+    FWidth: TOptionalSingle;
+    FHeight: TOptionalSingle;
+    FTop: TOptionalSingle;
+    FLeft: TOptionalSingle;
+    FOnClick: TNotifyEvent;
+    procedure ConfigureObject(AObject: TBuild); override;
   public
-    constructor Create(AControl: TControl); overload;
-    constructor Create(AClass: TControlClass; const AName: string=''); overload;
-    constructor Create(AClass: TControlClass; const AName: string; out Reference); overload;
-    constructor Create(AClass: TControlClass; out Reference); overload;
     constructor Create; overload;
-    function WithAlign(
-      AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TSelf;
+    function GetParent: TWinControl;
+    procedure SetParent(AValue: TWinControl);
+    function GetAlign: TOptionalAlign;
+    function GetCaption: TOptionalString;
+    function GetHeight: TOptionalSingle;
+    function GetLeft: TOptionalSingle;
+    function GetOnClick: TNotifyEvent;
+    function GetText: TOptionalString;
+    function GetTop: TOptionalSingle;
+    function GetWidth: TOptionalSingle;
+    procedure SetAlign(AValue: TOptionalAlign);
+    procedure SetCaption(AValue: TOptionalString);
+    procedure SetHeight(AValue: TOptionalSingle);
+    procedure SetLeft(AValue: TOptionalSingle);
+    procedure SetOnClick(AValue: TNotifyEvent);
+    procedure SetText(AValue: TOptionalString);
+    procedure SetTop(AValue: TOptionalSingle);
+    procedure SetWidth(AValue: TOptionalSingle);
+    function WithAlign(AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TSelf;
     function WithName(AName: string): TSelf;
     function WithTag(ATag: NativeInt): TSelf;
     function WithWidth(AWidth: Single): TSelf;
@@ -272,13 +352,26 @@ type
     function WithCaption(ACaption: string): TSelf;
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
-
-    function Build: TControl; override;
+    property Parent: TWinControl read GetParent write SetParent;
+    property Caption: TOptionalString read FCaption write FCaption;
+    property Text: TOptionalString read FText write FText;
+    property Align: TOptionalAlign read FAlign write FAlign;
+    property Width: TOptionalSingle read FWidth write FWidth;
+    property Height: TOptionalSingle read FHeight write FHeight;
+    property Top: TOptionalSingle read FTop write FTop;
+    property Left: TOptionalSingle read FLeft write FLeft;
+    property OnClick: TNotifyEvent read FOnClick write FOnClick;
   end;
 
   TControlBuilder = class;
-  TControlBuilder =
-    class({$IFDEF FPC}specialize{$ENDIF} TControlBuilderBase<TControlBuilder>)
+  TControlBuilder = class({$IFDEF FPC}specialize{$ENDIF} TControlBuilderBase<TControl, TControlBuilder>)
+  protected
+    function CreateObject: TControl; override;
+  public
+    constructor Create; overload;
+    constructor Create(AClass: TControlClass; const AName: string=''); overload;
+    constructor Create(AClass: TControlClass; const AName: string; out Reference); overload;
+    constructor Create(AClass: TControlClass; out Reference); overload;
   end;
 
   TComponentRegistry = class;
@@ -539,7 +632,7 @@ type
 
   TControlCreatorLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TControlCreatorLevel>;
 
-  TMenusBuilderLevel = class
+  TMenuCreatorLevel = class
   public
     {$IFDEF FRAMEWORK_FMX}
     Parent: TFmxObject;
@@ -548,13 +641,12 @@ type
     {$ENDIF}
   end;
 
-  TMenusBuilderLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TMenusBuilderLevel>;
+  TMenuCreatorLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TMenuCreatorLevel>;
+  TComponentCreator = class;
+  TComponentCreatorObjProc = procedure(const ABuiler: TComponentCreator) of object;
+  TComponentCreatorProc = procedure(const ABuiler: TComponentCreator);
 
-  TComponentsBuilder = class;
-  TComponentsBuilderObjProc = procedure(const ABuiler: TComponentsBuilder) of object;
-  TComponentsBuilderProc = procedure(const ABuiler: TComponentsBuilder);
-
-  TComponentsBuilder = class
+  TComponentCreator = class
   private
     FOwner: TComponent;
     FRegistryContextHandle: IRegistryContextHandle;
@@ -565,47 +657,45 @@ type
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
-    function External(const AProc: TComponentsBuilderObjProc): TComponentsBuilder; overload;
-    function External(const AProc: TComponentsBuilderProc): TComponentsBuilder; overload;
-    {$IFDEF FPC}generic{$ENDIF}
-    function GetComponent<T: TComponent>(const AName: string): T; overload;
+    function External(const AProc: TComponentCreatorObjProc): TComponentCreator; overload;
+    function External(const AProc: TComponentCreatorProc): TComponentCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF} function GetComponent<T: TComponent>(const AName: string): T; overload;
     function GetComponent(const AName: string): TComponent; overload;
-    function WithOwner(AOwner: TComponent): TComponentsBuilder;
-    function Add(AComponentBuilder: TComponentBuilder): TComponentsBuilder; overload;
-    function Add(AComponentBuilders: TComponentBuilderArray): TComponentsBuilder; overload;
+    function WithOwner(AOwner: TComponent): TComponentCreator;
+    function Add(AComponentBuilder: {$IFDEF FPC}specialize{$ENDIF} IComponentBuilder<TComponent>): TComponentCreator; overload;
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TComponent read GetItem; default;
   end;
 
-  TMenusBuilder = class;
-  TMenusBuilderObjProc = procedure(const ABuiler: TMenusBuilder) of object;
-  TMenusBuilderProc = procedure(const ABuiler: TMenusBuilder);
+  TMenuCreator = class;
+  TMenuCreatorObjProc = procedure(const ABuiler: TMenuCreator) of object;
+  TMenuCreatorProc = procedure(const ABuiler: TMenuCreator);
 
-  TMenusBuilder = class
+  TMenuCreator = class
   private
     FOwner: TComponent;
     FRegistryContextHandle: IRegistryContextHandle;
-    FLevelStack: TMenusBuilderLevelStack;
+    FLevelStack: TMenuCreatorLevelStack;
     function GetComponentRegistry: TComponentRegistry;
-    function GetCurrenteLevel: TMenusBuilderLevel;
+    function GetCurrenteLevel: TMenuCreatorLevel;
   public
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
-    function WithOwner(AOwner: TComponent): TMenusBuilder;
-    function External(const AProc: TMenusBuilderObjProc): TMenusBuilder; overload;
-    function External(const AProc: TMenusBuilderProc): TMenusBuilder; overload;
-    function AddMenu(AMenuBuilder: TMenuBuilder): TMenusBuilder;
-    function AddMenuItem(AMenuItemBuilder: TMenuItemBuilder): TMenusBuilder;
-    function SubLevel(AMenuItemBuilder: TMenuItemBuilder): TMenusBuilder;
-    function SuperLevel: TMenusBuilder;
+    function WithOwner(AOwner: TComponent): TMenuCreator;
+    function External(const AProc: TMenuCreatorObjProc): TMenuCreator; overload;
+    function External(const AProc: TMenuCreatorProc): TMenuCreator; overload;
+    function AddMenu(AMenuBuilder: TMenuBuilder): TMenuCreator;
+    function AddMenuItem(AMenuItemBuilder: TMenuItemBuilder): TMenuCreator;
+    function SubLevel(AMenuItemBuilder: TMenuItemBuilder): TMenuCreator;
+    function SuperLevel: TMenuCreator;
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenu<T: TMenu>(const AName: string): T; overload;
     function GetMenu(const AName: string): TMenu; overload;
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenuItem<T: TMenuItem>(const AName: string): T; overload;
     function GetMenuItem(const AName: string): TMenuItem; overload;
-    property CurrentLevel: TMenusBuilderLevel read GetCurrenteLevel;
+    property CurrentLevel: TMenuCreatorLevel read GetCurrenteLevel;
     property Registry: TComponentRegistry read GetComponentRegistry;
   end;
 
@@ -632,16 +722,32 @@ type
     function GetFContentHeight: Single;
     function GetComponentRegistry: TComponentRegistry;
     function GetItem(const AName: string): TControl;
-    procedure SetupControlBuilderForGridMode(AControlBuilder: TCustomControlBuilder);
-    function CreateControl(Builder: TCustomControlBuilder; AOwner: TComponent = nil): TControl;
+    procedure ApplyDefaultControlSize(Control: TControl);
+    function CanAddToGrid: Boolean;
+    procedure AdjustControlToCell(AControl: TControl; ACellRect: TRect);
   public
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
-    {$IFDEF FPC}generic{$ENDIF}
-    function GetControl<T: TControl>(const AName: string): T; overload;
+    {$IFDEF FPC}generic{$ENDIF} function GetControl<T: TControl>(const AName: string): T; overload;
     function GetControl(const AName: string): TControl; overload;
     function GetControlsBounds(AControlsNames: array of string): TControlGroupBounds;
+    function GetNamedControl(const AName: string): TControl;
+    property NamedControls[const AName: string]: TControl read GetNamedControl;
+    property ContentWidth: Single read GetContentWidth;
+    property ContentHeight: Single read GetFContentHeight;
+    property CurrentLevel: TControlCreatorLevel read GetCurrenteLevel;
+    property Controls: TControlList read GetControls;
+    property Registry: TComponentRegistry read GetComponentRegistry;
+    property Items[const AName: string]: TControl read GetItem; default;
+  end;
+
+  TControlCreatorHelper = class helper for TControlCreator
+  public
+    {$IFDEF FPC}generic{$ENDIF}
+    procedure SetupControlBuilderForGridMode<TBuild>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+    {$IFDEF FPC}generic{$ENDIF}
+    function CreateControl<TBuild>(ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AOwner: TComponent = nil): TBuild;
     function External(const AProc: TControlCreatorObjProc): TControlCreator; overload;
     function External(const AProc: TControlCreatorProc): TControlCreator; overload;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlCreator;
@@ -659,23 +765,31 @@ type
     function SiblingSubLevelWithBreak(AGroupName: string=''): TControlCreator; overload;
     function SiblingSubLevelWithBreak(ADirection: TControlCreatorDirection;
       AGroupName: string=''): TControlCreator; overload;
-    function SubLevel(AControlBuilder: TControlBuilder;        // main
-      AGroupName: string=''): TControlCreator; overload;
-    function SubLevel(AControlBuilder: TControlBuilder;
-      ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
-    function SiblingSubLevel(AControlBuilder: TControlBuilder;
-      AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
-    function SiblingSubLevel(AControlBuilder: TControlBuilder;
-      ADirection: TControlCreatorDirection;
-      AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
-    function SiblingSubLevel(AControlBuilder: TControlBuilder;
-      ABreak: Boolean=False): TControlCreator; overload;
-    function SiblingSubLevel(AControlBuilder: TControlBuilder;
-      ADirection: TControlCreatorDirection;
-      ABreak: Boolean): TControlCreator; overload;
+    // main
+    {$IFDEF FPC}generic{$ENDIF}
+    function SubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload;
+    function SubLevel(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF}
+    function SubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
+    function SubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF}
+    function SiblingSubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel(AControlBuilder: TControlBuilder; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF}
+    function SiblingSubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF}
+    function SiblingSubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel(AControlBuilder: TControlBuilder; ABreak: Boolean=False): TControlCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF}
+    function SiblingSubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator; overload;
+    function SiblingSubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF}
+    function SiblingSubLevelWithBreak<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload;
     function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator; overload;
-    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection;
-      AGroupName: string=''): TControlCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF}
+    function SiblingSubLevelWithBreak<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
+    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
     function SetVerticalSpace(AVerticalSpace: Single): TControlCreator;
     function SetHorizontalSpace(AHorizontalSpace: Single): TControlCreator;
     function SetTopLeft(ATop, ALeft: Single): TControlCreator;
@@ -725,25 +839,24 @@ type
     function Break(AIncTopOrLeft: Single): TControlCreator; overload;
     function BreakLine(AIncTop: Single): TControlCreator; overload;
     function BreakColumn(AIncLeft: Single): TControlCreator; overload;
-    {$IFDEF FRAMEWORK_FMX}function WithOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlCreator;
-    {$ELSE}function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlCreator;
+    {$IFDEF FRAMEWORK_FMX}
+    function WithOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlCreator;
+    {$ELSE}
+    function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlCreator;
     {$ENDIF}
     function WithParent(AParent: TWinControl): TControlCreator;
-    function AddControl(AControlBuilder: TCustomControlBuilder; // main
-      const AGroups: array of string): TControlCreator; overload;
-    function AddControl(AControlBuilder: TCustomControlBuilder): TControlCreator; overload;
-    function AddControls(AControlCreateBuilders: array of TCustomControlBuilder): TControlCreator; overload;
-    function AddControls(AControlCreateBuilders: array of TCustomControlBuilder;
-      const AGroups: array of string): TControlCreator; overload;
+    // main
+    {$IFDEF FPC}generic{$ENDIF}
+    function AddControl<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; const AGroups: array of string): TControlCreator; overload;
+    {$IFDEF FPC}generic{$ENDIF}
+    function AddControl<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator; overload;
+    function AddControl(AControlBuilder: TControlBuilder): TControlCreator; overload;
     function AddControl(AClass: TControlClass; const AName: string=''): TControlCreator; overload;
     function AddControl(AClass: TControlClass; const AName: string; out Reference): TControlCreator; overload;
     function AddControl(AClass: TControlClass; out Reference): TControlCreator; overload;
     function AddControl(AClass: TControlClass; const AName: string; AProc: TControlSetupProcObj): TControlCreator; overload;
     function AddControl(AClass: TControlClass; const AName: string; out Reference; AProc: TControlSetupProcObj): TControlCreator; overload;
     function AddControl(AClass: TControlClass; out Reference; AProc: TControlSetupProcObj): TControlCreator; overload;
-    function AddInLevel(const AControls: array of TCustomControlBuilder;
-      ADirection: TControlCreatorDirection): TControlCreator;
-    function GetNamedControl(const AName: string): TControl;
     function MoveControls(const AControl: TControl; const ADX,
       ADY: Single): TControlCreator; overload;
     function MoveControls(const AControlNames: array of string;
@@ -770,27 +883,20 @@ type
       AReferenceGroup: array of string): TControlCreator;
     function ReturnCurrentLevel(var ACurrentLevel: TControlCreatorLevel): TControlCreator;
     function ReturnLastControl(out AControl: TControl): TControlCreator;
-    property NamedControls[const AName: string]: TControl read GetNamedControl;
-    property ContentWidth: Single read GetContentWidth;
-    property ContentHeight: Single read GetFContentHeight;
-    property CurrentLevel: TControlCreatorLevel read GetCurrenteLevel;
-    property Controls: TControlList read GetControls;
-    property Registry: TComponentRegistry read GetComponentRegistry;
-    property Items[const AName: string]: TControl read GetItem; default;
   end;
 
   TOPCBCreators = class
   private
     FRegistryContextHandle: IRegistryContextHandle;
-    FComponentsBuilder: TComponentsBuilder;
+    FComponentCreator: TComponentCreator;
     FControlCreator: TControlCreator;
-    FMenusBuilder: TMenusBuilder;
+    FMenuCreator: TMenuCreator;
   public
     constructor Create(const ARegistryContextKey: string='');
     destructor Destroy; override;
-    function AsComponentsBuilder: TComponentsBuilder;
+    function AsComponentCreator: TComponentCreator;
     function AsControlCreator: TControlCreator;
-    function AsMenusBuilder: TMenusBuilder;
+    function AsMenuCreator: TMenuCreator;
   end;
 
 implementation
@@ -808,223 +914,77 @@ uses
 
 { TControlBuilder }
 
-constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
-  AClass: TControlClass; const AName: string='');
-begin
-  inherited Create;
-  FControl := nil;
-  FObjectClass := AClass;
-  FName := AName;
-  FTag := 0;
-  FHeight := -1;
-  FWidth := -1;
-  FAlign := TOptionalAlign.None;
-  FCaption := TOptionalString.None;
-  FText := TOptionalString.None;
-  FTop := TOptionalSingle.None;
-  FLeft := TOptionalSingle.None;
-  FOnClick := nil;
-end;
-
-constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
-  AClass: TControlClass; const AName: string; out Reference);
-begin
-  Create(AClass, AName);
-  Assign(Reference);
-end;
-
-constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
-  AClass: TControlClass; out Reference);
-begin
-  Create(AClass, '');
-  Assign(Reference);
-end;
-
-constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
-  AControl: TControl);
-begin
-  inherited Create;
-  FControl := AControl;
-  FObjectClass := TControlClass(AControl.ClassType);
-  FName := AControl.Name;
-  FTag := 0;
-  FHeight := -1;
-  FWidth := -1;
-  FAlign := TOptionalAlign.None;
-  FCaption := TOptionalString.None;
-  FText := TOptionalString.None;
-  FTop := TOptionalSingle.None;
-  FLeft := TOptionalSingle.None;
-  FOnClick := nil;
-  // FTargetField := nil;
-end;
-
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Build: TControl;
-var
-  Proc: TControlSetupProcObj;
-  RefProc: TControlSetupRefProc;
-  Ref: Pointer;
-begin
-  try
-    if Assigned(Control) then
-      Result := Control
-    else
-      Result := ObjectClass.Create(Self.Owner);
-
-    if not Self.Name.IsEmpty then
-      Result.Name := Self.Name;
-
-    Result.Tag := FTag;
-    Result.Parent := Self.Parent;
-
-    if Caption.HasValue then
-    begin
-      {$IFDEF FRAMEWORK_FMX}
-      if Result is TPresentedTextControl then
-        TPresentedTextControl(Result).Text := Caption.Value;
-      if Result is TTextControl then
-        TTextControl(Result).Text := Caption.Value;
-      {$ELSE}
-        {$IFDEF FPC}
-        Result.Caption := Caption.Value;
-        {$ELSE}
-        TProtectedControl(Result).Caption := Caption.Value;
-        {$ENDIF}
-      {$ENDIF}
-    end;
-
-    if Text.HasValue then
-    begin
-      {$IFDEF FRAMEWORK_FMX}
-      if Result is TPresentedTextControl then
-        TPresentedTextControl(Result).Text := Text.Value;
-      if Result is TTextControl then
-        TTextControl(Result).Text := Text.Value;
-      {$ELSE}
-        {$IFDEF FPC}
-          Result.Caption := Text.Value;
-        {$ELSE}
-          TProtectedControl(Result).Text := Text.Value;
-        {$ENDIF}
-      {$ENDIF}
-    end;
-
-    if Align.HasValue then
-      Result.Align := Align.Value;
-
-    if Width >= 0 then
-      Result.Width := {$IFDEF FRAMEWORK_FMX}Width{$ELSE}Trunc(Width){$ENDIF};
-
-    if Height >= 0 then
-      Result.Height := {$IFDEF FRAMEWORK_FMX}Height{$ELSE}Trunc(Height){$ENDIF};
-
-    if Top.HasValue then
-    begin
-      {$IFDEF FRAMEWORK_FMX}
-      Result.Position.Y := Top.Value;
-      {$ELSE}
-      Result.Top := Trunc(Top.Value);
-      {$ENDIF}
-    end;
-
-    if Left.HasValue then
-    begin
-      {$IFDEF FRAMEWORK_FMX}
-      Result.Position.X := Left.Value;
-      {$ELSE}
-      Result.Left := Trunc(Left.Value);
-      {$ENDIF}
-    end;
-
-    TProtectedControl(Result).OnClick := OnClick;
-
-    for Ref in FTargetFields do
-      PPointer(Ref)^ := Result;
-
-    for Proc in FSetupProcList do
-      Proc(Result);
-
-    for RefProc in FSetupRefProcList do
-      RefProc(Result);
-
-    ApplyPendindProps(Result);
-  finally
-    if FAutoFree then
-      Free;
-  end;
-end;
-
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithAlign(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithAlign(
   AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF}): TSelf;
 begin
   Result := TSelf(Self);
   FAlign := AAlign;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithCaption(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithCaption(
   ACaption: string): TSelf;
 begin
   Result := TSelf(Self);
   FCaption := ACaption;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithHeight(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithHeight(
   AHeight: Single): TSelf;
 begin
   Result := TSelf(Self);
   FHeight := AHeight;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithLeft(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithLeft(
   ALeft: Single): TSelf;
 begin
   Result := TSelf(Self);
   FLeft := ALeft;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithName(
   AName: string): TSelf;
 begin
   Result := TSelf(Self);
   FName := AName;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithOnClick(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithOnClick(
   AOnClick: TNotifyEvent): TSelf;
 begin
   Result := TSelf(Self);
   FOnClick := AOnClick;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithTag(
   ATag: NativeInt): TSelf;
 begin
   Result := TSelf(Self);
   FTag := ATag;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithText(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithText(
   AText: string): TSelf;
 begin
   Result := TSelf(Self);
   FText := AText;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTop(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithTop(
   ATop: Single): TSelf;
 begin
   Result := TSelf(Self);
   FTop := ATop;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithWidth(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithWidth(
   AWidth: Single): TSelf;
 begin
   Result := TSelf(Self);
   FWidth := AWidth;
 end;
 
-function TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithWidthAndHeight(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithWidthAndHeight(
   AWidth: Single; AHeight: Single): TSelf;
 begin
   Result := TSelf(Self);
@@ -1034,7 +994,7 @@ end;
 
 { TControlCreator }
 
-function TControlCreator.BreakLine: TControlCreator;
+function TControlCreatorHelper.BreakLine: TControlCreator;
 begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
@@ -1050,7 +1010,7 @@ begin
   end;
 end;
 
-function TControlCreator.Break: TControlCreator;
+function TControlCreatorHelper.Break: TControlCreator;
 begin
   Result := Self;
   if CurrentLevel.Direction = cpdHorizontal then
@@ -1059,7 +1019,7 @@ begin
     BreakColumn;
 end;
 
-function TControlCreator.Break(AIncTopOrLeft: Single): TControlCreator;
+function TControlCreatorHelper.Break(AIncTopOrLeft: Single): TControlCreator;
 begin
   Result := Self;
   Self.Break;
@@ -1069,14 +1029,14 @@ begin
     IncLeft(AIncTopOrLeft);
 end;
 
-function TControlCreator.BreakColumn(AIncLeft: Single): TControlCreator;
+function TControlCreatorHelper.BreakColumn(AIncLeft: Single): TControlCreator;
 begin
   Result := Self;
   Self.BreakColumn;
   IncLeft(AIncLeft);
 end;
 
-function TControlCreator.BreakColumn: TControlCreator;
+function TControlCreatorHelper.BreakColumn: TControlCreator;
 begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
@@ -1092,7 +1052,7 @@ begin
   end;
 end;
 
-function TControlCreator.CenterControlsVertically(const AControlNames,
+function TControlCreatorHelper.CenterControlsVertically(const AControlNames,
   AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
@@ -1111,7 +1071,7 @@ begin
   MoveControls(AControlNames, 0, DeltaY);
 end;
 
-function TControlCreator.CenterControlsInParentVertically(
+function TControlCreatorHelper.CenterControlsInParentVertically(
   const AControlNames: array of string): TControlCreator;
 var
   TargetBounds: TControlGroupBounds;
@@ -1160,7 +1120,7 @@ begin
   MoveControls(AControlNames, 0, DeltaY);
 end;
 
-function TControlCreator.CenterControlsInParentHorizontally(
+function TControlCreatorHelper.CenterControlsInParentHorizontally(
   const AControlNames: array of string): TControlCreator;
 var
   TargetBounds: TControlGroupBounds;
@@ -1208,7 +1168,7 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-function TControlCreator.CenterControlInParentHorizontally: TControlCreator;
+function TControlCreatorHelper.CenterControlInParentHorizontally: TControlCreator;
 var
   ParentCtrl: TControl;
   ParentWidth: Single;
@@ -1263,8 +1223,8 @@ begin
   FLevelStack.Add(TControlCreatorLevel.Create);
 end;
 
-procedure TControlCreator.SetupControlBuilderForGridMode(
-  AControlBuilder: TCustomControlBuilder);
+{$IFDEF FPC}generic{$ENDIF}
+procedure TControlCreatorHelper.SetupControlBuilderForGridMode<TBuild>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
 var
   Row, Col: Integer;
   RowSpan, ColSpan: Integer;
@@ -1288,8 +1248,8 @@ begin
   begin
     RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(
       RCell,
-      AControlBuilder.Width,
-      AControlBuilder.Height
+      IfThen(AControlBuilder.Width.HasValue, AControlBuilder.Width.Value, 0),
+      IfThen(AControlBuilder.Height.HasValue, AControlBuilder.Height.Value,0)
     );
 
     AControlBuilder.Align := {$IFDEF FRAMEWORK_FMX}TAlignLayout.None{$ELSE}alNone{$ENDIF};
@@ -1302,103 +1262,40 @@ begin
   CurrentLevel.GridMode.ResetSpans;
 end;
 
-function TControlCreator.CreateControl(Builder: TCustomControlBuilder;
-  AOwner: TComponent = nil): TControl;
+{$IFDEF FPC}generic{$ENDIF}
+function TControlCreatorHelper.CreateControl<TBuild>(
+  ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  AOwner: TComponent = nil): TBuild;
 var
   ControlName: string;
 begin
   ControlName := '';
-  if not Builder.Name.IsEmpty then
-    ControlName := Registry.UniqueName(Builder.Name);
+  if not ABuilder.Name.IsEmpty then
+    ControlName := Registry.UniqueName(ABuilder.Name);
 
-  if not Builder.Top.HasValue then
-    Builder.Top := CurrentLevel.CurrentTop;
+  if not ABuilder.Top.HasValue then
+    ABuilder.Top := CurrentLevel.CurrentTop;
 
-  if not Builder.Left.HasValue then
-    Builder.Left := CurrentLevel.CurrentLeft;
+  if not ABuilder.Left.HasValue then
+    ABuilder.Left := CurrentLevel.CurrentLeft;
 
   if not Assigned(AOwner) then
     AOwner := FOwner;
 
-  Builder.Owner := AOwner;
-  Builder.Parent := CurrentLevel.Parent;
-  Builder.Name := ControlName;
+  ABuilder.Owner := AOwner;
+  ABuilder.Parent := CurrentLevel.Parent;
+  ABuilder.Name := ControlName;
 
-  Result := Builder.Build;
+  Result := ABuilder.Build;
 end;
 
-function TControlCreator.AddControl(AControlBuilder: TCustomControlBuilder;
+{$IFDEF FPC}generic{$ENDIF}
+function TControlCreatorHelper.AddControl<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   const AGroups: array of string): TControlCreator;
 var
-  Control: TControl;
+  Control: TBuild;
   Level: TControlCreatorLevel;
-
-  procedure ApplyDefaultControlSize;
-  begin
-    {$IFDEF FRAMEWORK_FMX}
-    if CurrentLevel.ControlHeight.HasValue then
-      Control.Height := CurrentLevel.ControlHeight.Value;
-    if CurrentLevel.ControlWidth.HasValue then
-      Control.Width := CurrentLevel.ControlWidth.Value;
-    {$ELSE}
-    if CurrentLevel.ControlHeight.HasValue then
-      Control.Height := Trunc(CurrentLevel.ControlHeight.Value);
-    if CurrentLevel.ControlWidth.HasValue then
-      Control.Width := Trunc(CurrentLevel.ControlWidth.Value);
-    {$ENDIF}
-  end;
-
-  function CanAddToGrid: Boolean;
-  var
-    R, C: Integer;
-  begin
-    Result := False;
-
-    if CurrentLevel.GridMode.IsCellFree(
-      CurrentLevel.GridMode.CurrentRow,
-      CurrentLevel.GridMode.CurrentCol
-    ) then
-    begin
-      Result := True;
-      Exit;
-    end;
-
-    if (CurrentLevel.GridMode.Direction = gfdRowFirst) and (gaeRows in CurrentLevel.GridMode.AutoExpand)
-       or
-       (CurrentLevel.GridMode.Direction = gfdColFirst) and (gaeCols in CurrentLevel.GridMode.AutoExpand)
-    then
-    begin
-      Result := True;
-      Exit;
-    end;
-
-    Result := CurrentLevel.GridMode.PeekNext(R, C);
-  end;
-
-  procedure AdjustControlToCell(AControl: TControl; ACellRect: TRect);
-  var
-    RControl: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
-  begin
-
-    RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(
-      ACellRect,
-      AControl.Width,
-      AControl.Height
-    );
-
-    TProtectedControl(AControl).Left := RControl.Left;
-    TProtectedControl(AControl).Top := RControl.Top;
-  end;
-
-  function GetRectFromControlBuilder(AControlBuilder: TControlBuilder): TRect;
-  begin
-    Result := TRect.Create(
-      TPoint.Create(Trunc(AControlBuilder.Top.Value), Trunc(AControlBuilder.Left.Value)),
-      Trunc(AControlBuilder.Width),
-      Trunc(AControlBuilder.Height)
-    );
-  end;
-
 begin
   Result := Self;
 
@@ -1407,17 +1304,17 @@ begin
     if not CanAddToGrid then
       Exit;
 
-    SetupControlBuilderForGridMode(AControlBuilder);
-    Control := CreateControl(AControlBuilder);
+    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
+    Control := {$IFDEF FPC}specialize{$ENDIF} CreateControl<TBuild>(AControlBuilder);
   end
   else
   begin
-    Control := CreateControl(AControlBuilder);
+    Control := {$IFDEF FPC}specialize{$ENDIF} CreateControl<TBuild>(AControlBuilder);
   end;
 
-  ApplyDefaultControlSize;
+  ApplyDefaultControlSize(Control as TControl);
 
-  Registry.AddComponent(Control, Control.Name);
+  Registry.AddComponent(Control as TControl, (Control as TControl).Name);
 
   // caso especial: TTabSheet / TPageControl
   {$IFDEF FRAMEWORK_FMX}
@@ -1435,72 +1332,107 @@ begin
 
   for Level in FLevelStack do
     if not Level.GroupName.IsEmpty then
-      AddControlToGroups(Control, [Level.GroupName]);
+      AddControlToGroups(Control as TControl, [Level.GroupName]);
 
-  AddControlToGroups(Control, AGroups);
+  AddControlToGroups(Control as TControl, AGroups);
 
-  MoveTopLeftAfterControl(Control);
+  MoveTopLeftAfterControl(Control as TControl);
 end;
 
-function TControlCreator.AddControl(AClass: TControlClass;
+procedure TControlCreator.ApplyDefaultControlSize(Control: TControl);
+begin
+  {$IFDEF FRAMEWORK_FMX}
+  if CurrentLevel.ControlHeight.HasValue then
+    Control.Height := CurrentLevel.ControlHeight.Value;
+  if CurrentLevel.ControlWidth.HasValue then
+    Control.Width := CurrentLevel.ControlWidth.Value;
+  {$ELSE}
+  if CurrentLevel.ControlHeight.HasValue then
+    Control.Height := Trunc(CurrentLevel.ControlHeight.Value);
+  if CurrentLevel.ControlWidth.HasValue then
+    Control.Width := Trunc(CurrentLevel.ControlWidth.Value);
+  {$ENDIF}
+end;
+
+function TControlCreator.CanAddToGrid: Boolean;
+var
+  R, C: Integer;
+begin
+  Result := False;
+
+  if CurrentLevel.GridMode.IsCellFree(
+    CurrentLevel.GridMode.CurrentRow,
+    CurrentLevel.GridMode.CurrentCol
+  ) then
+    Exit(True);
+
+  if ((CurrentLevel.GridMode.Direction = gfdRowFirst) and (gaeRows in CurrentLevel.GridMode.AutoExpand))
+     or
+     ((CurrentLevel.GridMode.Direction = gfdColFirst) and (gaeCols in CurrentLevel.GridMode.AutoExpand)) then
+    Exit(True);
+
+  Result := CurrentLevel.GridMode.PeekNext(R, C);
+end;
+
+procedure TControlCreator.AdjustControlToCell(AControl: TControl; ACellRect: TRect);
+var
+  RControl: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+begin
+  RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(
+    ACellRect,
+    AControl.Width,
+    AControl.Height
+  );
+
+  TProtectedControl(AControl).Left := RControl.Left;
+  TProtectedControl(AControl).Top := RControl.Top;
+end;
+
+function TControlCreatorHelper.AddControl(AControlBuilder: TControlBuilder): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(AControlBuilder);
+end;
+
+function TControlCreatorHelper.AddControl(AClass: TControlClass;
   const AName: string=''): TControlCreator;
 begin
-  Result := AddControl(TControlBuilder.Create(AClass, AName));
+  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, AName));
 end;
 
-function TControlCreator.AddControl(AClass: TControlClass; const AName: string;
+function TControlCreatorHelper.AddControl(AClass: TControlClass; const AName: string;
   out Reference): TControlCreator;
 begin
-  Result := AddControl(TControlBuilder.Create(AClass, AName, Reference));
+  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, AName, Reference));
 end;
 
-function TControlCreator.AddControl(AClass: TControlClass;
+function TControlCreatorHelper.AddControl(AClass: TControlClass;
   out Reference): TControlCreator;
 begin
-  Result := AddControl(TControlBuilder.Create(AClass, Reference));
+  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, Reference));
 end;
 
-function TControlCreator.AddControl(AClass: TControlClass; const AName: string;
+function TControlCreatorHelper.AddControl(AClass: TControlClass; const AName: string;
   AProc: TControlSetupProcObj): TControlCreator;
 begin
-  Result := AddControl(TControlBuilder.Create(AClass, AName).Setup(AProc));
+  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, AName).Setup(AProc));
 end;
 
-function TControlCreator.AddControl(AClass: TControlClass; const AName: string;
+function TControlCreatorHelper.AddControl(AClass: TControlClass; const AName: string;
   out Reference; AProc: TControlSetupProcObj): TControlCreator;
 begin
-  Result := AddControl(TControlBuilder.Create(AClass, AName, Reference).Setup(AProc));
+  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, AName, Reference).Setup(AProc));
 end;
 
-function TControlCreator.AddControl(AClass: TControlClass; out Reference;
+function TControlCreatorHelper.AddControl(AClass: TControlClass; out Reference;
   AProc: TControlSetupProcObj): TControlCreator;
 begin
-  Result := AddControl(TControlBuilder.Create(AClass, Reference).Setup(AProc));
+  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, Reference).Setup(AProc));
 end;
 
-function TControlCreator.AddControl(AControlBuilder: TCustomControlBuilder): TControlCreator;
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.AddControl<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator;
 begin
-  Result := AddControl(AControlBuilder, []);
-end;
-
-function TControlCreator.AddControls(AControlCreateBuilders: array of TCustomControlBuilder;
-  const AGroups: array of string): TControlCreator;
-var
-  I: Integer;
-begin
-  Result := Self;
-  for I := Low(AControlCreateBuilders) to High(AControlCreateBuilders) do
-    AddControl(AControlCreateBuilders[I], AGroups);
-end;
-
-function TControlCreator.AddControls(
-  AControlCreateBuilders: array of TCustomControlBuilder): TControlCreator;
-var
-  I: Integer;
-begin
-  Result := Self;
-  for I := Low(AControlCreateBuilders) to High(AControlCreateBuilders) do
-    AddControl(AControlCreateBuilders[I], []);
+  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TBuild>(AControlBuilder, []);
 end;
 
 procedure TControlCreator.AddControlToGroups(AControl: TControl;
@@ -1520,16 +1452,7 @@ begin
   end;
 end;
 
-function TControlCreator.AddInLevel(const AControls: array of TCustomControlBuilder;
-  ADirection: TControlCreatorDirection): TControlCreator;
-begin
-  Result := Self;
-  SubLevel(ADirection);
-  AddControls(AControls);
-  SuperLevel;
-end;
-
-function TControlCreator.CenterControlsHorizontally(const AControlNames,
+function TControlCreatorHelper.CenterControlsHorizontally(const AControlNames,
   AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
@@ -1548,7 +1471,7 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-function TControlCreator.AlignControlsRight(const AControlNames,
+function TControlCreatorHelper.AlignControlsRight(const AControlNames,
   AReferenceGroup: array of string; const ARightPadding: Single = 0): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
@@ -1568,7 +1491,7 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
-function TControlCreator.SubLevel(AGroupName: string): TControlCreator;
+function TControlCreatorHelper.SubLevel(AGroupName: string): TControlCreator;
 var
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
@@ -1604,38 +1527,38 @@ begin
     CurrentLevel.GroupName := AGroupName;
 end;
 
-function TControlCreator.SubLevel(
+function TControlCreatorHelper.SubLevel(
   ADirection: TControlCreatorDirection; AGroupName: string): TControlCreator;
 begin
   Result := SubLevel(AGroupName);
   SetDirection(ADirection);
 end;
 
-function TControlCreator.SiblingSubLevel(ADirection: TControlCreatorDirection;
+function TControlCreatorHelper.SiblingSubLevel(ADirection: TControlCreatorDirection;
   ABreak: Boolean): TControlCreator;
 begin
   Result := SiblingSubLevel(ADirection, '', ABreak);
 end;
 
-function TControlCreator.SiblingSubLevelWithBreak(
+function TControlCreatorHelper.SiblingSubLevelWithBreak(
   ADirection: TControlCreatorDirection;
   AGroupName: string): TControlCreator;
 begin
   Result := SiblingSubLevel(ADirection, AGroupName, True);
 end;
 
-function TControlCreator.SiblingSubLevelWithBreak(
+function TControlCreatorHelper.SiblingSubLevelWithBreak(
   AGroupName: string): TControlCreator;
 begin
   Result := SiblingSubLevel(AGroupName, True);
 end;
 
-function TControlCreator.SiblingSubLevel(ABreak: Boolean): TControlCreator;
+function TControlCreatorHelper.SiblingSubLevel(ABreak: Boolean): TControlCreator;
 begin
   Result := SiblingSubLevel('', ABreak);
 end;
 
-function TControlCreator.BreakLine(AIncTop: Single): TControlCreator;
+function TControlCreatorHelper.BreakLine(AIncTop: Single): TControlCreator;
 begin
   Result := Self;
   Self.BreakLine;
@@ -1653,7 +1576,7 @@ begin
   inherited;
 end;
 
-function TControlCreator.SuperLevel: TControlCreator;
+function TControlCreatorHelper.SuperLevel: TControlCreator;
 var
   SubL, SuperL: TControlCreatorLevel;
   Bounds: TControlGroupBounds;
@@ -1769,7 +1692,7 @@ begin
   Result := Self;
 end;
 
-function TControlCreator.RecalcParentHeight(AExtraHeight: Single): TControlCreator;
+function TControlCreatorHelper.RecalcParentHeight(AExtraHeight: Single): TControlCreator;
 begin
   Result := Self;
   {$IFDEF FRAMEWORK_FMX}
@@ -1784,7 +1707,7 @@ begin
   {$ENDIF}
 end;
 
-function TControlCreator.RecalcParentSize(AExtraHeight,
+function TControlCreatorHelper.RecalcParentSize(AExtraHeight,
   AExtraWidth: Single): TControlCreator;
 begin
   Result := Self;
@@ -1792,7 +1715,7 @@ begin
   RecalcParentWidth(AExtraWidth);
 end;
 
-function TControlCreator.RecalcParentWidth(
+function TControlCreatorHelper.RecalcParentWidth(
   AExtraWidth: Single): TControlCreator;
 begin
   Result := Self;
@@ -1808,7 +1731,7 @@ begin
   {$ENDIF}
 end;
 
-function TControlCreator.CopyHeight(const AControlNames,
+function TControlCreatorHelper.CopyHeight(const AControlNames,
   AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
@@ -1836,7 +1759,7 @@ begin
   end;
 end;
 
-function TControlCreator.CopyWidth(const AControlNames,
+function TControlCreatorHelper.CopyWidth(const AControlNames,
   AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
@@ -1864,7 +1787,7 @@ begin
   end;
 end;
 
-function TControlCreator.CopySize(const AControlNames,
+function TControlCreatorHelper.CopySize(const AControlNames,
   AReferenceGroup: array of string): TControlCreator;
 var
   RefBounds: TControlGroupBounds;
@@ -1894,14 +1817,14 @@ begin
   end;
 end;
 
-function TControlCreator.ReturnCurrentLevel(var ACurrentLevel:
+function TControlCreatorHelper.ReturnCurrentLevel(var ACurrentLevel:
   TControlCreatorLevel): TControlCreator;
 begin
   Result := Self;
   ACurrentLevel := Self.CurrentLevel;
 end;
 
-function TControlCreator.ReturnLastControl(out AControl: TControl): TControlCreator;
+function TControlCreatorHelper.ReturnLastControl(out AControl: TControl): TControlCreator;
 begin
   Result := Self;
   AControl := nil;
@@ -1915,19 +1838,19 @@ begin
     Result := nil;
 end;
 
-function TControlCreator.IncLeft(AIncLeft: Single): TControlCreator;
+function TControlCreatorHelper.IncLeft(AIncLeft: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.CurrentLeft := CurrentLevel.CurrentLeft + AIncLeft;
 end;
 
-function TControlCreator.IncTop(AIncTop: Single): TControlCreator;
+function TControlCreatorHelper.IncTop(AIncTop: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.CurrentTop := CurrentLevel.CurrentTop + AIncTop;
 end;
 
-function TControlCreator.IncTopLeft(AIncTop,
+function TControlCreatorHelper.IncTopLeft(AIncTop,
   AIncLeft: Single): TControlCreator;
 begin
   Result := Self;
@@ -2013,7 +1936,7 @@ begin
   Result := Self.GetControl(AName);
 end;
 
-function TControlCreator.MoveControls(const AControl: TControl;
+function TControlCreatorHelper.MoveControls(const AControl: TControl;
   const ADX, ADY: Single): TControlCreator;
 var
     L, T: Single;
@@ -2040,7 +1963,7 @@ begin
   {$ENDIF}
 end;
 
-function TControlCreator.MoveControls(const AControlNames: array of string;
+function TControlCreatorHelper.MoveControls(const AControlNames: array of string;
   const ADX, ADY: Single): TControlCreator;
 var
   Name: string;
@@ -2149,7 +2072,7 @@ begin
   MoveTopLeftAfterRect(R, AControl.Align);
 end;
 
-function TControlCreator.SiblingSubLevel(ADirection: TControlCreatorDirection;
+function TControlCreatorHelper.SiblingSubLevel(ADirection: TControlCreatorDirection;
   AGroupName: string; ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
@@ -2158,7 +2081,7 @@ begin
   SubLevel(ADirection, AGroupName);
 end;
 
-function TControlCreator.SiblingSubLevel(AGroupName: string;
+function TControlCreatorHelper.SiblingSubLevel(AGroupName: string;
   ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
@@ -2167,19 +2090,19 @@ begin
   SubLevel(AGroupName);
 end;
 
-function TControlCreator.SetControlHeight(AHeight: Single): TControlCreator;
+function TControlCreatorHelper.SetControlHeight(AHeight: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlHeight := AHeight;
 end;
 
-function TControlCreator.SetControlWidth(AWidth: Single): TControlCreator;
+function TControlCreatorHelper.SetControlWidth(AWidth: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlWidth := AWidth;
 end;
 
-function TControlCreator.SetControlWidthAndHeight(AWidth,
+function TControlCreatorHelper.SetControlWidthAndHeight(AWidth,
   AHeight: Single): TControlCreator;
 begin
   Result := Self;
@@ -2187,26 +2110,26 @@ begin
   CurrentLevel.ControlWidth := AWidth;
 end;
 
-function TControlCreator.UnsetControlHeight: TControlCreator;
+function TControlCreatorHelper.UnsetControlHeight: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlHeight := TOptionalSingle.None;
 end;
 
-function TControlCreator.UnsetControlWidth: TControlCreator;
+function TControlCreatorHelper.UnsetControlWidth: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlWidth := TOptionalSingle.None;
 end;
 
-function TControlCreator.UnsetControlWidthAndHeight: TControlCreator;
+function TControlCreatorHelper.UnsetControlWidthAndHeight: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.ControlHeight := TOptionalSingle.None;
   CurrentLevel.ControlWidth := TOptionalSingle.None;
 end;
 
-function TControlCreator.GridInit(ARows, ACols: Integer): TControlCreator;
+function TControlCreatorHelper.GridInit(ARows, ACols: Integer): TControlCreator;
 begin
   Result := Self;
   SubLevel;
@@ -2218,7 +2141,7 @@ begin
   );
 end;
 
-function TControlCreator.GridCellSpan(ACellSpan: Integer): TControlCreator;
+function TControlCreatorHelper.GridCellSpan(ACellSpan: Integer): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.ResetSpans;
@@ -2229,19 +2152,19 @@ begin
     CurrentLevel.GridMode.RowSpan := ACellSpan;
 end;
 
-function TControlCreator.GridRowSpan(ARowSpan: Integer): TControlCreator;
+function TControlCreatorHelper.GridRowSpan(ARowSpan: Integer): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.RowSpan := ARowSpan;
 end;
 
-function TControlCreator.GridColSpan(AColSpan: Integer): TControlCreator;
+function TControlCreatorHelper.GridColSpan(AColSpan: Integer): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.ColSpan := AColSpan;
 end;
 
-function TControlCreator.GridSetCellWidthAndHeight(AWidth,
+function TControlCreatorHelper.GridSetCellWidthAndHeight(AWidth,
   AHeight: Integer): TControlCreator;
 begin
   Result := Self;
@@ -2249,93 +2172,93 @@ begin
   CurrentLevel.GridMode.CellHeight := AHeight;
 end;
 
-function TControlCreator.GridSetColWidth(ACol: Integer;
+function TControlCreatorHelper.GridSetColWidth(ACol: Integer;
   AWidth: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.SetColWidth(ACol, AWidth);
 end;
 
-function TControlCreator.GridSetRowHeight(ARow: Integer;
+function TControlCreatorHelper.GridSetRowHeight(ARow: Integer;
   AHeight: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.SetRowHeight(ARow, AHeight);
 end;
 
-function TControlCreator.GridSetColOffset(ACol: Integer; AOffset: Single): TControlCreator;
+function TControlCreatorHelper.GridSetColOffset(ACol: Integer; AOffset: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.SetColOffset(ACol, AOffset);
 end;
 
-function TControlCreator.GridSetRowOffset(ARow: Integer; AOffset: Single): TControlCreator;
+function TControlCreatorHelper.GridSetRowOffset(ARow: Integer; AOffset: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.SetRowOffset(ARow, AOffset);
 end;
 
-function TControlCreator.GridAutoExpand: TControlCreator;
+function TControlCreatorHelper.GridAutoExpand: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.AutoExpand := [gaeRows, gaeCols];
 end;
 
-function TControlCreator.GridAutoExpandRows: TControlCreator;
+function TControlCreatorHelper.GridAutoExpandRows: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.AutoExpand := [gaeRows];
 end;
 
-function TControlCreator.GridAutoExpandCols: TControlCreator;
+function TControlCreatorHelper.GridAutoExpandCols: TControlCreator;
 begin
   Result := Self;
   CurrentLevel.GridMode.AutoExpand := [gaeCols];
 end;
 
-function TControlCreator.GridCellPosition(ACellPosition: TCellPosition): TControlCreator;
+function TControlCreatorHelper.GridCellPosition(ACellPosition: TCellPosition): TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellPosition := ACellPosition;
 end;
 
-function TControlCreator.GridCellNoStrech: TControlCreator;
+function TControlCreatorHelper.GridCellNoStrech: TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellStrech := [];
 end;
 
-function TControlCreator.GridCellStrechAll: TControlCreator;
+function TControlCreatorHelper.GridCellStrechAll: TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellStrech := [csVertical, csHorizontal];
 end;
 
-function TControlCreator.GridCellStrechHorizontal: TControlCreator;
+function TControlCreatorHelper.GridCellStrechHorizontal: TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellStrech := [csHorizontal];
 end;
 
-function TControlCreator.GridCellStrechVertical: TControlCreator;
+function TControlCreatorHelper.GridCellStrechVertical: TControlCreator;
 begin
   Result := Self;
   Self.CurrentLevel.GridMode.CellStrech := [csVertical];
 end;
 
-function TControlCreator.GridReturnNumberOfRows(out ARows: Integer): TControlCreator;
+function TControlCreatorHelper.GridReturnNumberOfRows(out ARows: Integer): TControlCreator;
 begin
   Result := Self;
   ARows := Self.CurrentLevel.GridMode.Rows;
 end;
 
-function TControlCreator.GridReturnNumberOfCols(out ACols: Integer): TControlCreator;
+function TControlCreatorHelper.GridReturnNumberOfCols(out ACols: Integer): TControlCreator;
 begin
   Result := Self;
   ACols := Self.CurrentLevel.GridMode.Cols;
 end;
 
-function TControlCreator.GridSkipCell: TControlCreator;
+function TControlCreatorHelper.GridSkipCell: TControlCreator;
 var
   Row, Col, RowSpan, ColSpan: Integer;
   Dir: TGridFillDirection;
@@ -2364,7 +2287,7 @@ begin
   end;
 end;
 
-function TControlCreator.GridSkipCells(ANumCells: Integer): TControlCreator;
+function TControlCreatorHelper.GridSkipCells(ANumCells: Integer): TControlCreator;
 var
   I: Integer;
 begin
@@ -2379,7 +2302,7 @@ begin
     GridSkipCell;
 end;
 
-function TControlCreator.GridGotoCell(ARow, ACol: Integer): TControlCreator;
+function TControlCreatorHelper.GridGotoCell(ARow, ACol: Integer): TControlCreator;
 var
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
@@ -2405,7 +2328,7 @@ begin
   end;
 end;
 
-function TControlCreator.GridFinish: TControlCreator;
+function TControlCreatorHelper.GridFinish: TControlCreator;
 begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
@@ -2415,21 +2338,21 @@ begin
   end;
 end;
 
-function TControlCreator.SetDirection(
+function TControlCreatorHelper.SetDirection(
   ADirection: TControlCreatorDirection): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.Direction := ADirection;
 end;
 
-function TControlCreator.SetHorizontalSpace(
+function TControlCreatorHelper.SetHorizontalSpace(
   AHorizontalSpace: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.HorizontalSpace := AHorizontalSpace;
 end;
 
-function TControlCreator.SetLeft(AControlName: string): TControlCreator;
+function TControlCreatorHelper.SetLeft(AControlName: string): TControlCreator;
 var
   L: Single;
 begin
@@ -2442,7 +2365,7 @@ begin
   Result := SetLeft(L);
 end;
 
-function TControlCreator.SetLeft(ALeft: Single): TControlCreator;
+function TControlCreatorHelper.SetLeft(ALeft: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.CurrentLeft := ALeft;
@@ -2451,21 +2374,21 @@ begin
   CurrentLevel.MaxControlWidth := 0;
 end;
 
-function TControlCreator.External(const AProc: TControlCreatorObjProc): TControlCreator;
+function TControlCreatorHelper.External(const AProc: TControlCreatorObjProc): TControlCreator;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TControlCreator.External(const AProc: TControlCreatorProc): TControlCreator;
+function TControlCreatorHelper.External(const AProc: TControlCreatorProc): TControlCreator;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TControlCreator.SetSpace(AVerticalSpace,
+function TControlCreatorHelper.SetSpace(AVerticalSpace,
   AHorizontalSpace: Single): TControlCreator;
 begin
   Result := Self;
@@ -2473,7 +2396,7 @@ begin
   CurrentLevel.HorizontalSpace := AHorizontalSpace;
 end;
 
-function TControlCreator.SetTop(ATop: Single): TControlCreator;
+function TControlCreatorHelper.SetTop(ATop: Single): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.CurrentTop := ATop;
@@ -2482,7 +2405,7 @@ begin
   CurrentLevel.MaxControlWidth := 0;
 end;
 
-function TControlCreator.SetTop(AControlName: string): TControlCreator;
+function TControlCreatorHelper.SetTop(AControlName: string): TControlCreator;
 var
   T: Single;
 begin
@@ -2495,14 +2418,14 @@ begin
   Result := SetTop(T);
 end;
 
-function TControlCreator.SetTopLeft(ATop, ALeft: Single): TControlCreator;
+function TControlCreatorHelper.SetTopLeft(ATop, ALeft: Single): TControlCreator;
 begin
   Result := Self;
   SetTop(ATop);
   SetLeft(ALeft);
 end;
 
-function TControlCreator.SetTopLeftNearControl(AControlName: string;
+function TControlCreatorHelper.SetTopLeftNearControl(AControlName: string;
   APosition: TRelativePosition): TControlCreator;
 var
   Control: TControl;
@@ -2534,7 +2457,7 @@ begin
     SetLeft(CurrentLevel.CurrentLeft + W + CurrentLevel.HorizontalSpace);
 end;
 
-function TControlCreator.SetTopLeftNearControls(
+function TControlCreatorHelper.SetTopLeftNearControls(
   AControlsNames: array of string;
   APosition: TRelativePosition): TControlCreator;
 var
@@ -2566,7 +2489,7 @@ begin
   end;
 end;
 
-function TControlCreator.SetTopLeftNearGroup(const AGroupName: string;
+function TControlCreatorHelper.SetTopLeftNearGroup(const AGroupName: string;
   APosition: TRelativePosition): TControlCreator;
 var
   Bounds: TControlGroupBounds;
@@ -2584,7 +2507,7 @@ begin
     SetLeft(CurrentLevel.CurrentLeft + Bounds.Width + CurrentLevel.HorizontalSpace);
 end;
 
-function TControlCreator.SetVerticalSpace(
+function TControlCreatorHelper.SetVerticalSpace(
   AVerticalSpace: Single): TControlCreator;
 begin
   Result := Self;
@@ -2592,7 +2515,7 @@ begin
 end;
 
 {$IFNDEF FRAMEWORK_FMX}
-function TControlCreator.WithOwnerAndParent(AOwner: TComponent;
+function TControlCreatorHelper.WithOwnerAndParent(AOwner: TComponent;
   AParent: TWinControl): TControlCreator;
 begin
   Result := Self;
@@ -2602,7 +2525,7 @@ end;
 {$ENDIF}
 
 {$IFDEF FRAMEWORK_FMX}
-function TControlCreator.WithOwnerAndParent(AOwner: TComponent;
+function TControlCreatorHelper.WithOwnerAndParent(AOwner: TComponent;
   AParent: TFmxObject): TControlCreator;
 begin
   Result := Self;
@@ -2611,30 +2534,35 @@ begin
 end;
 {$ENDIF}
 
-function TControlCreator.WithParent(AParent: TWinControl): TControlCreator;
+function TControlCreatorHelper.WithParent(AParent: TWinControl): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.Parent := AParent;
 end;
 
-function TControlCreator.SubLevel(
-  AControlBuilder: TControlBuilder;
+{$IFDEF FPC}generic{$ENDIF}
+function TControlCreatorHelper.SubLevel<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   AGroupName: string
 ): TControlCreator;
 var
-  Control: TControl;
+  Control: TBuild;
   OwnerToUse: TComponent;
   IsTabChild: Boolean;
 begin
   Result := Self;
 
-  IsTabChild :=
-    AControlBuilder.ObjectClass.InheritsFrom(
-      {$IFDEF FRAMEWORK_FMX}TTabItem{$ELSE}TTabSheet{$ENDIF}
-    ) and
-    (CurrentLevel.Parent is
-      {$IFDEF FRAMEWORK_FMX}TTabControl{$ELSE}TPageControl{$ENDIF}
-    );
+  IsTabChild := False;
+
+  // todo: precisa rever essa checagem
+  if AControlBuilder is TControlBuilder then
+    IsTabChild :=
+      (AControlBuilder as TControlBuilder).ObjectClass.InheritsFrom(
+        {$IFDEF FRAMEWORK_FMX}TTabItem{$ELSE}TTabSheet{$ENDIF}
+      ) and
+      (CurrentLevel.Parent is
+        {$IFDEF FRAMEWORK_FMX}TTabControl{$ELSE}TPageControl{$ENDIF}
+      );
 
   if IsTabChild then
     OwnerToUse := CurrentLevel.Parent
@@ -2642,19 +2570,25 @@ begin
     OwnerToUse := FOwner;
 
   if CurrentLevel.GridMode.Active then
-    SetupControlBuilderForGridMode(AControlBuilder);
+    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
 
-  Control := CreateControl(AControlBuilder, OwnerToUse);
+  // Control := specialize CreateControl<TBuild>(AControlBuilder, OwnerToUse);
 
   if not CurrentLevel.GridMode.Active then
-    AddControl(TControlBuilder.Create(Control))
+  begin
+    AControlBuilder.AssignReference(Control);
+    {$IFDEF FPC}specialize{$ENDIF} AddControl<TBuild>(AControlBuilder);
+  end
   else
-    MoveTopLeftAfterControl(Control);
+  begin
+    Control := {$IFDEF FPC}specialize{$ENDIF} CreateControl<TBuild>(AControlBuilder, OwnerToUse);
+    MoveTopLeftAfterControl(Control as TControl);
+  end;
 
   SubLevel(AGroupName);
 
   WithParent(
-    {$IFDEF FRAMEWORK_FMX}Control
+    {$IFDEF FRAMEWORK_FMX}TWinControl(Control)
     {$ELSE}TWinControl(Control)
     {$ENDIF}
   );
@@ -2662,56 +2596,100 @@ begin
   SetTopLeft(0, 0);
 end;
 
-function TControlCreator.SubLevel(AControlBuilder: TControlBuilder;
+function TControlCreatorHelper.SubLevel(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SubLevel<TControl>(AControlBuilder, AGroupName);
+end;
+
+function TControlCreatorHelper.SubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SubLevel<TControl>(AControlBuilder, ADirection, AGroupName);
+end;
+
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SubLevel<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   ADirection: TControlCreatorDirection; AGroupName: string): TControlCreator;
 begin
-  Result := SubLevel(AControlBuilder, AGroupName);
+  Result := {$IFDEF FPC}specialize{$ENDIF} SubLevel<TBuild>(AControlBuilder, AGroupName);
   SetDirection(ADirection);
 end;
 
-function TControlCreator.SiblingSubLevel(AControlBuilder: TControlBuilder;
-  AGroupName: string; ABreak: Boolean): TControlCreator;
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevel<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string; ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
   if ABreak then
     Break;
-  SubLevel(AControlBuilder, AGroupName);
+
+  {$IFDEF FPC}specialize{$ENDIF}
+  SubLevel<TBuild>(AControlBuilder, AGroupName);
 end;
 
-function TControlCreator.SiblingSubLevel(AControlBuilder: TControlBuilder;
-  ADirection: TControlCreatorDirection; AGroupName: string;
-  ABreak: Boolean): TControlCreator;
+function TControlCreatorHelper.SiblingSubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TControl>(AControlBuilder, ADirection, ABreak);
+end;
+
+function TControlCreatorHelper.SiblingSubLevel(AControlBuilder: TControlBuilder; ABreak: Boolean=False): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TControl>(AControlBuilder, ABreak);
+end;
+
+function TControlCreatorHelper.SiblingSubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''; ABreak: Boolean=False): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TControl>(AControlBuilder, ADirection, AGroupName, ABreak);
+end;
+
+function TControlCreatorHelper.SiblingSubLevel(AControlBuilder: TControlBuilder; AGroupName: string=''; ABreak: Boolean=False): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TControl>(AControlBuilder, AGroupName, ABreak);
+end;
+
+{$IFDEF FPC}generic{$ENDIF}
+function TControlCreatorHelper.SiblingSubLevel<TBuild>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string; ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
   if ABreak then
     Break;
-  SubLevel(AControlBuilder, ADirection, AGroupName);
+  {$IFDEF FPC}specialize{$ENDIF} SubLevel<TBuild>(AControlBuilder, ADirection, AGroupName);
 end;
 
-function TControlCreator.SiblingSubLevel(AControlBuilder: TControlBuilder;
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevel<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   ABreak: Boolean): TControlCreator;
 begin
-  Result := SiblingSubLevel(AControlBuilder, '', ABreak);
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, '', ABreak);
 end;
 
-function TControlCreator.SiblingSubLevel(AControlBuilder: TControlBuilder;
-  ADirection: TControlCreatorDirection;
-  ABreak: Boolean): TControlCreator;
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevel<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator;
 begin
-  Result := SiblingSubLevel(AControlBuilder, ADirection, '', ABreak);
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, ADirection, '', ABreak);
 end;
 
-function TControlCreator.SiblingSubLevelWithBreak(
-  AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection;
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevelWithBreak<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  ADirection: TControlCreatorDirection; AGroupName: string): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, ADirection, AGroupName, True);
+end;
+
+function TControlCreatorHelper.SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevelWithBreak<TControl>(AControlBuilder, ADirection, AGroupName);
+end;
+
+function TControlCreatorHelper.SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevelWithBreak<TControl>(AControlBuilder, AGroupName);
+end;
+
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevelWithBreak<TBuild>(
+  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   AGroupName: string): TControlCreator;
 begin
-  Result := SiblingSubLevel(AControlBuilder, ADirection, AGroupName, True);
-end;
-
-function TControlCreator.SiblingSubLevelWithBreak(
-  AControlBuilder: TControlBuilder; AGroupName: string): TControlCreator;
-begin
-  Result := SiblingSubLevel(AControlBuilder, AGroupName, True);
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, AGroupName, True);
 end;
 
 { TControlGroupBounds }
@@ -3668,8 +3646,7 @@ end;
 
 { TComponentsBuilder }
 
-function TComponentsBuilder.Add(
-  AComponentBuilder: TComponentBuilder): TComponentsBuilder;
+function TComponentCreator.Add(AComponentBuilder: {$IFDEF FPC}specialize{$ENDIF}IComponentBuilder<TComponent>): TComponentCreator;
 var
   Component: TComponent;
   ComponentName: string;
@@ -3685,44 +3662,34 @@ begin
   Registry.AddComponent(Component, Component.Name);
 end;
 
-function TComponentsBuilder.Add(
-  AComponentBuilders: TComponentBuilderArray): TComponentsBuilder;
-var
-  I: Integer;
-begin
-  Result := Self;
-  for I := 0 to High(AComponentBuilders) do
-    Add(AComponentBuilders[I]);
-end;
-
-constructor TComponentsBuilder.Create(ARegistryContextKey: string);
+constructor TComponentCreator.Create(ARegistryContextKey: string);
 begin
   Create(TRegistryContextHandle.Create(ARegistryContextKey))
 end;
 
-constructor TComponentsBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
+constructor TComponentCreator.Create(ARegistryContextHandle: IRegistryContextHandle);
 begin
   FRegistryContextHandle := ARegistryContextHandle;
 end;
 
-destructor TComponentsBuilder.Destroy;
+destructor TComponentCreator.Destroy;
 begin
   inherited;
 end;
 
-function TComponentsBuilder.GetComponent(const AName: string): TComponent;
+function TComponentCreator.GetComponent(const AName: string): TComponent;
 begin
   Result := Registry.GetComponent(AName);
 end;
 
-function TComponentsBuilder.External(const AProc: TComponentsBuilderObjProc): TComponentsBuilder;
+function TComponentCreator.External(const AProc: TComponentCreatorObjProc): TComponentCreator;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TComponentsBuilder.External(const AProc: TComponentsBuilderProc): TComponentsBuilder;
+function TComponentCreator.External(const AProc: TComponentCreatorProc): TComponentCreator;
 begin
   Result := Self;
   if Assigned(AProc) then
@@ -3730,27 +3697,27 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TComponentsBuilder.GetComponent<T>(const AName: string): T;
+function TComponentCreator.GetComponent<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
-function TComponentsBuilder.GetComponentRegistry: TComponentRegistry;
+function TComponentCreator.GetComponentRegistry: TComponentRegistry;
 begin
   Result := FRegistryContextHandle.GetRegistry;
 end;
 
-function TComponentsBuilder.GetComponents: TComponentList;
+function TComponentCreator.GetComponents: TComponentList;
 begin
   Result := Registry.FComponents;
 end;
 
-function TComponentsBuilder.GetItem(const AName: string): TComponent;
+function TComponentCreator.GetItem(const AName: string): TComponent;
 begin
   Result := Self.GetComponent(AName);
 end;
 
-function TComponentsBuilder.WithOwner(AOwner: TComponent): TComponentsBuilder;
+function TComponentCreator.WithOwner(AOwner: TComponent): TComponentCreator;
 begin
   Result := Self;
   FOwner := AOwner;
@@ -3814,12 +3781,12 @@ end;
 
 { TOPCBCreators }
 
-function TOPCBCreators.AsComponentsBuilder: TComponentsBuilder;
+function TOPCBCreators.AsComponentCreator: TComponentCreator;
 begin
-  if not Assigned(FComponentsBuilder) then
-    FComponentsBuilder := TComponentsBuilder.Create(FRegistryContextHandle);
+  if not Assigned(FComponentCreator) then
+    FComponentCreator := TComponentCreator.Create(FRegistryContextHandle);
 
-  Result := FComponentsBuilder;
+  Result := FComponentCreator;
 end;
 
 function TOPCBCreators.AsControlCreator: TControlCreator;
@@ -3830,51 +3797,38 @@ begin
   Result := FControlCreator;
 end;
 
-function TOPCBCreators.AsMenusBuilder: TMenusBuilder;
+function TOPCBCreators.AsMenuCreator: TMenuCreator;
 begin
-  if not Assigned(FMenusBuilder) then
-    FMenusBuilder := TMenusBuilder.Create(FRegistryContextHandle);
-  Result := FMenusBuilder;
+  if not Assigned(FMenuCreator) then
+    FMenuCreator := TMenuCreator.Create(FRegistryContextHandle);
+  Result := FMenuCreator;
 end;
 
 constructor TOPCBCreators.Create(const ARegistryContextKey: string);
 begin
   FRegistryContextHandle := TRegistryContextHandle.Create(ARegistryContextKey);
-  FComponentsBuilder := nil;
+  FComponentCreator := nil;
   FControlCreator := nil;
-  FMenusBuilder := nil;
+  FMenuCreator := nil;
 end;
 
 destructor TOPCBCreators.Destroy;
 begin
-  if Assigned(FComponentsBuilder) then
-    FComponentsBuilder.Free;
+  if Assigned(FComponentCreator) then
+    FComponentCreator.Free;
 
   if Assigned(FControlCreator) then
     FControlCreator.Free;
 
-  if Assigned(FMenusBuilder) then
-    FMenusBuilder.Free;
+  if Assigned(FMenuCreator) then
+    FMenuCreator.Free;
 
   inherited;
 end;
 
-{ TComponentBuilderHelper }
+{ TMenuCreator }
 
-class function TComponentBuilderHelper.CreateArray(AClass: TComponentClass;
-  const ANames: array of string): TComponentBuilderArray;
-var
-  I: Integer;
-begin
-  Result := [];
-  SetLength(Result, Length(ANames));
-  for I := 0 to High(ANames) do
-    Result[I] := TComponentBuilder.Create(AClass, ANames[I]);
-end;
-
-{ TMenusBuilder }
-
-function TMenusBuilder.AddMenu(AMenuBuilder: TMenuBuilder): TMenusBuilder;
+function TMenuCreator.AddMenu(AMenuBuilder: TMenuBuilder): TMenuCreator;
 var
   Menu: TMenu;
   MenuName: string;
@@ -3899,7 +3853,7 @@ begin
   {$ENDIF}
 end;
 
-function TMenusBuilder.AddMenuItem(AMenuItemBuilder: TMenuItemBuilder): TMenusBuilder;
+function TMenuCreator.AddMenuItem(AMenuItemBuilder: TMenuItemBuilder): TMenuCreator;
 var
   MenuItem: TMenuItem;
   MenuItemName: string;
@@ -3922,57 +3876,57 @@ begin
   {$ENDIF}
 end;
 
-constructor TMenusBuilder.Create(ARegistryContextKey: string);
+constructor TMenuCreator.Create(ARegistryContextKey: string);
 begin
   Create(TRegistryContextHandle.Create(ARegistryContextKey));
 end;
 
-constructor TMenusBuilder.Create(ARegistryContextHandle: IRegistryContextHandle);
+constructor TMenuCreator.Create(ARegistryContextHandle: IRegistryContextHandle);
 begin
   FRegistryContextHandle := ARegistryContextHandle;
-  FLevelStack := TMenusBuilderLevelStack.Create(True);
-  FLevelStack.Add(TMenusBuilderLevel.Create);
+  FLevelStack := TMenuCreatorLevelStack.Create(True);
+  FLevelStack.Add(TMenuCreatorLevel.Create);
 end;
 
-destructor TMenusBuilder.Destroy;
+destructor TMenuCreator.Destroy;
 begin
   FLevelStack.Free;
   inherited;
 end;
 
-function TMenusBuilder.GetComponentRegistry: TComponentRegistry;
+function TMenuCreator.GetComponentRegistry: TComponentRegistry;
 begin
   Result := FRegistryContextHandle.GetRegistry;
 end;
 
-function TMenusBuilder.GetCurrenteLevel: TMenusBuilderLevel;
+function TMenuCreator.GetCurrenteLevel: TMenuCreatorLevel;
 begin
   Result := FLevelStack.Last;
 end;
 
-function TMenusBuilder.GetMenu(const AName: string): TMenu;
+function TMenuCreator.GetMenu(const AName: string): TMenu;
 begin
   Result := Registry.GetComponent(AName) as TMenu;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TMenusBuilder.GetMenu<T>(const AName: string): T;
+function TMenuCreator.GetMenu<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
-function TMenusBuilder.GetMenuItem(const AName: string): TMenuItem;
+function TMenuCreator.GetMenuItem(const AName: string): TMenuItem;
 begin
   Result := Registry.GetComponent(AName) as TMenuItem;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TMenusBuilder.GetMenuItem<T>(const AName: string): T;
+function TMenuCreator.GetMenuItem<T>(const AName: string): T;
 begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
-function TMenusBuilder.SubLevel(AMenuItemBuilder: TMenuItemBuilder): TMenusBuilder;
+function TMenuCreator.SubLevel(AMenuItemBuilder: TMenuItemBuilder): TMenuCreator;
 var
   MenuItem: TMenuItem;
   MenuItemName: string;
@@ -3993,11 +3947,11 @@ begin
   CurrentLevel.Parent.Add(MenuItem);
   {$ENDIF}
 
-  FLevelStack.Add(TMenusBuilderLevel.Create);
+  FLevelStack.Add(TMenuCreatorLevel.Create);
   CurrentLevel.Parent := MenuItem;
 end;
 
-function TMenusBuilder.SuperLevel: TMenusBuilder;
+function TMenuCreator.SuperLevel: TMenuCreator;
 begin
   if FLevelStack.Count <= 1 then
     raise Exception.Create('PreviousLevel chamado no nível raiz');
@@ -4006,20 +3960,20 @@ begin
   Result := Self;
 end;
 
-function TMenusBuilder.WithOwner(AOwner: TComponent): TMenusBuilder;
+function TMenuCreator.WithOwner(AOwner: TComponent): TMenuCreator;
 begin
   Result := Self;
   FOwner := AOwner;
 end;
 
-function TMenusBuilder.External(const AProc: TMenusBuilderObjProc): TMenusBuilder;
+function TMenuCreator.External(const AProc: TMenuCreatorObjProc): TMenuCreator;
 begin
   Result := Self;
   if Assigned(AProc) then
     AProc(Self);
 end;
 
-function TMenusBuilder.External(const AProc: TMenusBuilderProc): TMenusBuilder;
+function TMenuCreator.External(const AProc: TMenuCreatorProc): TMenuCreator;
 begin
   Result := Self;
   if Assigned(AProc) then
@@ -4036,7 +3990,7 @@ end;
 { TPropEnum }
 
 {$IFDEF FPC}generic{$ENDIF}
-class function TPropValue.Create<E>(const APropName: string; const AValue: E): TPropValue;
+class function TPropertyValue.Create<E>(const APropName: string; const AValue: E): TPropertyValue;
 begin
   Result.PropName := APropName;
   Result.Value := TValue.{$IFDEF FPC}specialize{$ENDIF}From<E>(AValue);
@@ -4044,17 +3998,24 @@ end;
 
 { TObjectBuilderBase }
 
-procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}
-  .ApplyPendindProps(Instance: TObject);
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ApplyPendindProps(Instance: TObject);
 var
-  Prop: TPropValue;
+  Prop: TPropertyValue;
 begin
   for Prop in FProperties do
     ApplyPropPath(Instance, Prop);
 end;
 
-procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}
-  .ApplyPropPath(Instance: TObject; AProp: TPropValue);
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ConfigureObject(AObject: TBuild);
+var
+  Ref: Pointer;
+begin
+  for Ref in FTargetFields do
+    PPointer(Ref)^ := (AObject as TObject);
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}
+  .ApplyPropPath(Instance: TObject; AProp: TPropertyValue);
 var
   Context: TRttiContext;
   RType: TRttiType;
@@ -4101,16 +4062,27 @@ begin
   end;
 end;
 
-constructor TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Create;
+constructor TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Create;
 begin
-  FAutoFree := True;
   FSetupProcList := TSetupProcObjList.Create;
   FSetupRefProcList := TSetupRefProcList.Create;
   FProperties := TPropValueList.Create;
   FTargetFields := TPointerList.Create;
 end;
 
-destructor TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Destroy;
+constructor TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Create(AClass: TObjectClass);
+begin
+  Create;
+  FObjectClass := AClass;
+end;
+
+constructor TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Create(AClass: TObjectClass; out Reference);
+begin
+  Create(AClass);
+  Assign(Reference);
+end;
+
+destructor TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Destroy;
 begin
   FSetupProcList.Free;
   FSetupRefProcList.Free;
@@ -4119,22 +4091,27 @@ begin
   inherited;
 end;
 
-procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.AssignReference(out Reference);
+begin
+  Assign(Reference);
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}
   .ResetReferences;
 begin
   FTargetFields.Clear;
 end;
 
-function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Assign(out Reference): TSelf;
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Assign(out Reference): TSelf;
 begin
   Result := TSelf(Self);
   FTargetFields.Add(@Reference);
 end;
 
-function TObjectBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithProp(
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithProp(
   const APropName: string; const AValue: TValue): TSelf;
 var
-  P: TPropValue;
+  P: TPropertyValue;
 begin
   Result := TSelf(Self);
   P.PropName := APropName;
@@ -4142,143 +4119,160 @@ begin
   FProperties.Add(P);
 end;
 
-function TObjectBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithProp(const APropValue: TPropValue): TSelf;
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithProp(const APropValue: TPropertyValue): TSelf;
 begin
   Result := Self.WithProp(APropValue.PropName, APropValue.Value);
 end;
 
-function TObjectBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithPropObj(
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithPropObj(
   const APropName: string; AObj: TObject): TSelf;
 begin
   Result := WithProp(
-    TPropValue.{$IFDEF FPC}specialize{$ENDIF}Create<TObject>(APropName, AObj)
+    TPropertyValue.{$IFDEF FPC}specialize{$ENDIF}Create<TObject>(APropName, AObj)
   );
 end;
 
-function TObjectBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithPropSet(const APropName: string; const AValue: Integer): TSelf;
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithPropSet(const APropName: string; const AValue: Integer): TSelf;
 begin
   Result := WithProp(APropName, TValue.{$IFDEF FPC}specialize{$ENDIF}From<NativeInt>(AValue));
 end;
 
-procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.SetupProc(
-  AProcObj: TSetupProcObj);
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild,  TSelf>{$ENDIF}.SetupProc(
+  AProcObj: {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TBuild>);
 begin
   FSetupProcList.Add(AProcObj);
 end;
 
-procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.SetupProc(
-  ARefProc: TSetupRefProc);
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetupProc(
+  ARefProc: {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TBuild>);
 begin
   FSetupRefProcList.Add(ARefProc);
 end;
 
-procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.SetupProc(
-  const AProcs: array of TSetupProcObj);
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Build: TBuild;
 var
-  Proc: TSetupProcObj;
+  Proc: TSetupProcObjBuild;
+  RefProc: TSetupRefProcBuild;
 begin
-  for Proc in AProcs do
-    SetupProc(Proc);
+  Result := CreateObject;
+  ConfigureObject(Result);
+  ApplyPendindProps(Result);
+
+  for Proc in FSetupProcList do
+    Proc(Result);
+
+  for RefProc in FSetupRefProcList do
+    RefProc(Result);
 end;
 
-function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Setup(
-  const AProcs: array of TSetupProcObj): TSelf;
-var
-  Proc: TSetupProcObj;
-begin
-  Result := TSelf(Self);
-  for Proc in AProcs do
-    SetupProc(Proc);
-end;
-
-function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Setup(
-  AProc: TSetupProcObj): TSelf;
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Setup(
+  AProc: TSetupRefProcBuild): TSelf;
 begin
   Result := TSelf(Self);
   Self.SetupProc(AProc);
 end;
 
-function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TObjClass, TSetupProcObj, TSetupRefProc>{$ENDIF}.Setup(
-  AProc: TSetupRefProc): TSelf;
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Setup(
+  AProc: TSetupProcObjBuild): TSelf;
 begin
   Result := TSelf(Self);
   Self.SetupProc(AProc);
+end;
+
+function TObjectBuilder.CreateObject: TObject;
+begin
+  Result := TObjectClass(FObjectClass).Create;
+end;
+
+constructor TObjectBuilder.Create;
+begin
+  inherited Create(TObject);
+end;
+
+constructor TObjectBuilder.Create(out Reference);
+begin
+  inherited Create(TObject, Reference);
+end;
+
+constructor TObjectBuilder.Create(AClass: TObjectClass);
+begin
+  inherited Create(AClass);
+end;
+
+constructor TObjectBuilder.Create(AClass: TObjectClass; out Reference);
+begin
+  inherited Create(AClass, Reference);
 end;
 
 { TComponentBuilderBase<TSelf> }
 
-function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Build: TComponent;
-var
-  Proc: TComponentSetupProcObj;
-  RefProc: TComponentSetupRefProc;
-  Ref: Pointer;
+constructor TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Create(AClass: TComponentClass; out Reference);
 begin
-  try
-    if Assigned(Component) then
-      Result := Component
-    else
-      Result := ObjectClass.Create(Owner);
-
-    if not Self.Name.IsEmpty then
-      Result.Name := Self.Name;
-
-    Result.Tag := FTag;
-
-    for Ref in FTargetFields do
-      PPointer(Ref)^ := Result;
-
-    for Proc in FSetupProcList do
-      Proc(Result);
-
-    for RefProc in FSetupRefProcList do
-      RefProc(Result);
-
-    ApplyPendindProps(Result);
-  finally
-    Free;
-  end;
-end;
-
-constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(
-  AComponentClass: TComponentClass; out Reference);
-begin
-  Create(AComponentClass);
+  Create(AClass);
   Assign(Reference);
 end;
 
-constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AComponent: TComponent);
+function TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetName: string;
 begin
-  inherited Create;
-  FComponent := AComponent;
-  FObjectClass := TComponentClass(AComponent.ClassType);
-  FName := AComponent.Name;
-  FTag := 0;
+  Result := FName;
 end;
 
-constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TComponentClass;
+function TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetOwner: TComponent;
+begin
+  Result := FOwner;
+end;
+
+function TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetTag: NativeInt;
+begin
+  Result := FTag;
+end;
+
+procedure TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetName(AValue: string);
+begin
+  FName := AValue;
+end;
+
+procedure TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetOwner(AValue: TComponent);
+begin
+  FOwner := AValue;
+end;
+
+procedure TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetTag(AValue: NativeInt);
+begin
+  FTag := AValue;
+end;
+
+procedure TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ConfigureObject(AObject: TBuild);
+begin
+  inherited ConfigureObject(AObject);
+  if not Self.Name.IsEmpty then
+    AObject.Name := Self.Name;
+  AObject.Tag := FTag;
+end;
+
+constructor TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Create(AClass: TComponentClass;
   const AName: string; out Reference);
 begin
   Create(AClass, AName);
   Assign(Reference);
 end;
 
-constructor TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TComponentClass;
+constructor TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Create(AClass: TComponentClass;
   const AName: string);
 begin
   inherited Create;
-  FComponent := nil;
   FObjectClass := AClass;
   FName := AName;
   FTag := 0;
 end;
 
-function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(AName: string): TSelf;
+function TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithName(AName: string): TSelf;
 begin
   Result := TSelf(Self);
   FName := AName;
 end;
 
-function TComponentBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
+function TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
 begin
   Result := TSelf(Self);
   FTag := ATag;
@@ -4286,211 +4280,308 @@ end;
 
 { TMenuBuilderBase<TSelf> }
 
-function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Build: TMenu;
-var
-  Proc: TMenuSetupProcObj;
-  RefProc: TMenuSetupRefProc;
-  Ref: Pointer;
+constructor TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Create;
 begin
-  try
-    if Assigned(Menu) then
-      Result := Menu
-    else
-      Result := ObjectClass.Create(Self.Owner);
-
-    if not Self.Name.IsEmpty then
-      Result.Name := Self.Name;
-
-    Result.Tag := FTag;
-
-    for Ref in FTargetFields do
-      PPointer(Ref)^ := Result;
-
-    for Proc in FSetupProcList do
-      Proc(Result);
-
-    for RefProc in FSetupRefProcList do
-      RefProc(Result);
-
-    ApplyPendindProps(Result);
-  finally
-    if FAutoFree then
-      Free;
-  end;
-end;
-
-constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AMenu: TMenu);
-begin
-  inherited Create;
-  FMenu := AMenu;
-  FObjectClass := TMenuClass(AMenu.ClassType);
-  FName := AMenu.Name;
-  FTag := 0;
-end;
-
-constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuClass; out Reference);
-begin
-  Create(AClass, '');
-  Assign(Reference);
-end;
-
-constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuClass;
-  const AName: string; out Reference);
-begin
-  Create(AClass, AName);
-  Assign(Reference);
-end;
-
-constructor TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuClass;
-  const AName: string);
-begin
-  inherited Create;
-  FMenu := nil;
-  FObjectClass := AClass;
-  FName := AName;
-  FTag := 0;
-end;
-
-function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(AName: string): TSelf;
-begin
-  Result := TSelf(Self);
-  FName := AName;
-end;
-
-function TMenuBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
-begin
-  Result := TSelf(Self);
-  FTag := ATag;
+  Create(TControl);
 end;
 
 { TMenuItemBuilderBase<TSelf> }
 
-function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Build: TMenuItem;
-var
-  Proc: TMenuItemSetupProcObj;
-  RefProc: TMenuItemSetupRefProc;
-  Ref: Pointer;
+function TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetCaption: TOptionalString;
 begin
-  try
-    if Assigned(MenuItem) then
-      Result := MenuItem
-    else
-      Result := ObjectClass.Create(Self.Owner);
-
-    if not Self.Name.IsEmpty then
-      Result.Name := Self.Name;
-
-    Result.Tag := FTag;
-
-    if Caption.HasValue then
-      {$IFDEF FRAMEWORK_FMX}
-      Result.Text := Caption.Value;
-      {$ELSE}
-      Result.Caption := Caption.Value;
-      {$ENDIF}
-
-    if ImageIndex.HasValue then
-      Result.ImageIndex := ImageIndex.Value;
-
-    Result.OnClick := OnClick;
-
-    for Ref in FTargetFields do
-      PPointer(Ref)^ := Result;
-
-    for Proc in FSetupProcList do
-      Proc(Result);
-
-    for RefProc in FSetupRefProcList do
-      RefProc(Result);
-
-    ApplyPendindProps(Result);
-  finally
-    if FAutoFree then
-      Free;
-  end;
+  Result := FCaption;
 end;
 
-constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuItemClass;
-  const AName: string);
+function TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetImageIndex: TOptionalInteger;
 begin
-  inherited Create;
-  FMenuItem := nil;
-  FObjectClass := AClass;
-  FName := AName;
-  FTag := 0;
-  FCaption := TOptionalString.None;;
-  FImageIndex := TOptionalInteger.None;
+  Result := FImageIndex;
 end;
 
-constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(out Reference);
+function TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetOnClick: TNotifyEvent;
 begin
-  Create(TMenuItem, Reference);
+  Result := FOnClick;
 end;
 
-constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AMenuItem: TMenuItem);
+procedure TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetCaption(AValue: TOptionalString);
 begin
-  inherited Create;
-  FMenuItem := AMenuItem;
-  FObjectClass := TMenuItemClass(AMenuItem.ClassType);
-  FName := AMenuItem.Name;
-  FTag := 0;
-  FCaption := TOptionalString.None;
-  FImageIndex := TOptionalInteger.None;
+  FCaption := AValue;
 end;
 
-constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create;
+procedure TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetImageIndex(AValue: TOptionalInteger);
+begin
+  FImageIndex := AValue;
+end;
+
+procedure TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetOnClick(AValue: TNotifyEvent);
+begin
+  FOnClick := AValue;
+end;
+
+constructor TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Create;
 begin
   Create(TMenuItem);
 end;
 
-constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuItemClass;
-  const AName: string; out Reference);
+procedure TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ConfigureObject(AObject: TBuild);
 begin
-  Create(AClass, AName);
-  Assign(Reference);
+  inherited ConfigureObject(AObject);
+
+  if Caption.HasValue then
+    {$IFDEF FRAMEWORK_FMX}
+    AObject.Text := Caption.Value;
+    {$ELSE}
+    AObject.Caption := Caption.Value;
+    {$ENDIF}
+
+  if ImageIndex.HasValue then
+    AObject.ImageIndex := ImageIndex.Value;
+
+  AObject.OnClick := OnClick;
 end;
 
-constructor TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create(AClass: TMenuItemClass;
-  out Reference);
-begin
-  Create(AClass, '');
-  Assign(Reference);
-end;
-
-function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithCaption(ACaption: string): TSelf;
+function TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithCaption(ACaption: string): TSelf;
 begin
   Result := TSelf(Self);
   FCaption := ACaption;
 end;
 
-function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithImageIndex(
+function TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithImageIndex(
   AImageIndex: Integer): TSelf;
 begin
   Result := TSelf(Self);
   FImageIndex := AImageIndex;
 end;
 
-function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithName(AName: string): TSelf;
-begin
-  Result := TSelf(Self);
-  FName := AName;
-end;
-
-function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithOnClick(AOnClick: TNotifyEvent): TSelf;
+function TMenuItemBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithOnClick(AOnClick: TNotifyEvent): TSelf;
 begin
   Result := TSelf(Self);
   FOnClick := AOnClick;
 end;
 
-function TMenuItemBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ConfigureObject(AObject: TBuild);
 begin
-  Result := TSelf(Self);
-  FTag := ATag;
+  inherited ConfigureObject(AObject);
+  AObject.Parent := Self.Parent;
+
+  if Caption.HasValue then
+  begin
+    {$IFDEF FRAMEWORK_FMX}
+    if AObject is TPresentedTextControl then
+      TPresentedTextControl(AObject).Text := Caption.Value;
+    if AObject is TTextControl then
+      TTextControl(AObject).Text := Caption.Value;
+    {$ELSE}
+      {$IFDEF FPC}
+      AObject.Caption := Caption.Value;
+      {$ELSE}
+      TProtectedControl(AObject).Caption := Caption.Value;
+      {$ENDIF}
+    {$ENDIF}
+  end;
+
+  if Text.HasValue then
+  begin
+    {$IFDEF FRAMEWORK_FMX}
+    if AObject is TPresentedTextControl then
+      TPresentedTextControl(AObject).Text := Text.Value;
+    if AObject is TTextControl then
+      TTextControl(AObject).Text := Text.Value;
+    {$ELSE}
+      {$IFDEF FPC}
+        AObject.Caption := Text.Value;
+      {$ELSE}
+        TProtectedControl(AObject).Text := Text.Value;
+      {$ENDIF}
+    {$ENDIF}
+  end;
+
+  if Align.HasValue then
+    AObject.Align := Align.Value;
+
+  if Width.HasValue then
+    AObject.Width := {$IFDEF FRAMEWORK_FMX}Width.Value{$ELSE}Trunc(Width.Value){$ENDIF};
+
+  if Height.HasValue then
+    AObject.Height := {$IFDEF FRAMEWORK_FMX}Height.Value{$ELSE}Trunc(Height.Value){$ENDIF};
+
+  if Top.HasValue then
+  begin
+    {$IFDEF FRAMEWORK_FMX}
+    AObject.Position.Y := Top.Value;
+    {$ELSE}
+    AObject.Top := Trunc(Top.Value);
+    {$ENDIF}
+  end;
+
+  if Left.HasValue then
+  begin
+    {$IFDEF FRAMEWORK_FMX}
+    AObject.Position.X := Left.Value;
+    {$ELSE}
+    AObject.Left := Trunc(Left.Value);
+    {$ENDIF}
+  end;
+
+  TProtectedControl(AObject).OnClick := OnClick;
 end;
 
-constructor TControlBuilderBase{$IFNDEF FPC}<TSelf>{$ENDIF}.Create;
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetParent: TWinControl;
 begin
-  Create(TControl);
+  Result := FParent;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetParent(AValue: TWinControl);
+begin
+  FParent := AValue;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetAlign: TOptionalAlign;
+begin
+  Result := FAlign;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetCaption: TOptionalString;
+begin
+  Result := FCaption;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild,  TSelf>{$ENDIF}.GetHeight: TOptionalSingle;
+begin
+  Result := FHeight;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetLeft: TOptionalSingle;
+begin
+  Result := FLeft;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetOnClick: TNotifyEvent;
+begin
+  Result := FOnClick;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetText: TOptionalString;
+begin
+  Result := FText;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetTop: TOptionalSingle;
+begin
+  Result := FTop;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetWidth: TOptionalSingle;
+begin
+  Result := FWidth;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetAlign(AValue: TOptionalAlign);
+begin
+  FAlign := AValue;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetCaption(AValue: TOptionalString);
+begin
+  FCaption := AValue;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetHeight(AValue: TOptionalSingle);
+begin
+  FHeight := AValue;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetLeft(AValue: TOptionalSingle);
+begin
+  FLeft := AValue
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetOnClick(AValue: TNotifyEvent);
+begin
+  FOnClick := AValue;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetText(AValue: TOptionalString);
+begin
+  FText := AValue;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetTop(AValue: TOptionalSingle);
+begin
+  FTop := AValue;
+end;
+
+procedure TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetWidth(AValue: TOptionalSingle);
+begin
+  FWidth := AValue;
+end;
+
+function TControlBuilder.CreateObject: TControl;
+begin
+  Result := TControlClass(FObjectClass).Create(Owner);
+end;
+
+constructor TControlBuilder.Create;
+begin
+  inherited Create(TControl);
+end;
+
+constructor TControlBuilder.Create(AClass: TControlClass; const AName: string);
+begin
+  inherited Create(AClass, AName);
+end;
+
+constructor TControlBuilder.Create(AClass: TControlClass; const AName: string;
+  out Reference);
+begin
+  inherited Create(AClass, AName, Reference);
+end;
+
+constructor TControlBuilder.Create(AClass: TControlClass; out Reference);
+begin
+  inherited Create(AClass, Reference);
+end;
+
+{ TComponentBuilder }
+
+constructor TComponentBuilder.Create;
+begin
+  inherited Create(TComponent);
+end;
+
+constructor TComponentBuilder.Create(AClass: TComponentClass;
+  const AName: string);
+begin
+  inherited Create(AClass, AName);
+end;
+
+constructor TComponentBuilder.Create(AClass: TComponentClass;
+  const AName: string; out Reference);
+begin
+  inherited Create(AClass, AName, Reference);
+end;
+
+constructor TComponentBuilder.Create(AClass: TComponentClass; out Reference);
+begin
+  inherited Create(AClass, Reference);
+end;
+
+function TComponentBuilder.CreateObject: TComponent;
+begin
+  Result := TComponentClass(FObjectClass).Create(Owner);
+end;
+
+{ TMenuBuilder }
+
+function TMenuBuilder.CreateObject: TMenu;
+begin
+  Result := TMenuClass(FObjectClass).Create(Owner);
+end;
+
+{ TMenuItemBuilder }
+
+function TMenuItemBuilder.CreateObject: TMenuItem;
+begin
+  Result := TMenuItemClass(FObjectClass).Create(Owner);
 end;
 
 initialization

@@ -46,6 +46,16 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlBuilderTests"/>
       </Unit>
+      <Unit>
+        <Filename Value="uobjectbuildertests.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UObjectBuilderTests"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ucomponentbuildertests.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UComponentBuilderTests"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

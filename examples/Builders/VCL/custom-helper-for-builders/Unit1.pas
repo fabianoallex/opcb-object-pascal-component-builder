@@ -16,6 +16,10 @@ type
     { Public declarations }
   end;
 
+  TButtonExt = class(TButton)
+
+  end;
+
   TButtonBuilderHelper = class helper for TButtonBuilder
   public
     function WithFontSize(ASize: Integer): TButtonBuilder;
@@ -48,10 +52,10 @@ begin
       .WithOwnerAndParent(Self, Self)
       .GridInit(4, 4)
         .GridSetCellWidthAndHeight(250, 60)
-        .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // metodo definido no helper
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 2').WithEnabled(False))
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // metodo definido no helper
-        .AddControl(TButtonBuilder.Create.WithCaption('Test 4').WithCursor(crHandPoint))      // medoto definido no helper (com rtti)
+        .AddControl<TButton>(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // metodo definido no helper
+        .AddControl<TButton>(TButtonBuilder.Create(TButtonExt).WithCaption('Teste 2').WithEnabled(False))
+        .AddControl<TButton>(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // metodo definido no helper
+        .AddControl<TButton>(TButtonBuilder.Create.WithCaption('Test 4').WithCursor(crHandPoint))      // medoto definido no helper (com rtti)
         .AddControl(TControlBuilder.Create(TPanel).WithBorderStyle(bsSingle))
       .GridFinish
     ;
@@ -64,27 +68,25 @@ end;
 
 function TButtonBuilderHelper.WithCursor(ACursor: Integer): TButtonBuilder;
 begin
-  Result := Self.WithProp('Cursor', ACursor);
+  Result := Self.WithProp('Cursor', ACursor) as TButtonBuilder;
 end;
 
 function TButtonBuilderHelper.WithFontSize(ASize: Integer): TButtonBuilder;
 begin
   Result := Self;
-  Setup(
-    procedure(AControl: TControl)
-    begin
-      TButton(AControl).Font.Size := ASize;
-    end
-  );
+  Setup(procedure(AButton: TButton)
+  begin
+    AButton.Font.Size := ASize;
+  end);
 end;
 
 function TButtonBuilderHelper.WithVisible(AVisible: Boolean): TButtonBuilder;
 begin
   Result := Self;
   Setup(
-    procedure(AControl: TControl)
+    procedure(AButton: TButton)
     begin
-      TButton(AControl).Visible := AVisible;
+      AButton.Visible := AVisible;
     end
   );
 end;
@@ -97,7 +99,7 @@ begin
   Result := Self.WithProp(
     'BorderStyle',
     TValue.From<TBorderStyle>(ABorderStyle)
-  );
+  ) as TControlBuilder;
 end;
 
 end.

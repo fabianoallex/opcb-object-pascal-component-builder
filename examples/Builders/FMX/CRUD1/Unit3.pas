@@ -30,17 +30,17 @@ begin
   Creators := TOPCBCreators.Create(Self.Name);
 
   try
-    Creators.AsComponentsBuilder
+    Creators.AsComponentCreator
       .WithOwner(Self)
     ;
 
     Creators.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
-      .AddControls([
-        TControlBuilder.Create(TButton, 'B1'), TControlBuilder.Create(TButton, 'B2'),
-        TControlBuilder.Create(TButton, 'B3'), TControlBuilder.Create(TButton, 'B4')
-      ])
+      .AddControl(TControlBuilder.Create(TButton, 'B1'))
+      .AddControl(TControlBuilder.Create(TButton, 'B2'))
+      .AddControl(TControlBuilder.Create(TButton, 'B3'))
+      .AddControl(TControlBuilder.Create(TButton, 'B4'))
     ;
   finally
     Creators.Free;

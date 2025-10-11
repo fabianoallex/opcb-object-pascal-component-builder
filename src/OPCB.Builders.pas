@@ -19,10 +19,12 @@ type
 
   TButtonClass = class of TButton;
   TButtonBuilder = class;
-  TButtonBuilder = class({$IFDEF FPC}specialize{$ENDIF} TControlBuilderBase<TButtonBuilder>)
+  TButtonBuilder = class({$IFDEF FPC}specialize{$ENDIF} TControlBuilderBase<TButton, TButtonBuilder>)
   private
     FModalResult: Integer;
     FEnabled: TOptionalBoolean;
+  protected
+    function CreateObject: TButton; override;
   public
     constructor Create(const AName: string=''); overload;
     constructor Create(AClass: TButtonClass; const AName: string=''); overload;
@@ -30,8 +32,6 @@ type
     constructor Create(AClass: TButtonClass; out Reference); overload;
     function WithModalResult(AModalResult: Integer): TButtonBuilder;
     function WithEnabled(AEnabled: Boolean): TButtonBuilder;
-    // function Build(AOwner: TComponent; AParent: TWinControl; const AControlName: string): TControl; override;
-    function Build: TControl; override;
   end;
 
 implementation
@@ -54,6 +54,11 @@ begin
   inherited Create(AClass, Reference);
 end;
 
+function TButtonBuilder.CreateObject: TButton;
+begin
+  Result := TButtonClass(FObjectClass).Create(Owner);
+end;
+
 constructor TButtonBuilder.Create(const AName: string);
 begin
   inherited Create(TButton, AName);
@@ -69,16 +74,6 @@ function TButtonBuilder.WithModalResult(AModalResult: Integer): TButtonBuilder;
 begin
   Result := Self;
   FModalResult := AModalResult;
-end;
-
-// function TButtonBuilder.Build(AOwner: TComponent; AParent: TWinControl; const AControlName: string): TControl;
-function TButtonBuilder.Build: TControl;
-begin
-  Result := inherited Build; //(AOwner, AParent, AControlName);
-
-  (Result as TButton).ModalResult := FModalResult;
-  if FEnabled.HasValue then
-    (Result as TButton).Enabled := FEnabled.Value;
 end;
 
 end.

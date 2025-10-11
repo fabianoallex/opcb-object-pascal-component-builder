@@ -9,16 +9,6 @@ uses
 
 type
 
-  { TTestableBuilder }
-
-  TControlBuilderAutoFreeTest = class(TControlBuilder)
-  private
-    FOnDestroyed: TNotifyEvent;
-  public
-    destructor Destroy; override;
-    property OnDestroyed: TNotifyEvent read FOnDestroyed write FOnDestroyed;
-  end;
-
   { TPanelWithReadOnlyProp }
 
   TPanelWithReadOnlyProp = class(TPanel)
@@ -42,15 +32,12 @@ type
     procedure ButtonClick(Self: TObject);
   published
     procedure TestControlBuilder;
-    procedure TestControlBuilderAutoFreeEnabled;
-    procedure TestControlBuilderAutoFreeDisabled;
-    procedure TestControlBuilderAutoFreeDefaultTrue;
     procedure TestControlBuilderDescendetControlBuild;
     procedure TestControlBuilderAssignsReference;
     procedure TestControlBuilderAssignsMultiReferences;
     procedure TestControlBuilderAssignsName;
-    procedure TestControlBuilderMultipleBuilds;
-    procedure TestControlBuilderMultipleBuildsWithReferences;
+    procedure TestControlBuilderMultiplesBuilds;
+    procedure TestControlBuilderMultiplesBuildsWithReferences;
     procedure TestControlBuilderResetReferences;
     procedure TestControlBuilderSetup;
     procedure TestControlBuilderMultipleSetups;
@@ -81,21 +68,13 @@ type
     procedure TestControlBuilderWithInvalidType;
     procedure TestControlBuilderWithOutOfRangeValue;
     procedure TestControlBuilderReadOnlyProp;
+    procedure TestControlBuilderSetupAndWithName;
   end;
 
 implementation
 
 uses
   StdCtrls, Menus, Graphics, Forms, RTTI, TypInfo;
-
-{ TTestableBuilder }
-
-destructor TControlBuilderAutoFreeTest.Destroy;
-begin
-  if Assigned(FOnDestroyed) then
-    FOnDestroyed(Self);
-  inherited Destroy;
-end;
 
 { TPanelWithReadOnlyProp }
 
@@ -114,23 +93,6 @@ begin
 
 end;
 
-procedure TControlBuilderTests.TestControlBuilderAutoFreeEnabled;
-var
-  Builder: TControlBuilderAutoFreeTest;
-  Control: TControl;
-begin
-  Control := nil;
-  Builder := TControlBuilderAutoFreeTest.Create;
-  Self.FDestroyed := False;  // inicia com false
-  Builder.OnDestroyed := @BuilderDestroy;
-  Builder.AutoFree := True;
-  try
-    Control := Builder.Build;  // auto free Builder
-    AssertTrue('Builder com AutoFree deveria ser destruido após o build', Self.FDestroyed);
-  finally
-    Control.Free;
-  end;
-end;
 
 procedure TControlBuilderTests.BuilderDestroy(Sender: TObject);
 begin
@@ -159,47 +121,9 @@ var
 begin
   Control := nil;
   Builder := TControlBuilder.Create;
-  Builder.AutoFree := True;
   try
-    Control := Builder.Build;  // auto free Builder
+    Control := Builder.Build;
     AssertNotNull('Control não deveria ser nil', Control);
-  finally
-    Control.Free;
-  end;
-end;
-
-procedure TControlBuilderTests.TestControlBuilderAutoFreeDisabled;
-var
-  Builder: TControlBuilderAutoFreeTest;
-  Control: TControl;
-begin
-  Control := nil;
-  Builder := TControlBuilderAutoFreeTest.Create;
-  Self.FDestroyed := False;  // inicia com false
-  Builder.OnDestroyed := @BuilderDestroy;
-  Builder.AutoFree := False;
-  try
-    Control := Builder.Build;  // auto free Builder
-    AssertFalse('Builder com AutoFree False não deveria ser destruido após o build', Self.FDestroyed);
-  finally
-    Control.Free;
-    Builder.Free;
-  end;
-end;
-
-procedure TControlBuilderTests.TestControlBuilderAutoFreeDefaultTrue;
-var
-  Builder: TControlBuilderAutoFreeTest;
-  Control: TControl;
-begin
-  Control := nil;
-  Builder := TControlBuilderAutoFreeTest.Create;
-  Self.FDestroyed := False;  // inicia com false
-  Builder.OnDestroyed := @BuilderDestroy;
-  // Builder.AutoFree := True;  // tem que ter o mesmo comportamento que passar True
-  try
-    Control := Builder.Build;  // auto free Builder
-    AssertTrue('Builder com AutoFree deveria ser destruido após o build', Self.FDestroyed);
   finally
     Control.Free;
   end;
@@ -212,9 +136,8 @@ var
 begin
   Control := nil;
   Builder := TControlBuilder.Create(TPanel);  // Instancia um TPanel
-  Builder.AutoFree := True;
   try
-    Control := Builder.Build;  // auto free Builder
+    Control := Builder.Build;
     AssertNotNull('Control não deveria ser nil', Control);
     AssertEquals(
       'Control deveria ser exatamente da classe TPanel',
@@ -231,7 +154,6 @@ var
 begin
   Control := nil;
   Builder := TControlBuilder.Create(TPanel, Control);  // Passa a variável que ira receber a instancia como referencia
-  Builder.AutoFree := True;
   try
     Builder.Build;  // não atribui o build diretamente a variavel
     AssertNotNull('Control não deveria ser nil', Control);
@@ -253,7 +175,6 @@ begin
   Builder := TControlBuilder.Create(TPanel, Control_1);
   Builder.Assign(Control_2);
   Builder.Assign(Control_3);
-  Builder.AutoFree := True;
 
   try
     Control_Build := Builder.Build; // capturando retorno do Build
@@ -288,7 +209,6 @@ var
 begin
   Control := nil;
   Builder := TControlBuilder.Create(TPanel, 'PanelTeste');  // Instancia um TPanel
-  Builder.AutoFree := True;
   try
     Control := Builder.Build;  // auto free Builder
     AssertNotNull('Control não deveria ser nil', Control);
@@ -298,13 +218,12 @@ begin
   end;
 end;
 
-procedure TControlBuilderTests.TestControlBuilderMultipleBuilds;
+procedure TControlBuilderTests.TestControlBuilderMultiplesBuilds;
 var
   Builder: TControlBuilder;
   Control1, Control2: TControl;
 begin
   Builder := TControlBuilder.Create(TPanel);
-  Builder.AutoFree := False;
 
   Control1 := Builder.Build;
   Control2 := Builder.Build;
@@ -318,7 +237,7 @@ begin
   Builder.Free;
 end;
 
-procedure TControlBuilderTests.TestControlBuilderMultipleBuildsWithReferences;
+procedure TControlBuilderTests.TestControlBuilderMultiplesBuildsWithReferences;
 var
   Builder: TControlBuilder;
   FirstInstance, Control_1, Control_2: TControl;
@@ -329,7 +248,6 @@ begin
 
   Builder := TControlBuilder.Create(TPanel, Control_1);
   Builder.Assign(Control_2);
-  Builder.AutoFree := False;
 
   // primeira build
   Control_Build := Builder.Build;
@@ -366,7 +284,6 @@ begin
   Control_3 := nil;
 
   Builder := TControlBuilder.Create(TPanel, Control_1);
-  Builder.AutoFree := False;
 
   Builder.Assign(Control_2).Build;
 
@@ -391,7 +308,7 @@ var
 begin
   Control := nil;
   Builder := TControlBuilder.Create(TPanel);  // Instancia um TPanel
-  Builder.Setup(@SetupControl_1); // altera hight pra 299
+  Builder.Setup(TControlSetupProcObj(@SetupControl_1)); // altera hight pra 299
   try
     Control := Builder.Build;  // auto free Builder
     AssertNotNull('Control não deveria ser nil', Control);
@@ -544,7 +461,7 @@ begin
   PopupMenu := TPopupMenu.Create(nil);
   Panel := nil;
   Builder := TControlBuilder.Create(TPanel);  // Instancia um TPanel
-  Builder.WithProp(TPropValue.specialize Create<TPopupMenu>('PopupMenu', PopupMenu)); // altera via rtti
+  Builder.WithProp(TPropertyValue.specialize Create<TPopupMenu>('PopupMenu', PopupMenu)); // altera via rtti
   try
     Panel := Builder.Build as TPanel;
     AssertNotNull('Panel não deveria ser nil', Panel);
@@ -588,7 +505,7 @@ begin
   Builder := TControlBuilder.Create(TPanel);
 
   // seta via RTTI o enum Align
-  Builder.WithProp(TPropValue.specialize Create<TAlign>('Align', alRight));
+  Builder.WithProp(TPropertyValue.specialize Create<TAlign>('Align', alRight));
 
   try
     Panel := Builder.Build as TPanel;
@@ -959,6 +876,26 @@ begin
     );
   finally
     Panel.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestControlBuilderSetupAndWithName;
+var
+  Builder: TControlBuilder;
+  Control: TControl;
+begin
+  Control := nil;
+  Builder := TControlBuilder.Create;
+  Builder
+    .WithProp('Tag', 7)
+    .WithName('ABC')
+  ;
+
+  try
+    Control := Builder.Build;  // auto free Builder
+    AssertNotNull('Control não deveria ser nil', Control);
+  finally
+    Control.Free;
   end;
 end;
 
