@@ -8,7 +8,7 @@
       <Unit>
         <Filename Value="fpcunitproject1.lpr"/>
         <IsPartOfProject Value="True"/>
-        <EditorIndex Value="9"/>
+        <EditorIndex Value="8"/>
         <CursorPos X="15" Y="16"/>
         <UsageCount Value="211"/>
         <Loaded Value="True"/>
@@ -26,7 +26,7 @@
         <Filename Value="ucontrolbuildertests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlBuilderTests"/>
-        <EditorIndex Value="10"/>
+        <EditorIndex Value="9"/>
         <TopLine Value="16"/>
         <CursorPos X="15" Y="51"/>
         <UsageCount Value="211"/>
@@ -37,7 +37,7 @@
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="16"/>
-        <CursorPos X="59" Y="31"/>
+        <CursorPos X="39" Y="32"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
@@ -50,7 +50,7 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
-        <EditorIndex Value="6"/>
+        <EditorIndex Value="5"/>
         <TopLine Value="1871"/>
         <CursorPos X="3" Y="1889"/>
         <UsageCount Value="114"/>
@@ -74,7 +74,7 @@
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
         <UnitName Value="Generics.Collections"/>
-        <EditorIndex Value="8"/>
+        <EditorIndex Value="7"/>
         <TopLine Value="1319"/>
         <CursorPos Y="1326"/>
         <UsageCount Value="114"/>
@@ -83,7 +83,7 @@
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
         <UnitName Value="Controls"/>
-        <EditorIndex Value="3"/>
+        <EditorIndex Value="2"/>
         <TopLine Value="1255"/>
         <CursorPos X="34" Y="1272"/>
         <UsageCount Value="105"/>
@@ -99,11 +99,10 @@
       <Unit>
         <Filename Value="..\..\..\src\ulayout.pas"/>
         <UnitName Value="ULayout"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="354"/>
         <CursorPos X="86" Y="374"/>
         <UsageCount Value="97"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\menus.pp"/>
@@ -116,7 +115,7 @@
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\lclclasses.pp"/>
         <UnitName Value="LCLClasses"/>
-        <EditorIndex Value="5"/>
+        <EditorIndex Value="4"/>
         <TopLine Value="27"/>
         <CursorPos X="3" Y="45"/>
         <UsageCount Value="173"/>
@@ -125,7 +124,7 @@
       <Unit>
         <Filename Value="..\..\..\src\opcb.optionals.pas"/>
         <UnitName Value="OPCB.Optionals"/>
-        <EditorIndex Value="4"/>
+        <EditorIndex Value="3"/>
         <TopLine Value="256"/>
         <CursorPos Y="185"/>
         <UsageCount Value="181"/>
@@ -135,7 +134,7 @@
         <Filename Value="uobjectbuildertests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UObjectBuilderTests"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="10"/>
         <TopLine Value="209"/>
         <CursorPos X="25" Y="56"/>
         <UsageCount Value="287"/>
@@ -144,7 +143,7 @@
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\win32\classes.pp"/>
         <UnitName Value="Classes"/>
-        <EditorIndex Value="7"/>
+        <EditorIndex Value="6"/>
         <UsageCount Value="141"/>
         <Loaded Value="True"/>
       </Unit>
@@ -152,14 +151,14 @@
         <Filename Value="ucomponentbuildertests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UComponentBuilderTests"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="11"/>
         <TopLine Value="112"/>
         <CursorPos X="58" Y="130"/>
         <UsageCount Value="283"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="29">
+    <JumpHistory HistoryIndex="27">
       <Position>
         <Filename Value="uobjectbuildertests.pas"/>
         <Caret Line="90" Column="23" TopLine="81"/>
@@ -259,13 +258,6 @@
       <Position>
         <Filename Value="..\..\..\src\OPCB.pas"/>
         <Caret Line="554" Column="17" TopLine="544"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\src\ulayout.pas"/>
-        <Caret Line="24" Column="57" TopLine="7"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\src\ulayout.pas"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\src\OPCB.pas"/>
