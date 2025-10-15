@@ -1,26 +1,24 @@
 # OPCB – Object Pascal Component Builder  
 
-**Versão em português**: veja [README_PT.md](README_PT.md)
+🚀 Instancie e configure componentes Delphi e Lazarus de forma fluente, expressiva e reutilizável.  
 
-🚀 Instantiate and configure Delphi and Lazarus components in a fluent, expressive, and reusable way.  
-
-**OPCB (Object Pascal Component Builder)** is a library that simplifies runtime component creation in **Delphi** and **Lazarus**, allowing you to build and configure visual components with a fluent, clear, and organized API.  
+O **OPCB (Object Pascal Component Builder)** é uma biblioteca que facilita a construção de componente em tempo de execução em **Delphi** e **Lazarus**, permitindo criar e configurar componentes visuais com uma API fluente, clara e organizada.  
 
 ---
 
-## ✨ Benefits  
+## ✨ Benefícios  
 
-- 🔹 **Fluent API** – Configure properties and events in a chained way.  
-- 🔹 **Less repetitive code**.
-- 🔹 **Hierarchical organization** – Facilitates creation of nested layouts.  
-- 🔹 **Automatic grid support** – Add controls in cells with `RowSpan` and `ColSpan`.  
-- 🔹 **Compatible with VCL, LCL, and FMX** . 
+- 🔹 **API fluente** – Configure propriedades e eventos de forma encadeada.  
+- 🔹 **Menos código repetitivo**.
+- 🔹 **Organização em níveis hierárquicos** – Facilita a criação de layouts aninhados.  
+- 🔹 **Suporte a grids automáticos** – Adicione controles em células com `RowSpan` e `ColSpan`.  
+- 🔹 **Compatível com VCL, LCL e FMX** . 
 
 ---
 
-## 🚀 Usage Examples  
+## 🚀 Exemplos de uso  
 
-Simple control creation:  
+Criação simples de alguns controles:  
 
 ```pascal
 uses
@@ -57,7 +55,7 @@ end;
 
 ---
 
-Nested control creation:  
+Criação de controles aninhados:  
 
 ```pascal
 uses
@@ -106,7 +104,7 @@ end;
 
 ---
 
-Grid Mode:  
+Modo Grid:  
 
 ```pascal
 uses
@@ -166,9 +164,9 @@ end;
 ![Exemplo 03](docs/img/img-03.png)
 
 
-## 🚀 Example: Building a Virtual Keyboard
+## 🚀 Exemplo: Construindo um Teclado Virtual
 
-The example below demonstrates how to build a complete **virtual keyboard** using the library.
+O exemplo abaixo demonstra como montar um **teclado virtual** completo usando a biblioteca.
 
 ```pascal
 procedure TForm1.FormCreate(Sender: TObject);
@@ -230,41 +228,41 @@ end;
 
 ---
 
-## 🔑 Features Demonstrated
+## 🔑 Funcionalidades Demonstradas
 
-- **Fluent control creation**
-  - `.WithOwnerAndParent(Self, Self)` defines owner and parent.
-  - `.SetSpace(2, 2)` / `.SetTopLeft(20, 20)` control spacing and initial position.
+- **Criação fluente de controles**
+  - `.WithOwnerAndParent(Self, Self)` define o owner e parent.
+  - `.SetSpace(2, 2)` / `.SetTopLeft(20, 20)` controlam espaçamento e posição inicial.
 
-- **Hierarchy of levels**
-  - `.SubLevel(...)` opens a new construction scope (e.g. a `TPanel`).
-  - `.SuperLevel` returns to the previous level.
+- **Hierarquia de níveis**
+  - `.SubLevel(...)` abre um novo escopo de construção (ex.: um `TPanel`).
+  - `.SuperLevel` retorna ao nível anterior.
 
-- **Grid layouts**
-  - `.GridInit(Cols, Rows)` starts a grid.
-  - `.GridSetCellWidthAndHeight(W, H)` defines the cell dimensions.
-  - `.GridSetRowOffset(Row, Offset)` applies offset in specific rows.
+- **Layouts em grid**
+  - `.GridInit(Cols, Rows)` inicia um grid.
+  - `.GridSetCellWidthAndHeight(W, H)` define as dimensões das células.
+  - `.GridSetRowOffset(Row, Offset)` aplica deslocamento em linhas específicas.
 
-- **Dynamic control insertion**
+- **Inserção dinâmica de controles**
   - `.External(procedure(ACreator: TControlCreator) ...)`  
-    allows batch creation of controls such as keys from arrays/strings.
+    permite criar controles em lote, como teclas, a partir de arrays/strings.
 
-- **Grid positioning control**
-  - `.Break` → line/column break.  
-  - `.GridSkipCells(N)` → skips cells.  
-  - `.GridColSpan(N)` → merges columns (e.g. **SPACE** key).
+- **Controle de posicionamento no grid**
+  - `.Break` → quebra de linha/coluna.  
+  - `.GridSkipCells(N)` → pula células.  
+  - `.GridColSpan(N)` → mescla colunas (ex.: tecla **SPACE**).
 
-- **Automatic container adjustment**
-  - `.RecalcParentSize(PaddingX, PaddingY)` automatically resizes the parent container.
+- **Ajuste automático de container**
+  - `.RecalcParentSize(PaddingX, PaddingY)` redimensiona automaticamente o container pai.
 
 ---
 
-## 🎹 Result
+## 🎹 Resultado
 
-The example creates:
+O exemplo cria:
 
-- A **QWERTY keyboard** with two letter rows and an expanded **[ SPACE ]** key.  
-- A **numeric keyboard** with digits `0–9` and a comma.  
-- Both organized within a `TPanel` that automatically adjusts to its content.
+- Um **teclado QWERTY** com duas linhas de letras e a tecla **[ SPACE ]** expandida.  
+- Um **teclado numérico** com dígitos `0–9` e vírgula.  
+- Ambos organizados dentro de um painel (`TPanel`) que se ajusta automaticamente ao conteúdo.
 
 
