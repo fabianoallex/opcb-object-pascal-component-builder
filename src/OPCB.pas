@@ -34,7 +34,7 @@ uses
     Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, Types,
     {$ENDIF}
   {$ENDIF}
-  Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults, RTTI,
+  Classes, SysUtils, Generics.Collections, Generics.Defaults, RTTI,
   TypInfo, OPCB.Optionals;
 
 type
@@ -535,6 +535,8 @@ type
   TCellStrech = set of (csVertical, csHorizontal);
   TCellPosition = (cpCenter, cpTop, cpRight, cpBottom, cpLeft,
     cpTopRight, cpTopLeft, cpBottomRight, cpBottomLeft);
+
+  TIntSingleDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<Integer, Single>;
 
   { TGridMode }
 
