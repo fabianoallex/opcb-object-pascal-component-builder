@@ -17,9 +17,8 @@
         <Filename Value="ucontrolcreatortests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlCreatorTests"/>
-        <IsVisibleTab Value="True"/>
         <TopLine Value="2057"/>
-        <CursorPos X="21" Y="2069"/>
+        <CursorPos X="53" Y="2075"/>
         <UsageCount Value="211"/>
         <Loaded Value="True"/>
       </Unit>
@@ -35,9 +34,10 @@
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="25"/>
-        <CursorPos X="43" Y="38"/>
+        <CursorPos X="75" Y="46"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
@@ -46,7 +46,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="70"/>
         <CursorPos X="64" Y="98"/>
-        <UsageCount Value="39"/>
+        <UsageCount Value="36"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
@@ -62,14 +62,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="68"/>
         <CursorPos X="3" Y="87"/>
-        <UsageCount Value="41"/>
+        <UsageCount Value="38"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\inc\typshrdh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="55"/>
         <CursorPos X="3" Y="62"/>
-        <UsageCount Value="41"/>
+        <UsageCount Value="38"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
@@ -94,7 +94,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="99"/>
         <CursorPos X="54" Y="118"/>
-        <UsageCount Value="35"/>
+        <UsageCount Value="32"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\ulayout.pas"/>
@@ -102,7 +102,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="354"/>
         <CursorPos X="86" Y="374"/>
-        <UsageCount Value="83"/>
+        <UsageCount Value="80"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\menus.pp"/>
@@ -110,7 +110,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="131"/>
         <CursorPos X="3" Y="149"/>
-        <UsageCount Value="24"/>
+        <UsageCount Value="22"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\lclclasses.pp"/>
