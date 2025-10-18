@@ -294,12 +294,12 @@ var
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
-        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(180, 280).Setup(SetupListBoxLeft))
+        .Add(TControlBuilder.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(180, 280).Setup(SetupListBoxLeft))
         .SubLevel(cpdVertical)
-          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(ButtonMoveToRightClick))
-          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(ButtonMoveToLeftClick))
+          .Add(TControlBuilder.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(ButtonMoveToRightClick))
+          .Add(TControlBuilder.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(ButtonMoveToLeftClick))
         .SuperLevel
-        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(180, 280).Setup(SetupListBoxRight))
+        .Add(TControlBuilder.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(180, 280).Setup(SetupListBoxRight))
         .CenterControlsInParentVertically(['ButtonMoveToRight', 'ButtonMoveToLeft'])
     finally
       ControlCreator.Free;
@@ -439,9 +439,9 @@ var
         .SetSpace(20, 20)
         .SubLevel(TControlBuilder.Create(TPanel, 'Px').WithAlign(alTop).WithCaption(''))
           .SetTopLeft(5, 5)
-          .AddControl(TControlBuilder.Create(TEdit, 'eee').WithWidth(480).Setup(SetupEditSearch))
+          .Add(TControlBuilder.Create(TEdit, 'eee').WithWidth(480).Setup(SetupEditSearch))
         .SuperLevel
-        .AddControl(TControlBuilder.Create(TDBGrid).WithAlign(alClient).Setup(SetupDBGrid))
+        .Add(TControlBuilder.Create(TDBGrid).WithAlign(alClient).Setup(SetupDBGrid))
     finally
       Creators.Free;
     end;

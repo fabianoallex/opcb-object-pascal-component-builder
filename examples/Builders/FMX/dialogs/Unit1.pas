@@ -250,12 +250,12 @@ var
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
-        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(80, 280).Setup(SetupListBoxLeft))
+        .Add(TControlBuilder.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(80, 280).Setup(SetupListBoxLeft))
         .SubLevel(cpdVertical)
-          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(ButtonMoveToRightClick))
-          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(ButtonMoveToLeftClick))
+          .Add(TControlBuilder.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(ButtonMoveToRightClick))
+          .Add(TControlBuilder.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(ButtonMoveToLeftClick))
         .SuperLevel
-        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(80, 280).Setup(SetupListBoxRight))
+        .Add(TControlBuilder.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(80, 280).Setup(SetupListBoxRight))
         .CenterControlsInParentVertically(['ButtonMoveToRight', 'ButtonMoveToLeft'])
     finally
       ControlBuilder.Free;

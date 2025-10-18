@@ -53,13 +53,13 @@ begin
     .SetSpace(5, 5)
     .SetTopLeft(20, 20)
     .SubLevel(cpdVertical)
-      .AddControl(TControlBuilder.Create(TLabel, 'LabelMessage').WithCaption(AMsg))
-      .AddControl(AControlBuilder)
+      .Add(TControlBuilder.Create(TLabel, 'LabelMessage').WithCaption(AMsg))
+      .Add(AControlBuilder)
     .SuperLevel
     .Break
     .IncTop(10)
-    .AddControl(TControlBuilder.Create(TBitBtn, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(SetupButton))
-    .AddControl(TControlBuilder.Create(TBitBtn, 'ButtonCancel').WithCaption('Cancelar').WithHeight(30).Setup(SetupButton))
+    .Add(TControlBuilder.Create(TBitBtn, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(SetupButton))
+    .Add(TControlBuilder.Create(TBitBtn, 'ButtonCancel').WithCaption('Cancelar').WithHeight(30).Setup(SetupButton))
     .AlignControlsRight(['ButtonOk', 'ButtonCancel'], [ControlName])
   ;
 

@@ -48,31 +48,31 @@ begin
             var Key: Char;
             begin
               for Key in KeyRows[0] do
-                ABuilder.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
+                ABuilder.Add(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
               ABuilder.Break;
               for Key in KeyRows[1] do
-                ABuilder.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
+                ABuilder.Add(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
               ABuilder.Break;
               ABuilder.GridSkipCells(2);
               ABuilder.GridColSpan(5);
-              ABuilder.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('[ SPACE ]'));
+              ABuilder.Add(TControlBuilder.Create(TSpeedButton).WithCaption('[ SPACE ]'));
             end)
         .GridFinish
         .IncLeft(20)
         .GridInit(4, 3)
           .GridSetCellWidthAndHeight(80, 80)
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('7'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('8'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('9'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('4'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('5'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('6'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('1'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('2'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('3'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('7'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('8'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('9'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('4'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('5'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('6'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('1'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('2'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('3'))
           .GridColSpan(2)
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('0'))
-          .AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(','))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption('0'))
+          .Add(TControlBuilder.Create(TSpeedButton).WithCaption(','))
         .GridFinish
         .RecalcParentSize(10, 10)
       .SuperLevel

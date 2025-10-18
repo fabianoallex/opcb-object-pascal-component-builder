@@ -17,8 +17,9 @@
         <Filename Value="ucontrolcreatortests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlCreatorTests"/>
-        <TopLine Value="466"/>
-        <CursorPos X="26" Y="483"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="2057"/>
+        <CursorPos X="21" Y="2069"/>
         <UsageCount Value="211"/>
         <Loaded Value="True"/>
       </Unit>
@@ -34,10 +35,9 @@
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="16"/>
-        <CursorPos X="39" Y="32"/>
+        <TopLine Value="25"/>
+        <CursorPos X="43" Y="38"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
@@ -46,7 +46,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="70"/>
         <CursorPos X="64" Y="98"/>
-        <UsageCount Value="53"/>
+        <UsageCount Value="39"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
@@ -62,14 +62,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="68"/>
         <CursorPos X="3" Y="87"/>
-        <UsageCount Value="55"/>
+        <UsageCount Value="41"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\inc\typshrdh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="55"/>
         <CursorPos X="3" Y="62"/>
-        <UsageCount Value="55"/>
+        <UsageCount Value="41"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
@@ -94,7 +94,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="99"/>
         <CursorPos X="54" Y="118"/>
-        <UsageCount Value="49"/>
+        <UsageCount Value="35"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\ulayout.pas"/>
@@ -102,7 +102,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="354"/>
         <CursorPos X="86" Y="374"/>
-        <UsageCount Value="97"/>
+        <UsageCount Value="83"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\menus.pp"/>
@@ -110,7 +110,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="131"/>
         <CursorPos X="3" Y="149"/>
-        <UsageCount Value="39"/>
+        <UsageCount Value="24"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\lclclasses.pp"/>
@@ -158,11 +158,7 @@
         <Loaded Value="True"/>
       </Unit>
     </Units>
-    <JumpHistory HistoryIndex="27">
-      <Position>
-        <Filename Value="uobjectbuildertests.pas"/>
-        <Caret Line="90" Column="23" TopLine="81"/>
-      </Position>
+    <JumpHistory HistoryIndex="29">
       <Position>
         <Filename Value="uobjectbuildertests.pas"/>
         <Caret Line="33" Column="42" TopLine="12"/>
@@ -270,6 +266,17 @@
       <Position>
         <Filename Value="..\..\..\src\OPCB.pas"/>
         <Caret Line="544" Column="30" TopLine="509"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="38" Column="43" TopLine="25"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolcreatortests.pas"/>
+        <Caret Line="106" Column="23" TopLine="91"/>
+      </Position>
+      <Position>
+        <Filename Value="ucontrolcreatortests.pas"/>
       </Position>
     </JumpHistory>
     <RunParams>

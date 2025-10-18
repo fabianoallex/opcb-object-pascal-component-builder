@@ -52,11 +52,11 @@ begin
       .WithOwnerAndParent(Self, Self)
       .GridInit(4, 4)
         .GridSetCellWidthAndHeight(250, 60)
-        .AddControl<TButton>(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // metodo definido no helper
-        .AddControl<TButton>(TButtonBuilder.Create(TButtonExt).WithCaption('Teste 2').WithEnabled(False))
-        .AddControl<TButton>(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // metodo definido no helper
-        .AddControl<TButton>(TButtonBuilder.Create.WithCaption('Test 4').WithCursor(crHandPoint))      // medoto definido no helper (com rtti)
-        .AddControl(TControlBuilder.Create(TPanel).WithBorderStyle(bsSingle))
+        .Add<TButton>(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // metodo definido no helper
+        .Add<TButton>(TButtonBuilder.Create(TButtonExt).WithCaption('Teste 2').WithEnabled(False))
+        .Add<TButton>(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // metodo definido no helper
+        .Add<TButton>(TButtonBuilder.Create.WithCaption('Test 4').WithCursor(crHandPoint))      // medoto definido no helper (com rtti)
+        .Add(TControlBuilder.Create(TPanel).WithBorderStyle(bsSingle))
       .GridFinish
     ;
   finally

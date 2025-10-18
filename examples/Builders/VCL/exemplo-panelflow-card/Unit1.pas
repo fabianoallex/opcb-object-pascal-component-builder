@@ -82,11 +82,11 @@ begin
   CardsCreator
     .SubLevel(TControlBuilder.Create(TPanel).WithWidthAndHeight(250, 350), cpdVertical)
       .SetVerticalSpace(2)
-      .AddControl(TControlBuilder.Create(TImage).Setup(SetupImage))
+      .Add(TControlBuilder.Create(TImage).Setup(SetupImage))
       .CenterControlInParentHorizontally
-      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Nome'))
+      .Add(TControlBuilder.Create(TLabel).WithCaption('Nome'))
       .CenterControlInParentHorizontally
-      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Contato'))
+      .Add(TControlBuilder.Create(TLabel).WithCaption('Contato'))
       .CenterControlInParentHorizontally
     .SuperLevel
   ;
@@ -110,13 +110,13 @@ begin
       .SetDirection(cpdVertical)
       .SubLevel(TControlBuilder.Create(TPanel).WithAlign(alTop))
         .SetTopLeft(10, 10)
-        .AddControl(TControlBuilder.Create(TButton)
+        .Add(TControlBuilder.Create(TButton)
           .WithCaption('Novo Card')
           .WithOnClick(ButtonAddCardClick)
         )
       .SuperLevel
       .SetDirection(cpdHorizontal)
-      .AddControl(TControlBuilder.Create(TFlowPanel, 'FlowCards').WithAlign(alClient).WithCaption(''))
+      .Add(TControlBuilder.Create(TFlowPanel, 'FlowCards').WithAlign(alClient).WithCaption(''))
     ;
 
     CardsCreator := TControlCreator.Create(Self.Name);

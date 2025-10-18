@@ -37,10 +37,10 @@ begin
     Creators.AsControlCreator
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
-      .AddControl(TControlBuilder.Create(TButton, 'B1'))
-      .AddControl(TControlBuilder.Create(TButton, 'B2'))
-      .AddControl(TControlBuilder.Create(TButton, 'B3'))
-      .AddControl(TControlBuilder.Create(TButton, 'B4'))
+      .Add(TControlBuilder.Create(TButton, 'B1'))
+      .Add(TControlBuilder.Create(TButton, 'B2'))
+      .Add(TControlBuilder.Create(TButton, 'B3'))
+      .Add(TControlBuilder.Create(TButton, 'B4'))
     ;
   finally
     Creators.Free;

@@ -40,7 +40,7 @@ type
     procedure TestSetControlWidth;
     procedure TestUnsetControlWidth;
     procedure TestExternal;
-    procedure TestAddControlToRegistry;                // testa se um conrole ao ser criado é inserido no registro
+    procedure TestAddToRegistry;                // testa se um conrole ao ser criado é inserido no registro
     procedure TestRemoveControlFromRegistryOnDestroy;  // testa se um controle quando destruído será removido do registro
     procedure TestSubLevel;
     procedure TestSubLevelSubLevel;    // mais de um nivel de profunidade
@@ -103,7 +103,7 @@ var
 begin
   ControlBuilder := TControlBuilder.Create(TPanel, 'PanelTest');
   ControlBuilder.WithCaption('EXTERNAL-TEST');
-  ACreator.specialize AddControl<TControl>(ControlBuilder);
+  ACreator.specialize Add<TControl>(ControlBuilder);
 end;
 
 procedure TControlCreatorTests.SetUp;
@@ -127,7 +127,7 @@ begin
     begin
       WithOwnerAndParent(FForm, FForm);
       SetTopLeft(10, 20);
-      AddControl(TControlBuilder.Create(TPanel, P));
+      Add(TControlBuilder.Create(TPanel, P));
     end;
 
     AssertEquals('Propriedade Top diferente da esperada', 10, P.Top);
@@ -148,8 +148,8 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .SetDirection(cpdHorizontal)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidth(15).WithHeight(15))
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel).WithWidth(15).WithHeight(15))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
     AssertEquals('Propriedade Top diferente da esperada', 10 + 0, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 20 + 15, P.Left);
@@ -169,8 +169,8 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .SetDirection(cpdVertical)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidth(15).WithHeight(15))
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel).WithWidth(15).WithHeight(15))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
     AssertEquals('Propriedade Top diferente da esperada', 10 + 15, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 20 + 0, P.Left);
@@ -190,7 +190,7 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .IncTop(13)
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
 
     AssertEquals('Propriedade Top diferente da esperada', 10 + 13, P.Top);
@@ -211,7 +211,7 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .IncLeft(17)
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
 
     AssertEquals('Propriedade Top diferente da esperada', 10, P.Top);
@@ -230,10 +230,10 @@ begin
   try
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
       .Break
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
     AssertEquals('Propriedade Top diferente da esperada', 10, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
@@ -252,10 +252,10 @@ begin
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
       .SetDirection(cpdVertical)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
       .Break
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
     AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 15, P.Left);
@@ -273,13 +273,13 @@ begin
   try
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
       .SetTopLeft(40, 30)  // muda o local de referencia do break
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(5, 5))
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(5, 5))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(5, 5))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(5, 5))
       .Break
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
     AssertEquals('Propriedade Top diferente da esperada', 40 + 5, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 30, P.Left);
@@ -308,18 +308,18 @@ begin
   try
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
-      .AddControl(TControlBuilder.Create(TPanel).WithHeight(15))
-      .AddControl(TControlBuilder.Create(TPanel).WithHeight(25)) // maior incluido primeiro
+      .Add(TControlBuilder.Create(TPanel).WithHeight(15))
+      .Add(TControlBuilder.Create(TPanel).WithHeight(25)) // maior incluido primeiro
       .Break
-      .AddControl(TControlBuilder.Create(TPanel, P1).WithHeight(5))
+      .Add(TControlBuilder.Create(TPanel, P1).WithHeight(5))
     ;
     AssertEquals('Propriedade Top diferente da esperada para P1', 25, P1.Top);
 
     ControlCreator
-      .AddControl(TControlBuilder.Create(TPanel).WithHeight(25)) // maior incluido segundo
-      .AddControl(TControlBuilder.Create(TPanel).WithHeight(15))
+      .Add(TControlBuilder.Create(TPanel).WithHeight(25)) // maior incluido segundo
+      .Add(TControlBuilder.Create(TPanel).WithHeight(15))
       .Break
-      .AddControl(TControlBuilder.Create(TPanel, P2))
+      .Add(TControlBuilder.Create(TPanel, P2))
     ;
     AssertEquals('Propriedade Top diferente da esperada para P2', 25 + 25, P2.Top);
   finally
@@ -353,18 +353,18 @@ begin
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
       .SetDirection(cpdVertical)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidth(15))
-      .AddControl(TControlBuilder.Create(TPanel).WithWidth(25)) // maior incluido primeiro
+      .Add(TControlBuilder.Create(TPanel).WithWidth(15))
+      .Add(TControlBuilder.Create(TPanel).WithWidth(25)) // maior incluido primeiro
       .Break
-      .AddControl(TControlBuilder.Create(TPanel, P1).WithWidth(5))
+      .Add(TControlBuilder.Create(TPanel, P1).WithWidth(5))
     ;
     AssertEquals('Propriedade Left diferente da esperada para P1', 25, P1.Left);
 
     ControlCreator
-      .AddControl(TControlBuilder.Create(TPanel).WithWidth(25)) // maior incluido segundo
-      .AddControl(TControlBuilder.Create(TPanel).WithWidth(15))
+      .Add(TControlBuilder.Create(TPanel).WithWidth(25)) // maior incluido segundo
+      .Add(TControlBuilder.Create(TPanel).WithWidth(15))
       .Break
-      .AddControl(TControlBuilder.Create(TPanel, P2))
+      .Add(TControlBuilder.Create(TPanel, P2))
     ;
     AssertEquals('Propriedade Left diferente da esperada  para P2', 25 + 25, P2.Left);
   finally
@@ -382,8 +382,8 @@ begin
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
       .SetSpace(7, 8)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
     AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 15 + 8, P.Left);
@@ -403,8 +403,8 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetDirection(cpdVertical)
       .SetSpace(7, 8)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
-      .AddControl(TControlBuilder.Create(TPanel, P))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel, P))
     ;
     AssertEquals('Propriedade Top diferente da esperada', 10 + 7, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
@@ -424,8 +424,8 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .SetControlHeight(33)
-      .AddControl(TControlBuilder.Create(TPanel, P1).WithHeight(44)) // tem que sobrepor com 33, mesmo passando 44
-      .AddControl(TControlBuilder.Create(TPanel, P2))
+      .Add(TControlBuilder.Create(TPanel, P1).WithHeight(44)) // tem que sobrepor com 33, mesmo passando 44
+      .Add(TControlBuilder.Create(TPanel, P2))
     ;
 
     AssertEquals('Propriedade Height de P1 diferente da esperada', 33, P1.Height);
@@ -446,11 +446,11 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .SetControlHeight(33)
-      .AddControl(TControlBuilder.Create(TPanel).WithHeight(44))
-      .AddControl(TControlBuilder.Create(TPanel))
+      .Add(TControlBuilder.Create(TPanel).WithHeight(44))
+      .Add(TControlBuilder.Create(TPanel))
       .UnsetControlHeight
-      .AddControl(TControlBuilder.Create(TPanel, P1).WithHeight(44)) // agora tem que ser considerado os 44
-      .AddControl(TControlBuilder.Create(TPanel, P2))
+      .Add(TControlBuilder.Create(TPanel, P1).WithHeight(44)) // agora tem que ser considerado os 44
+      .Add(TControlBuilder.Create(TPanel, P2))
     ;
 
     AssertEquals('Propriedade Height de P1 diferente da esperada', 44, P1.Height);
@@ -471,8 +471,8 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .SetControlWidth(33)
-      .AddControl(TControlBuilder.Create(TPanel, P1).WithWidth(44)) // tem que sobrepor com 33, mesmo passando 44
-      .AddControl(TControlBuilder.Create(TPanel, P2))
+      .Add(TControlBuilder.Create(TPanel, P1).WithWidth(44)) // tem que sobrepor com 33, mesmo passando 44
+      .Add(TControlBuilder.Create(TPanel, P2))
     ;
 
     AssertEquals('Propriedade Width de P1 diferente da esperada', 33, P1.Width);
@@ -493,11 +493,11 @@ begin
       .WithOwnerAndParent(FForm, FForm)
       .SetTopLeft(10, 20)
       .SetControlWidth(33)
-      .AddControl(TControlBuilder.Create(TPanel).WithWidth(44))
-      .AddControl(TControlBuilder.Create(TPanel))
+      .Add(TControlBuilder.Create(TPanel).WithWidth(44))
+      .Add(TControlBuilder.Create(TPanel))
       .UnsetControlWidth
-      .AddControl(TControlBuilder.Create(TPanel, P1).WithWidth(44)) // agora tem que ser considerado os 44
-      .AddControl(TControlBuilder.Create(TPanel, P2))
+      .Add(TControlBuilder.Create(TPanel, P1).WithWidth(44)) // agora tem que ser considerado os 44
+      .Add(TControlBuilder.Create(TPanel, P2))
     ;
 
     AssertEquals('Propriedade Width de P1 diferente da esperada', 44, P1.Width);
@@ -530,7 +530,7 @@ begin
   end;
 end;
 
-procedure TControlCreatorTests.TestAddControlToRegistry;
+procedure TControlCreatorTests.TestAddToRegistry;
 var
   ControlCreator: TControlCreator;
 begin
@@ -541,7 +541,7 @@ begin
 
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
-      .AddControl(TControlBuilder.Create(TPanel))
+      .Add(TControlBuilder.Create(TPanel))
     ;
 
     AssertEquals('A quantidade de controles no registro diferente do esperado',
@@ -563,7 +563,7 @@ begin
 
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
-      .AddControl(TControlBuilder.Create(TPanel, 'panel_test'))
+      .Add(TControlBuilder.Create(TPanel, 'panel_test'))
     ;
 
     P := ControlCreator.GetControl('panel_test') as TPanel;
@@ -593,7 +593,7 @@ begin
 
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
-      .AddControl(TControlBuilder.Create(TPanel).WithHeight(50).WithLeft(60))
+      .Add(TControlBuilder.Create(TPanel).WithHeight(50).WithLeft(60))
       .SubLevel;
 
     NewLevel := ControlCreator.CurrentLevel;
@@ -619,7 +619,7 @@ begin
 
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
-      .AddControl(TControlBuilder.Create(TPanel).WithHeight(50).WithLeft(60))
+      .Add(TControlBuilder.Create(TPanel).WithHeight(50).WithLeft(60))
       .SubLevel;
 
     NewLevel_01 := ControlCreator
@@ -690,7 +690,7 @@ begin
         // Não pode considerar o espaçamento na inclusão do item
         // após o SuperLevel.
       .SuperLevel
-      .AddControl(TControlBuilder.Create(TPanel, P));
+      .Add(TControlBuilder.Create(TPanel, P));
 
     AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
@@ -714,20 +714,20 @@ begin
       .SetControlWidth(80)
       .SetControlHeight(50)
       .SetDirection(cpdHorizontal)
-      .AddControl(TControlBuilder.Create(TPanel))          // Width 80 (A)
+      .Add(TControlBuilder.Create(TPanel))          // Width 80 (A)
       .SubLevel
         .SetControlWidth(80)
         .SetControlHeight(50)
         .SetDirection(cpdVertical)
-        .AddControl(TControlBuilder.Create(TPanel))       // Width 80 (B)
-        .AddControl(TControlBuilder.Create(TPanel, P1))
+        .Add(TControlBuilder.Create(TPanel))       // Width 80 (B)
+        .Add(TControlBuilder.Create(TPanel, P1))
     ;
 
     SubLevelDirection := ControlCreator.CurrentLevel.Direction;
 
     ControlCreator
       .SuperLevel
-      .AddControl(TControlBuilder.Create(TPanel, P2))    // <-- left 160 (80A + 80B)
+      .Add(TControlBuilder.Create(TPanel, P2))    // <-- left 160 (80A + 80B)
     ;
 
     SuperLevelDirection := ControlCreator.CurrentLevel.Direction;
@@ -765,17 +765,17 @@ begin
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
       .SubLevel(TControlBuilder.Create(TPanel, P).WithHeight(10).WithLeft(15))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
         .Break
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
         .RecalcParentSize
       .SuperLevel
     ;
@@ -797,17 +797,17 @@ begin
     ControlCreator
       .WithOwnerAndParent(FForm, FForm)
       .SubLevel(TControlBuilder.Create(TPanel, P).WithHeight(10).WithLeft(15))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
         .Break
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
-        .AddControl(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
         .RecalcParentSize(12, 17)
       .SuperLevel
     ;
@@ -831,10 +831,10 @@ begin
       .SetDirection(cpdHorizontal)
       .GridInit(2, 2)
         .GridSetCellWidthAndHeight(6, 7)
-        .AddControl(TControlBuilder.Create(TPanel, P1))
-        .AddControl(TControlBuilder.Create(TPanel, P2))
-        .AddControl(TControlBuilder.Create(TPanel, P3))
-        .AddControl(TControlBuilder.Create(TPanel, P4))
+        .Add(TControlBuilder.Create(TPanel, P1))
+        .Add(TControlBuilder.Create(TPanel, P2))
+        .Add(TControlBuilder.Create(TPanel, P3))
+        .Add(TControlBuilder.Create(TPanel, P4))
       .GridFinish
     ;
 
@@ -881,11 +881,11 @@ begin
       .SetDirection(cpdHorizontal)
       .GridInit(2, 2)
         .GridSetCellWidthAndHeight(6, 7)
-        .AddControl(TControlBuilder.Create(TPanel, P1))
-        .AddControl(TControlBuilder.Create(TPanel, P2))
-        .AddControl(TControlBuilder.Create(TPanel, P3))
-        .AddControl(TControlBuilder.Create(TPanel, P4))
-        .AddControl(TControlBuilder.Create(TPanel, P5))  // deve ignorar pois já finalizou o grid
+        .Add(TControlBuilder.Create(TPanel, P1))
+        .Add(TControlBuilder.Create(TPanel, P2))
+        .Add(TControlBuilder.Create(TPanel, P3))
+        .Add(TControlBuilder.Create(TPanel, P4))
+        .Add(TControlBuilder.Create(TPanel, P5))  // deve ignorar pois já finalizou o grid
       .GridFinish
     ;
 
@@ -919,11 +919,11 @@ begin
       .GridInit(2, 2)
         .GridAutoExpand
         .GridSetCellWidthAndHeight(6, 7)
-        .AddControl(TControlBuilder.Create(TPanel, P1))
-        .AddControl(TControlBuilder.Create(TPanel, P2))
-        .AddControl(TControlBuilder.Create(TPanel, P3))
-        .AddControl(TControlBuilder.Create(TPanel, P4))
-        .AddControl(TControlBuilder.Create(TPanel, P5)) // ao adicionar esse registro grid se expande
+        .Add(TControlBuilder.Create(TPanel, P1))
+        .Add(TControlBuilder.Create(TPanel, P2))
+        .Add(TControlBuilder.Create(TPanel, P3))
+        .Add(TControlBuilder.Create(TPanel, P4))
+        .Add(TControlBuilder.Create(TPanel, P5)) // ao adicionar esse registro grid se expande
       .GridFinish
     ;
 
@@ -950,12 +950,12 @@ begin
       .SetDirection(cpdHorizontal)
       .GridInit(2, 2)
         .GridAutoExpand
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
         .GridReturnNumberOfRows(RowsBeforeExpand)
-        .AddControl(TControlBuilder.Create(TPanel)) // ao adicionar esse registro grid se expande
+        .Add(TControlBuilder.Create(TPanel)) // ao adicionar esse registro grid se expande
         .GridReturnNumberOfRows(RowsAfterExpand)
       .GridFinish
     ;
@@ -980,12 +980,12 @@ begin
       .SetDirection(cpdVertical)
       .GridInit(2, 2)
         .GridAutoExpand
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
         .GridReturnNumberOfCols(ColsBeforeExpand)
-        .AddControl(TControlBuilder.Create(TPanel)) // ao adicionar esse registro grid se expande
+        .Add(TControlBuilder.Create(TPanel)) // ao adicionar esse registro grid se expande
         .GridReturnNumberOfCols(ColsAfterExpand)
       .GridFinish
     ;
@@ -1014,20 +1014,20 @@ begin
       .SetDirection(cpdHorizontal)
       .GridInit(2, 2)
         .GridAutoExpandRows                                         // aqui define que apenas expande Linhas
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('1'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('2'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('3'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('4'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('1'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('2'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('3'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('4'))
 
         .GridReturnNumberOfRows(RowsBeforeExpand)
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('5'))  // aqui expande automaticamente linhas para 3
+        .Add(TControlBuilder.Create(TPanel).WithCaption('5'))  // aqui expande automaticamente linhas para 3
         .GridReturnNumberOfRows(RowsAfterExpand)
 
         .SetDirection(cpdVertical) // ao mudar pra direção vertical, apos preencher a ultima celula da coluna, tentará criar uma nova coluna
 
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('6'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('6'))
         .GridReturnNumberOfCols(ColsBeforeExpand)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithCaption('7'))  // aqui ignora pois não expande colunas
+        .Add(TControlBuilder.Create(TPanel, P).WithCaption('7'))  // aqui ignora pois não expande colunas
         .GridReturnNumberOfCols(ColsAfterExpand)
       .GridFinish
     ;
@@ -1063,20 +1063,20 @@ begin
       .SetDirection(cpdVertical)
       .GridInit(2, 2)
         .GridAutoExpandCols                                         // aqui define que apenas expande Colunas
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('1'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('2'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('3'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('4'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('1'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('2'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('3'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('4'))
 
         .GridReturnNumberOfCols(ColsBeforeExpand)
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('5'))  // aqui expande automaticamente Colunas para 3
+        .Add(TControlBuilder.Create(TPanel).WithCaption('5'))  // aqui expande automaticamente Colunas para 3
         .GridReturnNumberOfCols(ColsAfterExpand)
 
         .SetDirection(cpdHorizontal) // ao mudar pra direção vertical, apos preencher a ultima celula da linha, tentará criar uma nova linha
 
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('6'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('6'))
         .GridReturnNumberOfRows(RowsBeforeExpand)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithCaption('7'))  // aqui ignora pois não expande colunas
+        .Add(TControlBuilder.Create(TPanel, P).WithCaption('7'))  // aqui ignora pois não expande colunas
         .GridReturnNumberOfRows(RowsAfterExpand)
       .GridFinish
     ;
@@ -1104,17 +1104,17 @@ begin
       .SetDirection(cpdHorizontal)
       .GridInit(4, 4)
         .GridSetCellWidthAndHeight(20, 25)
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
         // sublevel na segunda linha e na segunda coluna
         .SubLevel
           // P1 e P2 estão em um sublevel dentro de uma celula, mas eles
           // não devem se comportar como conteudo da celula
-          .AddControl(TControlBuilder.Create(TPanel, P1).WithWidthAndHeight(6, 7))
-          .AddControl(TControlBuilder.Create(TPanel, P2))
+          .Add(TControlBuilder.Create(TPanel, P1).WithWidthAndHeight(6, 7))
+          .Add(TControlBuilder.Create(TPanel, P2))
         .SuperLevel
       .GridFinish
     ;
@@ -1142,9 +1142,9 @@ begin
       .GridInit(2, 3)
         .GridSetCellWidthAndHeight(10, 15)
 
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
         .GridSkipCell
-        .AddControl(TControlBuilder.Create(TPanel, P))
+        .Add(TControlBuilder.Create(TPanel, P))
       .GridFinish
     ;
 
@@ -1168,15 +1168,15 @@ begin
         .GridSetCellWidthAndHeight(50, 60)  // altura padrão da linha = 60
         .GridSetRowHeight(0, 100)           // altera a linha 0 para altura = 100
 
-        .AddControl(TControlBuilder.Create(TPanel, P1))  // p1 esta na linha 0
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel, P2)) // p2 esta na linha 2
+        .Add(TControlBuilder.Create(TPanel, P1))  // p1 esta na linha 0
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P2)) // p2 esta na linha 2
       .GridFinish
     ;
 
@@ -1201,15 +1201,15 @@ begin
         .GridSetCellWidthAndHeight(50, 60)  // largura padrão da linha = 50
         .GridSetColWidth(0, 90)           // altera a coluna 0 para largura = 90
 
-        .AddControl(TControlBuilder.Create(TPanel, P1))  // p1 esta na coluna 0
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel, P2)) // p2 esta na coluna 2
+        .Add(TControlBuilder.Create(TPanel, P1))  // p1 esta na coluna 0
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P2)) // p2 esta na coluna 2
       .GridFinish
     ;
 
@@ -1233,16 +1233,16 @@ begin
       .GridInit(3, 3)
         .GridSetCellWidthAndHeight(50, 60)  // altura da celula
 
-        .AddControl(TControlBuilder.Create(TPanel, P1)) // sem rowspan
+        .Add(TControlBuilder.Create(TPanel, P1)) // sem rowspan
         .GridRowSpan(2)
-        .AddControl(TControlBuilder.Create(TPanel, P2)) // com rowspan=2
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P2)) // com rowspan=2
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1265,16 +1265,16 @@ begin
       .SetDirection(cpdHorizontal)
       .GridInit(3, 3)
         .GridSetCellWidthAndHeight(50, 60)
-        .AddControl(TControlBuilder.Create(TPanel, P1)) // sem colspan
+        .Add(TControlBuilder.Create(TPanel, P1)) // sem colspan
         .GridColSpan(2)
-        .AddControl(TControlBuilder.Create(TPanel, P2)) // com colspan=2
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P2)) // com colspan=2
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1298,16 +1298,16 @@ begin
       .GridInit(4, 2)
         .GridSetCellWidthAndHeight(50, 60)  // altura da celula
 
-        .AddControl(TControlBuilder.Create(TPanel, P1)) // sem rowspan
+        .Add(TControlBuilder.Create(TPanel, P1)) // sem rowspan
         .GridRowSpan(2)
-        .AddControl(TControlBuilder.Create(TPanel, P2)) // com rowspan=2
-        .AddControl(TControlBuilder.Create(TPanel, P3)) // sem rowspan automaticamente
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P2)) // com rowspan=2
+        .Add(TControlBuilder.Create(TPanel, P3)) // sem rowspan automaticamente
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1331,16 +1331,16 @@ begin
       .SetDirection(cpdHorizontal)
       .GridInit(2, 4)
         .GridSetCellWidthAndHeight(50, 60)
-        .AddControl(TControlBuilder.Create(TPanel, P1)) // sem colspan
+        .Add(TControlBuilder.Create(TPanel, P1)) // sem colspan
         .GridColSpan(2)
-        .AddControl(TControlBuilder.Create(TPanel, P2)) // com colspan=2
-        .AddControl(TControlBuilder.Create(TPanel, P3)) // sem colspan automaticamente
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P2)) // com colspan=2
+        .Add(TControlBuilder.Create(TPanel, P3)) // sem colspan automaticamente
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1365,20 +1365,20 @@ begin
       .GridInit(3, 3)
         .GridSetCellWidthAndHeight(50, 60)  // altura da celula
 
-        .AddControl(TControlBuilder.Create(TPanel)) // sem rowspan
+        .Add(TControlBuilder.Create(TPanel)) // sem rowspan
 
         // span 3 irá ultrapassar limite da ultima linha do grid.
         // espera-se que limite a 2
         .GridRowSpan(3)
 
-        .AddControl(TControlBuilder.Create(TPanel, P)) // com rowspan=2
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P)) // com rowspan=2
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1401,20 +1401,20 @@ begin
       .GridInit(3, 3)
         .GridSetCellWidthAndHeight(50, 60)  // altura da celula
 
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
 
         // span 3 irá ultrapassar limite da ultima coluna do grid.
         // espera-se que limite a 2
         .GridColSpan(3)
 
-        .AddControl(TControlBuilder.Create(TPanel, P)) // com colspan=2
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P)) // com colspan=2
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1438,20 +1438,20 @@ begin
         .GridAutoExpand
         .GridSetCellWidthAndHeight(50, 60)  // altura da celula
 
-        .AddControl(TControlBuilder.Create(TPanel)) // sem rowspan
+        .Add(TControlBuilder.Create(TPanel)) // sem rowspan
 
         // span 3 irá ultrapassar limite da ultima linha do grid.
         // espera-se que expanda o grid para 4 linhas
         .GridRowSpan(3)
 
-        .AddControl(TControlBuilder.Create(TPanel, P)) // com rowspan=3
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P)) // com rowspan=3
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1475,20 +1475,20 @@ begin
         .GridAutoExpand
         .GridSetCellWidthAndHeight(50, 60)  // altura da celula
 
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
 
         // span 3 irá ultrapassar limite da ultima coluna do grid.
         // espera-se que expanda as colunas do grid
         .GridColSpan(3)
 
-        .AddControl(TControlBuilder.Create(TPanel, P)) // com colspan=3
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P)) // com colspan=3
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1511,7 +1511,7 @@ begin
       .GridInit(5, 5)
         .GridSetCellWidthAndHeight(30, 42)
         .GridGotoCell(2, 3)
-        .AddControl(TControlBuilder.Create(TPanel, P))
+        .Add(TControlBuilder.Create(TPanel, P))
       .GridFinish
     ;
 
@@ -1536,16 +1536,16 @@ begin
       .GridInit(3, 3)
         .GridSetCellWidthAndHeight(50, 60)  // altura da celula
 
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
         .GridRowSpan(2)
-        .AddControl(TControlBuilder.Create(TPanel, P)) // com rowspan=2
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P)) // com rowspan=2
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1568,16 +1568,16 @@ begin
       .SetHorizontalSpace(9)            // define o espaçaento entre as colunas
       .GridInit(3, 3)
         .GridSetCellWidthAndHeight(50, 60)
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
         .GridColSpan(2)
-        .AddControl(TControlBuilder.Create(TPanel, P)) // com colspan=2
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel, P)) // com colspan=2
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
       .GridFinish
     ;
 
@@ -1599,7 +1599,7 @@ begin
       .GridInit(1, 1)
         .GridSetCellWidthAndHeight(50, 60)
         .GridCellStrechHorizontal                                                // strech na horizontal = largura da celula
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(30, 25))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(30, 25))
       .GridFinish
     ;
 
@@ -1622,7 +1622,7 @@ begin
       .GridInit(1, 1)
         .GridSetCellWidthAndHeight(50, 60)
         .GridCellStrechVertical                                                // strech na horizontal = largura da celula
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(30, 25))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(30, 25))
       .GridFinish
     ;
 
@@ -1645,7 +1645,7 @@ begin
       .GridInit(1, 1)
         .GridSetCellWidthAndHeight(50, 60)
         .GridCellStrechAll                                                // strech na horizontal e vertical
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(30, 25))   // 30 e 25: esses valores sao ignorados
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(30, 25))   // 30 e 25: esses valores sao ignorados
       .GridFinish
     ;
 
@@ -1668,7 +1668,7 @@ begin
       .GridInit(1, 1)
         .GridSetCellWidthAndHeight(50, 60)
         .GridCellNoStrech                                                     // sem strech
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(30, 25))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(30, 25))
       .GridFinish
     ;
 
@@ -1692,7 +1692,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpCenter)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1716,7 +1716,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpTop)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1740,7 +1740,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpTopRight)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1764,7 +1764,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpRight)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1788,7 +1788,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpBottomRight)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1812,7 +1812,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpBottom)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1836,7 +1836,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpBottomLeft)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1860,7 +1860,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpLeft)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1884,7 +1884,7 @@ begin
         .GridSetCellWidthAndHeight(60, 50)
         .GridCellNoStrech
         .GridCellPosition(cpTopLeft)
-        .AddControl(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(10, 14))
       .GridFinish
     ;
 
@@ -1908,17 +1908,17 @@ begin
       .GridInit(3, 3)
         .GridSetCellWidthAndHeight(50, 60)
         .GridSetRowOffset(1, 15)                      // segunda linha com offset positivo de 15
-        .AddControl(TControlBuilder.Create(TPanel, P1))  // linha 1
-        .AddControl(TControlBuilder.Create(TPanel, P2))  // linha 1
-        .AddControl(TControlBuilder.Create(TPanel, P3))  // linha 1
+        .Add(TControlBuilder.Create(TPanel, P1))  // linha 1
+        .Add(TControlBuilder.Create(TPanel, P2))  // linha 1
+        .Add(TControlBuilder.Create(TPanel, P3))  // linha 1
 
-        .AddControl(TControlBuilder.Create(TPanel, P4))  // linha 2
-        .AddControl(TControlBuilder.Create(TPanel, P5))  // linha 2
-        .AddControl(TControlBuilder.Create(TPanel, P6))  // linha 2
+        .Add(TControlBuilder.Create(TPanel, P4))  // linha 2
+        .Add(TControlBuilder.Create(TPanel, P5))  // linha 2
+        .Add(TControlBuilder.Create(TPanel, P6))  // linha 2
 
-        .AddControl(TControlBuilder.Create(TPanel, P7))  // linha 3
-        .AddControl(TControlBuilder.Create(TPanel, P8))  // linha 3
-        .AddControl(TControlBuilder.Create(TPanel, P9))  // linha 3
+        .Add(TControlBuilder.Create(TPanel, P7))  // linha 3
+        .Add(TControlBuilder.Create(TPanel, P8))  // linha 3
+        .Add(TControlBuilder.Create(TPanel, P9))  // linha 3
       .GridFinish
     ;
 
@@ -1955,17 +1955,17 @@ begin
       .GridInit(3, 3)
         .GridSetCellWidthAndHeight(50, 60)
         .GridSetColOffset(1, 15)                      // segunda coluna com offset positivo de 15
-        .AddControl(TControlBuilder.Create(TPanel, P1))  // coluna 1
-        .AddControl(TControlBuilder.Create(TPanel, P2))  // coluna 1
-        .AddControl(TControlBuilder.Create(TPanel, P3))  // coluna 1
+        .Add(TControlBuilder.Create(TPanel, P1))  // coluna 1
+        .Add(TControlBuilder.Create(TPanel, P2))  // coluna 1
+        .Add(TControlBuilder.Create(TPanel, P3))  // coluna 1
 
-        .AddControl(TControlBuilder.Create(TPanel, P4))  // coluna 2
-        .AddControl(TControlBuilder.Create(TPanel, P5))  // coluna 2
-        .AddControl(TControlBuilder.Create(TPanel, P6))  // coluna 2
+        .Add(TControlBuilder.Create(TPanel, P4))  // coluna 2
+        .Add(TControlBuilder.Create(TPanel, P5))  // coluna 2
+        .Add(TControlBuilder.Create(TPanel, P6))  // coluna 2
 
-        .AddControl(TControlBuilder.Create(TPanel, P7))  // coluna 3
-        .AddControl(TControlBuilder.Create(TPanel, P8))  // coluna 3
-        .AddControl(TControlBuilder.Create(TPanel, P9))  // coluna 3
+        .Add(TControlBuilder.Create(TPanel, P7))  // coluna 3
+        .Add(TControlBuilder.Create(TPanel, P8))  // coluna 3
+        .Add(TControlBuilder.Create(TPanel, P9))  // coluna 3
       .GridFinish
     ;
 
@@ -2000,10 +2000,10 @@ begin
       .SetDirection(cpdHorizontal)
       .GridInit(2, 4)
         .GridSetCellWidthAndHeight(10, 15)
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
         .BreakLine
-        .AddControl(TControlBuilder.Create(TPanel, P)) // segunda linha, primeira coluna
+        .Add(TControlBuilder.Create(TPanel, P)) // segunda linha, primeira coluna
       .GridFinish
     ;
 
@@ -2026,10 +2026,10 @@ begin
       .SetDirection(cpdVertical)
       .GridInit(4, 2)
         .GridSetCellWidthAndHeight(10, 15)
-        .AddControl(TControlBuilder.Create(TPanel))
-        .AddControl(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
+        .Add(TControlBuilder.Create(TPanel))
         .BreakColumn
-        .AddControl(TControlBuilder.Create(TPanel, P)) // segunda coluna, primeira linha
+        .Add(TControlBuilder.Create(TPanel, P)) // segunda coluna, primeira linha
       .GridFinish
     ;
 
@@ -2054,7 +2054,7 @@ begin
       .GridInit(1, 1)
         .GridSetCellWidthAndHeight(50, 50)
         .GridCellStrechAll
-        .AddControl(TControlBuilder.Create(TPanel, P))
+        .Add(TControlBuilder.Create(TPanel, P))
       .GridFinish
     ;
 
@@ -2079,7 +2079,7 @@ begin
         .GridGotoCell(1, 1)
         .GridSetCellWidthAndHeight(50, 50)
         .GridCellStrechAll
-        .AddControl(TControlBuilder.Create(TPanel, P))
+        .Add(TControlBuilder.Create(TPanel, P))
       .GridFinish
     ;
 

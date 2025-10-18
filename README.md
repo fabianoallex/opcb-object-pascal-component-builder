@@ -37,15 +37,15 @@ begin
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
       .SetDirection(cpdVertical)
-      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Nome'))
-      .AddControl(TControlBuilder.Create(TEdit, 'edit_name').WithWidth(250).WithCaption(''))
+      .Add(TControlBuilder.Create(TLabel).WithCaption('Nome'))
+      .Add(TControlBuilder.Create(TEdit, 'edit_name').WithWidth(250).WithCaption(''))
       .IncTop(15)
-      .AddControl(TControlBuilder.Create(TLabel).WithCaption('Idade'))
-      .AddControl(TControlBuilder.Create(TNumberBox).WithWidth(50))
+      .Add(TControlBuilder.Create(TLabel).WithCaption('Idade'))
+      .Add(TControlBuilder.Create(TNumberBox).WithWidth(50))
       .IncTop(20)
       .SetDirection(cpdHorizontal)
-      .AddControl(TControlBuilder.Create(TButton, 'button_enviar').WithCaption('Enviar'))
-      .AddControl(TControlBuilder.Create(TButton, 'button_cancelar').WithCaption('Cancelar'))
+      .Add(TControlBuilder.Create(TButton, 'button_enviar').WithCaption('Enviar'))
+      .Add(TControlBuilder.Create(TButton, 'button_cancelar').WithCaption('Cancelar'))
       .AlignControlsRight(['button_enviar', 'button_cancelar'], ['edit_name'])
     ;
   finally
@@ -76,24 +76,24 @@ begin
       .SubLevel(TControlBuilder.Create(TGroupBox).WithCaption('Opções').WithWidthAndHeight(250, 250))
         .SetDirection(cpdVertical)
         .SetTopLeft(20, 20)
-        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 1'))
-        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 2'))
-        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 3'))
-        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 4'))
-        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 5'))
-        .AddControl(TControlBuilder.Create(TCheckBox).WithCaption('Opção 6'))
+        .Add(TControlBuilder.Create(TCheckBox).WithCaption('Opção 1'))
+        .Add(TControlBuilder.Create(TCheckBox).WithCaption('Opção 2'))
+        .Add(TControlBuilder.Create(TCheckBox).WithCaption('Opção 3'))
+        .Add(TControlBuilder.Create(TCheckBox).WithCaption('Opção 4'))
+        .Add(TControlBuilder.Create(TCheckBox).WithCaption('Opção 5'))
+        .Add(TControlBuilder.Create(TCheckBox).WithCaption('Opção 6'))
       .SuperLevel
       .SubLevel(TControlBuilder.Create(TPanel).WithWidthAndHeight(250, 250))
         .SetDirection(cpdVertical)
         .SetTopLeft(20, 20)
-        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 1'))
-        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 2'))
-        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 3'))
-        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 4'))
-        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 5'))
-        .AddControl(TControlBuilder.Create(TLabel).WithCaption('Informação 6'))
+        .Add(TControlBuilder.Create(TLabel).WithCaption('Informação 1'))
+        .Add(TControlBuilder.Create(TLabel).WithCaption('Informação 2'))
+        .Add(TControlBuilder.Create(TLabel).WithCaption('Informação 3'))
+        .Add(TControlBuilder.Create(TLabel).WithCaption('Informação 4'))
+        .Add(TControlBuilder.Create(TLabel).WithCaption('Informação 5'))
+        .Add(TControlBuilder.Create(TLabel).WithCaption('Informação 6'))
         .IncTop(50)
-        .AddControl(TControlBuilder.Create(TButton).WithCaption('Copiar'))
+        .Add(TControlBuilder.Create(TButton).WithCaption('Copiar'))
       .SuperLevel
     ;
   finally
@@ -127,35 +127,35 @@ begin
         .GridSetCellWidthAndHeight(70, 70)
         .GridSetColWidth(0, 200)
         .GridSetRowHeight(1, 150)
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('1'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('2'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('1'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('2'))
         .SubLevel(TControlBuilder.Create(TPanel).WithCaption('3'))
-          .AddControl(TControlBuilder.Create(TButton).WithCaption('B1'))
-          .AddControl(TControlBuilder.Create(TButton).WithCaption('B2'))
+          .Add(TControlBuilder.Create(TButton).WithCaption('B1'))
+          .Add(TControlBuilder.Create(TButton).WithCaption('B2'))
         .SuperLevel
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('4'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('5'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('4'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('5'))
         .SetDirection(cpdHorizontal)
         .GridColSpan(2)
         .GridRowSpan(2)
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('6'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('7'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('8'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('9'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('10'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('11'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('6'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('7'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('8'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('9'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('10'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('11'))
         .GridSkipCell
         .GridColSpan(1)
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('12'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('13'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('12'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('13'))
         .GridRowSpan(2)
         .GridColSpan(1)
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('14'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('15'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('16'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('17'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('18'))
-        .AddControl(TControlBuilder.Create(TPanel).WithCaption('19'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('14'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('15'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('16'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('17'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('18'))
+        .Add(TControlBuilder.Create(TPanel).WithCaption('19'))
       .GridFinish
     ;
   finally
@@ -192,14 +192,14 @@ begin
             var Key: Char;
             begin
               for Key in KeyRows[0] do
-                ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
+                ACreator.Add(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
               ACreator.Break;
               for Key in KeyRows[1] do
-                ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
+                ACreator.Add(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
               ACreator.Break;
               ACreator.GridSkipCells(2);
               ACreator.GridColSpan(5);
-              ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('[ SPACE ]'));
+              ACreator.Add(TControlBuilder.Create(TSpeedButton).WithCaption('[ SPACE ]'));
             end
           )
         .GridFinish
@@ -211,10 +211,10 @@ begin
             var Key: Char;
             begin
               for Key in Keys do
-                ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
+                ACreator.Add(TControlBuilder.Create(TSpeedButton).WithCaption(Key));
               ACreator.GridColSpan(2);
-              ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption('0'));
-              ACreator.AddControl(TControlBuilder.Create(TSpeedButton).WithCaption(','));
+              ACreator.Add(TControlBuilder.Create(TSpeedButton).WithCaption('0'));
+              ACreator.Add(TControlBuilder.Create(TSpeedButton).WithCaption(','));
             end
           )
         .GridFinish

@@ -475,7 +475,7 @@ type
   public
     constructor Create;
     destructor Destroy; override;
-    procedure AddControl(AControl: TControl; const AName: string = '');
+    procedure Add(AControl: TControl; const AName: string = '');
     procedure AddComponent(AComponent: TComponent; const AName: string = '');
     {$IFDEF FPC}generic{$ENDIF}
     function GetComponent<T: TComponent>(const AName: string): T; overload;
@@ -734,7 +734,7 @@ type
       const ARect: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
       AAlign: {$IFDEF FRAMEWORK_FMX}TAlignLayout{$ELSE}TAlign{$ENDIF});
     procedure MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
-    procedure AddControlToGroups(AControl: TControl; const AGroups: array of string);
+    procedure AddToGroups(AControl: TControl; const AGroups: array of string);
     function GetGroupBounds(const AGroupName: string): TControlGroupBounds;
     function GetCurrenteLevel: TControlCreatorLevel;
     function GetContentWidth: Single;
@@ -866,16 +866,16 @@ type
     function WithParent(AParent: TWinControl): TControlCreator;
     // main
     {$IFDEF FPC}generic{$ENDIF}
-    function AddControl<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; const AGroups: array of string): TControlCreator; overload;
+    function Add<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; const AGroups: array of string): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function AddControl<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator; overload;
-    function AddControl(AControlBuilder: TControlBuilder): TControlCreator; overload;
-    function AddControl(AClass: TControlClass; const AName: string=''): TControlCreator; overload;
-    function AddControl(AClass: TControlClass; const AName: string; out Reference): TControlCreator; overload;
-    function AddControl(AClass: TControlClass; out Reference): TControlCreator; overload;
-    function AddControl(AClass: TControlClass; const AName: string; AProc: TControlSetupProcObj): TControlCreator; overload;
-    function AddControl(AClass: TControlClass; const AName: string; out Reference; AProc: TControlSetupProcObj): TControlCreator; overload;
-    function AddControl(AClass: TControlClass; out Reference; AProc: TControlSetupProcObj): TControlCreator; overload;
+    function Add<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator; overload;
+    function Add(AControlBuilder: TControlBuilder): TControlCreator; overload;
+    function Add(AClass: TControlClass; const AName: string=''): TControlCreator; overload;
+    function Add(AClass: TControlClass; const AName: string; out Reference): TControlCreator; overload;
+    function Add(AClass: TControlClass; out Reference): TControlCreator; overload;
+    function Add(AClass: TControlClass; const AName: string; AProc: TControlSetupProcObj): TControlCreator; overload;
+    function Add(AClass: TControlClass; const AName: string; out Reference; AProc: TControlSetupProcObj): TControlCreator; overload;
+    function Add(AClass: TControlClass; out Reference; AProc: TControlSetupProcObj): TControlCreator; overload;
     function MoveControls(const AControl: TControl; const ADX,
       ADY: Single): TControlCreator; overload;
     function MoveControls(const AControlNames: array of string;
@@ -1309,7 +1309,7 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TControlCreatorHelper.AddControl<TBuild>(
+function TControlCreatorHelper.Add<TBuild>(
   AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   const AGroups: array of string): TControlCreator;
 var
@@ -1351,9 +1351,9 @@ begin
 
   for Level in FLevelStack do
     if not Level.GroupName.IsEmpty then
-      AddControlToGroups(Control as TControl, [Level.GroupName]);
+      AddToGroups(Control as TControl, [Level.GroupName]);
 
-  AddControlToGroups(Control as TControl, AGroups);
+  AddToGroups(Control as TControl, AGroups);
 
   MoveTopLeftAfterControl(Control as TControl);
 end;
@@ -1407,54 +1407,54 @@ begin
   TProtectedControl(AControl).Top := RControl.Top;
 end;
 
-function TControlCreatorHelper.AddControl(AControlBuilder: TControlBuilder): TControlCreator;
+function TControlCreatorHelper.Add(AControlBuilder: TControlBuilder): TControlCreator;
 begin
-  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(AControlBuilder);
+  Result := {$IFDEF FPC}specialize{$ENDIF} Add<TControl>(AControlBuilder);
 end;
 
-function TControlCreatorHelper.AddControl(AClass: TControlClass;
+function TControlCreatorHelper.Add(AClass: TControlClass;
   const AName: string=''): TControlCreator;
 begin
-  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, AName));
+  Result := {$IFDEF FPC}specialize{$ENDIF} Add<TControl>(TControlBuilder.Create(AClass, AName));
 end;
 
-function TControlCreatorHelper.AddControl(AClass: TControlClass; const AName: string;
+function TControlCreatorHelper.Add(AClass: TControlClass; const AName: string;
   out Reference): TControlCreator;
 begin
-  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, AName, Reference));
+  Result := {$IFDEF FPC}specialize{$ENDIF} Add<TControl>(TControlBuilder.Create(AClass, AName, Reference));
 end;
 
-function TControlCreatorHelper.AddControl(AClass: TControlClass;
+function TControlCreatorHelper.Add(AClass: TControlClass;
   out Reference): TControlCreator;
 begin
-  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, Reference));
+  Result := {$IFDEF FPC}specialize{$ENDIF} Add<TControl>(TControlBuilder.Create(AClass, Reference));
 end;
 
-function TControlCreatorHelper.AddControl(AClass: TControlClass; const AName: string;
+function TControlCreatorHelper.Add(AClass: TControlClass; const AName: string;
   AProc: TControlSetupProcObj): TControlCreator;
 begin
-  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, AName).Setup(AProc));
+  Result := {$IFDEF FPC}specialize{$ENDIF} Add<TControl>(TControlBuilder.Create(AClass, AName).Setup(AProc));
 end;
 
-function TControlCreatorHelper.AddControl(AClass: TControlClass; const AName: string;
+function TControlCreatorHelper.Add(AClass: TControlClass; const AName: string;
   out Reference; AProc: TControlSetupProcObj): TControlCreator;
 begin
-  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, AName, Reference).Setup(AProc));
+  Result := {$IFDEF FPC}specialize{$ENDIF} Add<TControl>(TControlBuilder.Create(AClass, AName, Reference).Setup(AProc));
 end;
 
-function TControlCreatorHelper.AddControl(AClass: TControlClass; out Reference;
+function TControlCreatorHelper.Add(AClass: TControlClass; out Reference;
   AProc: TControlSetupProcObj): TControlCreator;
 begin
-  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TControl>(TControlBuilder.Create(AClass, Reference).Setup(AProc));
+  Result := {$IFDEF FPC}specialize{$ENDIF} Add<TControl>(TControlBuilder.Create(AClass, Reference).Setup(AProc));
 end;
 
-{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.AddControl<TBuild>(
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.Add<TBuild>(
   AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator;
 begin
-  Result := {$IFDEF FPC}specialize{$ENDIF} AddControl<TBuild>(AControlBuilder, []);
+  Result := {$IFDEF FPC}specialize{$ENDIF} Add<TBuild>(AControlBuilder, []);
 end;
 
-procedure TControlCreator.AddControlToGroups(AControl: TControl;
+procedure TControlCreator.AddToGroups(AControl: TControl;
   const AGroups: array of string);
 var
   Group: string;
@@ -2596,7 +2596,7 @@ begin
   if not CurrentLevel.GridMode.Active then
   begin
     AControlBuilder.AssignReference(Control);
-    {$IFDEF FPC}specialize{$ENDIF} AddControl<TBuild>(AControlBuilder);
+    {$IFDEF FPC}specialize{$ENDIF} Add<TBuild>(AControlBuilder);
   end
   else
   begin
@@ -3367,7 +3367,7 @@ begin
   end;
 end;
 
-procedure TComponentRegistry.AddControl(AControl: TControl;
+procedure TComponentRegistry.Add(AControl: TControl;
   const AName: string);
 begin
   AddComponent(AControl, AName);

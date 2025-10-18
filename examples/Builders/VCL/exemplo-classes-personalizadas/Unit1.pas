@@ -52,9 +52,9 @@ begin
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
-      .AddControl(TControlBuilder.Create(TButton).WithCaption('Opção 1'))
-      .AddControl(TControlBuilder.Create(TButton).WithCaption('Opção 2'))
-      .AddControl(TControlBuilder.Create(TAutoClickButton).Setup(SetupAutoClickButton))
+      .Add(TControlBuilder.Create(TButton).WithCaption('Opção 1'))
+      .Add(TControlBuilder.Create(TButton).WithCaption('Opção 2'))
+      .Add(TControlBuilder.Create(TAutoClickButton).Setup(SetupAutoClickButton))
     ;
 
   finally

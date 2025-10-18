@@ -12,7 +12,7 @@ uses
     Vcl.Controls, Vcl.StdCtrls, Vcl.ExtCtrls, Vcl.Menus, Types,
     {$ENDIF}
   {$ENDIF}
-  Classes, SysUtils, ULayout, Generics.Collections, Generics.Defaults, OPCB.Optionals;
+  Classes, SysUtils, Generics.Collections, Generics.Defaults, OPCB.Optionals;
 
 type
   { TButtonBuilder }
