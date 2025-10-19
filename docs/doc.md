@@ -5,10 +5,6 @@
     * [Benefícios](#benefícios)
     * [Licença - Direitos autorais](#licença---direitos-autorais)
 * [Instalação e configuração](#instalação-e-configuração)
-    * [Instalação](#instalação)
-        * [Delphi](#delphi)
-        * [Lazarus](#lazarus)
-    * [Exemplo](#exemplo)
 * [Classes e Interfaces](#classes-e-interfaces)
     * [Builders](#builders)
         * [IObjectBuilder](#iobjectbuilder)
@@ -73,3 +69,41 @@ Isso significa que você pode usar, modificar e distribuir a biblioteca livremen
 Você pode consultar o texto completo da licença no arquivo LICENSE do repositório.
 
 A licença permite tanto uso em projetos open source quanto proprietários, oferecendo flexibilidade máxima para integração em diferentes contextos.
+
+
+### Instalação e configuração
+
+#### 🔹 Opção 1 – Clonar o repositório
+
+```bash
+git clone https://github.com/fabianoallex/opcb-object-pascal-component-builder.git
+```
+
+#### 🔹 Opção 2 – Download manual
+
+Baixe o arquivo ZIP do repositório no GitHub e extraia o conteúdo em uma pasta de sua preferência.
+
+
+#### 💠 Delphi
+
+1. Abra o **Delphi**.  
+2. Vá em **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.  
+3. No campo **Library Path**, adicione o caminho completo da pasta `src`.  
+   Exemplo:  
+   `C:\opcb\src`
+
+
+#### 💠 Lazarus
+
+1. Abra o **Lazarus**.  
+2. Vá em **Project ▸ Project Options ▸ Compiler Options ▸ Paths**.  
+3. Em **Other unit files (-Fu)**, adicione o caminho da pasta `src`.  
+   Exemplo:  
+   `C:\opcb\src`
+
+### 🧰 Pronto!
+
+Após isso, as units do projeto estarão disponíveis para uso em seus projetos Delphi ou Lazarus.
+
+---
+
