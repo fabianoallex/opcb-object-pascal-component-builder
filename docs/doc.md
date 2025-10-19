@@ -248,9 +248,72 @@ Métodos
 
 | Propriedade | Tipo | Descrição |
 |--------|----------|------------|
-GetName: string;|string|Retorna o nome atual do componente.
-SetName(AValue: string);||Define o nome do componente.
-GetTag: NativeInt;	|NativeInt|Retorna o valor atual da propriedade Tag.
-SetTag(AValue: NativeInt);||Define o valor da propriedade Tag.
-GetOwner: TComponent;|TComponent|Retorna o Owner associado ao componente.
-SetOwner(AValue: TComponent);||Define o Owner responsável pelo ciclo de vida do componente.
+GetName: string;|string|Retorna o nome a ser atribuído ao objeto a ser instanciado 
+SetName(AValue: string);||Define o nome do componente a ser instanciado pelo Build.
+GetTag: NativeInt;	|NativeInt|Retorna o valor da propriedade Tag a ser atribuída ao objeto instanciado.
+SetTag(AValue: NativeInt);||Define o valor da propriedade Tag do objeto a ser instanciado.
+GetOwner: TComponent;|TComponent|Retorna o Owner associado ao componente a ser instanciado.
+SetOwner(AValue: TComponent);||Define o Owner responsável pelo ciclo de vida do componente a ser instanciado.
+
+
+
+
+
+
+
+#### TComponentBuilderBase<TBuild, TSelf>
+
+Classe abstrata que estende *TObjectBuilderBase<TBuild, TSelf>*
+ e implementa a interface *IComponentBuilder\<TBuild\>*.
+
+Serve como base para todos os builders voltados à criação e configuração de componentes (TComponent e descendentes), adicionando suporte a propriedades típicas como Name, Owner e Tag.
+
+Além disso, *TComponentBuilderBase* mantém a fluência dos métodos herdados da classe base (*TObjectBuilderBase*), preservando o retorno do tipo genérico TSelf.
+Isso permite encadear chamadas entre os métodos herdados e os métodos específicos de componentes, garantindo uma experiência fluente, por exemplo:
+
+```pascal
+Builder
+  .WithName('BtnOk')
+  .WithTag(10)
+  .WithProp('Caption', 'Confirmar')
+  .Setup(SetupProc)
+  .Build;
+```
+
+Herança
+
+    TComponentBuilderBase<TBuild, TSelf> = class(TObjectBuilderBase<TBuild, TSelf>, IComponentBuilder<TBuild>)
+
+Campos protegidos
+| Propriedade | Tipo | Descrição |
+|--------|----------|------------|
+FName	|string|	Armazena o nome do componente.
+FTag	|NativeInt|	Armazena o valor de identificação livre do componente.
+FOwner	|TComponent|	Armazena o componente que será o owner da instância criada.
+
+Métodos protegidos
+| Propriedade | Descrição |
+|----------|------------|
+ConfigureObject(AObject: TBuild); override;|	Executa a configuração adicional do componente após sua criação, aplicando Name, Tag e Owner conforme definidos.
+
+Métodos públicos
+| Método | Tipo | Descrição |
+|--------|----------|------------|
+Create(AClass: TComponentClass; const AName: string=''); overload;	||Construtor. Cria o builder para um tipo de componente e opcionalmente define o nome inicial.
+Create(AClass: TComponentClass; const AName: string; out Reference); overload;	||Construtor. Cria o builder para um tipo de componente, define o nome e atribui a referência do objeto criado.
+Create(AClass: TComponentClass; out Reference); overload;	||Construtor. Cria o builder e atribui a referência sem definir o nome.
+GetName: string;	||Retorna o nome atual configurado para o componente.
+GetOwner: TComponent;	||Retorna o owner atualmente associado ao componente.
+GetTag: NativeInt;	||Retorna o valor atual configurado para a propriedade Tag.
+SetName(AValue: string);	||Define o nome do componente que será atribuído durante a construção.
+SetOwner(AValue: TComponent);	||Define o owner responsável pelo ciclo de vida do componente.
+SetTag(AValue: NativeInt);	||Define o valor da propriedade Tag do componente.
+WithName(AName: string): TSelf;||	Define o nome do componente e retorna a própria instância (método fluente).
+WithTag(ATag: NativeInt): TSelf;||	Define o valor da propriedade Tag e retorna a própria instância (método fluente).
+
+Propriedades
+| Propriedade | Tipo | Descrição |
+|--------|----------|------------|
+Name	|string|	Nome do componente a ser criado.
+Tag|	NativeInt|	Valor numérico associado ao componente.
+Owner	|TComponent|	Componente owner responsável pela instância criada.
