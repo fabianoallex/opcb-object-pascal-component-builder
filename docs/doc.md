@@ -317,3 +317,31 @@ Propriedades
 Name	|string|	Nome do componente a ser criado.
 Tag|	NativeInt|	Valor numérico associado ao componente.
 Owner	|TComponent|	Componente owner responsável pela instância criada.
+
+#### TComponentBuilder
+
+A classe *TComponentBuilder* é uma especialização concreta da classe genérica *TComponentBuilderBase*, projetada para facilitar a criação de instâncias de TComponent (ou de qualquer descendente) de forma fluente e configurável.
+
+Ela oferece construtores sobrecarregados que permitem:
+
+* Criar o componente sem nome nem referência.
+* Criar o componente com nome definido.
+* Criar o componente atribuindo automaticamente a instância a uma variável externa.
+
+O método protegido CreateObject é sobrescrito para realizar a instanciação efetiva do componente, utilizando o tipo informado no construtor.
+
+Assim como as demais classes Builder da biblioteca, TComponentBuilder mantém a fluência herdada dos métodos da classe base (TComponentBuilderBase), permitindo encadeamento de chamadas com retorno do tipo TSelf.
+
+Isso significa que métodos herdados e específicos podem ser combinados livremente, proporcionando uma construção legível e expressiva.
+
+| Construtor | Descrição |
+|--------|------------|
+Create|	Cria o builder sem parâmetros, utilizando como classe a ser instanciada TComponent.
+Create(AClass: TComponentClass; const AName: string = '')|	Cria o builder para a classe informada, opcionalmente definindo o nome do componente.
+Create(AClass: TComponentClass; const AName: string; out Reference)|Cria o builder e atribui a instância criada à variável Reference.
+Create(AClass: TComponentClass; out Reference)	|Cria o builder atribuindo a instância criada à variável Reference, sem definir nome.
+
+Método
+| Propriedade | Tipo | Descrição |
+|--------|----------|------------|
+CreateObject: TComponent|TComponent|Sobrescreve o método base para instanciar o componente informado em AClass.
