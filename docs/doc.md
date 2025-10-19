@@ -127,9 +127,7 @@ Interface base que define as operações de construção de objetos genéricos.
 | `AssignReference(var AReference: TBuild)` | `void` | Atribui a instância criada por `Build` à variável informada. |
 
 
-#### TObjectBuilderBase
-
-**TObjectBuilderBase<TBuild, TSelf>**
+#### TObjectBuilderBase<TBuild, TSelf>
 
 Classe abstrata que implementa a interface *IObjectBuilder\<TBuild\>*
  e fornece a infraestrutura principal para construção de objetos no padrão Builder.
@@ -138,12 +136,12 @@ Classe abstrata que implementa a interface *IObjectBuilder\<TBuild\>*
 
 | Método | Retorno | Descrição |
 |--------|----------|------------|
-CreateObject: TBuild; virtual; abstract;|TBuild|	Método abstrato a ser implementado pelas classes base. Deve Criar uma nova instância do tipo definido em ObjectClass. 
-ConfigureObject(AObject: TBuild); virtual;||	Atribui as propriedades definidas pelo builder ao objeto instanciado após o build. Deve ser sobrescrito pelas classes que estendem TObjectBuilderBase, mas sempre chamando **inherited ConfigureObject(AObject);**.
-ApplyPropPath(Instance: TObject; AProp: TPropertyValue); ||	Aplica um valor de propriedade via RTTI usando caminho hierárquico ('Prop.SubProp'). Exemplo: 'Font.Size'.
-ApplyPendindProps(Instance: TObject);	||Aplica todas as propriedades pendentes armazenadas em FProperties via RTTI.
-SetupProc(AProcObj: TSetupProcObj<TBuild>); overload;	||Adiciona uma referencia a um procedimento de configuração de objeto definido pelo usuário. Procedimento será executado durante a execução do método build.
-SetupProc(ARefProc: TSetupRefProc<TBuild>); overload;	||Adiciona uma referencia a um procedimento de configuração de objeto definido pelo usuário. Procedimento será executado durante a execução do método build.
+CreateObject: TBuild; virtual; abstract;|TBuild|Método abstrato a ser implementado pelas classes derivadas. Deve criar uma nova instância através do construtor definido em ObjectClass. 
+ConfigureObject(AObject: TBuild); virtual;||Atribui as propriedades definidas pelo builder ao objeto instanciado após o build. Deve ser sobrescrito pelas classes que estendem TObjectBuilderBase, mas sempre chamando **inherited ConfigureObject(AObject);**.
+ApplyPropPath(Instance: TObject; AProp: TPropertyValue); ||	Aplica ao objeto instanciado com Build um valor de propriedade via RTTI usando caminho hierárquico ('Prop.SubProp'). Exemplo: 'Font.Size'.
+ApplyPendindProps(Instance: TObject);	||Aplica ao objeto instanciado com Build todas as propriedades pendentes armazenadas em FProperties via RTTI.
+SetupProc(AProcObj: TSetupProcObj<TBuild>); overload;||Adiciona uma referencia a um procedimento de configuração de objeto definido pelo usuário. Procedimento será executado durante a execução do método build.
+SetupProc(ARefProc: TSetupRefProc<TBuild>); overload;||Adiciona uma referencia a um procedimento de configuração de objeto definido pelo usuário. Procedimento será executado durante a execução do método build.
 Create; overload;	||Construtor.
 Create(AClass: TObjectClass); overload;	||Construtor que recebe como parâmetro a classe a ser instanciada.
 Create(AClass: TObjectClass; out Reference); overload;	||Construtor que recebe como parâmetro a classe a ser instanciada. Recebe também como parâmetro uma referência de uma variável para receber a instância criada.
@@ -151,7 +149,7 @@ Destroy; override;	||Destrutor.
 AssignReference(out Reference);	||Atribui o objeto criado por build ao parâmetro recebido. Mantém a referencia em uma lista.
 ResetReferences;	||Limpa lista de referências.
 Assign(out Reference): TSelf; overload;	|TSelf|Atribui a referência e retorna a própria instância para uso fluente.
-WithProp(const APropName: string; const AValue: TValue): TSelf; overload;	|TSelf|Define o valor de uma propriedade simples.
+WithProp(const APropName: string; const AValue: TValue): TSelf; overload;	|TSelf|Define o valor de uma propriedade simples via RTTI.
 WithProp(const APropValue: TPropertyValue): TSelf; overload;	|TSelf|Define uma propriedade do objeto via RTTI usando um registro TPropertyValue.
 WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;	|TSelf|Define uma propriedade do objeto via RTTI de tipo objeto.
 WithPropSet(const APropName: string; const AValue: Integer): TSelf;	|TSelf|Define uma propriedade de tipo set do objeto via RTTI.
@@ -168,6 +166,9 @@ Classe concreta que herda TObjectBuilderbase. Define tipo genérico TBuild como 
 Exemplo de uso:
 
 ```pascal
+uses
+  OPCB;
+  
 type
   TMyClass = class
   private
