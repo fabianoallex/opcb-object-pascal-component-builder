@@ -222,3 +222,35 @@ Create; overload;||Cria uma nova instância de TObjectBuilder associada à class
 Create(out Reference); overload;||Cria uma nova instância e atribui a referência do objeto construído à variável fornecida.
 Create(AClass: TObjectClass); overload;	||Inicializa o builder associando-o a uma classe específica de objeto (TObjectClass).
 Create(AClass: TObjectClass; out Reference); overload;	||Cria uma instância associada a uma classe e já atribui a referência de saída.
+
+
+
+
+
+#### IComponentBuilder<TBuild>
+
+A interface *IComponentBuilder\<TBuild\>* estende *IObjectBuilder\<TBuild\>*
+ e define as operações específicas para construção de componentes (TComponent e descendentes).
+
+Ela adiciona suporte ao gerenciamento de propriedades comuns de componentes — como Name, Owner e Tag —, permitindo que o processo de criação seja totalmente controlado de forma fluente e consistente.
+
+Herança
+
+    IComponentBuilder<TBuild> = interface(IObjectBuilder<TBuild>)
+
+| Propriedade | Tipo | Descrição |
+|--------|----------|------------|
+Name|string|Define o nome do componente, equivalente à propriedade Name do TComponent.
+Tag|	NativeInt|	Define o valor do identificador livre (Tag) associado ao componente.
+Owner|TComponent|Define ou obtém o componente responsável por gerenciar o ciclo de vida do componente construído.
+
+Métodos
+
+| Propriedade | Tipo | Descrição |
+|--------|----------|------------|
+GetName: string;|string|Retorna o nome atual do componente.
+SetName(AValue: string);||Define o nome do componente.
+GetTag: NativeInt;	|NativeInt|Retorna o valor atual da propriedade Tag.
+SetTag(AValue: NativeInt);||Define o valor da propriedade Tag.
+GetOwner: TComponent;|TComponent|Retorna o Owner associado ao componente.
+SetOwner(AValue: TComponent);||Define o Owner responsável pelo ciclo de vida do componente.
