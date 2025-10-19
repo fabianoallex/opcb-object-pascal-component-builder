@@ -115,7 +115,7 @@ Após isso, as units do projeto estarão disponíveis para uso em seus projetos 
 Builders são classes utilizadas para a instanciação de objetos na interface
 
 
-![Diagrama de classes](docs/img/builder-class-diagram.png)
+![Diagrama de classes](img/builder-class-diagram.png)
 
 ##### IObjectBuilder
 #### TObjectBuilderBase
