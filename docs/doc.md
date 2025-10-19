@@ -155,7 +155,7 @@ WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;	|TSelf|Def
 WithPropSet(const APropName: string; const AValue: Integer): TSelf;	|TSelf|Define uma propriedade de tipo set do objeto via RTTI.
 Setup(AProc: TSetupProcObjBuild): TSelf; overload;	|TSelf|Adiciona um procedimento de configuração de objeto.
 Setup(AProc: TSetupRefProcBuild): TSelf; overload;	|TSelf|Adiciona um procedimento de configuração de objecto.
-Build |TBuild	|Cria, configura e retorna o objeto final do tipo TBuild.
+Build: TBuild; |TBuild	|Cria, configura e retorna o objeto final do tipo TBuild.
 property ObjectClass:	TObjectClass	||Retorna a classe associada à construção atual.
 
 
@@ -202,3 +202,23 @@ begin
 end;
 ```
 
+#### TObjectBuilder
+
+Classe concreta que herda de *TObjectBuilderBase<TObject, TObjectBuilder>*.
+
+Fornece uma implementação genérica para construção de instâncias de TObject, permitindo criar objetos de qualquer classe derivada de TObject sem a necessidade de definir um tipo genérico específico.
+
+É útil como builder universal para cenários onde o tipo concreto do objeto é determinado em tempo de execução.
+
+Herança
+
+    TObjectBuilder = class(TObjectBuilderBase<TObject, TObjectBuilder>)
+
+
+| Método | Retorno | Descrição |
+|--------|----------|------------|
+CreateObject: TObject; override;|TObject|Cria uma nova instância do tipo TObject com base na classe definida em FObjectClass. Este método sobrescreve a implementação abstrata da classe base.
+Create; overload;||Cria uma nova instância de TObjectBuilder associada à classe TObject.
+Create(out Reference); overload;||Cria uma nova instância e atribui a referência do objeto construído à variável fornecida.
+Create(AClass: TObjectClass); overload;	||Inicializa o builder associando-o a uma classe específica de objeto (TObjectClass).
+Create(AClass: TObjectClass; out Reference); overload;	||Cria uma instância associada a uma classe e já atribui a referência de saída.
