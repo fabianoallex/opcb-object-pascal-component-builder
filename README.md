@@ -268,3 +268,44 @@ The example creates:
 - Both organized within a `TPanel` that automatically adjusts to its content.
 
 
+---
+
+## 🧩 Installation
+
+### 🔹 Option 1 – Clone the repository
+
+```bash
+git clone https://github.com/FabianoArndt/opcb.git
+```
+
+### 🔹 Option 2 – Manual download
+
+Download the ZIP file from the GitHub repository and extract it to a folder of your choice.
+
+---
+
+### 💠 Delphi
+
+1. Open **Delphi**.  
+2. Go to **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.  
+3. In the **Library Path** field, add the full path to the `src` folder.  
+   Example:  
+   `C:\MyProjects\opcb\src`
+
+---
+
+### 💠 Lazarus
+
+1. Open **Lazarus**.  
+2. Go to **Project ▸ Project Options ▸ Compiler Options ▸ Paths**.  
+3. In **Other unit files (-Fu)**, add the path to the `src` folder.  
+   Example:  
+   `/home/user/opcb/src`
+
+---
+
+### 🧰 Done!
+
+After that, the project's units will be available for use in your Delphi or Lazarus projects.
+
+---
