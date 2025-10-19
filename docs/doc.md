@@ -1,6 +1,6 @@
 # Documentação
 
-* [Visão geral](#visao-geral)
+* [Visão geral](#visão-geral)
     * [Sobre a biblioteca](#sobre-a-biblioteca)
     * [Características](#características)
     * [Benefícios](#benefícios)
@@ -35,7 +35,7 @@
         * [TOPCBCreators](#topcbcreators)
 
 
-## Visao geral
+## Visão geral
 
 ### Sobre a biblioteca
 A **OPCB (Object Pascal Component Builder)** é uma biblioteca desenvolvida em Object Pascal, projetada para simplificar a criação e configuração de componentes visuais e não-visuais e menus em aplicações Delphi e Lazarus.  
