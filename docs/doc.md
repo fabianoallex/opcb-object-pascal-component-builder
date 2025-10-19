@@ -70,6 +70,7 @@ Você pode consultar o texto completo da licença no arquivo LICENSE do reposit�
 
 A licença permite tanto uso em projetos open source quanto proprietários, oferecendo flexibilidade máxima para integração em diferentes contextos.
 
+---
 
 ### Instalação e configuração
 
@@ -107,3 +108,15 @@ Após isso, as units do projeto estarão disponíveis para uso em seus projetos 
 
 ---
 
+### Classes e Interfaces
+
+#### Builders
+
+Builders são classes utilizadas para a instanciação de objetos na interface
+
+
+![Diagrama de classes](docs/img/builder-class-diagram.png)
+
+##### IObjectBuilder
+#### TObjectBuilderBase
+##### TObjectBuilder
