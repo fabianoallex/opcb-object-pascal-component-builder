@@ -275,7 +275,7 @@ The example creates:
 ### 🔹 Option 1 – Clone the repository
 
 ```bash
-git clone https://github.com/FabianoArndt/opcb.git
+git clone https://github.com/fabianoallex/opcb-object-pascal-component-builder.git
 ```
 
 ### 🔹 Option 2 – Manual download
@@ -290,7 +290,7 @@ Download the ZIP file from the GitHub repository and extract it to a folder of y
 2. Go to **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.  
 3. In the **Library Path** field, add the full path to the `src` folder.  
    Example:  
-   `C:\MyProjects\opcb\src`
+   `C:\opcb\src`
 
 ---
 
@@ -300,7 +300,7 @@ Download the ZIP file from the GitHub repository and extract it to a folder of y
 2. Go to **Project ▸ Project Options ▸ Compiler Options ▸ Paths**.  
 3. In **Other unit files (-Fu)**, add the path to the `src` folder.  
    Example:  
-   `/home/user/opcb/src`
+   `C:\opcb\src`
 
 ---
 

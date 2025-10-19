@@ -265,4 +265,42 @@ O exemplo cria:
 - Um **teclado numérico** com dígitos `0–9` e vírgula.  
 - Ambos organizados dentro de um painel (`TPanel`) que se ajusta automaticamente ao conteúdo.
 
+## Instalação
 
+### 🔹 Opção 1 – Clonar o repositório
+
+```bash
+git clone https://github.com/fabianoallex/opcb-object-pascal-component-builder.git
+```
+
+### 🔹 Opção 2 – Download manual
+
+Baixe o arquivo ZIP do repositório no GitHub e extraia o conteúdo em uma pasta de sua preferência.
+
+---
+
+### 💠 Delphi
+
+1. Abra o **Delphi**.  
+2. Vá em **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.  
+3. No campo **Library Path**, adicione o caminho completo da pasta `src`.  
+   Exemplo:  
+   `C:\MeusProjetos\opcb\src`
+
+---
+
+### 💠 Lazarus
+
+1. Abra o **Lazarus**.  
+2. Vá em **Project ▸ Project Options ▸ Compiler Options ▸ Paths**.  
+3. Em **Other unit files (-Fu)**, adicione o caminho da pasta `src`.  
+   Exemplo:  
+   `C:\opcb\src`
+
+---
+
+### 🧰 Pronto!
+
+Após isso, as units do projeto estarão disponíveis para uso em seus projetos Delphi ou Lazarus.
+
+---
