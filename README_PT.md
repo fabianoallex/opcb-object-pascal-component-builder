@@ -285,7 +285,7 @@ Baixe o arquivo ZIP do repositório no GitHub e extraia o conteúdo em uma pasta
 2. Vá em **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.  
 3. No campo **Library Path**, adicione o caminho completo da pasta `src`.  
    Exemplo:  
-   `C:\MeusProjetos\opcb\src`
+   `C:\opcb\src`
 
 ---
 
