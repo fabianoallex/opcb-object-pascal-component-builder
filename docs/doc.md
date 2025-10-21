@@ -261,7 +261,7 @@ SetOwner(AValue: TComponent);||Define o Owner responsável pelo ciclo de vida do
 
 
 
-#### TComponentBuilderBase<TBuild, TSelf>
+#### TComponentBuilderBase
 
 Classe abstrata que estende *TObjectBuilderBase<TBuild, TSelf>*
  e implementa a interface *IComponentBuilder\<TBuild\>*.
@@ -346,7 +346,7 @@ Método
 |--------|----------|------------|
 CreateObject: TComponent|TComponent|Sobrescreve o método base para instanciar o componente informado em AClass.
 
-#### IControlBuilder\<TBuild\>
+#### IControlBuilder
 
 A interface *IControlBuilder\<TBuild\>* estende *IComponentBuilder\<TBuild\>*
 , acrescentando suporte às propriedades e eventos típicos de controles visuais (TControl e descendentes).
@@ -392,7 +392,7 @@ Get/SetOnClick	|Define o manipulador do evento OnClick.
 
 
 
-#### TControlBuilderBase<TBuild, TSelf>
+#### TControlBuilderBase
 
 A classe *TControlBuilderBase\<TBuild, TSelf\>* é uma classe abstrata que implementa *IControlBuilder\<TBuild\>* e estende *TComponentBuilderBase\<TBuild, TSelf\>*.
 
@@ -449,5 +449,68 @@ Get/Set*	|Implementações dos acessores da interface IControlBuilder\<TBuild\>.
 * Mantém fluência total com os métodos da classe base (TComponentBuilderBase e TObjectBuilderBase), graças ao uso do tipo genérico TSelf.
 * É compatível com Delphi (VCL/FM) e Lazarus (LCL), adaptando o tipo Align conforme o framework ativo (TAlign ou TAlignLayout).
 * Permite que componentes sejam criados inteiramente via código, reduzindo a dependência de formulários visuais.
-* É a base para builders concretos como TControlBuilder
- e outros builders especializados (TButtonBuilder, TPanelBuilder, etc.).
+* É a base para builders concretos como TControlBuilder e outros builders especializados (TButtonBuilder, TPanelBuilder, etc.).
+
+
+
+
+
+
+
+
+#### TControlBuilder
+
+A classe TControlBuilder é a implementação concreta de *TControlBuilderBase\<TBuild, TSelf\>*, especializada para o tipo TControl.
+
+Ela serve como um builder universal de controles visuais, permitindo instanciar dinamicamente qualquer classe descendente de TControl (como TButton, TPanel, TEdit, etc.) com configuração fluente.
+
+Estrutura 
+
+```pascal
+TControlBuilder = class(TControlBuilderBase<TControl, TControlBuilder>)
+protected
+  function CreateObject: TControl; override;
+public
+  constructor Create; overload;
+  constructor Create(AClass: TControlClass; const AName: string=''); overload;
+  constructor Create(AClass: TControlClass; const AName: string; out Reference); overload;
+  constructor Create(AClass: TControlClass; out Reference); overload;
+end;
+```
+
+
+**Descrição**
+
+A classe implementa o método CreateObject, responsável por instanciar o controle informado no construtor. É ideal para cenários em que se deseja criar e configurar controles sem precisar declarar uma classe de builder específica, mantendo a flexibilidade e o estilo fluente da biblioteca OPCB.
+
+Principais Construtores
+| Método | Descrição |
+|--------|---------------|
+Create	|Cria um builder genérico, definindo a classe de instanciação como TControl.
+Create(AClass: TControlClass; const AName: string='')	|Cria um builder para a classe especificada (TButton, TPanel, etc.), opcionalmente atribuindo um nome.
+Create(AClass: TControlClass; const AName: string; out Reference)	|Igual ao anterior, mas retorna a referência do controle criado.
+Create(AClass: TControlClass; out Reference)	|Variante sem nome inicial, mas com retorno por referência.
+
+**Exemplo de uso**
+```pascal
+uses
+  OPCB.ControlBuilder;
+
+var
+  Btn: TButton;
+begin
+  TControlBuilder.Create(TButton, 'BtnOk', Btn)
+    .WithCaption('OK')
+    .WithAlign(alRight)
+    .WithWidthAndHeight(100, 30)
+    .WithOnClick(@OnOkClick)
+    .Build;
+end;
+```
+
+**Observações**
+
+* Mantém fluência completa com os métodos herdados de TControlBuilderBase
+ e classes anteriores na hierarquia.
+* Evita a necessidade de classes específicas quando não há comportamento adicional a sobrescrever.
+* Ideal para criação dinâmica de UI em frameworks compatíveis (VCL, LCL e FMX).
