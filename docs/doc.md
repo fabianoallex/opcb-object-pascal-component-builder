@@ -342,6 +342,41 @@ Create(AClass: TComponentClass; const AName: string; out Reference)|Cria o build
 Create(AClass: TComponentClass; out Reference)	|Cria o builder atribuindo a instância criada à variável Reference, sem definir nome.
 
 Método
-| Propriedade | Tipo | Descrição |
+| Método | Tipo | Descrição |
 |--------|----------|------------|
 CreateObject: TComponent|TComponent|Sobrescreve o método base para instanciar o componente informado em AClass.
+
+#### IControlBuilder\<TBuild\>
+
+A interface *IControlBuilder\<TBuild\>* estende *IComponentBuilder\<TBuild\>*
+, acrescentando suporte às propriedades e eventos típicos de controles visuais (TControl e descendentes).
+
+Ela define os métodos de acesso (get/set) e propriedades opcionais que permitem configurar dinamicamente aspectos visuais, como posição, dimensões, alinhamento, texto e eventos, sem necessidade de interação direta com o formulário ou arquivos .dfm/.lfm.
+
+O uso de tipos opcionais (TOptionalString, TOptionalSingle, TOptionalAlign) permite distinguir entre valores definidos explicitamente e valores padrão herdados do controle, tornando o builder mais seguro e previsível em cenários de inicialização parcial.
+
+**Principais propriedades**
+| Propriedade | Tipo | Descrição |
+|--------|----------|------------|
+Caption	|TOptionalString|	Define o texto de exibição do controle (quando aplicável).
+Text	|TOptionalString|	Define o conteúdo textual, usado em controles de entrada como TEdit ou TMemo.
+Align	|TOptionalAlign|	Define o alinhamento do controle dentro do container (alTop, alLeft, etc.).
+Width	|TOptionalSingle|	Largura do controle em pixels.
+Height	|TOptionalSingle|	Altura do controle em pixels.
+Top	|TOptionalSingle|	Posição vertical relativa ao container.
+Left	|TOptionalSingle|	Posição horizontal relativa ao container.
+Parent	|TWinControl|	Container pai onde o controle será inserido.
+OnClick	|TNotifyEvent|	Define o evento de clique do controle.
+
+**Métodos definidos**
+| Propriedade | Descrição |
+|--------|---------------|
+Get/SetAlign	|Obtém ou define o alinhamento do controle.
+Get/SetCaption	|Obtém ou define o texto de exibição.
+Get/SetText	|Obtém ou define o conteúdo textual do controle.
+Get/SetHeight	|Obtém ou define a altura.
+Get/SetWidth	|Obtém ou define a largura.
+Get/SetTop	|Obtém ou define a posição vertical.
+Get/SetLeft	|Obtém ou define a posição horizontal.
+Get/SetParent	|Define o container pai (TWinControl).
+Get/SetOnClick	|Define o manipulador do evento OnClick.

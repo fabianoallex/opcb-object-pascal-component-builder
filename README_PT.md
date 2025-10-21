@@ -143,11 +143,9 @@ begin
         .Add(TControlBuilder.Create(TPanel).WithCaption('10'))
         .Add(TControlBuilder.Create(TPanel).WithCaption('11'))
         .GridSkipCell
-        .GridColSpan(1)
         .Add(TControlBuilder.Create(TPanel).WithCaption('12'))
         .Add(TControlBuilder.Create(TPanel).WithCaption('13'))
         .GridRowSpan(2)
-        .GridColSpan(1)
         .Add(TControlBuilder.Create(TPanel).WithCaption('14'))
         .Add(TControlBuilder.Create(TPanel).WithCaption('15'))
         .Add(TControlBuilder.Create(TPanel).WithCaption('16'))
