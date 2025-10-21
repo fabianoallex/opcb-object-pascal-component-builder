@@ -230,6 +230,11 @@ type
   TMenuBuilder = class({$IFDEF FPC}specialize{$ENDIF} TMenuBuilderBase<TMenu, TMenuBuilder>)
   protected
     function CreateObject: TMenu; override;
+  public
+    constructor Create; overload;
+    constructor Create(AClass: TMenuClass; const AName: string=''); overload;
+    constructor Create(AClass: TMenuClass; const AName: string; out Reference); overload;
+    constructor Create(AClass: TMenuClass; out Reference); overload;
   end;
 
   { IMenuItemBuilder }
@@ -282,6 +287,11 @@ type
   TMenuItemBuilder = class({$IFDEF FPC}specialize{$ENDIF} TMenuItemBuilderBase<TMenuItem, TMenuItemBuilder>)
   protected
     function CreateObject: TMenuItem; override;
+  public
+    constructor Create; overload;
+    constructor Create(AClass: TMenuItemClass; const AName: string=''); overload;
+    constructor Create(AClass: TMenuItemClass; const AName: string; out Reference); overload;
+    constructor Create(AClass: TMenuItemClass; out Reference); overload;
   end;
 
   { IControlBuilder }
@@ -4591,12 +4601,54 @@ end;
 
 { TMenuBuilder }
 
+constructor TMenuBuilder.Create;
+begin
+  inherited Create(TMenu);
+end;
+
+constructor TMenuBuilder.Create(AClass: TMenuClass; const AName: string);
+begin
+  inherited Create(AClass, AName);
+end;
+
+constructor TMenuBuilder.Create(AClass: TMenuClass; const AName: string;
+  out Reference);
+begin
+  inherited Create(AClass, AName, Reference);
+end;
+
+constructor TMenuBuilder.Create(AClass: TMenuClass; out Reference);
+begin
+  inherited Create(AClass, Reference);
+end;
+
 function TMenuBuilder.CreateObject: TMenu;
 begin
   Result := TMenuClass(FObjectClass).Create(Owner);
 end;
 
 { TMenuItemBuilder }
+
+constructor TMenuItemBuilder.Create;
+begin
+  inherited Create(TMenuItem);
+end;
+
+constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; const AName: string);
+begin
+  inherited Create(AClass, AName);
+end;
+
+constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; const AName: string;
+  out Reference);
+begin
+  Create(AClass, AName, Reference);
+end;
+
+constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; out Reference);
+begin
+  inherited Create(AClass, Reference);
+end;
 
 function TMenuItemBuilder.CreateObject: TMenuItem;
 begin
