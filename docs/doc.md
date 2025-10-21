@@ -380,3 +380,74 @@ Get/SetTop	|Obtém ou define a posição vertical.
 Get/SetLeft	|Obtém ou define a posição horizontal.
 Get/SetParent	|Define o container pai (TWinControl).
 Get/SetOnClick	|Define o manipulador do evento OnClick.
+
+
+
+
+
+
+
+
+
+
+
+
+#### TControlBuilderBase<TBuild, TSelf>
+
+A classe *TControlBuilderBase\<TBuild, TSelf\>* é uma classe abstrata que implementa *IControlBuilder\<TBuild\>* e estende *TComponentBuilderBase\<TBuild, TSelf\>*.
+
+Ela fornece uma implementação fluente e genérica para a construção e configuração de controles visuais (TControl e descendentes), tanto no Delphi quanto no Lazarus.
+
+Por meio de métodos encadeáveis (**With**), é possível definir propriedades como posição, tamanho, alinhamento, texto, e eventos sem depender de formulários ou arquivos .dfm/.lfm.
+Essa classe mantém a fluência de chamadas herdada da hierarquia base — todos os métodos retornam TSelf, permitindo composições como:
+```pascal
+TControlBuilder.Create(TButton)
+  .WithName('BtnSave')
+  .WithCaption('Salvar')
+  .WithAlign(alBottom)
+  .WithOnClick(@OnSaveClick)
+  .Build;
+```  
+
+**Principais propriedades**
+| Propriedade | Tipo |Descrição |
+|--------|--------|---------------|
+Parent	|TWinControl|	Define o container onde o controle será inserido.
+Caption	|TOptionalString|	Texto de exibição do controle (quando aplicável).
+Text	|TOptionalString|	Conteúdo textual (ex.: TEdit.Text).
+Align	|TOptionalAlign|	Alinhamento do controle no container (alTop, alClient, etc.).
+Width	|TOptionalSingle|	Largura do controle em pixels.
+Height	|TOptionalSingle|	Altura do controle em pixels.
+Top	|TOptionalSingle|	Posição vertical relativa ao container.
+Left	|TOptionalSingle|	Posição horizontal relativa ao container.
+OnClick	|TNotifyEvent|	Evento disparado quando o controle é clicado.
+
+**Métodos de configuração (fluentes)**
+| Método | Descrição |
+|--------|---------------|
+WithAlign(AAlign)	|Define o alinhamento (TAlign ou TAlignLayout, conforme o framework).
+WithName(AName)	|Define o nome (Name) do controle.
+WithTag(ATag)	|Define o identificador numérico (Tag).
+WithWidth(AWidth)	|Define a largura.
+WithHeight(AHeight)	|Define a altura.
+WithWidthAndHeight(AWidth, AHeight)	|Define largura e altura simultaneamente.
+WithTop(ATop)	|Define a posição vertical.
+WithLeft(ALeft)	|Define a posição horizontal.
+WithCaption(ACaption)	|Define o texto de exibição (Caption).
+WithText(AText)	|Define o conteúdo textual (Text).
+WithOnClick(AOnClick)	|Define o evento de clique (OnClick).
+
+**Métodos herdados e sobrescritos**
+| Método | Descrição |
+|--------|---------------|
+ConfigureObject(AObject: TBuild)	|Sobrescreve o método base para aplicar as propriedades visuais configuradas.
+Create	|Construtor padrão, inicializa a instância definindo TControl como Classe a ser instanciada.
+Get/Set*	|Implementações dos acessores da interface IControlBuilder\<TBuild\>.
+
+**Observações**
+
+* Mantém fluência total com os métodos da classe base (TComponentBuilderBase e TObjectBuilderBase), graças ao uso do tipo genérico TSelf.
+* É compatível com Delphi (VCL/FM) e Lazarus (LCL), adaptando o tipo Align conforme o framework ativo (TAlign ou TAlignLayout).
+* Permite que componentes sejam criados inteiramente via código, reduzindo a dependência de formulários visuais.
+* É a base para builders concretos como TControlBuilder
+ e outros builders especializados (TButtonBuilder, TPanelBuilder, etc.).
