@@ -6,7 +6,7 @@ O **OPCB (Object Pascal Component Builder)** é uma biblioteca que facilita a co
 ---
 
 ## 📖 Documentação
-	[docs/doc-pt.md](docs/doc-pt.md)
+[docs/doc-pt.md](docs/doc-pt.md)
 
 ---
 
