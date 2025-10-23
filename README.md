@@ -11,7 +11,7 @@
 ---
 
 ## 📖 Documentation
-Documentation: [docs/doc.md](docs/doc.md)
+	[docs/doc.md](docs/doc.md)
 ---
 
 ## ✨ Benefits  
