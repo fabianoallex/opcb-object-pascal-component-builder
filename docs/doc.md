@@ -1,11 +1,11 @@
-# Documentação
+# Documentation
 
-* [Visão geral](#visão-geral)
-    * [Sobre a biblioteca](#sobre-a-biblioteca)
-    * [Benefícios](#benefícios)
-    * [Licença - Direitos autorais](#licença---direitos-autorais)
-* [Instalação e configuração](#instalação-e-configuração)
-* [Classes e Interfaces](#classes-e-interfaces)
+* [Overview](#overview)
+    * [About the library](#about-the-library)
+    * [Benefits](#benefits)
+    * [License - Copyright](#license---copyright)
+* [Installation and Configuration](#installation-and-configuration)
+* [Classes and Interfaces](#classes-and-interfaces)
     * [Builders](#builders)
         * [IObjectBuilder](#iobjectbuilder)
             * [TObjectBuilderBase](#tobjectbuilderbase)
@@ -30,140 +30,138 @@
         * [TOPCBCreators](#topcbcreators)
 
 
-## Visão geral
+## Overview
 
-### Sobre a biblioteca
+### About the Library
 
-A OPCB (Object Pascal Component Builder) é uma biblioteca desenvolvida em Object Pascal, criada para simplificar a criação e configuração de componentes visuais e não-visuais em aplicações Delphi e Lazarus.
-Seu objetivo é reduzir a complexidade do código, eliminar repetição e fornecer uma abordagem fluente para a construção de componentes, tornando os projetos mais fáceis de manter, escalar e evoluir.
+**OPCB (Object Pascal Component Builder)** is a library developed in **Object Pascal**, designed to simplify the creation and configuration of both visual and non-visual components in **Delphi** and **Lazarus** applications.  
+Its goal is to reduce code complexity, eliminate repetition, and provide a fluent approach to component construction, making projects easier to maintain, scale, and evolve.
 
-### Benefícios
+### Benefits
 
-Uma das principais vantagens da OPCB é permitir a criação de componentes diretamente no código, dispensando o uso de arquivos .dfm (Delphi) ou .lfm (Lazarus). Dessa forma, toda a lógica e configuração dos componentes ficam centralizadas em unidades .pas, o que oferece vários benefícios práticos:
+One of the main advantages of OPCB is the ability to create components directly in code, eliminating the need for `.dfm` (Delphi) or `.lfm` (Lazarus) files.  
+This way, all logic and component configuration remain centralized in `.pas` units, offering several practical benefits:
 
-* Compatibilidade entre Delphi e Lazarus: facilita a portabilidade de projetos entre as duas IDEs.
-* Substituição de componentes simplificada;
-* Facilidade de criar novos componentes com base nos existentes sem precisar instalá-los na IDE.
-* Redução de conflitos em sistemas de versionamento: evita problemas comuns com arquivos .dfm ou .lfm em repositórios Git.
-* Código mais organizado e centralizado: todas as definições de componentes e layouts ficam em um único lugar, facilitando manutenção e revisão.
+* **Compatibility between Delphi and Lazarus:** makes it easier to port projects between the two IDEs.  
+* **Simplified component replacement.**  
+* **Ease of creating new components** based on existing ones without having to install them in the IDE.  
+* **Reduced version control conflicts:** avoids common issues with `.dfm` or `.lfm` files in Git repositories.  
+* **More organized and centralized code:** all component and layout definitions are located in one place, making maintenance and code review easier.
 
-Em resumo, a OPCB torna o desenvolvimento de interfaces mais rápido, consistente e confiável, oferecendo flexibilidade e controle total sobre a criação de componentes.
-
----
-
-### Licença - Direitos autorais
-
-A OPCB (Object Pascal Component Builder) é distribuída sob a Apache License, Version 2.0 (Janeiro de 2004).
-
-Isso significa que você pode usar, modificar e distribuir a biblioteca livremente, inclusive em projetos comerciais, desde que respeite os seguintes pontos:
-
-1. **Notificação de copyright e licença**
-    * Todos os arquivos da biblioteca devem manter a indicação de copyright e a referência à licença.
-2. **Redistribuição de modificações**
-    * Se você alterar a biblioteca e redistribuí-la, deve informar as mudanças realizadas.
-3. **Sem garantias**
-    * A biblioteca é fornecida “no estado em que se encontra”, sem qualquer garantia de funcionamento ou responsabilidade por danos.
-
-**Recursos adicionais**
-
-Você pode consultar o texto completo da licença no arquivo LICENSE do repositório.
-
-A licença permite tanto uso em projetos open source quanto proprietários, oferecendo flexibilidade máxima para integração em diferentes contextos.
+In summary, OPCB makes interface development faster, more consistent, and more reliable, providing flexibility and full control over component creation.
 
 ---
+### License - Copyright Notice
 
-### Instalação e configuração
+The **OPCB (Object Pascal Component Builder)** is distributed under the **Apache License, Version 2.0 (January 2004).**
 
-#### 🔹 Opção 1 – Clonar o repositório
+This means you are free to use, modify, and distribute the library — including in commercial projects — as long as you comply with the following conditions:
+
+1. **Copyright and License Notice**  
+   * All files in the library must retain the copyright notice and a reference to the license.
+
+2. **Redistribution of Modifications**  
+   * If you modify and redistribute the library, you must clearly indicate the changes made.
+
+3. **No Warranty**  
+   * The library is provided “as is,” without any warranty of performance or liability for damages.
+
+**Additional Resources**  
+You can find the full text of the license in the `LICENSE` file included in the repository.
+
+The license allows usage in both **open-source and proprietary projects**, providing maximum flexibility for integration in different contexts.
+
+---
+### Installation and Configuration
+
+#### 🔹 Option 1 – Clone the Repository
 
 ```bash
 git clone https://github.com/fabianoallex/opcb-object-pascal-component-builder.git
 ```
 
-#### 🔹 Opção 2 – Download manual
+#### 🔹 Option 2 – Manual Download
 
-Baixe o arquivo ZIP do repositório no GitHub e extraia o conteúdo em uma pasta de sua preferência.
-
+Download the ZIP file from the GitHub repository and extract its contents to a folder of your choice.
 
 #### 💠 Delphi
 
-1. Abra o **Delphi**.  
-2. Vá em **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.  
-3. No campo **Library Path**, adicione o caminho completo da pasta `src`.  
-   Exemplo:  
+1. Open **Delphi**.  
+2. Go to **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.  
+3. In the **Library Path** field, add the full path to the `src` folder.  
+   Example:  
    `C:\opcb\src`
-
 
 #### 💠 Lazarus
 
-1. Abra o **Lazarus**.  
-2. Vá em **Project ▸ Project Options ▸ Compiler Options ▸ Paths**.  
-3. Em **Other unit files (-Fu)**, adicione o caminho da pasta `src`.  
-   Exemplo:  
+1. Open **Lazarus**.  
+2. Go to **Project ▸ Project Options ▸ Compiler Options ▸ Paths**.  
+3. In **Other unit files (-Fu)**, add the path to the `src` folder.  
+   Example:  
    `C:\opcb\src`
 
-### 🧰 Pronto!
+### 🧰 All Set!
 
-Após isso, as units do projeto estarão disponíveis para uso em seus projetos Delphi ou Lazarus.
+After completing these steps, the units from the OPCB project will be available for use in your Delphi or Lazarus projects.
 
 ---
 
-### Classes e Interfaces
+### Classes and Interfaces
 
 #### Builders
 
-Builders são classes utilizadas para facilitar a instanciação de objetos.
+Builders are classes designed to simplify object instantiation.
 
-
-![Diagrama de classes](img/builder-class-diagram.png)
+![Class Diagram](img/builder-class-diagram.png)
 
 ##### IObjectBuilder
 
-Interface base que define as operações de construção de objetos genéricos.
+Base interface that defines operations for constructing generic objects.
 
-| Método | Retorno | Descrição |
-|--------|----------|------------|
-| `Build: TBuild` | `TBuild` | Cria e retorna uma nova instância do tipo genérico `TBuild`. |
-| `AssignReference(var AReference: TBuild)` | `void` | Atribui a instância criada por `.Build` à variável informada. |
+| Method | Return | Description |
+|--------|----------|-------------|
+| `Build: TBuild` | `TBuild` | Creates and returns a new instance of the generic type `TBuild`. |
+| `AssignReference(var AReference: TBuild)` | `void` | Assigns the instance created by `.Build` to the provided variable. |
 
 ---
 #### `TObjectBuilderBase`
 
-Classe abstrata que implementa a interface `IObjectBuilder<TBuild>`
- e fornece a infraestrutura principal para construção de objetos no padrão Builder.
-É responsável por criar, configurar e preparar instâncias do tipo genérico `TBuild`, permitindo o uso de métodos fluentes e operações de configuração customizadas.
+Abstract class that implements the `IObjectBuilder<TBuild>` interface  
+and provides the core infrastructure for object construction using the Builder pattern.  
+It is responsible for creating, configuring, and preparing instances of the generic type `TBuild`, enabling fluent methods and custom configuration operations.
 
-
-| Método | Retorno | Descrição |
-|--------|----------|------------|
-`CreateObject: TBuild; virtual; abstract;`|TBuild|Método abstrato a ser implementado pelas classes derivadas. Deve criar uma nova instância através do construtor definido em `ObjectClass`. 
-`ConfigureObject(AObject: TBuild); virtual;`||Atribui as propriedades definidas pelo builder ao objeto instanciado após o `.Build`. Deve ser sobrescrito pelas classes que estendem `TObjectBuilderBase`, mas sempre chamando `inherited ConfigureObject(AObject);`.
-`ApplyPropPath(Instance: TObject; AProp: TPropertyValue);` ||	Aplica ao objeto instanciado com `.Build` um valor de propriedade via RTTI usando caminho hierárquico (`'Prop.SubProp'`). Exemplo: `'Font.Size'`.
-`ApplyPendindProps(Instance: TObject);`	||Aplica ao objeto instanciado com `.Build` todas as propriedades pendentes armazenadas em FProperties via RTTI.
-`SetupProc(AProcObj: TSetupProcObj<TBuild>); overload;`||Adiciona uma referencia a um procedimento de configuração de objeto definido pelo usuário. Procedimento será executado durante a execução do método `.Build`.
-`SetupProc(ARefProc: TSetupRefProc<TBuild>); overload;`||Adiciona uma referencia a um procedimento de configuração de objeto definido pelo usuário. Procedimento será executado durante a execução do método `.Build`.
-`Create; overload;`	||Construtor.
-`Create(AClass: TObjectClass); overload;`	||Construtor que recebe como parâmetro a classe a ser instanciada.
-`Create(AClass: TObjectClass; out Reference); overload;`	||Construtor que recebe como parâmetro a classe a ser instanciada. Recebe também como parâmetro uma referência de uma variável para receber a instância criada.
-`Destroy; override;`	||Destrutor.
-`AssignReference(out Reference);`	||Atribui o objeto criado por `.Build` ao parâmetro recebido. Mantém a referencia em uma lista.
-`ResetReferences;`	||Limpa lista de referências.
-`Assign(out Reference): TSelf; overload;`	|`TSelf`|Atribui a referência e retorna a própria instância para uso fluente.
-`WithProp(const APropName: string; const AValue: TValue): TSelf; overload;`	|`TSelf`|Define o valor de uma propriedade simples via RTTI.
-`WithProp(const APropValue: TPropertyValue): TSelf; overload;`	|`TSelf`|Define uma propriedade do objeto via RTTI usando um registro TPropertyValue.
-`WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;`	|`TSelf`|Define uma propriedade do objeto via RTTI de tipo objeto.
-`WithPropSet(const APropName: string; const AValue: Integer): TSelf;`	|`TSelf`|Define uma propriedade de tipo set do objeto via RTTI.
-`Setup(AProc: TSetupProcObjBuild): TSelf; overload;`	|`TSelf`|Adiciona um procedimento de configuração de objeto.
-`Setup(AProc: TSetupRefProcBuild): TSelf; overload;`	|`TSelf`|Adiciona um procedimento de configuração de objecto.
-`Build: TBuild;` |`TBuild`	|Cria, configura e retorna o objeto final do tipo `TBuild`.
-`property ObjectClass:	TObjectClass`	||Retorna a classe associada à construção atual.
+| Method | Return | Description |
+|--------|----------|-------------|
+| `CreateObject: TBuild; virtual; abstract;` | `TBuild` | Abstract method to be implemented by derived classes. It must create a new instance using the constructor defined in `ObjectClass`. |
+| `ConfigureObject(AObject: TBuild); virtual;` |  | Assigns the properties defined by the builder to the instantiated object after `.Build`. Should be overridden by classes extending `TObjectBuilderBase`, but must always call `inherited ConfigureObject(AObject);`. |
+| `ApplyPropPath(Instance: TObject; AProp: TPropertyValue);` |  | Applies to the object instantiated via `.Build` a property value using RTTI and a hierarchical path (`'Prop.SubProp'`). Example: `'Font.Size'`. |
+| `ApplyPendindProps(Instance: TObject);` |  | Applies to the object instantiated with `.Build` all pending properties stored in `FProperties` via RTTI. |
+| `SetupProc(AProcObj: TSetupProcObj<TBuild>); overload;` |  | Adds a reference to a user-defined object setup procedure. The procedure is executed during the `.Build` method execution. |
+| `SetupProc(ARefProc: TSetupRefProc<TBuild>); overload;` |  | Adds a reference to a user-defined object setup procedure. The procedure is executed during the `.Build` method execution. |
+| `Create; overload;` |  | Constructor. |
+| `Create(AClass: TObjectClass); overload;` |  | Constructor that takes as parameter the class to be instantiated. |
+| `Create(AClass: TObjectClass; out Reference); overload;` |  | Constructor that takes the class to instantiate and an additional variable reference to receive the created instance. |
+| `Destroy; override;` |  | Destructor. |
+| `AssignReference(out Reference);` |  | Assigns the object created by `.Build` to the given parameter and keeps the reference in a list. |
+| `ResetReferences;` |  | Clears the reference list. |
+| `Assign(out Reference): TSelf; overload;` | `TSelf` | Assigns the reference and returns the instance itself for fluent usage. |
+| `WithProp(const APropName: string; const AValue: TValue): TSelf; overload;` | `TSelf` | Defines a simple property value using RTTI. |
+| `WithProp(const APropValue: TPropertyValue): TSelf; overload;` | `TSelf` | Defines an object property using RTTI and a `TPropertyValue` record. |
+| `WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;` | `TSelf` | Defines an object-type property using RTTI. |
+| `WithPropSet(const APropName: string; const AValue: Integer): TSelf;` | `TSelf` | Defines a property of type `set` using RTTI. |
+| `Setup(AProc: TSetupProcObjBuild): TSelf; overload;` | `TSelf` | Adds an object setup procedure. |
+| `Setup(AProc: TSetupRefProcBuild): TSelf; overload;` | `TSelf` | Adds an object setup procedure. |
+| `Build: TBuild;` | `TBuild` | Creates, configures, and returns the final object of type `TBuild`. |
+| `property ObjectClass: TObjectClass` |  | Returns the class associated with the current construction. |
 
 ---
+
 ##### `TObjectBuilder`
 
-Classe concreta que herda `TObjectBuilderbase`. Define tipo genérico `TBuild` como `TComponent`.
+Concrete class that inherits from `TObjectBuilderBase`.  
+Defines the generic type `TBuild` as `TComponent`.
 
-Exemplo de uso:
+Example of use:
 
 ```pascal
 uses
@@ -201,251 +199,252 @@ begin
     ShowMessage(Format('%d - %s', [Foo, Bar]));
 end;
 ```
+
 ---
 #### `TObjectBuilder`
 
-Classe concreta que herda de `TObjectBuilderBase<TObject, TObjectBuilder>`.
+Concrete class that inherits from `TObjectBuilderBase<TObject, TObjectBuilder>`.
 
-Fornece uma implementação genérica para construção de instâncias de `TObject`, permitindo criar objetos de qualquer classe derivada de `TObject` sem a necessidade de definir um tipo genérico específico.
+Provides a generic implementation for building instances of `TObject`, allowing the creation of objects of any class derived from `TObject` without the need to define a specific generic type.
 
-É útil como builder universal para cenários onde o tipo concreto do objeto é determinado em tempo de execução.
+It is useful as a universal builder for scenarios where the concrete object type is determined at runtime.
 
-Herança
+Inheritance
 
     TObjectBuilder = class(TObjectBuilderBase<TObject, TObjectBuilder>)
 
-
-| Método | Retorno | Descrição |
+| Method | Return | Description |
 |--------|----------|------------|
-`CreateObject: TObject; override;`|`TObject`|Cria uma nova instância do tipo `TObject` com base na classe definida em `FObjectClass`. Este método sobrescreve a implementação abstrata da classe base.
-`Create; overload;`||Cria uma nova instância de TObjectBuilder associada à classe `TObject`.
-`Create(out Reference); overload;`||Cria uma nova instância e atribui a referência do objeto construído à variável fornecida.
-`Create(AClass: TObjectClass); overload;`	||Inicializa o builder associando-o a uma classe específica de objeto (`TObjectClass`).
-`Create(AClass: TObjectClass; out Reference); overload;`	||Cria uma instância associada a uma classe e já atribui a referência de saída.
+| `CreateObject: TObject; override;` | `TObject` | Creates a new instance of type `TObject` based on the class defined in `FObjectClass`. This method overrides the abstract implementation of the base class. |
+| `Create; overload;` | | Creates a new instance of TObjectBuilder associated with the class `TObject`. |
+| `Create(out Reference); overload;` | | Creates a new instance and assigns the reference of the built object to the provided variable. |
+| `Create(AClass: TObjectClass); overload;` | | Initializes the builder by associating it with a specific object class (`TObjectClass`). |
+| `Create(AClass: TObjectClass; out Reference); overload;` | | Creates an instance associated with a class and already assigns the output reference. |
 
 ---
 
 #### `IComponentBuilder`
 
-A interface `IComponentBuilder<TBuild>` estende `IObjectBuilder<TBuild>`
- e define as operações específicas para construção de componentes (`TComponent` e descendentes).
+The `IComponentBuilder<TBuild>` interface extends `IObjectBuilder<TBuild>`
+ and defines specific operations for building components (`TComponent` and descendants).
 
-Ela adiciona suporte ao gerenciamento de propriedades comuns de componentes — como `Name`, `Owner` e `Tag` —, permitindo que o processo de criação seja totalmente controlado de forma fluente e consistente.
+It adds support for managing common component properties — such as `Name`, `Owner`, and `Tag` — allowing the creation process to be fully controlled in a fluent and consistent manner.
 
-Herança
+Inheritance
 
     IComponentBuilder<TBuild> = interface(IObjectBuilder<TBuild>)
 
-| Propriedade | Tipo | Descrição |
+| Property | Type | Description |
 |--------|----------|------------|
-`Name`|`string`|Define o nome do componente, equivalente à propriedade Name do TComponent.
-`Tag`|	`NativeInt`|	Define o valor do identificador livre (Tag) associado ao componente.
-`Owner`|`TComponent`|Define ou obtém o componente responsável por gerenciar o ciclo de vida do componente construído.
+| `Name` | `string` | Defines the name of the component, equivalent to the Name property of TComponent. |
+| `Tag` | `NativeInt` | Defines the value of the free identifier (Tag) associated with the component. |
+| `Owner` | `TComponent` | Defines or gets the component responsible for managing the lifecycle of the built component. |
 
-Métodos
+Methods
 
-| Propriedade | Tipo | Descrição |
+| Method | Type | Description |
 |--------|----------|------------|
-`GetName`|`string`|Retorna o nome a ser atribuído ao objeto a ser instanciado 
-`SetName(AValue: string);`||Define o nome do componente a ser instanciado pelo `.Build`.
-`GetTag`	|`NativeInt`|Retorna o valor da propriedade `Tag` a ser atribuída ao objeto instanciado.
-`SetTag(AValue: NativeInt);`||Define o valor da propriedade `Tag` do objeto a ser instanciado.
-`GetOwner`|`TComponent`|Retorna o `Owner` associado ao componente a ser instanciado.
-`SetOwner(AValue: TComponent);`||Define o `Owner` responsável pelo ciclo de vida do componente a ser instanciado.
+| `GetName` | `string` | Returns the name to be assigned to the object to be instantiated. |
+| `SetName(AValue: string);` | | Defines the name of the component to be instantiated by `.Build`. |
+| `GetTag` | `NativeInt` | Returns the value of the `Tag` property to be assigned to the instantiated object. |
+| `SetTag(AValue: NativeInt);` | | Defines the value of the `Tag` property of the object to be instantiated. |
+| `GetOwner` | `TComponent` | Returns the `Owner` associated with the component to be instantiated. |
+| `SetOwner(AValue: TComponent);` | | Defines the `Owner` responsible for the lifecycle of the component to be instantiated. |
 
 ---
 
 #### `TComponentBuilderBase`
 
-Classe abstrata que estende `TObjectBuilderBase<TBuild, TSelf>`
- e implementa a interface `IComponentBuilder<TBuild>`.
+Abstract class that extends `TObjectBuilderBase<TBuild, TSelf>`
+ and implements the `IComponentBuilder<TBuild>` interface.
 
-Serve como base para todos os builders voltados à criação e configuração de componentes (TComponent e descendentes), adicionando suporte a propriedades típicas como `Name`, `Owner` e `Tag`.
+Serves as the base for all builders focused on creating and configuring components (TComponent and descendants), adding support for typical properties such as `Name`, `Owner`, and `Tag`.
 
-Além disso, `TComponentBuilderBase` mantém a fluência dos métodos herdados da classe base (`TObjectBuilderBase`), preservando o retorno do tipo genérico `TSelf`.
-Isso permite encadear chamadas entre os métodos herdados e os métodos específicos de componentes, garantindo uma experiência fluente, por exemplo:
+Furthermore, `TComponentBuilderBase` maintains the fluency of the methods inherited from the base class (`TObjectBuilderBase`), preserving the return of the generic type `TSelf`.
+This allows chaining calls between inherited methods and specific component methods, ensuring a fluent experience, for example:
 
 ```pascal
 Builder
   .WithName('BtnOk')
   .WithTag(10)
-  .WithProp('Caption', 'Confirmar')
+  .WithProp('Caption', 'Confirm')
   .Setup(SetupProc)
   .Build;
 ```
 
-Herança
+Inheritance
 
     TComponentBuilderBase<TBuild, TSelf> = class(TObjectBuilderBase<TBuild, TSelf>, IComponentBuilder<TBuild>)
 
-Campos protegidos
-| Propriedade | Tipo | Descrição |
+Protected fields
+| Field | Type | Description |
 |--------|----------|------------|
-`FName`	|string|	Armazena o nome do componente.
-`FTag`	|NativeInt|	Armazena o valor de identificação livre do componente.
-`FOwner`	|TComponent|	Armazena o componente que será o owner da instância criada.
+| `FName` | `string` | Stores the name of the component. |
+| `FTag` | `NativeInt` | Stores the free identification value of the component. |
+| `FOwner` | `TComponent` | Stores the component that will be the owner of the created instance. |
 
-Métodos protegidos
-| Propriedade | Descrição |
+Protected methods
+| Method | Description |
 |----------|------------|
-`ConfigureObject(AObject: TBuild); override;`|	Executa a configuração adicional do componente após sua criação, aplicando `Name`, `Tag` e `Owner` conforme definidos.
+| `ConfigureObject(AObject: TBuild); override;` | Performs additional component configuration after its creation, applying `Name`, `Tag`, and `Owner` as defined. |
 
-Métodos públicos
-| Método | Tipo | Descrição |
+Public methods
+| Method | Type | Description |
 |--------|----------|------------|
-`Create(AClass: TComponentClass; const AName: string=''); overload;`	||Construtor. Cria o builder para um tipo de componente e opcionalmente define o nome inicial.
-`Create(AClass: TComponentClass; const AName: string; out Reference); overload;`	||Construtor. Cria o builder para um tipo de componente, define o nome e atribui a referência do objeto criado.
-`Create(AClass: TComponentClass; out Reference); overload;`	||Construtor. Cria o builder e atribui a referência sem definir o nome.
-`GetName`|`string`|Retorna o nome atual configurado para o componente.
-`GetOwner: TComponent;`	||Retorna o owner atualmente associado ao componente.
-`GetTag`	|`NativeInt`|Retorna o valor atual configurado para a propriedade `Tag`.
-`SetName(AValue: string);`	||Define o nome do componente que será atribuído durante a construção.
-`SetOwner(AValue: TComponent);`	||Define o owner responsável pelo ciclo de vida do componente.
-`SetTag(AValue: NativeInt);`	||Define o valor da propriedade `Tag` do componente.
-`WithName(AName: string)`|`TSelf`|	Define o nome do componente e retorna a própria instância (método fluente).
-`WithTag(ATag: NativeInt)`|`TSelf`|	Define o valor da propriedade `Tag` e retorna a própria instância (método fluente).
+| `Create(AClass: TComponentClass; const AName: string=''); overload;` | | Constructor. Creates the builder for a component type and optionally sets the initial name. |
+| `Create(AClass: TComponentClass; const AName: string; out Reference); overload;` | | Constructor. Creates the builder for a component type, sets the name, and assigns the reference of the created object. |
+| `Create(AClass: TComponentClass; out Reference); overload;` | | Constructor. Creates the builder and assigns the reference without setting the name. |
+| `GetName` | `string` | Returns the current name configured for the component. |
+| `GetOwner: TComponent;` | | Returns the owner currently associated with the component. |
+| `GetTag` | `NativeInt` | Returns the current value configured for the `Tag` property. |
+| `SetName(AValue: string);` | | Defines the name of the component that will be assigned during construction. |
+| `SetOwner(AValue: TComponent);` | | Defines the owner responsible for the component's lifecycle. |
+| `SetTag(AValue: NativeInt);` | | Defines the value of the component's `Tag` property. |
+| `WithName(AName: string)` | `TSelf` | Defines the component's name and returns the own instance (fluent method). |
+| `WithTag(ATag: NativeInt)` | `TSelf` | Defines the value of the `Tag` property and returns the own instance (fluent method). |
 
-Propriedades
-| Propriedade | Tipo | Descrição |
+Properties
+| Property | Type | Description |
 |--------|----------|------------|
-`Name`	|`string`|	Nome do componente a ser criado.
-`Tag`|	`NativeInt`|	Valor numérico associado ao componente.
-`Owner`	|`TComponent`|	Componente owner responsável pela instância criada.
+| `Name` | `string` | Name of the component to be created. |
+| `Tag` | `NativeInt` | Numeric value associated with the component. |
+| `Owner` | `TComponent` | Owner component responsible for the created instance. |
 
 ---
+
 #### `TComponentBuilder`
 
-A classe `TComponentBuilder` é uma especialização concreta da classe genérica `TComponentBuilderBase`, projetada para facilitar a criação de instâncias de `TComponent` (ou de qualquer descendente) de forma fluente e configurável.
+The `TComponentBuilder` class is a concrete specialization of the generic `TComponentBuilderBase` class, designed to facilitate the fluent and configurable creation of instances of `TComponent` (or any descendant).
 
-Ela oferece construtores sobrecarregados que permitem:
+It provides overloaded constructors that allow:
 
-* Criar o componente sem nome nem referência.
-* Criar o componente com nome definido.
-* Criar o componente atribuindo automaticamente a instância a uma variável externa.
+* Creating the component without a name or reference.
+* Creating the component with a defined name.
+* Creating the component by automatically assigning the instance to an external variable.
 
-O método protegido `CreateObject` é sobrescrito para realizar a instanciação efetiva do componente, utilizando o tipo informado no construtor.
+The protected method `CreateObject` is overridden to perform the actual instantiation of the component, using the type specified in the constructor.
 
-Assim como as demais classes Builder da biblioteca, `TComponentBuilder` mantém a fluência herdada dos métodos da classe base (`TComponentBuilderBase`), permitindo encadeamento de chamadas com retorno do tipo `TSelf`.
+Like the other Builder classes in the library, `TComponentBuilder` maintains the fluency inherited from the base class methods (`TComponentBuilderBase`), allowing method chaining with return of type `TSelf`.
 
-Isso significa que métodos herdados e específicos podem ser combinados livremente, proporcionando uma construção legível e expressiva.
+This means that inherited and specific methods can be freely combined, providing a readable and expressive construction.
 
-| Construtor | Descrição |
+| Constructor | Description |
 |--------|------------|
-`Create`|	Cria o builder sem parâmetros, utilizando como classe a ser instanciada `TComponent`.
-`Create(AClass: TComponentClass; const AName: string = '')`|	Cria o builder para a classe informada, opcionalmente definindo o nome do componente.
-`Create(AClass: TComponentClass; const AName: string; out Reference)`|Cria o builder e atribui a instância criada à variável `Reference`.
-`Create(AClass: TComponentClass; out Reference)`|Cria o builder atribuindo a instância criada à variável `Reference`, sem definir nome.
+| `Create` | Creates the builder without parameters, using `TComponent` as the class to be instantiated. |
+| `Create(AClass: TComponentClass; const AName: string = '')` | Creates the builder for the specified class, optionally setting the component's name. |
+| `Create(AClass: TComponentClass; const AName: string; out Reference)` | Creates the builder and assigns the created instance to the `Reference` variable. |
+| `Create(AClass: TComponentClass; out Reference)` | Creates the builder and assigns the created instance to the `Reference` variable, without setting a name. |
 
-Método
-| Método | Tipo | Descrição |
+Method
+| Method | Type | Description |
 |--------|----------|------------|
-`CreateObject: TComponent`|`TComponent`|Sobrescreve o método base para instanciar o componente informado em `AClass`.
+| `CreateObject: TComponent` | `TComponent` | Overrides the base method to instantiate the component specified in `AClass`. |
 
----
+---  
 #### `IControlBuilder`
 
-A interface `IControlBuilder<TBuild>` estende `IComponentBuilder<TBuild>`
-, acrescentando suporte às propriedades e eventos típicos de controles visuais (`TControl` e descendentes).
+The `IControlBuilder<TBuild>` interface extends `IComponentBuilder<TBuild>`
+, adding support for typical properties and events of visual controls (`TControl` and descendants).
 
-Ela define os métodos de acesso (`get/set`) e propriedades opcionais que permitem configurar dinamicamente aspectos visuais, como posição, dimensões, alinhamento, texto e eventos, sem necessidade de interação direta com o formulário ou arquivos .dfm/.lfm.
+It defines access methods (`get/set`) and optional properties that allow dynamically configuring visual aspects, such as position, dimensions, alignment, text, and events, without the need for direct interaction with the form or .dfm/.lfm files.
 
-O uso de tipos opcionais (`TOptionalString`, `TOptionalSingle`, `TOptionalAlign`) permite distinguir entre valores definidos explicitamente e valores padrão herdados do controle, tornando o builder mais seguro e previsível em cenários de inicialização parcial.
+The use of optional types (`TOptionalString`, `TOptionalSingle`, `TOptionalAlign`) allows distinguishing between explicitly set values and default values inherited from the control, making the builder safer and more predictable in partial initialization scenarios.
 
-**Principais propriedades**
-| Propriedade | Tipo | Descrição |
+**Main properties**
+| Property | Type | Description |
 |--------|----------|------------|
-`Caption`	|`TOptionalString`|	Define o texto de exibição do controle (quando aplicável).
-`Text`	|`TOptionalString`|	Define o conteúdo textual, usado em controles de entrada como `TEdit` ou `TMemo`.
-`Align`	|`TOptionalAlign`|	Define o alinhamento do controle dentro do container (`alTop`, `alLeft`, etc.).
-`Width`	|`TOptionalSingle`|	Largura do controle em pixels.
-`Height`	|`TOptionalSingle`|	Altura do controle em pixels.
-`Top`	|`TOptionalSingle`|	Posição vertical relativa ao container.
-`Left`	|`TOptionalSingle`|	Posição horizontal relativa ao container.
-`Parent`	|`TWinControl`|	Container pai onde o controle será inserido.
-`OnClick`	|`TNotifyEvent`|	Define o evento de clique do controle.
+| `Caption` | `TOptionalString` | Defines the display text of the control (when applicable). |
+| `Text` | `TOptionalString` | Defines the textual content, used in input controls like `TEdit` or `TMemo`. |
+| `Align` | `TOptionalAlign` | Defines the alignment of the control within the container (`alTop`, `alLeft`, etc.). |
+| `Width` | `TOptionalSingle` | Width of the control in pixels. |
+| `Height` | `TOptionalSingle` | Height of the control in pixels. |
+| `Top` | `TOptionalSingle` | Vertical position relative to the container. |
+| `Left` | `TOptionalSingle` | Horizontal position relative to the container. |
+| `Parent` | `TWinControl` | Parent container where the control will be inserted. |
+| `OnClick` | `TNotifyEvent` | Defines the click event of the control. |
 
-**Métodos definidos**
-| Propriedade | Descrição |
+**Defined methods**
+| Method | Description |
 |--------|---------------|
-`Get/SetAlign`	|Obtém ou define o alinhamento do controle.
-`Get/SetCaption`	|Obtém ou define o texto de exibição.
-`Get/SetText`	|Obtém ou define o conteúdo textual do controle.
-`Get/SetHeight`	|Obtém ou define a altura.
-`Get/SetWidth`	|Obtém ou define a largura.
-`Get/SetTop`	|Obtém ou define a posição vertical.
-`Get/SetLeft`	|Obtém ou define a posição horizontal.
-`Get/SetParent`	|Define o container pai (`TWinControl`).
-`Get/SetOnClick`	|Define o manipulador do evento `OnClick`.
+| `Get/SetAlign` | Gets or sets the alignment of the control. |
+| `Get/SetCaption` | Gets or sets the display text. |
+| `Get/SetText` | Gets or sets the textual content of the control. |
+| `Get/SetHeight` | Gets or sets the height. |
+| `Get/SetWidth` | Gets or sets the width. |
+| `Get/SetTop` | Gets or sets the vertical position. |
+| `Get/SetLeft` | Gets or sets the horizontal position. |
+| `Get/SetParent` | Defines the parent container (`TWinControl`). |
+| `Get/SetOnClick` | Defines the `OnClick` event handler. |
 
 ---
 
 #### `TControlBuilderBase`
 
-A classe `TControlBuilderBase<TBuild, TSelf>` é uma classe abstrata que implementa `IControlBuilder<TBuild>` e estende `TComponentBuilderBase<TBuild, TSelf>`.
+The `TControlBuilderBase<TBuild, TSelf>` class is an abstract class that implements `IControlBuilder<TBuild>` and extends `TComponentBuilderBase<TBuild, TSelf>`.
 
-Ela fornece uma implementação fluente e genérica para a construção e configuração de controles visuais (`TControl` e descendentes), tanto no Delphi quanto no Lazarus.
+It provides a fluent and generic implementation for building and configuring visual controls (`TControl` and descendants), both in Delphi and Lazarus.
 
-Por meio de métodos encadeáveis (`With`), é possível definir propriedades como posição, tamanho, alinhamento, texto, e eventos sem depender de formulários ou arquivos .dfm/.lfm.
-Essa classe mantém a fluência de chamadas herdada da hierarquia base — todos os métodos retornam TSelf, permitindo composições como:
+Through chainable methods (`With`), it's possible to define properties such as position, size, alignment, text, and events without depending on forms or .dfm/.lfm files.
+This class maintains the call fluency inherited from the base hierarchy — all methods return TSelf, allowing compositions like:
 ```pascal
 TControlBuilder.Create(TButton)
   .WithName('BtnSave')
-  .WithCaption('Salvar')
+  .WithCaption('Save')
   .WithAlign(alBottom)
   .WithOnClick(@OnSaveClick)
   .Build;
-```  
+```
 
-**Principais propriedades**
-| Propriedade | Tipo |Descrição |
+**Main properties**
+| Property | Type | Description |
 |--------|--------|---------------|
-`Parent`	|`TWinControl`|	Define o container onde o controle será inserido.
-`Caption`	|`TOptionalString`|	Texto de exibição do controle (quando aplicável).
-`Text`	|`TOptionalString`|	Conteúdo textual (ex.: `TEdit.Text`).
-`Align`	|`TOptionalAlign`|	Alinhamento do controle no container (`alTop`, `alClient`, etc.).
-`Width`	|`TOptionalSingle`|	Largura do controle em pixels.
-`Height`	|`TOptionalSingle`|	Altura do controle em pixels.
-`Top`	|`TOptionalSingle`|	Posição vertical relativa ao container.
-`Left`	|`TOptionalSingle`|	Posição horizontal relativa ao container.
-`OnClick`	|`TNotifyEvent`|	Evento disparado quando o controle é clicado.
+| `Parent` | `TWinControl` | Defines the container where the control will be inserted. |
+| `Caption` | `TOptionalString` | Display text of the control (when applicable). |
+| `Text` | `TOptionalString` | Textual content (ex.: `TEdit.Text`). |
+| `Align` | `TOptionalAlign` | Alignment of the control in the container (`alTop`, `alClient`, etc.). |
+| `Width` | `TOptionalSingle` | Width of the control in pixels. |
+| `Height` | `TOptionalSingle` | Height of the control in pixels. |
+| `Top` | `TOptionalSingle` | Vertical position relative to the container. |
+| `Left` | `TOptionalSingle` | Horizontal position relative to the container. |
+| `OnClick` | `TNotifyEvent` | Event triggered when the control is clicked. |
 
-**Métodos de configuração (fluentes)**
-| Método | Descrição |
+**Configuration methods (fluent)**
+| Method | Description |
 |--------|---------------|
-`WithAlign(AAlign)`	|Define o alinhamento (`TAlign` ou `TAlignLayout`, conforme o framework).
-`WithName(AName)`	|Define o nome (`Name`) do controle.
-`WithTag(ATag)`	|Define o identificador numérico (`Tag`).
-`WithWidth(AWidth)`	|Define a largura.
-`WithHeight(AHeight)`	|Define a altura.
-`WithWidthAndHeight(AWidth, AHeight)`	|Define largura e altura simultaneamente.
-`WithTop(ATop)`	|Define a posição vertical.
-`WithLeft(ALeft)`	|Define a posição horizontal.
-`WithCaption(ACaption)`	|Define o texto de exibição (`Caption`).
-`WithText(AText)`	|Define o conteúdo textual (`Text`).
-`WithOnClick(AOnClick)`	|Define o evento de clique (`OnClick`).
+| `WithAlign(AAlign)` | Defines the alignment (`TAlign` or `TAlignLayout`, according to the framework). |
+| `WithName(AName)` | Defines the name (`Name`) of the control. |
+| `WithTag(ATag)` | Defines the numeric identifier (`Tag`). |
+| `WithWidth(AWidth)` | Defines the width. |
+| `WithHeight(AHeight)` | Defines the height. |
+| `WithWidthAndHeight(AWidth, AHeight)` | Defines width and height simultaneously. |
+| `WithTop(ATop)` | Defines the vertical position. |
+| `WithLeft(ALeft)` | Defines the horizontal position. |
+| `WithCaption(ACaption)` | Defines the display text (`Caption`). |
+| `WithText(AText)` | Defines the textual content (`Text`). |
+| `WithOnClick(AOnClick)` | Defines the click event (`OnClick`). |
 
-**Métodos herdados e sobrescritos**
-| Método | Descrição |
+**Inherited and overridden methods**
+| Method | Description |
 |--------|---------------|
-`ConfigureObject(AObject: TBuild)`	|Sobrescreve o método base para aplicar as propriedades visuais configuradas.
-`Create`	|Construtor padrão, inicializa a instância definindo `TControl` como Classe a ser instanciada.
-`Get/Set*`	|Implementações dos acessores da interface `IControlBuilder<TBuild>`.
+| `ConfigureObject(AObject: TBuild)` | Overrides the base method to apply the configured visual properties. |
+| `Create` | Default constructor, initializes the instance by defining `TControl` as the Class to be instantiated. |
+| `Get/Set*` | Implementations of the accessors of the `IControlBuilder<TBuild>` interface. |
 
-**Observações**
+**Notes**
 
-* Mantém fluência total com os métodos da classe base (TComponentBuilderBase e TObjectBuilderBase), graças ao uso do tipo genérico TSelf.
-* É compatível com Delphi (VCL/FM) e Lazarus (LCL), adaptando o tipo Align conforme o framework ativo (`TAlign` ou `TAlignLayout`).
-* Permite que componentes sejam criados inteiramente via código, reduzindo a dependência de formulários visuais.
-* É a base para builders concretos como TControlBuilder e outros builders especializados (`TButtonBuilder`, `TPanelBuilder`, etc.).
+* Maintains full fluency with the methods of the base class (TComponentBuilderBase and TObjectBuilderBase), thanks to the use of the generic type TSelf.
+* Compatible with Delphi (VCL/FMX) and Lazarus (LCL), adapting the Align type according to the active framework (`TAlign` or `TAlignLayout`).
+* Allows components to be created entirely via code, reducing dependency on visual forms.
+* It is the base for concrete builders like TControlBuilder and other specialized builders (`TButtonBuilder`, `TPanelBuilder`, etc.).
 
 ---
 #### `TControlBuilder`
 
-A classe `TControlBuilder` é a implementação concreta de `TControlBuilderBase<TBuild, TSelf>`, especializada para o tipo TControl.
+The `TControlBuilder` class is the concrete implementation of `TControlBuilderBase<TBuild, TSelf>`, specialized for the TControl type.
 
-Ela serve como um builder universal de controles visuais, permitindo instanciar dinamicamente qualquer classe descendente de TControl (como `TButton`, `TPanel`, `TEdit`, etc.) com configuração fluente.
+It serves as a universal builder for visual controls, allowing dynamic instantiation of any class descending from TControl (such as `TButton`, `TPanel`, `TEdit`, etc.) with fluent configuration.
 
-Estrutura 
+Structure
 
 ```pascal
 TControlBuilder = class(TControlBuilderBase<TControl, TControlBuilder>)
@@ -459,20 +458,19 @@ public
 end;
 ```
 
+**Description**
 
-**Descrição**
+The class implements the `CreateObject` method, responsible for instantiating the control specified in the constructor. It is ideal for scenarios where you want to create and configure controls without needing to declare a specific builder class, maintaining the flexibility and fluent style of the OPCB library.
 
-A classe implementa o método `CreateObject`, responsável por instanciar o controle informado no construtor. É ideal para cenários em que se deseja criar e configurar controles sem precisar declarar uma classe de builder específica, mantendo a flexibilidade e o estilo fluente da biblioteca OPCB.
-
-Principais Construtores
-| Método | Descrição |
+Main Constructors
+| Method | Description |
 |--------|---------------|
-`Create`	|Cria um builder genérico, definindo a classe de instanciação como `TControl`.
-`Create(AClass: TControlClass; const AName: string='')`	|Cria um builder para a classe especificada (`TButton`, `TPanel`, etc.), opcionalmente atribuindo um nome.
-`Create(AClass: TControlClass; const AName: string; out Reference)`	|Igual ao anterior, mas retorna a referência do controle criado.
-`Create(AClass: TControlClass; out Reference)`	|Variante sem nome inicial, mas com retorno por referência.
+| `Create` | Creates a generic builder, defining the instantiation class as `TControl`. |
+| `Create(AClass: TControlClass; const AName: string='')` | Creates a builder for the specified class (`TButton`, `TPanel`, etc.), optionally assigning a name. |
+| `Create(AClass: TControlClass; const AName: string; out Reference)` | Same as above, but returns the reference of the created control. |
+| `Create(AClass: TControlClass; out Reference)` | Variant without an initial name, but with return by reference. |
 
-**Exemplo de uso**
+**Example of use**
 ```pascal
 uses
   OPCB.ControlBuilder;
@@ -489,89 +487,87 @@ begin
 end;
 ```
 
-**Observações**
+**Notes**
 
-* Mantém fluência completa com os métodos herdados de TControlBuilderBase
- e classes anteriores na hierarquia.
-* Evita a necessidade de classes específicas quando não há comportamento adicional a sobrescrever.
-* Ideal para criação dinâmica de UI em frameworks compatíveis (VCL, LCL e FMX).
+* Maintains complete fluency with the methods inherited from TControlBuilderBase
+ and previous classes in the hierarchy.
+* Avoids the need for specific classes when there is no additional behavior to override.
+* Ideal for dynamic UI creation in compatible frameworks (VCL, LCL, and FMX).
 
 ---
 #### `IMenuBuilder`
 
-A interface `IMenuBuilder\<TBuild\>` estende `IComponentBuilder\<TBuild\>`
-, fornecendo a estrutura necessária para builders voltados a componentes do tipo `TMenu` (como `TMainMenu`, `TPopupMenu` e derivados).
+The `IMenuBuilder\<TBuild\>` interface extends `IComponentBuilder\<TBuild\>`
+, providing the necessary structure for builders aimed at components of type `TMenu` (such as `TMainMenu`, `TPopupMenu`, and derivatives).
 
-Atualmente, não adiciona novos membros além dos herdados, mas serve como ponto de extensão para futuras especializações.
+Currently, it does not add new members beyond the inherited ones, but serves as an extension point for future specializations.
 
-**Observação**
+**Note**
 
-Mesmo sem declarar métodos adicionais, o uso de uma interface separada traz benefícios de tipagem genérica e semântica, permitindo que outros builders e creators possam reconhecer menus de forma específica (por exemplo, `TMenuItemBuilder`).
+Even without declaring additional methods, the use of a separate interface brings benefits of generic typing and semantics, allowing other builders and creators to recognize menus in a specific way (for example, `TMenuItemBuilder`).
 
 ---
 
 #### `TMenuBuilderBase`
 
-A classe abstrata `TMenuBuilderBase\<TBuild, TSelf\>` é a implementação base da interface `IMenuBuilder\<TBuild\>`.
-Ela herda toda a infraestrutura de TComponentBuilderBase
-, mantendo o estilo fluente e os mecanismos de configuração e construção já padronizados na hierarquia da biblioteca.
+The abstract class `TMenuBuilderBase\<TBuild, TSelf\>` is the base implementation of the `IMenuBuilder\<TBuild\>` interface.
+It inherits all the infrastructure from TComponentBuilderBase
+, maintaining the fluent style and the configuration and construction mechanisms already standardized in the library hierarchy.
 
 ---
 
-#### `TMenuBuilder` 
+#### `TMenuBuilder`
 
-A classe TMenuBuilder é a implementação concreta de TMenuBuilderBase<TBuild, TSelf>, especializada para o tipo TMenu.
+The TMenuBuilder class is the concrete implementation of TMenuBuilderBase<TBuild, TSelf>, specialized for the TMenu type.
 
-
-| Construtor                             | Uso                                                                |
+| Constructor | Usage |
 | -------------------------------------- | ------------------------------------------------------------------ |
-| `Create`                               | Cria o builder com o tipo padrão `TMenu`.                          |
-| `Create(AClass: TMenuClass)`           | Cria um menu de uma classe específica (por exemplo, `TPopupMenu`). |
-| `Create(AClass, AName)`                | Define o nome do componente ao criá-lo.                            |
-| `Create(AClass, AName, out Reference)` | Cria e já fornece uma referência para uso externo.                 |
-| `Create(AClass, out Reference)`        | Cria com referência, sem nome.                                     |
+| `Create` | Creates the builder with the default type `TMenu`. |
+| `Create(AClass: TMenuClass)` | Creates a menu of a specific class (for example, `TPopupMenu`). |
+| `Create(AClass, AName)` | Defines the component's name when creating it. |
+| `Create(AClass, AName, out Reference)` | Creates and already provides a reference for external use. |
+| `Create(AClass, out Reference)` | Creates with reference, without a name. |
 
 ---
 
 #### `IMenuItemBuilder`
 
+This interface defines the contract for building menu items, such as `TMenuItem`.
 
-Essa interface define o contrato para a construção de itens de menu, como `TMenuItem`.
-
-| Propriedade  | Tipo               | Função                                                          |
+| Property | Type | Function |
 | ------------ | ------------------ | --------------------------------------------------------------- |
-| `Caption`    | `TOptionalString`  | Define o texto exibido no item de menu.                         |
-| `ImageIndex` | `TOptionalInteger` | Define o índice da imagem associada, se houver um `TImageList`. |
-| `OnClick`    | `TNotifyEvent`     | Define o evento de clique do item.                              |
+| `Caption` | `TOptionalString` | Defines the text displayed in the menu item. |
+| `ImageIndex` | `TOptionalInteger` | Defines the index of the associated image, if there is a `TImageList`. |
+| `OnClick` | `TNotifyEvent` | Defines the click event of the item. |
 
 ---
 
 #### `TMenuItemBuilderBase`
 
-`TMenuItemBuilderBase` fornece uma base genérica para construção fluente de itens de menu (`TMenuItem`), herdando toda a infraestrutura de criação e configuração de componentes oferecida por `TComponentBuilderBase`.
+`TMenuItemBuilderBase` provides a generic base for fluent construction of menu items (`TMenuItem`), inheriting all the component creation and configuration infrastructure offered by `TComponentBuilderBase`.
 
-| Campo         | Tipo               | Descrição                                   |
+| Field | Type | Description |
 | ------------- | ------------------ | ------------------------------------------- |
-| `FCaption`    | `TOptionalString`  | Armazena o texto do item de menu.           |
-| `FImageIndex` | `TOptionalInteger` | Define o índice da imagem associada.        |
-| `FOnClick`    | `TNotifyEvent`     | Armazena o manipulador do evento de clique. |
+| `FCaption` | `TOptionalString` | Stores the text of the menu item. |
+| `FImageIndex` | `TOptionalInteger` | Defines the index of the associated image. |
+| `FOnClick` | `TNotifyEvent` | Stores the click event handler. |
 
-**Métodos**
+**Methods**
 
-| Método                        | Descrição                                 |
+| Method | Description |
 | ----------------------------- | ----------------------------------------- |
-| `WithCaption(ACaption)`       | Define o texto a ser exibido.             |
-| `WithImageIndex(AImageIndex)` | Define o índice da imagem associada.      |
-| `WithOnClick(AOnClick)`       | Define o manipulador de evento `OnClick`. |
+| `WithCaption(ACaption)` | Defines the text to be displayed. |
+| `WithImageIndex(AImageIndex)` | Defines the index of the associated image. |
+| `WithOnClick(AOnClick)` | Defines the `OnClick` event handler. |
 
 ---
 
 #### `TMenuItemBuilder`
 
-`TMenuItemBuilder` é a implementação concreta e pronta para uso do builder para objetos `TMenuItem` e descendentes.
-Ela herda toda a lógica de configuração da classe base `TMenuItemBuilderBase`, oferecendo um ponto de entrada simples e direto para a criação fluente de itens de menu no Delphi ou Lazarus.
+`TMenuItemBuilder` is the concrete and ready-to-use implementation of the builder for `TMenuItem` objects and descendants.
+It inherits all the configuration logic from the base class `TMenuItemBuilderBase`, offering a simple and straightforward entry point for fluent creation of menu items in Delphi or Lazarus.
 
-A classe segue a mesma hierarquia dos outros builders da biblioteca:
+The class follows the same hierarchy as the other builders in the library:
 ```
 TObjectBuilderBase
   └── TComponentBuilderBase
@@ -579,14 +575,15 @@ TObjectBuilderBase
               └── TMenuItemBuilder ← implementação concreta
 ```
 
-**Construtores**
 
-| Construtor                             | Uso típico                                                          |
+**Constructors**
+
+| Constructor | Typical usage |
 | -------------------------------------- | ------------------------------------------------------------------- |
-| `Create`                               | Criação padrão com `TMenuItem` como classe base.                    |
-| `Create(AClass: TMenuItemClass)`       | Permite construir descendentes de `TMenuItem` (ex.: `TMenuItemEx`). |
-| `Create(AClass, AName)`                | Define nome de design-time ao instanciar.                           |
-| `Create(AClass, AName, out Reference)` | Cria e retorna a referência do objeto instanciado.                  |
-| `Create(AClass, out Reference)`        | Cria e retorna referência sem nome pré-definido.                    |
+| `Create` | Standard creation with `TMenuItem` as the base class. |
+| `Create(AClass: TMenuItemClass)` | Allows building descendants of `TMenuItem` (e.g., `TMenuItemEx`). |
+| `Create(AClass, AName)` | Defines the design-time name when instantiating. |
+| `Create(AClass, AName, out Reference)` | Creates and returns the reference of the instantiated object. |
+| `Create(AClass, out Reference)` | Creates and returns a reference without a predefined name. |
 
 ---
