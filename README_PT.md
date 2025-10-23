@@ -1,6 +1,8 @@
 # OPCB – Object Pascal Component Builder  
 
-Documentantion: [docs/doc-pt.md](docs/doc-pt.md)
+## 📖 Documentação
+Documentação: [docs/doc-pt.md](docs/doc-pt.md)
+---
 
 🚀 Instancie e configure componentes Delphi e Lazarus de forma fluente, expressiva e reutilizável.  
 
