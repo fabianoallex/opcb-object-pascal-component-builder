@@ -127,7 +127,7 @@ Interface base que define as operações de construção de objetos genéricos.
 | `AssignReference(var AReference: TBuild)` | `void` | Atribui a instância criada por `.Build` à variável informada. |
 
 ---
-#### TObjectBuilderBase
+#### `TObjectBuilderBase`
 
 Classe abstrata que implementa a interface `IObjectBuilder<TBuild>`
  e fornece a infraestrutura principal para construção de objetos no padrão Builder.
@@ -159,7 +159,7 @@ Classe abstrata que implementa a interface `IObjectBuilder<TBuild>`
 `property ObjectClass:	TObjectClass`	||Retorna a classe associada à construção atual.
 
 ---
-##### TObjectBuilder
+##### `TObjectBuilder`
 
 Classe concreta que herda `TObjectBuilderbase`. Define tipo genérico `TBuild` como `TComponent`.
 
@@ -202,7 +202,7 @@ begin
 end;
 ```
 ---
-#### TObjectBuilder
+#### `TObjectBuilder`
 
 Classe concreta que herda de `TObjectBuilderBase<TObject, TObjectBuilder>`.
 
@@ -225,7 +225,7 @@ Herança
 
 ---
 
-#### IComponentBuilder<TBuild>
+#### `IComponentBuilder`
 
 A interface `IComponentBuilder<TBuild>` estende `IObjectBuilder<TBuild>`
  e define as operações específicas para construção de componentes (`TComponent` e descendentes).
@@ -255,7 +255,7 @@ Métodos
 
 ---
 
-#### TComponentBuilderBase
+#### `TComponentBuilderBase`
 
 Classe abstrata que estende `TObjectBuilderBase<TBuild, TSelf>`
  e implementa a interface `IComponentBuilder<TBuild>`.
@@ -313,7 +313,7 @@ Propriedades
 `Owner`	|`TComponent`|	Componente owner responsável pela instância criada.
 
 ---
-#### TComponentBuilder
+#### `TComponentBuilder`
 
 A classe `TComponentBuilder` é uma especialização concreta da classe genérica `TComponentBuilderBase`, projetada para facilitar a criação de instâncias de `TComponent` (ou de qualquer descendente) de forma fluente e configurável.
 
@@ -342,7 +342,7 @@ Método
 `CreateObject: TComponent`|`TComponent`|Sobrescreve o método base para instanciar o componente informado em `AClass`.
 
 ---
-#### IControlBuilder
+#### `IControlBuilder`
 
 A interface `IControlBuilder<TBuild>` estende `IComponentBuilder<TBuild>`
 , acrescentando suporte às propriedades e eventos típicos de controles visuais (`TControl` e descendentes).
