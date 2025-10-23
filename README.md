@@ -2,6 +2,8 @@
 
 **Versão em português**: veja [README_PT.md](README_PT.md)
 
+Documentantion: [docs/doc.md](docs/doc.md)
+
 🚀 Instantiate and configure Delphi and Lazarus components in a fluent, expressive, and reusable way.  
 
 **OPCB (Object Pascal Component Builder)** is a library that simplifies runtime component creation in **Delphi** and **Lazarus**, allowing you to build and configure visual components with a fluent, clear, and organized API.  
