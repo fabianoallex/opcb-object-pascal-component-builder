@@ -147,8 +147,10 @@ It is responsible for creating, configuring, and preparing instances of the gene
 | `Assign(out Reference): TSelf; overload;` | `TSelf` | Assigns the reference and returns the instance itself for fluent usage. |
 | `WithProp(const APropName: string; const AValue: TValue): TSelf; overload;` | `TSelf` | Defines a simple property value using RTTI. |
 | `WithProp(const APropValue: TPropertyValue): TSelf; overload;` | `TSelf` | Defines an object property using RTTI and a `TPropertyValue` record. |
-| `WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;` | `TSelf` | Defines an object-type property using RTTI. |
+| `WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;` | `TSelf` | Defines a property using RTTI. |
 | `WithPropSet(const APropName: string; const AValue: Integer): TSelf;` | `TSelf` | Defines a property of type `set` using RTTI. |
+|`WithEvent(const AEventName: string; const AMethod: TMethod): TSelf; overload;`|`TSelf`|Defines an object event using RTTI.|
+|`WithEvent(const AEventName: string; const AInstance: TObject; const AMethod: Pointer): TSelf; overload;`|`TSelf`|Defines an object event using RTTI.|
 | `Setup(AProc: TSetupProcObjBuild): TSelf; overload;` | `TSelf` | Adds an object setup procedure. |
 | `Setup(AProc: TSetupRefProcBuild): TSelf; overload;` | `TSelf` | Adds an object setup procedure. |
 | `Build: TBuild;` | `TBuild` | Creates, configures, and returns the final object of type `TBuild`. |

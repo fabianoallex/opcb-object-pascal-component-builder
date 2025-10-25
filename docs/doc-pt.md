@@ -151,8 +151,10 @@ Classe abstrata que implementa a interface `IObjectBuilder<TBuild>`
 `Assign(out Reference): TSelf; overload;`	|`TSelf`|Atribui a referência e retorna a própria instância para uso fluente.
 `WithProp(const APropName: string; const AValue: TValue): TSelf; overload;`	|`TSelf`|Define o valor de uma propriedade simples via RTTI.
 `WithProp(const APropValue: TPropertyValue): TSelf; overload;`	|`TSelf`|Define uma propriedade do objeto via RTTI usando um registro TPropertyValue.
-`WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;`	|`TSelf`|Define uma propriedade do objeto via RTTI de tipo objeto.
+`WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;`	|`TSelf`|Define uma propriedade do objeto via RTTI.
 `WithPropSet(const APropName: string; const AValue: Integer): TSelf;`	|`TSelf`|Define uma propriedade de tipo set do objeto via RTTI.
+`WithEvent(const AEventName: string; const AMethod: TMethod): TSelf; overload;`|`TSelf`|Define um evento do objeto via RTTI.
+`WithEvent(const AEventName: string; const AInstance: TObject; const AMethod: Pointer): TSelf; overload;`|`TSelf`|Define um evento do objeto via RTTI.
 `Setup(AProc: TSetupProcObjBuild): TSelf; overload;`	|`TSelf`|Adiciona um procedimento de configuração de objeto.
 `Setup(AProc: TSetupRefProcBuild): TSelf; overload;`	|`TSelf`|Adiciona um procedimento de configuração de objecto.
 `Build: TBuild;` |`TBuild`	|Cria, configura e retorna o objeto final do tipo `TBuild`.
