@@ -33,11 +33,31 @@
         <Loaded Value="True"/>
       </Unit>
       <Unit>
+        <Filename Value="uobjectbuildertests.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UObjectBuilderTests"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="209"/>
+        <CursorPos X="25" Y="56"/>
+        <UsageCount Value="287"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="ucomponentbuildertests.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UComponentBuilderTests"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="112"/>
+        <CursorPos X="58" Y="130"/>
+        <UsageCount Value="283"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="25"/>
-        <CursorPos X="75" Y="46"/>
+        <TopLine Value="37"/>
+        <CursorPos X="80" Y="48"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
@@ -131,30 +151,10 @@
         <Loaded Value="True"/>
       </Unit>
       <Unit>
-        <Filename Value="uobjectbuildertests.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UObjectBuilderTests"/>
-        <EditorIndex Value="10"/>
-        <TopLine Value="209"/>
-        <CursorPos X="25" Y="56"/>
-        <UsageCount Value="287"/>
-        <Loaded Value="True"/>
-      </Unit>
-      <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\win32\classes.pp"/>
         <UnitName Value="Classes"/>
         <EditorIndex Value="6"/>
         <UsageCount Value="141"/>
-        <Loaded Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ucomponentbuildertests.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UComponentBuilderTests"/>
-        <EditorIndex Value="11"/>
-        <TopLine Value="112"/>
-        <CursorPos X="58" Y="130"/>
-        <UsageCount Value="283"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>

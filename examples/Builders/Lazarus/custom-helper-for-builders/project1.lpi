@@ -52,7 +52,7 @@
     </Target>
     <SearchPaths>
       <IncludeFiles Value="$(ProjOutDir)"/>
-      <OtherUnitFiles Value="C:\Users\fabiano.arndt\Documents\projetos\lazarus\laytout-manager\src"/>
+      <OtherUnitFiles Value="C:\Users\fabiano.arndt\Documents\projetos\lazarus\laytout-manager\src\"/>
       <UnitOutputDirectory Value="lib\$(TargetCPU)-$(TargetOS)"/>
     </SearchPaths>
     <Linking>

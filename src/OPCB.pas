@@ -70,12 +70,12 @@ type
   { TPropertySetup }
 
   {$IFDEF FPC}generic{$ENDIF}
-  TPropertySetup<T> = class abstract
+  TPropertySetup<T, TControlType> = class abstract
   protected
     FValue: T;
   public
     constructor Create(const AValue: T);
-    procedure Apply(AControl: TControl); virtual; abstract;
+    procedure Apply(AControl: TControlType); virtual; abstract;
   end;
 
   { TPropValue }
@@ -1352,7 +1352,7 @@ begin
     TTabItem(Control).Parent := TTabControl(CurrentLevel.Parent);
   end;
   {$ELSE}
-  if (Control is TTabSheet) and (CurrentLevel.Parent is TPageControl) then
+  if (TControl(Control) is TTabSheet) and (CurrentLevel.Parent is TPageControl) then
   begin
     {$IFNDEF FPC}TTabSheet(Control).Parent := nil;{$ENDIF}
     TTabSheet(Control).PageControl := TPageControl(CurrentLevel.Parent);
@@ -1387,8 +1387,6 @@ function TControlCreator.CanAddToGrid: Boolean;
 var
   R, C: Integer;
 begin
-  Result := False;
-
   if CurrentLevel.GridMode.IsCellFree(
     CurrentLevel.GridMode.CurrentRow,
     CurrentLevel.GridMode.CurrentCol
@@ -2290,7 +2288,6 @@ end;
 function TControlCreatorHelper.GridSkipCell: TControlCreator;
 var
   Row, Col, RowSpan, ColSpan: Integer;
-  Dir: TGridFillDirection;
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
 begin
   Result := Self;
@@ -4011,7 +4008,7 @@ end;
 
 { TPropertySetup }
 
-constructor TPropertySetup{$IFNDEF FPC}<T>{$ENDIF}.Create(const AValue: T);
+constructor TPropertySetup{$IFNDEF FPC}<T, TControlType>{$ENDIF}.Create(const AValue: T);
 begin
   FValue := AValue;
 end;

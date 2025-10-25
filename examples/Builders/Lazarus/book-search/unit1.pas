@@ -243,20 +243,20 @@ begin
       .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alTop))
         .SetTopLeft(10, 10)
         .SubLevel(cpdVertical)
-          .AddControl(TControlBuilder.Create(TLabel).WithCaption('Pesquisa de Livros na Open Library'))
+          .Add(TControlBuilder.Create(TLabel).WithCaption('Pesquisa de Livros na Open Library'))
           .SetDirection(cpdHorizontal)
-          .AddControl(TControlBuilder.Create(TEdit, FEditSearch).WithWidth(220).WithText('Object Pascal'))
-          .AddControl(TControlBuilder.Create(TComboBox, FComboBoxPageSize).WithWidth(70).Setup(@SetupComboBoxPageSize))
-          .AddControl(TControlBuilder.Create(TButton).WithCaption('Pesquisar').Setup(@SetupButtonSearch))
+          .Add(TControlBuilder.Create(TEdit, FEditSearch).WithWidth(220).WithText('Object Pascal'))
+          .Add(TControlBuilder.Create(TComboBox, FComboBoxPageSize).WithWidth(70).Setup(@SetupComboBoxPageSize))
+          .Add(TControlBuilder.Create(TButton).WithCaption('Pesquisar').Setup(@SetupButtonSearch))
         .SuperLevel
         .IncLeft(50)
-        .AddControl(TControlBuilder.Create(TSearchPageNavigation, FSearchPageNavigation).WithWidth(300).Setup(@SetupSearchNavigation))
+        .Add(TControlBuilder.Create(TSearchPageNavigation, FSearchPageNavigation).WithWidth(300).Setup(@SetupSearchNavigation))
         .RecalcParentHeight(10)
       .SuperLevel
       .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alClient))
-        .AddControl(TControlBuilder.Create(TPanel, FPanelCards).WithAlign(alClient))
-        .AddControl(TControlBuilder.Create(TMemo, FMemo).WithAlign(alBottom))
-        .AddControl(TControlBuilder.Create(TProgressBar, FProgressBar).WithAlign(alBottom).Setup(@SetupProgressBar))
+        .Add(TControlBuilder.Create(TPanel, FPanelCards).WithAlign(alClient))
+        .Add(TControlBuilder.Create(TMemo, FMemo).WithAlign(alBottom))
+        .Add(TControlBuilder.Create(TProgressBar, FProgressBar).WithAlign(alBottom).Setup(@SetupProgressBar))
       .SuperLevel
     ;
   finally

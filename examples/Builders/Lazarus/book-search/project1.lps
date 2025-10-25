@@ -20,8 +20,9 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
-        <TopLine Value="207"/>
-        <CursorPos X="57" Y="234"/>
+        <IsVisibleTab Value="True"/>
+        <TopLine Value="228"/>
+        <CursorPos X="29" Y="246"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -31,8 +32,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UBookCard"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="202"/>
-        <CursorPos X="36" Y="225"/>
+        <TopLine Value="209"/>
+        <CursorPos X="13" Y="240"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
       </Unit>
@@ -41,8 +42,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="USearchPageNavigation"/>
         <EditorIndex Value="8"/>
-        <TopLine Value="183"/>
-        <CursorPos X="36" Y="205"/>
+        <TopLine Value="188"/>
+        <CursorPos X="11" Y="219"/>
         <UsageCount Value="138"/>
         <Loaded Value="True"/>
       </Unit>
@@ -51,8 +52,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDialogs"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="66"/>
-        <CursorPos X="72" Y="98"/>
+        <TopLine Value="38"/>
+        <CursorPos X="9" Y="68"/>
         <UsageCount Value="130"/>
         <Loaded Value="True"/>
       </Unit>
@@ -67,9 +68,8 @@
       </Unit>
       <Unit>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="302"/>
+        <TopLine Value="278"/>
         <CursorPos X="30" Y="324"/>
         <ExtraEditorCount Value="1"/>
         <ExtraEditor1>
@@ -127,50 +127,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="19" Column="26"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="238" Column="37" TopLine="207"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="20" Column="19"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="68" Column="32" TopLine="38"/>
-      </Position>
-      <Position>
-        <Filename Value="usearchpagenavigation.pas"/>
-        <Caret Line="145" Column="5" TopLine="126"/>
-      </Position>
-      <Position>
-        <Filename Value="usearchpagenavigation.pas"/>
-        <Caret Line="219" Column="34" TopLine="188"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="231" Column="17" TopLine="212"/>
-      </Position>
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="240" Column="36" TopLine="212"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="133" Column="15" TopLine="115"/>
-      </Position>
-      <Position>
-        <Filename Value="unit1.pas"/>
-        <Caret Line="249" Column="77" TopLine="228"/>
-      </Position>
-      <Position>
-        <Filename Value="udialogs.pas"/>
-        <Caret Line="19" Column="22"/>
-      </Position>
       <Position>
         <Filename Value="udialogs.pas"/>
         <Caret Line="98" Column="72" TopLine="66"/>
@@ -246,6 +202,47 @@
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <Caret Line="244" Column="7" TopLine="225"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="259" Column="83" TopLine="232"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="67" Column="6" TopLine="42"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="udialogs.pas"/>
+        <Caret Line="68" Column="9" TopLine="38"/>
+      </Position>
+      <Position>
+        <Filename Value="usearchpagenavigation.pas"/>
+        <Caret Line="211" Column="8" TopLine="192"/>
+      </Position>
+      <Position>
+        <Filename Value="usearchpagenavigation.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="usearchpagenavigation.pas"/>
+        <Caret Line="219" Column="11" TopLine="188"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="232" Column="10" TopLine="213"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="240" Column="13" TopLine="209"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="246" Column="12" TopLine="227"/>
       </Position>
     </JumpHistory>
     <RunParams>

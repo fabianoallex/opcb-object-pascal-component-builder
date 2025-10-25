@@ -22,13 +22,15 @@ type
 
   { TButtonBuilderHelper }
 
-  TFontSizeSetup = class(specialize TPropertySetup<Integer>)
+  { TFontSizeSetup }
+
+  TFontSizeSetup = class(specialize TPropertySetup<Integer, TButton>)
   public
-    procedure Apply(AControl: TControl); override;
+    procedure Apply(AButton: TButton); override;
   end;
 
-  TButtonVisibleSetup = class(specialize TPropertySetup<Boolean>)
-    procedure Apply(AControl: TControl); override;
+  TButtonVisibleSetup = class(specialize TPropertySetup<Boolean, TButton>)
+    procedure Apply(AButton: TButton); override;
   end;
 
   TButtonBuilderHelper = class helper for TButtonBuilder
@@ -67,12 +69,11 @@ begin
       .WithOwnerAndParent(Self, Self)
       .GridInit(4, 4)
         .GridSetCellWidthAndHeight(250, 60)
-        .AddControl(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // helper method: class + setup
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 2').WithEnabled(False))
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // helper method: class + setup
-        .AddControl(TButtonBuilder.Create.WithCaption('Teste 4').WithCursor(crHandPoint))     // helper method: RTTI
-
-        .AddControl(TControlBuilder.Create(TPanel).WithBorderStyle(bsSingle))
+        .specialize Add<TButton>(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // helper method: class + setup
+        .specialize Add<TButton>(TButtonBuilder.Create.WithCaption('Teste 2').WithEnabled(False))
+        .specialize Add<TButton>(TButtonBuilder.Create.WithCaption('Teste 3').WithVisible(False))          // helper method: class + setup
+        .specialize Add<TButton>(TButtonBuilder.Create.WithCaption('Teste 4').WithCursor(crHandPoint))     // helper method: RTTI
+        .Add(TControlBuilder.Create(TPanel).WithBorderStyle(bsSingle))
       .GridFinish
     ;
   finally
@@ -82,17 +83,17 @@ end;
 
 { TFontSizeSetup }
 
-procedure TFontSizeSetup.Apply(AControl: TControl);
+procedure TFontSizeSetup.Apply(AButton: TButton);
 begin
-  TButton(AControl).Font.Size := Self.FValue;
+  AButton.Font.Size := Self.FValue;
   Self.Free;
 end;
 
 { TButtonVisibleSetup }
 
-procedure TButtonVisibleSetup.Apply(AControl: TControl);
+procedure TButtonVisibleSetup.Apply(AButton: TButton);
 begin
-  TButton(AControl).Visible := FValue;
+  TButton(AButton).Visible := FValue;
   Self.Free;
 end;
 
@@ -101,13 +102,15 @@ end;
 function TButtonBuilderHelper.WithFontSize(ASize: Integer): TButtonBuilder;
 begin
   Result := Self;
-  with TFontSizeSetup.Create(ASize) do Setup(@Apply);
+  with TFontSizeSetup.Create(ASize) do
+    Setup(@Apply);
 end;
 
 function TButtonBuilderHelper.WithVisible(AVisible: Boolean): TButtonBuilder;
 begin
   Result := Self;
-  with TButtonVisibleSetup.Create(AVisible) do Setup(@Apply);
+  with TButtonVisibleSetup.Create(AVisible) do
+    Setup(@Apply);
 end;
 
 function TButtonBuilderHelper.WithCursor(ACursor: Integer): TButtonBuilder;

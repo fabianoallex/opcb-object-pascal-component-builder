@@ -208,15 +208,15 @@ begin
     ControlBuilder
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
-      .AddControl(TControlBuilder.Create(TLabel, FLabelResults).WithWidth(40).WithCaption('Resultados'))
+      .Add(TControlBuilder.Create(TLabel, FLabelResults).WithWidth(40).WithCaption('Resultados'))
       .Break
-      .AddControl(TControlBuilder.Create(TButton, FButtonFirst).WithWidth(40).WithCaption('1').Setup(@SetupButton))
-      .AddControl(TControlBuilder.Create(TButton, FButtonPrior).WithWidth(40).WithCaption('<').Setup(@SetupButton))
+      .Add(TControlBuilder.Create(TButton, FButtonFirst).WithWidth(40).WithCaption('1').Setup(@SetupButton))
+      .Add(TControlBuilder.Create(TButton, FButtonPrior).WithWidth(40).WithCaption('<').Setup(@SetupButton))
       .IncLeft(10)
-      .AddControl(TControlBuilder.Create(TButton, FButtonPage).WithWidth(40).WithCaption('1').Setup(@SetupButton))
+      .Add(TControlBuilder.Create(TButton, FButtonPage).WithWidth(40).WithCaption('1').Setup(@SetupButton))
       .IncLeft(10)
-      .AddControl(TControlBuilder.Create(TButton, FButtonNext).WithWidth(40).WithCaption('>').Setup(@SetupButton))
-      .AddControl(TControlBuilder.Create(TButton, FButtonLast).WithWidth(40).WithCaption('99').Setup(@SetupButton))
+      .Add(TControlBuilder.Create(TButton, FButtonNext).WithWidth(40).WithCaption('>').Setup(@SetupButton))
+      .Add(TControlBuilder.Create(TButton, FButtonLast).WithWidth(40).WithCaption('99').Setup(@SetupButton))
     ;
   finally
     ControlBuilder.Free;
