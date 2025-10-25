@@ -44,7 +44,9 @@ begin
 end;
 ```
 
-O Builder permite que configuremos um componente antes de criarmos ele efetivamente, através dos métodos, `WithTop`, `WithLeft`, `WithName`, e demais métodos que acessa as propriedades definidas em TControl e nas classes das quais TControl decende, porém não conseguimos usar métodos específicos para propriedades definidas na classe que estamos instanciando, como no caso TButton. Um exemplo é a propriedade ModalResult que encontramos em TButton. Nesse caso nós não teremos um método chamado WithModalResult, que permitisse definir o ModalResult desse botão. Para essa situação existem algumas possibilidades para permitir configurar o componente com todas as propriedades que queremos.
+O Builder permite que configuremos um componente antes de criarmos ele efetivamente, através dos métodos, `WithTop`, `WithLeft`, `WithName`, e demais métodos que acessem as propriedades definidas em TControl e nas classes das quais `TControl` decende, porém não conseguimos usar métodos específicos para propriedades definidas na classe que estamos instanciando, como no caso TButton. Um exemplo é a propriedade ModalResult que encontramos em `TButton`. Nesse caso nós não teremos um método chamado `WithModalResult`, que permitisse definir o `ModalResult` desse botão. 
+
+Para essa situação existem algumas possibilidades para permitir configurar o componente com todas as propriedades que queremos.
 
 **Método Setup**
 
@@ -88,15 +90,15 @@ begin
 end;
 ```
 
-A procedure passada como parâmetro em setup, será executada durante a chamada ao método `.Build`.
+A procedure passada como parâmetro em `setup`, será executada durante a chamada ao método `.Build`.
 
 **WithProp e WithEvent**
 
 WithProp e WithEvent são métodos que permitem definir uma propridade do objeto que estamos criando, através de RTTI.
 
-Esses métodos oferecem possibilidades de configurar diversas propriedades que não são suportadas diretamente pelos métodos With do componente. Porém é preciso estar atento, pois erros de propriedades  ou valores inválidos serão retornados apenas em tempo de execução.
+Esses métodos oferecem possibilidades de configurar diversas propriedades que não são suportadas diretamente pelos métodos `With` do componente. Porém é preciso atenção, pois erros de propriedades  ou valores inválidos serão retornados apenas em tempo de execução.
 
-Exemplo
+***Exemplo***
 
 ```pascal
 uses
@@ -106,7 +108,7 @@ var
   Builder: TControlBuilder;
   Button: TButton;
 begin
-  Builder := TControlBuilder.Create(TButton); //TButton indica a classe do objeto a ser criado.
+  Builder := TControlBuilder.Create(TButton); 
 
   try
     Builder
@@ -116,9 +118,9 @@ begin
       .WithWidth(150)
       .WithHeight(50)
       .WithName('Button1')
-      .WithOnClick(ButtonClick)  //ButtonClick deve ser um método com a implementação do clique
+      .WithOnClick(ButtonClick)  
       .WithCaption('Clique aqui')
-      .WithProp('Font.size', 22)
+      .WithProp('Font.size', 22)   //define a propriedade Font.size através de RTTI
     ;
 
     Button := Builder.Build as TButton;
