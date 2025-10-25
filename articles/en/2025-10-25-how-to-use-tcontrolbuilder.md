@@ -33,7 +33,7 @@ begin
       .WithHeight(50)
       .WithName('Button1')
       .WithOnClick(ButtonClick)  //ButtonClick deve ser um método com a implementação do clique
-      .WithCaption('Clique aqui')
+      .WithCaption('Click here')
     ;
 
     Button := Builder.Build as TButton;
@@ -71,7 +71,7 @@ var
   Builder: TControlBuilder;
   Button: TButton;
 begin
-  Builder := TControlBuilder.Create(TButton); //TButton indica a classe do objeto a ser criado.
+  Builder := TControlBuilder.Create(TButton); 
 
   try
     Builder
@@ -81,8 +81,8 @@ begin
       .WithWidth(150)
       .WithHeight(50)
       .WithName('Button1')
-      .WithOnClick(ButtonClick)  //ButtonClick deve ser um método com a implementação do clique
-      .WithCaption('Clique aqui')
+      .WithOnClick(ButtonClick)  
+      .WithCaption('Click here')
       .Setup(procedure (AControl: TControl)
              var
                Button: TButton;
@@ -132,9 +132,9 @@ begin
       .WithWidth(150)
       .WithHeight(50)
       .WithName('Button1')
-      .WithOnClick(ButtonClick)  
-      .WithCaption('Clique aqui')
-      .WithProp('Font.size', 22)   //define a propriedade Font.size através de RTTI
+      .WithCaption('Clique here')
+      .WithProp('Font.size', 22)   
+	  .WithEvent('OnClick', Self, @TForm1.ButtonClick)  
     ;
 
     Button := Builder.Build as TButton;

@@ -133,9 +133,9 @@ begin
       .WithWidth(150)
       .WithHeight(50)
       .WithName('Button1')
-      .WithOnClick(ButtonClick)  
       .WithCaption('Clique aqui')
       .WithProp('Font.size', 22)   //define a propriedade Font.size através de RTTI
+	  .WithEvent('OnClick', Self, @TForm1.ButtonClick)   //define o evento OnClick via RTTI
     ;
 
     Button := Builder.Build as TButton;
