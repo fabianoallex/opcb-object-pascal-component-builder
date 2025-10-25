@@ -1,3 +1,3 @@
 # Articles
 
-(2025-10-25-how-to-use-tcontrolbuilder.md)
+!(2025-10-25-how-to-use-tcontrolbuilder.md)
