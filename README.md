@@ -11,7 +11,11 @@
 ---
 
 ## 📖 Documentation
-[docs/doc.md](docs/doc.md)
+[docs](docs/doc.md)
+---
+
+## 📖 Articles
+[articles](articles/en/index.md)
 ---
 
 ## ✨ Benefits  
