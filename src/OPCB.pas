@@ -201,6 +201,7 @@ type
     procedure SetName(AValue: string);
     procedure SetOwner(AValue: TComponent);
     procedure SetTag(AValue: NativeInt);
+    function WithOwner(AOwner: TComponent): TSelf;
     function WithName(AName: string): TSelf;
     function WithTag(ATag: NativeInt): TSelf;
     property Name: string read FName write FName;
@@ -391,6 +392,8 @@ type
     function WithCaption(ACaption: string): TSelf;
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
+    function WithParent(AParent: TWinControl): TSelf;
+    function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TSelf;
     property Parent: TWinControl read GetParent write SetParent;
     property Caption: TOptionalString read FCaption write FCaption;
     property Text: TOptionalString read FText write FText;
@@ -995,6 +998,21 @@ function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithOnClick(
 begin
   Result := TSelf(Self);
   FOnClick := AOnClick;
+end;
+
+function TControlBuilderBase<TBuild, TSelf>.WithOwnerAndParent(
+  AOwner: TComponent; AParent: TWinControl): TSelf;
+begin
+  Result := TSelf(Self);
+  WithOwner(AOwner);
+  WithParent(AParent);
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithParent(
+  AParent: TWinControl): TSelf;
+begin
+  Result := TSelf(Self);
+  FParent := AParent;
 end;
 
 function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithTag(
@@ -4226,7 +4244,7 @@ begin
   Result := TSelf(Self);
   E.EventName := AEventName;
   E.Method := AMethod;
-  FEvents.Add(E); // supondo que você tenha criado uma lista FEvents: TList<TEventValue>
+  FEvents.Add(E);
 end;
 
 procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild,  TSelf>{$ENDIF}.SetupProc(
@@ -4363,6 +4381,13 @@ function TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithName(ANam
 begin
   Result := TSelf(Self);
   FName := AName;
+end;
+
+function TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithOwner(
+  AOwner: TComponent): TSelf;
+begin
+  Result := TSelf(Self);
+  FOwner := AOwner;
 end;
 
 function TComponentBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithTag(ATag: NativeInt): TSelf;
