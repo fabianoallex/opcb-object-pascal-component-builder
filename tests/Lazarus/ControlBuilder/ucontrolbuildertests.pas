@@ -29,7 +29,7 @@ type
     procedure BuilderDestroy(Sender: TObject);
     procedure SetupControl_1(AControl: TControl);
     procedure SetupControl_2(AControl: TControl);
-    procedure ButtonClick(Self: TObject);
+    procedure ButtonClick(Sender: TObject);
   published
     procedure TestControlBuilder;
     procedure TestControlBuilderDescendetControlBuild;
@@ -69,6 +69,8 @@ type
     procedure TestControlBuilderWithOutOfRangeValue;
     procedure TestControlBuilderReadOnlyProp;
     procedure TestControlBuilderSetupAndWithName;
+
+    procedure TestControlBuilderWithEvent;
   end;
 
 implementation
@@ -109,7 +111,7 @@ begin
   (AControl as TPanel).Width := 177;
 end;
 
-procedure TControlBuilderTests.ButtonClick(Self: TObject);
+procedure TControlBuilderTests.ButtonClick(Sender: TObject);
 begin
   FClicked := True;
 end;
@@ -899,6 +901,23 @@ begin
   end;
 end;
 
+procedure TControlBuilderTests.TestControlBuilderWithEvent;
+var
+  Builder: TControlBuilder;
+  Button: TControl;
+begin
+  Button := nil;
+  Builder := TControlBuilder.Create(TButton);
+  Builder.WithEvent('OnClick', Self, @TControlBuilderTests.ButtonClick);
+  try
+    Button := Builder.Build;
+    TButton(Button).Click;  // simula o click
+    AssertNotNull('Button não deveria ser nil', Button);
+    AssertEquals('Propriedade FClicked diferente da esperada', True, FClicked);
+  finally
+    Button.Free;
+  end;
+end;
 
 initialization
   RegisterTest(TControlBuilderTests);

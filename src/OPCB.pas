@@ -89,6 +89,13 @@ type
 
   TPropValueList = {$IFDEF FPC}specialize{$ENDIF} TList<TPropertyValue>;
 
+  TEventValue = record
+    EventName: string;
+    Method: TMethod;
+  end;
+
+  TEventValueList = {$IFDEF FPC}specialize{$ENDIF} TList<TEventValue>;
+
   {$IFDEF FPC}generic{$ENDIF}
   IObjectBuilder<TBuild> = interface
     ['{1FD2411F-05F7-4132-A10D-C06A2CA95781}']
@@ -114,10 +121,12 @@ type
     FSetupProcList: TSetupProcObjList;
     FSetupRefProcList: TSetupRefProcList;
     FProperties: TPropValueList;
+    FEvents: TEventValueList;
     function CreateObject: TBuild; virtual; abstract;
     procedure ConfigureObject(AObject: TBuild); virtual;
     procedure ApplyPropPath(Instance: TObject; AProp: TPropertyValue);
-    procedure ApplyPendindProps(Instance: TObject);
+    procedure ApplyPendingProps(Instance: TObject);
+    procedure ApplyPendingEvents(Instance: TObject);
     procedure SetupProc(AProcObj: {$IFDEF FPC}specialize{$ENDIF} TSetupProcObj<TBuild>); overload;
     procedure SetupProc(ARefProc: {$IFDEF FPC}specialize{$ENDIF} TSetupRefProc<TBuild>); overload;
   public
@@ -132,6 +141,9 @@ type
     function WithProp(const APropValue: TPropertyValue): TSelf; overload;
     function WithPropObj(const APropName: string; AObj: TObject): TSelf; overload;  // for lazarus
     function WithPropSet(const APropName: string; const AValue: Integer): TSelf;
+    function WithEvent(const AEventName: string; const AMethod: TMethod): TSelf; overload;
+    function WithEvent(const AEventName: string; const AInstance: TObject;
+      const AMethod: Pointer): TSelf; overload;
     function Setup(AProc: TSetupProcObjBuild): TSelf; overload;
     function Setup(AProc: TSetupRefProcBuild): TSelf; overload;
     function Build: TBuild;
@@ -4024,12 +4036,41 @@ end;
 
 { TObjectBuilderBase }
 
-procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ApplyPendindProps(Instance: TObject);
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ApplyPendingProps(Instance: TObject);
 var
   Prop: TPropertyValue;
 begin
   for Prop in FProperties do
     ApplyPropPath(Instance, Prop);
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ApplyPendingEvents(
+  Instance: TObject);
+var
+  Ctx: TRttiContext;
+  RttiType: TRttiType;
+  Prop: TRttiProperty;
+  Ev: TEventValue;
+  PropInfo: PPropInfo;
+begin
+  Ctx := TRttiContext.Create;
+  try
+    RttiType := Ctx.GetType(Instance.ClassType);
+
+    for Ev in FEvents do
+    begin
+      Prop := RttiType.GetProperty(Ev.EventName);
+      if Prop = nil then
+        Continue;
+
+      if not (Prop.PropertyType is TRttiMethodType) then
+        Continue;
+
+      SetMethodProp(Instance, ev.EventName, Ev.Method);
+    end;
+  finally
+    Ctx.Free;
+  end;
 end;
 
 procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.ConfigureObject(AObject: TBuild);
@@ -4093,6 +4134,7 @@ begin
   FSetupProcList := TSetupProcObjList.Create;
   FSetupRefProcList := TSetupRefProcList.Create;
   FProperties := TPropValueList.Create;
+  FEvents := TEventValueList.Create;
   FTargetFields := TPointerList.Create;
 end;
 
@@ -4113,6 +4155,7 @@ begin
   FSetupProcList.Free;
   FSetupRefProcList.Free;
   FProperties.Free;
+  FEvents.Free;
   FTargetFields.Free;
   inherited;
 end;
@@ -4145,6 +4188,18 @@ begin
   FProperties.Add(P);
 end;
 
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithEvent(const AEventName: string;
+  const AInstance: TObject; const AMethod: Pointer): TSelf;
+var
+  E: TEventValue;
+begin
+  Result := TSelf(Self);
+  E.EventName := AEventName;
+  E.Method.Code := AMethod;
+  E.Method.Data := AInstance;
+  FEvents.Add(E);
+end;
+
 function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithProp(const APropValue: TPropertyValue): TSelf;
 begin
   Result := Self.WithProp(APropValue.PropName, APropValue.Value);
@@ -4161,6 +4216,17 @@ end;
 function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithPropSet(const APropName: string; const AValue: Integer): TSelf;
 begin
   Result := WithProp(APropName, TValue.{$IFDEF FPC}specialize{$ENDIF}From<NativeInt>(AValue));
+end;
+
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithEvent(
+  const AEventName: string; const AMethod: TMethod): TSelf;
+var
+  E: TEventValue;
+begin
+  Result := TSelf(Self);
+  E.EventName := AEventName;
+  E.Method := AMethod;
+  FEvents.Add(E); // supondo que você tenha criado uma lista FEvents: TList<TEventValue>
 end;
 
 procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild,  TSelf>{$ENDIF}.SetupProc(
@@ -4182,7 +4248,8 @@ var
 begin
   Result := CreateObject;
   ConfigureObject(Result);
-  ApplyPendindProps(Result);
+  ApplyPendingProps(Result);
+  ApplyPendingEvents(Result);
 
   for Proc in FSetupProcList do
     Proc(Result);
