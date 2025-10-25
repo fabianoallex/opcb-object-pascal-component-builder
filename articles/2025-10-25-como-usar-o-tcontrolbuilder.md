@@ -1,8 +1,8 @@
-# Como Usar o TControlBuilder
+# Como Usar o `TControlBuilder`
 
-TControlBuilder é a implementação de um Builder para instanciação de Objetos que herdem de `TControl`.
+`TControlBuilder` é uma implementação do padrão *Builder* voltada à instanciação de objetos que herdam de `TControl`.
 
-Hierarquia:
+Hierarquia:  
 ```
 TObjectBuilderBase<TBuild, TSelf> : IObjectBuilder<TBuild>
   └── TComponentBuilderBase<TBuild, TSelf> : IComponentBuilder<TBuild>
@@ -11,9 +11,9 @@ TObjectBuilderBase<TBuild, TSelf> : IObjectBuilder<TBuild>
 
 ```
 
-Com o TControlBuilder é possível instanciar qualquer componente que herde de `TControl`, como `TButton`, `TPanel`, `TForm`.
+Com o `TControlBuilder`, é possível instanciar qualquer componente descendente de `TControl`, como `TButton`, `TPanel` ou `TForm`.
 
-Exemplo:
+***Exemplo***
 ```pascal
 uses
   OPCB;
@@ -44,14 +44,25 @@ begin
 end;
 ```
 
-O Builder permite que configuremos um componente antes de criarmos ele efetivamente, através dos métodos, `WithTop`, `WithLeft`, `WithName`, e demais métodos que acessem as propriedades definidas em TControl e nas classes das quais `TControl` decende, porém não conseguimos usar métodos específicos para propriedades definidas na classe que estamos instanciando, como no caso TButton. Um exemplo é a propriedade ModalResult que encontramos em `TButton`. Nesse caso nós não teremos um método chamado `WithModalResult`, que permitisse definir o `ModalResult` desse botão. 
+---
 
-Para essa situação existem algumas possibilidades para permitir configurar o componente com todas as propriedades que queremos.
+### 💡 Conceito
 
-**Método Setup**
+O *Builder* permite configurar um componente **antes de sua criação efetiva**, por meio de métodos como `WithTop`, `WithLeft`, `WithName` e outros que acessam propriedades definidas em `TControl` ou em suas classes ancestrais.
 
-Esse método permite vincular um ou mais métodos de configuração do componente a ser instanciado como pode ser visto no exemplo abaixo:
+No entanto, esses métodos não abrangem propriedades **específicas da classe concreta** sendo instanciada.  
+Por exemplo, ao criar um `TButton`, a propriedade `ModalResult` não possui um método dedicado (`WithModalResult`).  
 
+Para lidar com esse tipo de situação — ou seja, quando precisamos configurar propriedades que não possuem um método fluente específico — o `TControlBuilder` oferece alternativas flexíveis, descritas a seguir.
+
+---
+
+### ⚙️ Método `Setup`
+
+O método `Setup` permite associar um ou mais procedimentos de configuração ao componente que será criado.  
+Esses procedimentos são executados automaticamente durante a chamada ao método `.Build`.
+
+Exemplo:
 ```pascal
 uses
   OPCB;
@@ -90,16 +101,20 @@ begin
 end;
 ```
 
-A procedure passada como parâmetro em `setup`, será executada durante a chamada ao método `.Build`.
+> A *procedure* passada como parâmetro em `Setup` será executada no momento da construção do objeto, permitindo aplicar configurações personalizadas após todas as definições fluentes.
 
-**WithProp e WithEvent**
+---
 
-WithProp e WithEvent são métodos que permitem definir uma propridade do objeto que estamos criando, através de RTTI.
+### 🧩 Métodos `WithProp` e `WithEvent`
 
-Esses métodos oferecem possibilidades de configurar diversas propriedades que não são suportadas diretamente pelos métodos `With` do componente. Porém é preciso atenção, pois erros de propriedades  ou valores inválidos serão retornados apenas em tempo de execução.
+Os métodos `WithProp` e `WithEvent` permitem definir propriedades e eventos de um objeto por meio de **RTTI** (*Runtime Type Information*).
 
-***Exemplo***
+Eles oferecem uma forma dinâmica de configurar propriedades que não são suportadas diretamente pelos métodos `With` padrão do *Builder*.
 
+No entanto, é importante ter atenção:  
+erros relacionados a nomes de propriedades inexistentes, tipos incompatíveis ou valores inválidos **serão detectados apenas em tempo de execução**.
+
+Exemplo:
 ```pascal
 uses
   OPCB;
@@ -130,3 +145,14 @@ begin
   end;
 end;
 ```
+
+---
+
+### ✅ Resumo
+
+| Cenário | Método recomendado |
+|----------|--------------------|
+| Propriedades comuns de `TControl` ou ancestrais | `With...` |
+| Propriedades específicas da classe concreta | `Setup` ou `WithProp` |
+| Atribuição de eventos via código | `WithEvent` |
+
