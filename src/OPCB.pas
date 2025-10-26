@@ -3807,7 +3807,10 @@ begin
   inherited Create;
   FIsReleased := False;
   FContextKey := AContextKey;
-  FRegistry := TComponentRegistry.ForContext(AContextKey);
+  if AContextKey.Trim.IsEmpty then
+    FRegistry := TComponentRegistry.ForContext(GenerateAutoKey)
+  else
+    FRegistry := TComponentRegistry.ForContext(AContextKey);
 end;
 
 constructor TRegistryContextHandle.Create;
