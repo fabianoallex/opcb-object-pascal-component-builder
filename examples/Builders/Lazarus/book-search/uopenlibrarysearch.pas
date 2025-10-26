@@ -5,7 +5,7 @@ unit UOpenLibrarySearch;
 interface
 
 uses
-  Classes, SysUtils, Windows, WinInet, fpjson, jsonparser;
+  Classes, SysUtils, {$IFDEF WINDOWS}Windows, WinInet,{$ENDIF} fpjson, fphttpclient, jsonparser;
 
 type
   // Eventos
@@ -42,9 +42,6 @@ type
 
 implementation
 
-uses
-  fphttpclient ;
-
 const
   BASE_URL = 'https://openlibrary.org/search.json?q=%s&offset=%d&limit=%d';
 
@@ -56,6 +53,7 @@ begin
 end;
 
 function TOpenLibrarySearch.HttpGet(const AUrl: string): string;
+{$IFDEF WINDOWS}
 var
   hInet, hUrl: HINTERNET;
   Buffer: array[0..1023] of Byte;
@@ -89,6 +87,28 @@ begin
   finally
     InternetCloseHandle(hInet);
   end;
+{$ELSE}
+var
+  HTTPClient: TFPHttpClient;
+  S: TStringStream;
+begin
+  Result := '';
+  HTTPClient := TFPHttpClient.Create(nil);
+  S := TStringStream.Create('');
+  try
+    try
+      HTTPClient.AllowRedirect := True;
+      HTTPClient.Get(AUrl, S);
+      Result := S.DataString;
+    except
+      on E: Exception do
+        raise;
+    end;
+  finally
+    S.Free;
+    HTTPClient.Free;
+  end;
+{$ENDIF}
 end;
 
 procedure TOpenLibrarySearch.SetOnSearchReturn(AValue: TOnSearchReturn);
@@ -96,55 +116,6 @@ begin
   if FOnSearchReturn = AValue then Exit;
   FOnSearchReturn := AValue;
 end;
-
-{
-procedure TOpenLibrarySearch.Search(const q: string; AOffset: Integer; ALimit: Integer);
-var
-  url, rawJson: string;
-  jsonData: TJSONData;
-  jsonObj: TJSONObject;
-  docs: TJSONArray;
-  i, totalProcessed: Integer;
-begin
-  FQuery := q;
-  FOffset := AOffset;
-  FLimit := ALimit;
-
-  if Assigned(FOnSearchStart) then
-    FOnSearchStart(Self, q);
-
-  url := Format(BASE_URL, [q, AOffset, ALimit]);
-  rawJson := HttpGet(url);
-
-  totalProcessed := 0;
-  jsonData := GetJSON(rawJson);
-  try
-    if not (jsonData is TJSONObject) then
-      raise Exception.Create('Resposta não é um objeto JSON');
-
-    jsonObj := TJSONObject(jsonData);
-
-    if Assigned(FOnSearchReturn) then
-      FOnSearchReturn(Self, jsonObj.FindPath('numFound').AsInteger);
-
-    docs := TJSONArray(jsonObj.FindPath('docs'));
-    if docs <> nil then
-    begin
-      for i := 0 to docs.Count - 1 do
-      begin
-        if Assigned(FOnDocFound) then
-          FOnDocFound(Self, TJSONObject(docs.Items[i]));
-      end;
-      totalProcessed := docs.Count;
-    end;
-  finally
-    jsonData.Free;
-  end;
-
-  if Assigned(FOnSearchFinished) then
-    FOnSearchFinished(Self, totalProcessed);
-end;
-}
 
 procedure TOpenLibrarySearch.Search(const q: string; AOffset: Integer; ALimit: Integer);
 var
