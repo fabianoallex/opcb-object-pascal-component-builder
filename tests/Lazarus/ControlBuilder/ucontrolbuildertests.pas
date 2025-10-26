@@ -69,7 +69,6 @@ type
     procedure TestControlBuilderWithOutOfRangeValue;
     procedure TestControlBuilderReadOnlyProp;
     procedure TestControlBuilderSetupAndWithName;
-
     procedure TestControlBuilderWithEvent;
   end;
 

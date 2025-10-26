@@ -57,15 +57,15 @@ begin
     .SubLevel(cpdVertical);
 
       if AMsg <> '' then
-        ControlCreator.AddControl(TControlBuilder.Create(TLabel, 'LabelMessage').WithCaption(AMsg));
+        ControlCreator.Add(TControlBuilder.Create(TLabel, 'LabelMessage').WithCaption(AMsg));
 
    ControlCreator
-      .AddControl(AControlBuilder)
+      .Add(AControlBuilder)
     .SuperLevel
     .Break
     .IncTop(10)
-    .AddControl(TControlBuilder.Create(TBitBtn, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(@SetupButton))
-    .AddControl(TControlBuilder.Create(TBitBtn, 'ButtonCancel').WithCaption('Cancelar').WithHeight(30).Setup(@SetupButton))
+    .Add(TControlBuilder.Create(TBitBtn, 'ButtonOk').WithCaption('Ok').WithHeight(30).Setup(@SetupButton))
+    .Add(TControlBuilder.Create(TBitBtn, 'ButtonCancel').WithCaption('Cancelar').WithHeight(30).Setup(@SetupButton))
     .AlignControlsRight(['ButtonOk', 'ButtonCancel'], [ControlName])
     .RecalcParentSize(10, 10)
   ;

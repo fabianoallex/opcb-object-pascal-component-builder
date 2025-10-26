@@ -468,9 +468,9 @@ type
 
   TComponentRegistry = class
   private
+  protected
     class var FInstances: TStrComponentRegistryEntryDictionary;
     class function GetContextComponents(const AContext, AName: string): TComponent; static;
-  protected
     class function ForContext(const AKey: string): TComponentRegistry; static;
     class procedure ReleaseContext(const AKey: string); static;
     class procedure Finalize; static;

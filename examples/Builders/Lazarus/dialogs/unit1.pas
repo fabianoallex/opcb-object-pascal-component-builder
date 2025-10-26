@@ -358,12 +358,12 @@ var
         )
         .SetTopLeft(10, 10)
         .SetSpace(20, 20)
-        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(180, 280).Setup(@SetupListBoxLeft))
+        .Add(TControlBuilder.Create(TListBox, 'ListBoxLeft').WithWidthAndHeight(180, 280).Setup(@SetupListBoxLeft))
         .SubLevel(cpdVertical)
-          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(@ButtonMoveToRightClick))
-          .AddControl(TControlBuilder.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(@ButtonMoveToLeftClick))
+          .Add(TControlBuilder.Create(TButton, 'ButtonMoveToRight').WithCaption('>').WithOnClick(@ButtonMoveToRightClick))
+          .Add(TControlBuilder.Create(TButton, 'ButtonMoveToLeft').WithCaption('<').WithOnClick(@ButtonMoveToLeftClick))
         .SuperLevel
-        .AddControl(TControlBuilder.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(180, 280).Setup(@SetupListBoxRight))
+        .Add(TControlBuilder.Create(TListBox, 'ListBoxRight').WithWidthAndHeight(180, 280).Setup(@SetupListBoxRight))
         .CenterControlsInParentVertically(['ButtonMoveToRight', 'ButtonMoveToLeft'])
     finally
       ControlCreator.Free;
@@ -477,7 +477,7 @@ var
   begin
     Creators := TOPCBCreators.Create(ControlDialog.ControlCreator.Registry.ContextKey); // usa o mesmo context do dialog
     try
-      Creators.AsComponentsBuilder
+      Creators.AsComponentCreator
         .WithOwner(ControlDialog)
         .Add(TComponentBuilder.Create(TMemDataset, 'MDS').Setup(@SetupMDS))
         .Add(TComponentBuilder.Create(TDataSource, 'DS').Setup(@SetupDS))
@@ -492,10 +492,10 @@ var
         .SubLevel(TControlBuilder.Create(TPanel).WithAlign(alTop).WithHeight(70).WithCaption(''), cpdVertical)
           .SetTopLeft(5, 5)
           .SetSpace(5, 5)
-          .AddControl(TControlBuilder.Create(TLabel).WithCaption('Buscar por cidade').WithWidth(460))
-          .AddControl(TControlBuilder.Create(TEdit).WithWidth(480).Setup(@SetupEditSearch))
+          .Add(TControlBuilder.Create(TLabel).WithCaption('Buscar por cidade').WithWidth(460))
+          .Add(TControlBuilder.Create(TEdit).WithWidth(480).Setup(@SetupEditSearch))
         .SuperLevel
-        .AddControl(TControlBuilder.Create(TDBGrid).WithAlign(alClient).Setup(@SetupDBGrid))
+        .Add(TControlBuilder.Create(TDBGrid).WithAlign(alClient).Setup(@SetupDBGrid))
     finally
       Creators.Free;
     end;

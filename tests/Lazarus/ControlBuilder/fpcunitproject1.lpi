@@ -56,6 +56,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UComponentBuilderTests"/>
       </Unit>
+      <Unit>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UComponentRegistryTest"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

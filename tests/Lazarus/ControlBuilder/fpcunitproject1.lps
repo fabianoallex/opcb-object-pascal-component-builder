@@ -27,8 +27,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UControlBuilderTests"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="889"/>
-        <CursorPos X="49" Y="912"/>
+        <TopLine Value="121"/>
+        <CursorPos X="37" Y="145"/>
         <UsageCount Value="211"/>
         <Loaded Value="True"/>
       </Unit>
@@ -36,8 +36,8 @@
         <Filename Value="uobjectbuildertests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UObjectBuilderTests"/>
-        <EditorIndex Value="10"/>
-        <TopLine Value="209"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="208"/>
         <CursorPos X="25" Y="56"/>
         <UsageCount Value="287"/>
         <Loaded Value="True"/>
@@ -46,7 +46,7 @@
         <Filename Value="ucomponentbuildertests.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UComponentBuilderTests"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="12"/>
         <TopLine Value="112"/>
         <CursorPos X="58" Y="130"/>
         <UsageCount Value="283"/>
@@ -56,8 +56,8 @@
         <Filename Value="..\..\..\src\OPCB.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
-        <TopLine Value="984"/>
-        <CursorPos X="65" Y="1003"/>
+        <TopLine Value="926"/>
+        <CursorPos X="5" Y="948"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
@@ -66,7 +66,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="70"/>
         <CursorPos X="64" Y="98"/>
-        <UsageCount Value="34"/>
+        <UsageCount Value="31"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\objpas\classes\classesh.inc"/>
@@ -82,14 +82,14 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="68"/>
         <CursorPos X="3" Y="87"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="33"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\rtl\inc\typshrdh.inc"/>
         <EditorIndex Value="-1"/>
         <TopLine Value="55"/>
         <CursorPos X="3" Y="62"/>
-        <UsageCount Value="36"/>
+        <UsageCount Value="33"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
@@ -114,7 +114,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="99"/>
         <CursorPos X="54" Y="118"/>
-        <UsageCount Value="30"/>
+        <UsageCount Value="27"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\ulayout.pas"/>
@@ -122,7 +122,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="354"/>
         <CursorPos X="86" Y="374"/>
-        <UsageCount Value="78"/>
+        <UsageCount Value="75"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\menus.pp"/>
@@ -130,7 +130,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="131"/>
         <CursorPos X="3" Y="149"/>
-        <UsageCount Value="20"/>
+        <UsageCount Value="17"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\lclclasses.pp"/>
@@ -157,126 +157,136 @@
         <UsageCount Value="141"/>
         <Loaded Value="True"/>
       </Unit>
+      <Unit>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UComponentRegistryTest"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="5"/>
+        <CursorPos X="24" Y="25"/>
+        <UsageCount Value="39"/>
+        <Loaded Value="True"/>
+      </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
       <Position>
-        <Filename Value="ucontrolcreatortests.pas"/>
-        <Caret Line="106" Column="23" TopLine="91"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="24" Column="15" TopLine="5"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolcreatortests.pas"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="53" Column="3" TopLine="35"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="44" Column="40" TopLine="29"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="24" Column="32" TopLine="5"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="345" Column="3" TopLine="339"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="52" Column="3" TopLine="34"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="73" Column="42" TopLine="55"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="24" Column="15" TopLine="5"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="906" Column="3" TopLine="877"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="53" Column="50" TopLine="34"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="44" Column="37" TopLine="31"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="24" Column="15"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="357" Column="5" TopLine="341"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="52" Column="30" TopLine="34"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="73" Column="33" TopLine="51"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="25" Column="33" TopLine="5"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="911" TopLine="889"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="67" Column="84" TopLine="47"/>
       </Position>
       <Position>
-        <Filename Value="..\..\..\src\OPCB.pas"/>
-        <Caret Line="4193" Column="64" TopLine="4174"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="65" TopLine="47"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="909" Column="9" TopLine="890"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="66" TopLine="47"/>
       </Position>
       <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="916" Column="83" TopLine="890"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="912" Column="11" TopLine="890"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="32" Column="5" TopLine="9"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="117" Column="3" TopLine="115"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="32" Column="33" TopLine="13"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="114" Column="50" TopLine="114"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="73" Column="35" TopLine="57"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="915" Column="5" TopLine="890"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="63" Column="42" TopLine="41"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="715" Column="80" TopLine="701"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="73" Column="36" TopLine="46"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="917" Column="80" TopLine="890"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="63" Column="36" TopLine="56"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="708" Column="3" TopLine="701"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="73" Column="15" TopLine="46"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="914" Column="21" TopLine="889"/>
-      </Position>
-      <Position>
-        <Filename Value="ucontrolbuildertests.pas"/>
-        <Caret Line="73" Column="27" TopLine="56"/>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="70" Column="51" TopLine="47"/>
       </Position>
       <Position>
         <Filename Value="..\..\..\src\OPCB.pas"/>
-        <Caret Line="4193" Column="64" TopLine="4181"/>
+        <Caret Line="475" Column="21" TopLine="456"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="66" Column="47" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="65" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="66" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="67" TopLine="47"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="76" Column="43" TopLine="56"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="73" Column="89" TopLine="53"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="54" Column="92" TopLine="35"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="85" Column="46" TopLine="61"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="80" Column="13" TopLine="61"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="76" Column="62" TopLine="52"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="91" TopLine="71"/>
+      </Position>
+      <Position>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <Caret Line="68" Column="41" TopLine="54"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="3628" Column="23" TopLine="3615"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="43" Column="71" TopLine="22"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="..\..\..\src\OPCB.pas"/>
+        <Caret Line="27" Column="5"/>
       </Position>
     </JumpHistory>
     <RunParams>
