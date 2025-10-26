@@ -1000,7 +1000,7 @@ begin
   FOnClick := AOnClick;
 end;
 
-function TControlBuilderBase<TBuild, TSelf>.WithOwnerAndParent(
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithOwnerAndParent(
   AOwner: TComponent; AParent: TWinControl): TSelf;
 begin
   Result := TSelf(Self);
