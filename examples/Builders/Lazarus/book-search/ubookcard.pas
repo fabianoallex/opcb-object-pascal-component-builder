@@ -64,11 +64,17 @@ type
 implementation
 
 uses
-  Windows, WinInet, LCLType, LCLProc, LCLIntf, Graphics;
+  {$IFDEF WINDOWS}
+  WinInet
+  {$ENDIF}
+  {$IFDEF LINUX}
+  fphttpclient
+  {$ENDIF}, LCLType, LCLProc, LCLIntf, Graphics;
 
 { TImageLoaderThread }
 
 function DownloadURL(const Url: string; Stream: TStream): Boolean;
+{$IFDEF WINDOWS}
 var
   hInet, hFile: HINTERNET;
   Buffer: array[0..1023] of Byte;
@@ -94,6 +100,26 @@ begin
     InternetCloseHandle(hInet);
   end;
 end;
+{$ELSE}
+var
+  HTTPClient: TFPHttpClient;
+begin
+  Result := False;
+  HTTPClient := TFPHttpClient.Create(nil);
+  try
+    try
+      HTTPClient.AllowRedirect := True;
+      HTTPClient.Get(Url, Stream);
+      Result := True;
+    except
+      on E: Exception do
+        Result := False;
+    end;
+  finally
+    HTTPClient.Free;
+  end;
+end;
+{$ENDIF}
 
 procedure LoadImageFromURL(const AURL: string; AImage: TImage);
 var

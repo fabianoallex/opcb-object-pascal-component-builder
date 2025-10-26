@@ -10,7 +10,7 @@
         <IsPartOfProject Value="True"/>
         <EditorIndex Value="11"/>
         <CursorPos X="31" Y="14"/>
-        <UsageCount Value="138"/>
+        <UsageCount Value="139"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -22,7 +22,7 @@
         <UnitName Value="Unit1"/>
         <TopLine Value="171"/>
         <CursorPos X="67" Y="192"/>
-        <UsageCount Value="138"/>
+        <UsageCount Value="139"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
       </Unit>
@@ -30,10 +30,11 @@
         <Filename Value="ubookcard.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UBookCard"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="4"/>
-        <TopLine Value="209"/>
-        <CursorPos X="13" Y="240"/>
-        <UsageCount Value="138"/>
+        <TopLine Value="49"/>
+        <CursorPos X="46" Y="68"/>
+        <UsageCount Value="139"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -43,7 +44,7 @@
         <EditorIndex Value="8"/>
         <TopLine Value="188"/>
         <CursorPos X="11" Y="219"/>
-        <UsageCount Value="138"/>
+        <UsageCount Value="139"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -53,17 +54,17 @@
         <EditorIndex Value="9"/>
         <TopLine Value="38"/>
         <CursorPos X="9" Y="68"/>
-        <UsageCount Value="130"/>
+        <UsageCount Value="131"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="uopenlibrarysearch.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UOpenLibrarySearch"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <CursorPos X="49" Y="26"/>
-        <UsageCount Value="127"/>
+        <TopLine Value="80"/>
+        <CursorPos X="72" Y="98"/>
+        <UsageCount Value="128"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
@@ -127,10 +128,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="ubookcard.pas"/>
-        <Caret Line="221" Column="19" TopLine="202"/>
-      </Position>
       <Position>
         <Filename Value="ubookcard.pas"/>
         <Caret Line="225" Column="36" TopLine="202"/>
@@ -243,6 +240,10 @@
       <Position>
         <Filename Value="uopenlibrarysearch.pas"/>
         <Caret Line="8" Column="62"/>
+      </Position>
+      <Position>
+        <Filename Value="ubookcard.pas"/>
+        <Caret Line="72" Column="11" TopLine="56"/>
       </Position>
     </JumpHistory>
     <RunParams>
