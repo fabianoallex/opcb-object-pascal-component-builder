@@ -125,12 +125,12 @@ begin
   Creators := TOPCBCreators.Create;
 
   try
-    Creators.AsComponentsBuilder
+    Creators.AsComponentCreator
       .WithOwner(Self)
       .Add(TComponentBuilder.Create(TImageList, FMenuImages).Setup(@SetupMenuImages))
     ;
 
-    Creators.AsMenusBuilder
+    Creators.AsMenuCreator
       .WithOwner(Self)
       .AddMenu(TMenuBuilder.Create(TMainMenu).Setup(@SetupMainMenu))
         .SubLevel(TMenuItemBuilder.Create.WithCaption('Aplicação'))
@@ -150,7 +150,7 @@ begin
       .WithOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
-      .AddControl(TControlBuilder.Create(TStatusBar).Setup(@SetupStatusBar))
+      .Add(TControlBuilder.Create(TStatusBar).Setup(@SetupStatusBar))
       .SubLevel(TControlBuilder.Create(TPageControl, FPageControl).WithAlign(alClient))
         .SubLevel(TControlBuilder.Create(TTabSheet).WithCaption('Dashboard'))
         .SuperLevel
@@ -219,7 +219,7 @@ begin
   try
     ControlCreator
       .WithOwnerAndParent(Self, PageControl)
-      .AddControl(TControlBuilder.Create(TTabSheet).WithCaption('Nova aba'))
+      .Add(TControlBuilder.Create(TTabSheet).WithCaption('Nova aba'))
     ;
     Result := ControlCreator.Controls.Last as TTabSheet;
     PageControl.ActivePage := Result;
