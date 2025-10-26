@@ -22,6 +22,8 @@
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="Unit1"/>
         <IsVisibleTab Value="True"/>
+        <TopLine Value="46"/>
+        <CursorPos X="13" Y="76"/>
         <UsageCount Value="100"/>
         <Loaded Value="True"/>
         <LoadedDesigner Value="True"/>
@@ -37,11 +39,10 @@
       <Unit>
         <Filename Value="..\..\..\..\src\ulayout.pas"/>
         <UnitName Value="ULayout"/>
-        <EditorIndex Value="2"/>
+        <EditorIndex Value="-1"/>
         <TopLine Value="355"/>
         <CursorPos X="29" Y="364"/>
         <UsageCount Value="50"/>
-        <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\fpc\3.2.2\source\packages\rtl-generics\src\generics.collections.pas"/>
@@ -53,14 +54,6 @@
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2442" Column="27" TopLine="2408"/>
-      </Position>
-      <Position>
-        <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <Caret Line="2446" Column="11" TopLine="2412"/>
-      </Position>
       <Position>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
         <Caret Line="2449" Column="27" TopLine="2415"/>
@@ -171,6 +164,14 @@
       </Position>
       <Position>
         <Filename Value="unit1.pas"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="18" Column="51"/>
+      </Position>
+      <Position>
+        <Filename Value="unit1.pas"/>
+        <Caret Line="47" Column="13" TopLine="28"/>
       </Position>
     </JumpHistory>
     <RunParams>
