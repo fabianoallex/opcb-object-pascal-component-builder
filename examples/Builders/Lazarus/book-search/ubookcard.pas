@@ -68,7 +68,7 @@ uses
   WinInet
   {$ENDIF}
   {$IFDEF LINUX}
-  fphttpclient
+  fphttpclient, opensslsockets
   {$ENDIF}, LCLType, LCLProc, LCLIntf, Graphics;
 
 { TImageLoaderThread }

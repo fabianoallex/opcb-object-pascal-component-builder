@@ -5,7 +5,13 @@ unit UOpenLibrarySearch;
 interface
 
 uses
-  Classes, SysUtils, {$IFDEF WINDOWS}Windows, WinInet,{$ENDIF} fpjson, fphttpclient, jsonparser;
+  {$IFDEF WINDOWS}
+  WinInet
+  {$ENDIF}
+  {$IFDEF LINUX}
+  opensslsockets
+  {$ENDIF},
+  Classes, SysUtils,  fpjson, fphttpclient, jsonparser;
 
 type
   // Eventos
