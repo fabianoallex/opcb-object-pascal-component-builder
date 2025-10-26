@@ -3,7 +3,11 @@
   <ProjectSession>
     <PathDelim Value="\"/>
     <Version Value="12"/>
-    <BuildModes Active="Default"/>
+    <BuildModes Active="Default">
+      <SessionMatrixOptions Count="1">
+        <Item1 ID="620402910774" Modes="Default" Value="-dUSE_OPENSSL"/>
+      </SessionMatrixOptions>
+    </BuildModes>
     <Units>
       <Unit>
         <Filename Value="project1.lpr"/>
@@ -62,7 +66,7 @@
         <UnitName Value="UOpenLibrarySearch"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="6"/>
-        <CursorPos X="3" Y="9"/>
+        <CursorPos X="72" Y="24"/>
         <UsageCount Value="128"/>
         <Loaded Value="True"/>
       </Unit>
