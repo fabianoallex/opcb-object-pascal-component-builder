@@ -592,3 +592,92 @@ TObjectBuilderBase
 | `Create(AClass, out Reference)`        | Cria e retorna referência sem nome pré-definido.                    |
 
 ---
+
+
+
+
+
+
+
+
+
+#### TComponentCreator
+
+`TComponentCreator` permite centralizar a criação de múltiplos componentes e manter um registro interno das instâncias criadas, possibilitando recuperá-las posteriormente.
+
+---
+
+**Campos privados**
+
+| Campo | Tipo | Descrição |
+|-------|------|------------|
+| `FOwner` | `TComponent` | Define o *Owner* dos componentes adicionados por meio do método `Add`. |
+| `FRegistryContextHandle` | `IRegistryContextHandle` | Indica o *ContextHandle* utilizado para registrar os componentes criados. Permite compartilhar o registro com outros *Creators*, como `TControlCreator`, `TMenuCreator`, etc. |
+
+---
+
+**Métodos privados**
+
+| Método | Retorno | Descrição |
+|---------|----------|-----------|
+| `GetComponentRegistry` | `TComponentRegistry` | Retorna o registro de componentes associado ao `FRegistryContextHandle`. |
+| `GetComponents` | `TComponentList` | Retorna a lista de componentes vinculada ao registro a partir do `FRegistryContextHandle`. |
+| `GetItem(const AName: string)` | `TComponent` | Retorna um componente da lista pelo nome, desde que ele tenha sido nomeado. |
+
+---
+
+**Construtores**
+
+| Construtor | Uso típico |
+|-------------|-------------|
+| `Create(ARegistryContextKey: string = '')` | Instancia um novo `TComponentCreator`. Se `ARegistryContextKey` for informado, utilizará o registro existente com o mesmo nome; caso contrário, criará um novo. Se a chave não for informada, uma chave exclusiva aleatória será gerada, resultando em um novo registro. |
+| `Create(ARegistryContextHandle: IRegistryContextHandle)` | Instancia um `TComponentCreator` reutilizando um registro de componentes existente, obtido via `ARegistryContextHandle`. |
+
+---
+
+**Métodos públicos**
+
+| Método | Retorno | Descrição |
+|---------|----------|-----------|
+| `External(const AProc: TComponentCreatorObjProc)` | `TComponentCreator` | Permite a injeção de código externo por meio de uma *procedure* do tipo `TComponentCreatorObjProc`. |
+| `External(const AProc: TComponentCreatorProc)` | `TComponentCreator` | Permite a injeção de código externo por meio de uma *procedure* do tipo `TComponentCreatorProc`. |
+| `GetComponent<T: TComponent>(const AName: string): T; overload;` | `T` | Método genérico que tenta retornar um componente pelo seu nome. |
+| `GetComponent(const AName: string): TComponent;` | `TComponent` | Retorna um componente pelo nome informado. |
+| `WithOwner(AOwner: TComponent)` | `TComponentCreator` | Método fluente que define o *Owner* a ser utilizado nos componentes adicionados via `.Add`. |
+| `Add(AComponentBuilder: IComponentBuilder<TComponent>)` | `TComponentCreator` | Método fluente que adiciona um novo componente a partir de um `TComponentBuilder`. |
+
+---
+
+**Propriedades**
+
+| Propriedade | Tipo | Função |
+|--------------|------|---------|
+| `Registry` | `TComponentRegistry` | Retorna o `TComponentRegistry` utilizado para armazenar os componentes criados. |
+| `Items[const AName: string]` | `TComponent` | Retorna um componente do registro a partir do seu nome. |
+
+---
+
+**Exemplo**
+```pascal
+var
+  Creator: TComponentCreator;
+  CDS: TClientDataSet;
+  DS: TDataSource;
+begin
+  Creator := TComponentCreator.Create;
+
+  try
+    Creator
+      .WithOwner(Self)
+      .Add(TComponentBuilder.Create(TClientDataSet, CDS))
+      .Add(TComponentBuilder.Create(TDataSource, DS));
+
+    DS.DataSet := CDS;
+  finally
+    Creator.Free;
+  end;
+end;
+```
+
+
+

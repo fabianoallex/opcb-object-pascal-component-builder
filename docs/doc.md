@@ -589,3 +589,72 @@ TObjectBuilderBase
 | `Create(AClass, out Reference)` | Creates and returns a reference without a predefined name. |
 
 ---
+
+
+#### TComponentCreator
+
+`TComponentCreator` allows centralizing the creation of multiple components and maintaining an internal registry of these component instances, enabling their retrieval later.
+
+**Private Fields**
+
+| Field                   | Type                     | Description                                                                 |
+| ------------------------ | ------------------------ | --------------------------------------------------------------------------- |
+| `FOwner`                 | `TComponent`             | Defines the owner of the components added via the `Add` method.             |
+| `FRegistryContextHandle` | `IRegistryContextHandle` | Indicates the ContextHandle used to register created components. Allows sharing the registry with other `Creators`, such as `TControlCreator`, `TMenuCreator`, etc. |
+
+**Private Methods**
+
+| Method                        | Returns                | Description                                                                 |
+| ------------------------------ | ---------------------- | --------------------------------------------------------------------------- |
+| `GetComponentRegistry`         | `TComponentRegistry`   | Returns the component registry from the `FRegistryContextHandle`.           |
+| `GetComponents`                | `TComponentList`       | Returns the list of components linked to the registry from the `FRegistryContextHandle`. |
+| `GetItem(const AName: string)` | `TComponent`           | Retrieves a component from the list by name. The component must have been assigned a name. |
+
+**Constructors**
+
+| Constructor | Typical Usage |
+| ------------ | -------------- |
+| `Create(ARegistryContextKey: string='')` | Instantiates a `TComponentCreator`. If `ARegistryContextKey` is provided, it will use an existing registry with the same name; otherwise, a new one will be created. If no key is provided, a unique random key will be generated, creating a new registry. |
+| `Create(ARegistryContextHandle: IRegistryContextHandle)` | Instantiates a `TComponentCreator` using an existing component registry retrieved through `ARegistryContextHandle`. |
+
+**Public Methods**
+
+| Method | Returns | Description |
+| ------- | -------- | ------------ |
+| `External(const AProc: TComponentCreatorObjProc)` | `TComponentCreator` | Allows external code injection through a procedure of type `TComponentCreatorObjProc`. |
+| `External(const AProc: TComponentCreatorProc)` | `TComponentCreator` | Allows external code injection through a procedure of type `TComponentCreatorProc`. |
+| `GetComponent<T: TComponent>(const AName: string): T; overload;` | `T` | Generic method that attempts to return a component by its name. |
+| `GetComponent(const AName: string): TComponent;` | `TComponent` | Method that attempts to return a component by its name. |
+| `WithOwner(AOwner: TComponent)` | `TComponentCreator` | Fluent method that sets the owner used for components added via `.Add`. |
+| `Add(AComponentBuilder: IComponentBuilder<TComponent>)` | `TComponentCreator` | Fluent method that adds a new component using a `TComponentBuilder`. |
+
+**Properties**
+
+This interface defines the contract for building menu items such as `TMenuItem`.
+
+| Property | Type | Purpose |
+| --------- | ---- | -------- |
+| `Registry` | `TComponentRegistry` | Returns the `TComponentRegistry` used to store the created components. |
+| `Items[const AName: string]` | `TComponent` | Returns a component from the registry by its name. |
+
+**Example**
+```pascal
+var
+  Creator: TComponentCreator;
+  CDS: TClientDataSet;
+  DS: TDataSource;
+begin
+  Creator := TComponentCreator.Create;
+
+  try
+    Creator
+      .WithOwner(Self)
+      .Add(TComponentBuilder.Create(TClientDataSet, CDS))
+      .Add(TComponentBuilder.Create(TDataSource, DS))
+    ;
+
+    DS.DataSet := CDS;
+  finally
+    Creator.Free;
+  end;
+end;
