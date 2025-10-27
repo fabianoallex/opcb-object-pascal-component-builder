@@ -56,15 +56,14 @@
         <Filename Value="ucomponentregistrytest.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UComponentRegistryTest"/>
+        <IsVisibleTab Value="True"/>
         <EditorIndex Value="10"/>
-        <TopLine Value="5"/>
-        <CursorPos X="24" Y="25"/>
+        <CursorPos X="31" Y="32"/>
         <UsageCount Value="39"/>
         <Loaded Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
-        <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="926"/>
         <CursorPos X="73" Y="942"/>

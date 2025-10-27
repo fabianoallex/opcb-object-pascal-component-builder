@@ -170,6 +170,7 @@ begin
     FormUsers := TFormUsers2.CreateNew(Application);
     TabSheet := AddTabSheet;
     FormUsers.Parent := TabSheet;
+    FormUsers.Align := alClient; // Needed for Linux
     TabSheet.Caption := FormUsers.Caption;
     FormUsers.Show;
   end
