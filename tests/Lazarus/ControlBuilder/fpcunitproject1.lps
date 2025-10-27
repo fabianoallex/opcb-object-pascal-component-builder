@@ -53,11 +53,21 @@
         <Loaded Value="True"/>
       </Unit>
       <Unit>
+        <Filename Value="ucomponentregistrytest.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UComponentRegistryTest"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="5"/>
+        <CursorPos X="24" Y="25"/>
+        <UsageCount Value="39"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
         <Filename Value="..\..\..\src\OPCB.pas"/>
         <IsVisibleTab Value="True"/>
         <EditorIndex Value="1"/>
         <TopLine Value="926"/>
-        <CursorPos X="5" Y="948"/>
+        <CursorPos X="73" Y="942"/>
         <UsageCount Value="105"/>
         <Loaded Value="True"/>
       </Unit>
@@ -155,16 +165,6 @@
         <UnitName Value="Classes"/>
         <EditorIndex Value="6"/>
         <UsageCount Value="141"/>
-        <Loaded Value="True"/>
-      </Unit>
-      <Unit>
-        <Filename Value="ucomponentregistrytest.pas"/>
-        <IsPartOfProject Value="True"/>
-        <UnitName Value="UComponentRegistryTest"/>
-        <EditorIndex Value="10"/>
-        <TopLine Value="5"/>
-        <CursorPos X="24" Y="25"/>
-        <UsageCount Value="39"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
