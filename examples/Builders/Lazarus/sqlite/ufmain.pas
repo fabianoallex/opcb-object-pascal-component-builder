@@ -13,6 +13,7 @@ type
   { TFMain }
 
   TFMain = class(TForm)
+    Edit1: TEdit;
     procedure FormCreate(Sender: TObject);
     procedure FormShow(Sender: TObject);
   private

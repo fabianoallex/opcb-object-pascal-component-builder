@@ -50,7 +50,7 @@ end;
 
 constructor TFormLogin.CreateNew(AOwner: TComponent);
 var
-  ControlBuilder: TControlCreator;
+  Creator: TControlCreator;
 begin
   inherited CreateNew(AOwner, 0);
   Self.Name := 'FormLogin';
@@ -58,9 +58,9 @@ begin
   Self.BorderStyle := bsDialog;
   Self.Position := poMainFormCenter;
 
-  ControlBuilder := TControlCreator.Create(Self.Name);
+  Creator := TControlCreator.Create(Self.Name);
   try
-    ControlBuilder
+    Creator
       .WithOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
@@ -76,10 +76,10 @@ begin
       .AlignControlsRight(['ButtonOk', 'ButtonCancel'], ['EditUserName', 'EditPassword'])
     ;
 
-    Self.Width := Trunc(ControlBuilder.ContentWidth) + 20;
-    Self.Height := Trunc(ControlBuilder.ContentHeight) + 20;
+    Self.Width := Trunc(Creator.ContentWidth) + 20;
+    Self.Height := Trunc(Creator.ContentHeight) + 20;
   finally
-    ControlBuilder.Free;
+    Creator.Free;
   end;
 end;
 

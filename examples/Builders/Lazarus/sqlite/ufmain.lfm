@@ -4,9 +4,19 @@ object FMain: TFMain
   Top = 239
   Width = 277
   Caption = 'FMain'
+  ClientHeight = 309
+  ClientWidth = 277
   Position = poMainFormCenter
   LCLVersion = '4.0.0.4'
   WindowState = wsMaximized
   OnCreate = FormCreate
   OnShow = FormShow
+  object Edit1: TEdit
+    Left = 99
+    Height = 23
+    Top = 87
+    Width = 80
+    TabOrder = 0
+    Text = 'Edit1'
+  end
 end

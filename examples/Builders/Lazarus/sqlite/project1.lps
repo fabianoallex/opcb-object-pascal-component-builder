@@ -20,11 +20,11 @@
         <HasResources Value="True"/>
         <ResourceBaseClass Value="Form"/>
         <UnitName Value="UFMain"/>
-        <IsVisibleTab Value="True"/>
-        <TopLine Value="152"/>
-        <CursorPos X="44" Y="176"/>
+        <TopLine Value="205"/>
+        <CursorPos X="17" Y="218"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
+        <LoadedDesigner Value="True"/>
       </Unit>
       <Unit>
         <Filename Value="udmdatabase.pas"/>
@@ -45,6 +45,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDBUser"/>
         <EditorIndex Value="4"/>
+        <TopLine Value="94"/>
         <CursorPos X="69" Y="35"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
@@ -53,7 +54,8 @@
         <Filename Value="uusersession.pas"/>
         <IsPartOfProject Value="True"/>
         <UnitName Value="UUserSession"/>
-        <EditorIndex Value="10"/>
+        <IsVisibleTab Value="True"/>
+        <EditorIndex Value="12"/>
         <CursorPos X="25" Y="75"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
@@ -63,8 +65,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormLogin"/>
         <EditorIndex Value="9"/>
-        <TopLine Value="49"/>
-        <CursorPos X="11" Y="75"/>
+        <TopLine Value="67"/>
+        <CursorPos X="12" Y="82"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
@@ -73,8 +75,8 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormUsers"/>
         <EditorIndex Value="2"/>
-        <TopLine Value="75"/>
-        <CursorPos Y="90"/>
+        <TopLine Value="49"/>
+        <CursorPos X="3" Y="53"/>
         <UsageCount Value="215"/>
         <Loaded Value="True"/>
       </Unit>
@@ -83,7 +85,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UFormCRUD"/>
         <EditorIndex Value="3"/>
-        <TopLine Value="191"/>
+        <TopLine Value="196"/>
         <CursorPos X="13" Y="221"/>
         <UsageCount Value="205"/>
         <Loaded Value="True"/>
@@ -93,6 +95,7 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UDBEntity"/>
         <EditorIndex Value="5"/>
+        <TopLine Value="29"/>
         <CursorPos X="61" Y="15"/>
         <UsageCount Value="200"/>
         <Loaded Value="True"/>
@@ -108,7 +111,7 @@
       </Unit>
       <Unit>
         <Filename Value="..\..\..\..\src\OPCB.pas"/>
-        <EditorIndex Value="11"/>
+        <EditorIndex Value="13"/>
         <TopLine Value="1363"/>
         <CursorPos X="67" Y="1378"/>
         <UsageCount Value="108"/>
@@ -120,12 +123,12 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="150"/>
         <CursorPos X="3" Y="168"/>
-        <UsageCount Value="7"/>
+        <UsageCount Value="5"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\controls.pp"/>
         <UnitName Value="Controls"/>
-        <EditorIndex Value="12"/>
+        <EditorIndex Value="14"/>
         <TopLine Value="2413"/>
         <CursorPos X="15" Y="2431"/>
         <UsageCount Value="102"/>
@@ -137,7 +140,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="77"/>
         <CursorPos X="38" Y="88"/>
-        <UsageCount Value="96"/>
+        <UsageCount Value="94"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\dbgrids.pas"/>
@@ -145,7 +148,7 @@
         <EditorIndex Value="-1"/>
         <TopLine Value="41"/>
         <CursorPos X="25" Y="41"/>
-        <UsageCount Value="31"/>
+        <UsageCount Value="29"/>
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\extctrls.pp"/>
@@ -166,42 +169,31 @@
       </Unit>
       <Unit>
         <Filename Value="C:\lazarus4.0\lcl\include\wincontrol.inc"/>
-        <EditorIndex Value="13"/>
+        <EditorIndex Value="15"/>
         <TopLine Value="7912"/>
         <CursorPos X="3" Y="7921"/>
-        <UsageCount Value="90"/>
+        <UsageCount Value="101"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\lcl\stdctrls.pp"/>
+        <UnitName Value="StdCtrls"/>
+        <EditorIndex Value="10"/>
+        <TopLine Value="821"/>
+        <CursorPos X="20" Y="842"/>
+        <UsageCount Value="20"/>
+        <Loaded Value="True"/>
+      </Unit>
+      <Unit>
+        <Filename Value="C:\lazarus4.0\lcl\include\customedit.inc"/>
+        <EditorIndex Value="11"/>
+        <TopLine Value="59"/>
+        <CursorPos X="3" Y="68"/>
+        <UsageCount Value="20"/>
         <Loaded Value="True"/>
       </Unit>
     </Units>
     <JumpHistory HistoryIndex="29">
-      <Position>
-        <Filename Value="uformlogin.pas"/>
-        <Caret Line="68" Column="8" TopLine="49"/>
-      </Position>
-      <Position>
-        <Filename Value="uformlogin.pas"/>
-        <Caret Line="75" Column="11" TopLine="49"/>
-      </Position>
-      <Position>
-        <Filename Value="ufmain.pas"/>
-        <Caret Line="128" Column="32" TopLine="109"/>
-      </Position>
-      <Position>
-        <Filename Value="ufmain.pas"/>
-        <Caret Line="133" Column="27" TopLine="114"/>
-      </Position>
-      <Position>
-        <Filename Value="ufmain.pas"/>
-        <Caret Line="153" Column="8" TopLine="135"/>
-      </Position>
-      <Position>
-        <Filename Value="udbentity.pas"/>
-        <Caret Line="22" Column="32" TopLine="4"/>
-      </Position>
-      <Position>
-        <Filename Value="udbentity.pas"/>
-        <Caret Line="48" Column="3" TopLine="29"/>
-      </Position>
       <Position>
         <Filename Value="udbentity.pas"/>
         <Caret Line="22" Column="17" TopLine="3"/>
@@ -292,6 +284,34 @@
       <Position>
         <Filename Value="uformusers.pas"/>
         <Caret Line="24" Column="15" TopLine="3"/>
+      </Position>
+      <Position>
+        <Filename Value="ufmain.pas"/>
+        <Caret Line="29" Column="76"/>
+      </Position>
+      <Position>
+        <Filename Value="uformlogin.pas"/>
+        <Caret Line="75" Column="11" TopLine="49"/>
+      </Position>
+      <Position>
+        <Filename Value="C:\lazarus4.0\lcl\stdctrls.pp"/>
+        <Caret Line="951" Column="3" TopLine="947"/>
+      </Position>
+      <Position>
+        <Filename Value="C:\lazarus4.0\lcl\stdctrls.pp"/>
+        <Caret Line="842" Column="20" TopLine="821"/>
+      </Position>
+      <Position>
+        <Filename Value="uformlogin.pas"/>
+        <Caret Line="71" Column="46" TopLine="49"/>
+      </Position>
+      <Position>
+        <Filename Value="uformusers.pas"/>
+        <Caret Line="51" Column="30" TopLine="45"/>
+      </Position>
+      <Position>
+        <Filename Value="uformusers.pas"/>
+        <Caret Line="22" Column="43" TopLine="22"/>
       </Position>
     </JumpHistory>
     <RunParams>
