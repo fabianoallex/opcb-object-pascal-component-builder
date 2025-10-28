@@ -678,6 +678,37 @@ begin
   end;
 end;
 ```
+---
+
+#### TControlCreator
+
+TControlCreator permite centralizar a criação de múltiplos Controles e manter um registro interno das instâncias criadas, possibilitando recuperá-las posteriormente.
+
+TControlCreator foi desenhada para facilitar a criação de constroles visuais e posicioná-los na tela sem a necessidade de arrastar componentes na tela através da IDE em tempo de design.
+
+**Campos privados**
+
+| Campo | Tipo | Descrição |
+|-------|------|------------|
+| `FOwner` | `TComponent` | Define o *Owner* dos controles adicionados por meio do método `.Add`. |
+| `FRegistryContextHandle` | `IRegistryContextHandle` | Indica o *ContextHandle* utilizado para registrar os componentes criados. Permite compartilhar o registro com outros *Creators*, como `TControlCreator`, `TMenuCreator`, etc. |
+|`FGroups`|`TControlGroupMap`|`TControlGroupMap = TDictionary<string, TControlList>;`. <br> Permite adicionar os controles em grupos específicos para posterior recuperação de controle com base nos grupos pertencentes. Também são utilizados para determinar os limites (*Bounds*) ocupados por um grupo de controles. 
+|`FLevelStack`|`TControlCreatorLevelStack`|`TControlCreatorLevelStack = TObjectList<TControlCreatorLevel>;` <br>Pilha que armazena informações dos níveis (*levels*). Chamadas aos métodos `.SubLevel` e `.SuperLevel` adicionam e removem, respectivamente,  *levels* na pilha. O *level* no topo é o *level* corrente. <br><br>Um level é um objeto da classe `TControlCreatorLevel` que contém as informações de `Direction`, `CurrentTop`, `CurrentLeft`, `VerticalSpace`, `HorizontalSpace`, `MaxControlHeight`, `MaxControlWidht`, entre outras propriedades utilizadas para controlar o posicionamento e tamanho dos controles conforme são adicionados através dos métodos `.Add`.|
+
+**Métodos Privados**
+| Método | Retorno | Descrição |
+|---------|----------|-----------|
+|`GetControls`|`TControlList`|Retorna lista de controles adicionados via `.Add`|
+|`MoveTopLeftAfterControl (AControl: TControl)`||Move `CurrentTop` e `CurrentLeft` do `level` corrente após o `AControl`. Se `Direction` for `cpdVertical` `Top` e `Left` ficarão a direita do controle, se for `cpdHorizontal` ficarão abaixo do controle. <br>O cálculo do posicionamento leva em consideração também as propriedades `VerticalSpace` e `HorizontalSpace` do *level* corrente e também a propriedade `Align` de `AControl`. |
+|`MoveTopLeftAfterRect(const ARect: TRect;AAlign: TAlign);`||Mesmo do anterior, mas considerando `ARect`. <br>`AAlign` = `alTop` aplica a mudança apenas para `Top`. <br> `AAlign` = `alLeft` aplica a mudança apenas para `Left`. <br> `AAlign` = `alNone` aplica a mudança apenas para `Top` e `Left`. <br> No `FMX` os tipos de `AAlign` são tratados conforme o *framework*. |
+|`MoveTopLeftAfterBound(ABounds: TControlGroupBounds)`||Mesmo do Anterior, mas considerando objeto do tipo `TControlGroupBounds`.|
+|`AddToGroups(AControl: TControl; const AGroups: array of string)`||Adiciona o controle a um ou mais grupos definidos em `AGroups`.|
+|`GetGroupBounds(const AGroupName: string)`|`TControlGroupBounds`|Retorna um `record` do tipo `TControlGroupBounds` com informações de dimensões de um grupo de controles.|
+|`GetCurrenteLevel`|`TControlCreatorLevel`|Retorna o nível (*level*) atual|
+|`GetContentWidth`|`Single`|Retorna a largura ocupada por todos os controles adicionados. Utiliza tipo `Single` para melhor compatiblidade com o *framework Firemonkey*.|
+|`GetFContentHeight`|`Single`|Retorna a altura ocupada por todos os controles adicionados. Utiliza tipo `Single` para melhor compatiblidade com o *framework Firemonkey*.|
+|`GetComponentRegistry`|`TComponentRegistry`|Retorna o objeto de registro dos componentes adicionados. Esse objeto é definido na chamada do construtor pelo parâmetro `ARegistryContextKey` ou pelo parâmetro `ARegistryContextHandle`. Diferentes *Creators* podem compartilhar um mesmo Registro de seus componentes.|
 
 
-
+---
+**DOCUMENTAÇÃO EM CONSTRUÇÃO**
