@@ -1421,12 +1421,18 @@ begin
     CurrentLevel.GridMode.CurrentRow,
     CurrentLevel.GridMode.CurrentCol
   ) then
-    Exit(True);
+  begin
+    Result := True;
+    Exit;
+  end;
 
   if ((CurrentLevel.GridMode.Direction = gfdRowFirst) and (gaeRows in CurrentLevel.GridMode.AutoExpand))
      or
      ((CurrentLevel.GridMode.Direction = gfdColFirst) and (gaeCols in CurrentLevel.GridMode.AutoExpand)) then
-    Exit(True);
+  begin
+    Result := True;
+    Exit;
+  end;
 
   Result := CurrentLevel.GridMode.PeekNext(R, C);
 end;
@@ -3075,7 +3081,10 @@ var
   I: Integer;
 begin
   if (ARow < 0) or (ACol < 0) then
-    Exit(False);
+  begin
+    Result := False;
+    Exit;
+  end;
 
   H := AVerticalSpace * (ARowSpan - 1);
   for I := 0 to ARowSpan - 1 do
@@ -3495,7 +3504,10 @@ var
   Candidate: string;
 begin
   if ABaseName.IsEmpty then
-    Exit('');
+  begin
+    Result := '';
+    Exit;
+  end;
 
   Candidate := ABaseName;
   Index := 1;
@@ -3523,7 +3535,8 @@ begin
   begin
     Inc(Entry.RefCount);
     FInstances[AKey] := Entry;
-    Exit(Entry.Registry);
+    Result := Entry.Registry;
+    Exit;
   end;
 
   Entry.Registry := TComponentRegistry.CreatePrivate;
