@@ -49,7 +49,7 @@ begin
   ControlName := AControlBuilder.Name;
 
   ControlCreator
-    .WithOwnerAndParent(Self, Self)
+    .SetOwnerAndParent(Self, Self)
     .SetSpace(5, 5)
     .SetTopLeft(20, 20)
     .SubLevel(cpdVertical)

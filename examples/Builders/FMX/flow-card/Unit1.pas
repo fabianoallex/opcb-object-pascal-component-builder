@@ -97,7 +97,7 @@ begin
   Creators := TOPCBCreators.Create(Self.Name);
   try
     Creators.AsControlCreator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
       .SetDirection(cpdVertical)
@@ -115,7 +115,7 @@ begin
     CardsCreator := TControlCreator.Create(Self.Name);
 
     CardsCreator
-      .WithOwnerAndParent(
+      .SetOwnerAndParent(
         Self,
         Creators.AsControlCreator.GetControl<TFlowLayout>('FlowCards')
       )

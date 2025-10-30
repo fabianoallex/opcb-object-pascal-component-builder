@@ -705,7 +705,8 @@ type
     function External(const AProc: TComponentCreatorProc): TComponentCreator; overload;
     {$IFDEF FPC}generic{$ENDIF} function GetComponent<T: TComponent>(const AName: string): T; overload;
     function GetComponent(const AName: string): TComponent; overload;
-    function WithOwner(AOwner: TComponent): TComponentCreator;
+    function WithOwner(AOwner: TComponent): TComponentCreator; deprecated 'Use SetOwner instead';
+    function SetOwner(AOwner: TComponent): TComponentCreator;
     function Add(AComponentBuilder: {$IFDEF FPC}specialize{$ENDIF} IComponentBuilder<TComponent>): TComponentCreator; overload;
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TComponent read GetItem; default;
@@ -726,7 +727,8 @@ type
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
     destructor Destroy; override;
-    function WithOwner(AOwner: TComponent): TMenuCreator;
+    function WithOwner(AOwner: TComponent): TMenuCreator; deprecated 'Use SetOwner instead';
+    function SetOwner(AOwner: TComponent): TMenuCreator;
     function External(const AProc: TMenuCreatorObjProc): TMenuCreator; overload;
     function External(const AProc: TMenuCreatorProc): TMenuCreator; overload;
     function AddMenu(AMenuBuilder: TMenuBuilder): TMenuCreator;
@@ -884,11 +886,14 @@ type
     function BreakLine(AIncTop: Single): TControlCreator; overload;
     function BreakColumn(AIncLeft: Single): TControlCreator; overload;
     {$IFDEF FRAMEWORK_FMX}
-    function WithOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlCreator;
+    function WithOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlCreator; deprecated 'Use SetOwnerAndParent instead';
+    function SetOwnerAndParent(AOwner: TComponent; AParent: TFmxObject): TControlCreator;
     {$ELSE}
-    function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlCreator;
+    function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlCreator; deprecated 'Use SetOwnerAndParent instead';
+    function SetOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TControlCreator;
     {$ENDIF}
-    function WithParent(AParent: TWinControl): TControlCreator;
+    function WithParent(AParent: TWinControl): TControlCreator; deprecated 'Use SetParent instead';
+    function SetParent(AParent: TWinControl): TControlCreator;
     // main
     {$IFDEF FPC}generic{$ENDIF}
     function Add<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; const AGroups: array of string): TControlCreator; overload;
@@ -2353,13 +2358,14 @@ function TControlCreatorHelper.GridSkipCells(ANumCells: Integer): TControlCreato
 var
   I: Integer;
 begin
+  Result := Self;
+
   if not CurrentLevel.GridMode.Active then
     Exit;
 
   if ANumCells <= 0 then
     Exit;
 
-  Result := Self;
   for I:=1 to ANumCells do
     GridSkipCell;
 end;
@@ -2580,14 +2586,27 @@ end;
 function TControlCreatorHelper.WithOwnerAndParent(AOwner: TComponent;
   AParent: TWinControl): TControlCreator;
 begin
+  Result := SetOwnerAndParent(AOwner, AParent);
+end;
+
+function TControlCreatorHelper.SetOwnerAndParent(AOwner: TComponent;
+  AParent: TWinControl): TControlCreator;
+begin
   Result := Self;
   FOwner := AOwner;
   CurrentLevel.Parent := AParent;
 end;
+
 {$ENDIF}
 
 {$IFDEF FRAMEWORK_FMX}
 function TControlCreatorHelper.WithOwnerAndParent(AOwner: TComponent;
+  AParent: TFmxObject): TControlCreator;
+begin
+  Result := SetOwnerAndParent(AOwner, AParent);
+end;
+
+function TControlCreatorHelper.SetOwnerAndParent(AOwner: TComponent;
   AParent: TFmxObject): TControlCreator;
 begin
   Result := Self;
@@ -2597,6 +2616,11 @@ end;
 {$ENDIF}
 
 function TControlCreatorHelper.WithParent(AParent: TWinControl): TControlCreator;
+begin
+  Result := SetParent(AParent);
+end;
+
+function TControlCreatorHelper.SetParent(AParent: TWinControl): TControlCreator;
 begin
   Result := Self;
   CurrentLevel.Parent := AParent;
@@ -2649,7 +2673,7 @@ begin
 
   SubLevel(AGroupName);
 
-  WithParent(
+  SetParent(
     {$IFDEF FRAMEWORK_FMX}TWinControl(Control)
     {$ELSE}TWinControl(Control)
     {$ENDIF}
@@ -3786,10 +3810,15 @@ begin
   Result := Self.GetComponent(AName);
 end;
 
-function TComponentCreator.WithOwner(AOwner: TComponent): TComponentCreator;
+function TComponentCreator.SetOwner(AOwner: TComponent): TComponentCreator;
 begin
   Result := Self;
   FOwner := AOwner;
+end;
+
+function TComponentCreator.WithOwner(AOwner: TComponent): TComponentCreator;
+begin
+  Result := SetOwner(AOwner);
 end;
 
 { TRegistryNotifier }
@@ -3998,6 +4027,12 @@ begin
   Result := Registry.GetComponent<T>(AName);
 end;
 
+function TMenuCreator.SetOwner(AOwner: TComponent): TMenuCreator;
+begin
+  Result := Self;
+  FOwner := AOwner;
+end;
+
 function TMenuCreator.SubLevel(AMenuItemBuilder: TMenuItemBuilder): TMenuCreator;
 var
   MenuItem: TMenuItem;
@@ -4034,8 +4069,7 @@ end;
 
 function TMenuCreator.WithOwner(AOwner: TComponent): TMenuCreator;
 begin
-  Result := Self;
-  FOwner := AOwner;
+  Result := SetOwner(AOwner);
 end;
 
 function TMenuCreator.External(const AProc: TMenuCreatorObjProc): TMenuCreator;
@@ -4085,7 +4119,6 @@ var
   RttiType: TRttiType;
   Prop: TRttiProperty;
   Ev: TEventValue;
-  PropInfo: PPropInfo;
 begin
   Ctx := TRttiContext.Create;
   try

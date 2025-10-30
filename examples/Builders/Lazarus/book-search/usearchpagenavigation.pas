@@ -206,7 +206,7 @@ begin
 
   try
     ControlBuilder
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .Add(TControlBuilder.Create(TLabel, FLabelResults).WithWidth(40).WithCaption('Resultados'))
       .Break

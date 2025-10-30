@@ -33,7 +33,7 @@ begin
   ControlBuilder := TControlCreator.Create;
   try
     ControlBuilder
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(2, 2)
       .SetTopLeft(20, 20)
       .SubLevel(TControlBuilder.Create(TPanel))

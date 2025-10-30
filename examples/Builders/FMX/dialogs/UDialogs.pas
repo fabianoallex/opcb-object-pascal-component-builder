@@ -50,7 +50,7 @@ begin
   ControlName := AControlBuilder.Name;
 
   ControlBuilder
-    .WithOwnerAndParent(Self, Self)
+    .SetOwnerAndParent(Self, Self)
     .SetSpace(5, 5)
     .SetTopLeft(20, 20)
     .SubLevel(TControlBuilder.Create(TLayout))

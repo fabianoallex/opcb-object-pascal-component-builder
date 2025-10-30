@@ -38,7 +38,6 @@ type
     property StatusPanelUser: TStatusPanel read FStatusPanelUser;
     property StatusPanelConnected: TStatusPanel read FStatusPanelConnected;
     property FormUsers: TFormUsers2 read FFormUsers write SeTFormUsers;
-    property MenuImages: TImageList read FMenuImages;
   public
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
   end;
@@ -127,12 +126,12 @@ begin
 
   try
     Creators.AsComponentCreator
-      .WithOwner(Self)
+      .SetOwner(Self)
       .Add(TComponentBuilder.Create(TImageList, FMenuImages).Setup(@SetupMenuImages))
     ;
 
     Creators.AsMenuCreator
-      .WithOwner(Self)
+      .SetOwner(Self)
       .AddMenu(TMenuBuilder.Create(TMainMenu).Setup(@SetupMainMenu))
         .SubLevel(TMenuItemBuilder.Create.WithCaption('Aplicação'))
           .AddMenuItem(TMenuItemBuilder.Create.WithCaption('Logoff').WithOnClick(@MenuItemLogoffClick).WithImageIndex(1))
@@ -148,7 +147,7 @@ begin
     ;
 
     Creators.AsControlCreator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
       .Add(TControlBuilder.Create(TStatusBar).Setup(@SetupStatusBar))
@@ -220,7 +219,7 @@ begin
   ControlCreator := TControlCreator.Create(Self.Name);
   try
     ControlCreator
-      .WithOwnerAndParent(Self, PageControl)
+      .SetOwnerAndParent(Self, PageControl)
       .Add(TControlBuilder.Create(TTabSheet).WithCaption('Nova aba'))
     ;
     Result := ControlCreator.Controls.Last as TTabSheet;

@@ -50,7 +50,6 @@ type
     property Image: TImage read FImage;
     property LabelTitle: TLabel read FLabelTitle;
     property LabelAuthor: TLabel read FLabelAuthor;
-    property LabelBookURL: TLabel read FLabelBookURL;
     property LabelFirstEditionYear: TLabel read FLabelFirstEditionYear;
   public
     constructor Create(AOwner: TComponent); override;
@@ -251,7 +250,7 @@ begin
   ControlBuilder := TControlCreator.Create;
   try
     ControlBuilder
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
       .SubLevel(TControlBuilder.Create(TPanel).WithAlign(alLeft).WithWidth(150))

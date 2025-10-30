@@ -66,7 +66,7 @@ begin
   Creator := TControlCreator.Create;
   try
     Creator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .GridInit(4, 4)
         .GridSetCellWidthAndHeight(250, 60)
         .specialize Add<TButton>(TButtonBuilder.Create(TButton, B).WithCaption('Teste').WithFontSize(22))  // helper method: class + setup

@@ -38,7 +38,7 @@ begin
   Creator := TControlCreator.Create;
   try
     Creator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
       .SetDirection(cpdVertical)
@@ -75,7 +75,7 @@ begin
   Creator := TControlCreator.Create;
   try
     Creator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
       .SubLevel(TControlBuilder.Create(TGroupBox).WithCaption('Opções').WithWidthAndHeight(250, 250))
@@ -124,7 +124,7 @@ begin
   Creator := TControlCreator.Create;
   try
     Creator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetTopLeft(20, 20)
       .SetSpace(5, 5)
       .SetDirection(cpdVertical)
@@ -181,7 +181,7 @@ begin
   Creator := TControlCreator.Create;
   try
     Creator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(2, 2)
       .SetTopLeft(20, 20)
       .SubLevel(TControlBuilder.Create(TPanel))
@@ -236,7 +236,7 @@ end;
 ## 🔑 Funcionalidades Demonstradas
 
 - **Criação fluente de controles**
-  - `.WithOwnerAndParent(Self, Self)` define o owner e parent.
+  - `.SetOwnerAndParent(Self, Self)` define o owner e parent.
   - `.SetSpace(2, 2)` / `.SetTopLeft(20, 20)` controlam espaçamento e posição inicial.
 
 - **Hierarquia de níveis**

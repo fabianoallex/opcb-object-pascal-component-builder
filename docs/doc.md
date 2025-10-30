@@ -625,7 +625,7 @@ TObjectBuilderBase
 | `External(const AProc: TComponentCreatorProc)` | `TComponentCreator` | Allows external code injection through a procedure of type `TComponentCreatorProc`. |
 | `GetComponent<T: TComponent>(const AName: string): T; overload;` | `T` | Generic method that attempts to return a component by its name. |
 | `GetComponent(const AName: string): TComponent;` | `TComponent` | Method that attempts to return a component by its name. |
-| `WithOwner(AOwner: TComponent)` | `TComponentCreator` | Fluent method that sets the owner used for components added via `.Add`. |
+| `SetOwner(AOwner: TComponent)` | `TComponentCreator` | Fluent method that sets the owner used for components added via `.Add`. |
 | `Add(AComponentBuilder: IComponentBuilder<TComponent>)` | `TComponentCreator` | Fluent method that adds a new component using a `TComponentBuilder`. |
 
 **Properties**
@@ -648,7 +648,7 @@ begin
 
   try
     Creator
-      .WithOwner(Self)
+      .SetOwner(Self)
       .Add(TComponentBuilder.Create(TClientDataSet, CDS))
       .Add(TComponentBuilder.Create(TDataSource, DS))
     ;

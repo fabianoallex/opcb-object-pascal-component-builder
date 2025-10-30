@@ -352,7 +352,7 @@ var
     ControlCreator := TControlCreator.Create(ControlDialog.ControlCreator.Registry.ContextKey); // usa o mesmo context do dialog
     try
       ControlCreator
-        .WithOwnerAndParent(
+        .SetOwnerAndParent(
           ControlDialog,
           ControlDialog.ControlCreator.GetControl('PanelMain') as TPanel
         )
@@ -478,12 +478,12 @@ var
     Creators := TOPCBCreators.Create(ControlDialog.ControlCreator.Registry.ContextKey); // usa o mesmo context do dialog
     try
       Creators.AsComponentCreator
-        .WithOwner(ControlDialog)
+        .SetOwner(ControlDialog)
         .Add(TComponentBuilder.Create(TMemDataset, 'MDS').Setup(@SetupMDS))
         .Add(TComponentBuilder.Create(TDataSource, 'DS').Setup(@SetupDS))
       ;
       Creators.AsControlCreator
-        .WithOwnerAndParent(
+        .SetOwnerAndParent(
           ControlDialog,
           ControlDialog.ControlCreator.GetControl('PanelMain') as TPanel
         )

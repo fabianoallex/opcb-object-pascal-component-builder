@@ -244,7 +244,7 @@ var
     ControlBuilder := TControlCreator.Create(ControlDialog.ControlBuilder.Registry.ContextKey); // usa o mesmo context do dialog
     try
       ControlBuilder
-        .WithOwnerAndParent(
+        .SetOwnerAndParent(
           ControlDialog,
           ControlDialog.ControlBuilder.GetControl<TPanel>('PanelMain')
         )

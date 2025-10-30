@@ -114,7 +114,7 @@ begin
   Creator := TComponentCreator.Create(Self.Name);
   try
     Creator
-      .WithOwner(Self)
+      .SetOwner(Self)
       .Add(TComponentBuilder.Create(TSQLTransaction).Setup(@SetupTransaction))
       .Add(TComponentBuilder.Create(TSQLite3Connection).Setup(@SetupConnection))
     ;

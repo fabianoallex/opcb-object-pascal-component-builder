@@ -48,7 +48,7 @@ begin
   Creator := TComponentCreator.Create;
   try
     Creator
-      .WithOwner(DMDatabase)
+      .SetOwner(DMDatabase)
       .Add(TComponentBuilder.Create(TSQLQuery, FQueryCRUD).Setup(@SetupQueryCRUD))
       .Add(TComponentBuilder.Create(TSQLQuery, FQuerySearch).Setup(@SetupQuerySearch))
     ;

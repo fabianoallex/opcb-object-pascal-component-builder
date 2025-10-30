@@ -125,7 +125,7 @@ begin
   Creators := TOPCBCreators.Create(Self.Name);
   try
     Creators.AsMenuCreator
-      .WithOwner(Self)
+      .SetOwner(Self)
       .AddMenu(TMenuBuilder.Create(TMainMenu, 'MainMenu')) // menu principal por primeiro
         .SubLevel(TMenuItemBuilder.Create(TMenuItem, 'FileMenu'))
           .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'FileNewMenu'))
@@ -149,7 +149,7 @@ begin
     ;
 
     Creators.AsControlCreator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
     ;

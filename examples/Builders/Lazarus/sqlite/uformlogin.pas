@@ -61,7 +61,7 @@ begin
   Creator := TControlCreator.Create(Self.Name);
   try
     Creator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
       .SetDirection(cpdVertical)

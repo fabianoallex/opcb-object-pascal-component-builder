@@ -38,6 +38,7 @@ type
     procedure BuildContents(const ABuiler: TControlCreator); virtual; abstract;
     procedure DataSourceStateChange(Sender: TObject);
   public
+    constructor CreateNew(AOwner: TComponent);
     constructor CreateNew(AOwner: TComponent; AEntity: TDBEntity);
     property ButtonAdd: TButton read FButtonAdd;
     property ButtonEdit: TButton read FButtonEdit;
@@ -175,6 +176,11 @@ begin
   ButtonRefresh.Enabled := not (DataSourceCRUD.State in [dsInsert, dsEdit]);
 end;
 
+constructor TFormCRUDBase.CreateNew(AOwner: TComponent);
+begin
+  inherited CreateNew(AOwner);
+end;
+
 constructor TFormCRUDBase.CreateNew(AOwner: TComponent; AEntity: TDBEntity);
 var
   Creators: TOPCBCreators;
@@ -192,12 +198,12 @@ begin
 
   try
     Creators.AsComponentCreator
-      .WithOwner(Self)
+      .SetOwner(Self)
       .Add(TComponentBuilder.Create(TDataSource, FDataSourceCRUD).Setup(@SetupDataSourceCRUD))
     ;
 
     Creators.AsControlCreator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(2, 5)
       .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alTop))
         .SetTopLeft(5, 5)

@@ -53,21 +53,6 @@ begin
   ACreator
     .SetTopLeft(5, 5)
     .IncTopLeft(10, 10)
-    {
-    .NextLevel(cpdVertical)
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('ID'))
-      .AddControl(TControlInfo.Create(TDBEdit).Setup(@SetupDBEditID))
-    .PreviousLevel
-    .NextLevel(cpdVertical)
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('Nome'))
-      .AddControl(TControlInfo.Create(TDBEdit).WithWidth(250).Setup(@SetupDBEditUserName))
-    .PreviousLevel
-    .NextLevel(cpdVertical)
-      .AddControl(TControlInfo.Create(TLabel).WithCaption('Senha'))
-      .AddControl(TControlInfo.Create(TDBEdit).WithWidth(250).Setup(@SetupDBEditPassword))
-    .PreviousLevel
-    }
-
     .SetDirection(cpdVertical)
     .SetVerticalSpace(5)
     .Add(TControlBuilder.Create(TLabel).WithCaption('ID').WithWidth(50))
@@ -77,7 +62,6 @@ begin
     .Add(TControlBuilder.Create(TDBEdit).Setup(@SetupDBEditID))
     .Add(TControlBuilder.Create(TDBEdit).WithWidth(250).Setup(@SetupDBEditUserName))
     .Add(TControlBuilder.Create(TDBEdit).WithWidth(250).Setup(@SetupDBEditPassword))
-
     .RecalcParentHeight(25)
   ;
 end;

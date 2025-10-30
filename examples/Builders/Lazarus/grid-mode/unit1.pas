@@ -36,7 +36,7 @@ begin
   ControlBuilder := TControlCreator.Create;
   try
     ControlBuilder
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetTopLeft(20, 20)
       .SetSpace(5, 5)
       .SetDirection(cpdVertical)

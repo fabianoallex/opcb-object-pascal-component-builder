@@ -31,11 +31,11 @@ begin
 
   try
     Creators.AsComponentCreator
-      .WithOwner(Self)
+      .SetOwner(Self)
     ;
 
     Creators.AsControlCreator
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .Add(TControlBuilder.Create(TButton, 'B1'))
       .Add(TControlBuilder.Create(TButton, 'B2'))

@@ -49,7 +49,7 @@ begin
 
   try
     Builder
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetTopLeft(10, 10)
       .SetSpace(5, 5)
       .Add(TControlBuilder.Create(TButton).WithCaption('Opção 1'))

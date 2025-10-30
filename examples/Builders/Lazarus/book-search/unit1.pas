@@ -129,7 +129,7 @@ begin
 
   ControlBuilderPage := TControlCreator.Create;
   ControlBuilderPage
-    .WithOwnerAndParent(Self, FPanelCards)
+    .SetOwnerAndParent(Self, FPanelCards)
     .SubLevel(TControlBuilder.Create(TScrollBox, FScrollboxPage).WithAlign(alClient).Setup(@SetupScrollBoxPage))
   ;
 end;
@@ -238,7 +238,7 @@ begin
   ControlBuilder := TControlCreator.Create;
   try
     ControlBuilder
-      .WithOwnerAndParent(Self, Self)
+      .SetOwnerAndParent(Self, Self)
       .SetSpace(5, 5)
       .SubLevel(TControlBuilder.Create(TPanel).WithCaption('').WithAlign(alTop))
         .SetTopLeft(10, 10)

@@ -17,7 +17,7 @@ begin
   Creator := TControlCreator.Create;
   try
     Creator
-      .WithOwnerAndParent(MainForm, MainForm)
+      .SetOwnerAndParent(MainForm, MainForm)
       .SetSpace(5, 5)
       .SetTopLeft(10, 10)
       .Add(TControlBuilder.Create(TButton).WithCaption('Button 1'))
