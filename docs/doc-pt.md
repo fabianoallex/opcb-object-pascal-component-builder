@@ -684,7 +684,7 @@ end;
 
 TControlCreator permite centralizar a criação de múltiplos Controles e manter um registro interno das instâncias criadas, possibilitando recuperá-las posteriormente.
 
-TControlCreator foi desenhada para facilitar a criação de constroles visuais e posicioná-los na tela sem a necessidade de arrastar componentes na tela através da IDE em tempo de design.
+TControlCreator foi desenhada para facilitar a criação de controles visuais e posicioná-los na tela sem a necessidade de arrastar componentes na tela através da IDE em tempo de design.
 
 **Campos privados**
 
@@ -708,7 +708,110 @@ TControlCreator foi desenhada para facilitar a criação de constroles visuais e
 |`GetContentWidth`|`Single`|Retorna a largura ocupada por todos os controles adicionados. Utiliza tipo `Single` para melhor compatiblidade com o *framework Firemonkey*.|
 |`GetFContentHeight`|`Single`|Retorna a altura ocupada por todos os controles adicionados. Utiliza tipo `Single` para melhor compatiblidade com o *framework Firemonkey*.|
 |`GetComponentRegistry`|`TComponentRegistry`|Retorna o objeto de registro dos componentes adicionados. Esse objeto é definido na chamada do construtor pelo parâmetro `ARegistryContextKey` ou pelo parâmetro `ARegistryContextHandle`. Diferentes *Creators* podem compartilhar um mesmo Registro de seus componentes.|
+|`GetItem(const AName: string)`|`TControl`|Retorna o Controle identificado por `AName`.|
+|`ApplyDefaultControlSize(AControl: TControl)`||`TControlCreator` possui os campos opcionais `ControlHeight` e `ControlWidth` que podem ser usados para definir valores padrões para qualquer Controle adicionado via `.Add`. `ApplyDefaultControlSize` Aplica esses valores padrões aos controles ao serem adicionados.
+|`CanAddToGrid`|`Boolean`|Valida se um novo controle a ser criado pode ser adicionado ao Grid. É preciso que `TControlCreator` esteja no modo Grid e exista célula disponível para inclusão.
+|`AdjustControlToCell(AControl: TControl; ACellRect: TRect)`||Ajusta o tamanho do controle que está sendo adicionado para o tamanho da célula definido por `ACellRect`.|
 
+**Construtores**
+| Construtor | Uso típico |
+|-------------|-------------|
+| `Create(ARegistryContextKey: string = '')` | Instancia um novo `TControlCreator`. Se `ARegistryContextKey` for informado, utilizará o registro existente com o mesmo nome; caso contrário, criará um novo. Se a chave não for informada, uma chave exclusiva aleatória será gerada, resultando em um novo registro. |
+| `Create(ARegistryContextHandle: IRegistryContextHandle)` | Instancia um `TControlCreator` reutilizando um registro de componentes existente, obtido via `ARegistryContextHandle`. |
+
+**Métodos públicos**
+| Método | Retorno | Descrição |
+|---------|----------|-----------|
+|`GetControl<T: TControl>(const AName: string)`|`T`|Método genérico que retorna um controle a partir do nome. É necessário identificar o tipo do controle.|
+|`GetControl(const AName: string)`|`TControl`|Retorna um Controle a partir do nome.
+|`GetControlsBounds(AControlsNames: array of string)`|`TControlGroupBounds`|Retorna um objeto `TControlGroupBounds` contendo os limites (bounds - Top, Left, Heigth e Width) de um grupo de controles identificados pelo nome.
+|`GetNamedControl(const AName: string)`|`TControl`|Retorna um controle pelo seu nome.
+|**Métodos** Definidos na classe Helper |
+|`SetupControlBuilderForGridMode<TBuild>(AControlBuilder: IControlBuilder<TBuild>)`||Quando um controle é adicionado via `.Add` no modo Grid, `AControlBuilder` é ajustado para representar os tamanhos e posições corretas para a célula onde está sendo inserido.
+|`CreateControl<TBuild>(ABuilder: IControlBuilder<TBuild>; AOwner: TComponent = nil)`|`TBuild`|Instancia o controle adicionado via `.Add`. Antes de chamar o método `.build` do objeto `Builder` faz os ajustes necessários para definição de tamanho e posição conforme modo e configurações.
+|`External(const AProc: TControlCreatorObjProc)`|`TControlCreator`|Permite injetar um procedure do tipo `TControlCreatorObjProc` que recebe como parâmetro o próprio objeto `TControlCreator`.<br><br>`TControlCreatorObjProc = procedure(const ABuiler: TControlCreator) of object;`
+|`External(const AProc: TControlCreatorProc)`|`TControlCreator`|Permite injetar um procedure do tipo `TControlCreatorProc` que recebe como parâmetro o próprio objeto `TControlCreator`.<br><br>`TControlCreatorProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(ABuiler: TControlCreator);`
+|`SetSpace(AVerticalSpace, AHorizontalSpace: Single)`|`TControlCreator`|Define os espaçamentos horizontais e verticais entre os controles adicionados no Level Corrente.
+|`SubLevel(AGroupName: string='')`|`TControlCreator`|Inicia um novo nível na stack level sem vincular a um container. `FLevelStack.Add(CurrentLevel.Clone);`. Se `AGroupName` for informado, os controles adicionados serão vinculados ao Grupo passado como parâmetro. 
+|`SubLevel(ADirection: TControlCreatorDirection; AGroupName: string='')`|`TControlCreator`|Mesmo que o anterior, mas definindo nova direção.
+|`SubLevel(AControlBuilder: TControlBuilder; AGroupName: string='')`|`TControlCreator`|Mesmo que anterior, mas definindo um container, como TPanel por exemplo. Se informado `AGroupName` vincula os controles adicionados a esse grupo. 
+|`SubLevel<TBuild: class>(AControlBuilder: IControlBuilder<TBuild>; AGroupName: string='')`|`TControlCreator`|Mesmo que os métodos anteriores. É Genérico para permitir que classes diferentes de `TControlBuilder` sejam utilizadas também, desde que implementem `IControlBuilder`
+|`SuperLevel`|`TControlCreator`|Volta ao level anterior (ou acima).
+|`SetVerticalSpace(AVerticalSpace: Single)`|`TControlCreator`|Define o espaçamento vertical entre os controles adicionados.
+|`SetHorizontalSpace(AHorizontalSpace: Single)`|`TControlCreator`|Define o espaçamento horizontal entre os controles adicionados.
+|`SetTop(ATop: Single)`|`TControlCreator`|Define o Top - em CurrentLevel - do próximo controle a ser adicionado. Define também o `InicialTop` que é utilizado para definir a nova posição de Top  ao chamar o `.Break`, `.BreakLine` ou `.BreakColumn`.
+|`SetLeft(ALeft: Single)`|`TControlCreator`|Define o Left - em CurrentLevel - do próximo controle a ser adicionado. Define também o `InicialLeft` que é utilizados para definir a nova posição de Left ao chamar o `.Break`, `.BreakLine` ou `.BreakColumn`. 
+|`SetTopLeft(ATop, ALeft: Single)`|`TControlCreator`|Define o Top e Left - em CurrentLevel - do próximo controle a ser adicionado. Define também o `InicialTop` e `InicialLeft` que são utilizados para definir a nova posição de Top e Left ao chamar o `.Break`, `.BreakLine` ou `.BreakColumn`. 
+|`SetTopLeftNearControl(AControlName: string; APosition: TRelativePosition)`|`TControlCreator`|Define Top e Left com base em um controle existente. APosition define se abaixo ou a direita do controle. Leva em consideração os espaçamentos definidos em Vertical e Horizontal Spaces.
+|`SetTopLeftNearControls(AControlsNames: string; APosition: TRelativePosition)`|`TControlCreator`|Igual ao anterior, mas considerando a combinação dos controles passados como parametros em `AControlsNames`.
+|`SetTopLeftNearGroup(const AGroupName: string; APosition: TRelativePosition)`|`TControlCreator`|Igual o anterior mas considerando um grupo de controles.|
+|`IncTop(AIncTop: Single)`|`TControlCreator`|Incrementa Top sem mudar o `InitialTop`.
+|`IncLeft(AIncLeft: Single)`|`TControlCreator`|Incrementa Left sem mudar o `InitialLeft`.
+|`IncTopLeft(AIncTop, AIncLeft: Single)`|`TControlCreator`|Incrementa Top e Left sem mudar `InitialTop` e `InitialLeft`.
+|`SetDirection(ADirection: TControlCreatorDirection)`|`TControlCreator`|Define a direção em que os controles serão inseridos. Na vertical ou na Horizontal. <br><br>Cada vez que um controle é adicionado, é feito cálculo da posição de Top e Left (`CurrentTop` e `CurrentLeft`) para ser usada da próxima vez que outro Controle for adicionado. Para esse cálculo, é levado em consideração a direção atual.<br><br>`TControlCreatorDirection = (cpdHorizontal, cpdVertical);`
+|`SetControlHeight(AHeight: Single)`|`TControlCreator`|Define um valor padrão de altura para todos os controles que serão adicionados através `.Add` caso não seja definido um valor para ele.
+|`SetControlWidth`(AWidth: Single)|`TControlCreator`|Define um valor padrão de largura para todos os controles que serão adicionados através `.Add` caso não seja definido um valor para ele.
+|`SetControlWidthAndHeight(AWidth, AHeight: Single)`|`TControlCreator`|Define um valor padrão de altura e largura para todos os controles que serão adicionados através `.Add` caso não sejam definidos esses valores para ele.
+|`UnsetControlHeight`|`TControlCreator`|Remove a definição de valor padrão para altura dos controles adicionados via `.Add`.
+|`UnsetControlWidth`|`TControlCreator`|Remove a definição de valor padrão para largura dos controles adicionados via `.Add`.
+|`UnsetControlWidthAndHeight`|`TControlCreator`|Remove a definição de valor padrão para altura e largura dos controles adicionados via `.Add`.
+|`GridInit(ARows, ACols: Integer)`|`TControlCreator`|Inicia o modo Grid informando o numero de linhas e colunas. Internamente é feito uma chamada a `.SubLevel`.
+|`GridFinish`|`TControlCreator`|Sai do modo Grid. Internamente é feito uma chamada a `.SuperLevel`.
+|`GridCellSpan(ACellSpan: Integer)`|`TControlCreator`|Expande o tamanho da célula corrente para ocupar mais de uma célula. Leva em consideração a direção atual definida em `.SetDirection`.
+|`GridRowSpan(ARowSpan: Integer)`|`TControlCreator`|Expande o tamanho da célula corrente para ocupar mais de uma linha.
+|`GridColSpan(AColSpan: Integer)`|`TControlCreator`|Expande o tamanho da célula corrente para ocupar mais de uma coluna.
+|`GridSetCellWidthAndHeight(AWidth, AHeight: Integer)`|`TControlCreator`|Define o tamanho padrão de todas as células do grid.
+|`GridSetColWidth(ACol: Integer; AWidth: Single)`|`TControlCreator`|Define uma largura customizada para uma determinada coluna do Grid. As demais colunas, continuarão com o valor padrão da largura.
+|`GridSetRowHeight(ARow: Integer; AHeight: Single)`|`TControlCreator`|Define uma altura customizada para uma determinada linha do Grid. As demais linhas, continuarão com o valor padrão da altura.
+|`GridSetColOffset(ACol: Integer; AOffset: Single)`|`TControlCreator`|Define um deslocamento vertical de uma determinada coluna. 
+|GridSetRowOffset(ARow: Integer; AOffset: Single)|`TControlCreator`|Define um deslocamento horizontal de uma determinada linha. 
+|`GridSkipCell`|`TControlCreator`|Pula a celula corrente.
+|`GridSkipCells(ANumCells: Integer)|`TControlCreator`|Pula as próximas `ANumCells` células.
+|`GridGotoCell(ARow, ACol: Integer)`|`TControlCreator`|Move a célula corrente para uma nova posição.
+|`GridAutoExpand`|`TControlCreator`|Define que o grid pode expandir automaticamente linhas e colunas.
+|`GridAutoExpandRows`|`TControlCreator`|Define que o grid pode expandir automaticamente linhas.
+|`GridAutoExpandCols`|`TControlCreator`|Define que o grid pode expandir automaticamente colunas.
+|`GridCellPosition`|`TControlCreator`|Define a posição onde os controles serão inseridos na célula. <br><br>`TCellPosition = (cpCenter, cpTop, cpRight, cpBottom, cpLeft,cpTopRight, cpTopLeft, cpBottomRight, cpBottomLeft);`
+|`GridCellNoStrech`|`TControlCreator`|Define que a célula não irá esticar o controle para encaixar na célula.
+|`GridCellStrechAll`|`TControlCreator`|Define que a célula irá esticar o controle na vertical e na horizontal para encaixar na célula.
+|`GridCellStrechHorizontal`|`TControlCreator`|Define que a célula irá esticar o controle na horizontal para encaixar na célula.
+|`GridCellStrechVertical`|`TControlCreator`|Define que a célula irá esticar o controle na vertical para encaixar na célula.
+|`GridReturnNumberOfRows`|`TControlCreator`|Retorna através de `ARows` o número atual de linhas.
+|`GridReturnNumberOfCols`|`TControlCreator`|Retorna através de `ACols` o número atual de colunas.
+|`BreakLine`|`TControlCreator`|Move a posição do Top Corrente para uma linha abaixo enquanto Left Corrente volta para o Left Inicial.  
+|`BreakColumn`|`TControlCreator`|Move a posição do Left Corrente para uma coluna à direita enquanto Top Corrente volta para o Top Inicial.
+|`BreakLine(AIncTop: Single)`|`TControlCreator`|Mesmo que `.BreakLine` mas incrementando o Top
+|`BreakColumn(AIncLeft: Single)`|`TControlCreator`|Mesmo que `.BreakColumn` mas incrementando o Left
+|`Break`|`TControlCreator`|Chama `.BreakLine` ou `.BreakColumn` de acordo com a direção atual.
+|`Break(AIncTopOrLeft: Single)`|`TControlCreator`|Mesmo que `.Break` mas incrementando Top ou Left.
+|`Add(AControlBuilder: TControlBuilder)`|`TControlCreator`|Adiciona um novo controle através de um objeto `TControlBuilder`.
+|MoveControls(const AControl: TControl; const ADX, ADY: Single)`|`TControlCreator`|Move um controle vertical e/ou horizontalmente.
+|`MoveControls(const AControlNames: array of string; const ADX, ADY: Single)`|`TControlCreator`|Move os controles identificados pelos nomes em `AControlNames`.
+|`AlignControlsRight(const AControlNames, AReferenceGroup: array of string; const ARightPadding: Single = 0)`|`TControlCreator`|Alinha um conjunto de Controles a direita, considerando um grupo de outros controles como referência. Se `ARightPadding` informando, decrementa o valor no posicionamento.
+|`CenterControlsHorizontally(const AControlNames, AReferenceGroup: array of string)`|`TControlCreator`|Centraliza horizontalmente um conjunto de controles, considerando um grupo de outros controles como referência.
+|`CenterControlsVertically(const AControlNames, AReferenceGroup: array of string)`|`TControlCreator`|Centraliza verticalmente um conjunto de controles, considerando um grupo de outros controles como referência.
+|`CenterControlsInParentVertically(const AControlNames: array of string)`|`TControlCreator`|Centraliza Verticalmente um conjunto de controles, considerando as dimensões do Parent dos controles.
+|`CenterControlsInParentHorizontally(const AControlNames: array of string)`|`TControlCreator`|Centraliza Horizontalmente um conjunto de controles, considerando o Parent dos controles como referência.
+|`CenterControlInParentHorizontally`|`TControlCreator`|Centraliza Horizontalmente o último controle adicionado, considerando o Parent do controle como referência.
+|`RecalcParentHeight(AExtraHeight: Single = 0)`|`TControlCreator`|Recalcula a altura do Parent (container) do level corrente com base na dimensão dos controles já adicionados. Se informado `AExtraHeight` incrementa a altura com o valor.
+|`RecalcParentWidth(AExtraWidth: Single = 0)`|`TControlCreator`|Recalcula a largura do Parent (container) do level corrente com base na dimensão dos controles já adicionados. Se informado `AExtraWidth` incrementa a largura com o valor.
+|`RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0)`|`TControlCreator`|Recalcula a largura e altura do Parent (container) do level corrente com base na dimensão dos controles já adicionados. Se informado `AExtraWidth` e `AExtraHeight` incrementa a largura e altura com os valores.
+|`CopyHeight(const AControlNames, AReferenceGroup: array of string)`|`TControlCreator`|Copia a altura formada pelo Bounds do grupo de controles passados em `AReferenceGroup` para cada um dos controles definidos em `AControlNames`.
+|`CopyWidth(const AControlNames, AReferenceGroup: array of string)`|`TControlCreator`|Copia a largura formada pelo Bounds do grupo de controles passados em `AReferenceGroup` para cada um dos controles definidos em `AControlNames`.
+|`function CopySize(const AControlNames, AReferenceGroup: array of string)`|`TControlCreator`|Copia a largura e a altura formada pelo Bounds do grupo de controles passados em `AReferenceGroup` para cada um dos controles definidos em `AControlNames`.
+|`ReturnCurrentLevel(var ACurrentLevel: TControlCreatorLevel)`|`TControlCreator`|Retorna o Level Corrente através do parâmetro `ACurrentLevel`
+|`ReturnLastControl(out AControl: TControl)`|`TControlCreator`|Retorna o último controle adicionado através `.Add`.
+
+**Propriedades**
+| Propriedade | Tipo | Função |
+|--------------|------|---------|
+|`Registry` | `TComponentRegistry` | Retorna o `TComponentRegistry` utilizado para armazenar os componentes criados. |
+|`Items[const AName: string]` | `TControle` | Retorna um componente do registro a partir do seu nome. |
+|`NamedControls[const AName: string]`|`TControl`|Retorna um controle pelo seu nome.
+|`ContentWidth`|`Single`|Retorna a largura ocupada pelos componentes adicionados.
+|`ContentHeight`|`Single`|Retorna a altura ocupada pelos componentes adicionados.
+|`CurrentLevel`|`TControlCreatorLevel`|Retorna o objeto `TControlCreatorLevel` corrente.
+|`Controls`|`TControlList`|Retorna lista de controles adicionados. Se o `Registry` for compartilhado, irá retornar os objetos adicionados a partir de outros Creators.
 
 ---
 **DOCUMENTAÇÃO EM CONSTRUÇÃO**

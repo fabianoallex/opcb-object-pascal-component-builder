@@ -658,3 +658,144 @@ begin
     Creator.Free;
   end;
 end;
+
+
+#### TControlCreator
+
+TControlCreator allows centralizing the creation of multiple Controls and maintaining an internal registry of created instances, making it possible to retrieve them later.
+
+TControlCreator was designed to facilitate the creation of visual controls and position them on the screen without the need to drag components on the screen through the IDE at design time.
+
+**Private Fields**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `FOwner` | `TComponent` | Defines the *Owner* of controls added through the `.Add` method. |
+| `FRegistryContextHandle` | `IRegistryContextHandle` | Indicates the *ContextHandle* used to register the created components. Allows sharing the registry with other *Creators*, such as `TControlCreator`, `TMenuCreator`, etc. |
+| `FGroups` | `TControlGroupMap` | `TControlGroupMap = TDictionary<string, TControlList>;`. <br> Allows adding controls to specific groups for later retrieval based on their groups. Also used to determine the bounds occupied by a group of controls. |
+| `FLevelStack` | `TControlCreatorLevelStack` | `TControlCreatorLevelStack = TObjectList<TControlCreatorLevel>;` <br>Stack that stores level information. Calls to `.SubLevel` and `.SuperLevel` methods add and remove levels from the stack, respectively. The level at the top is the current level. <br><br>A level is an object of class `TControlCreatorLevel` that contains information such as `Direction`, `CurrentTop`, `CurrentLeft`, `VerticalSpace`, `HorizontalSpace`, `MaxControlHeight`, `MaxControlWidth`, among other properties used to control the positioning and size of controls as they are added through `.Add` methods.|
+
+**Private Methods**
+
+| Method | Return | Description |
+|--------|--------|-------------|
+| `GetControls` | `TControlList` | Returns list of controls added via `.Add` |
+| `MoveTopLeftAfterControl(AControl: TControl)` | - | Moves `CurrentTop` and `CurrentLeft` of the current level after `AControl`. If `Direction` is `cpdVertical`, `Top` and `Left` will be to the right of the control; if `cpdHorizontal`, they will be below the control. <br>Position calculation also considers the `VerticalSpace` and `HorizontalSpace` properties of the current level and the `Align` property of `AControl`. |
+| `MoveTopLeftAfterRect(const ARect: TRect; AAlign: TAlign)` | - | Same as previous, but considering `ARect`. <br>`AAlign` = `alTop` applies the change only to `Top`. <br>`AAlign` = `alLeft` applies the change only to `Left`. <br>`AAlign` = `alNone` applies the change only to `Top` and `Left`. <br>In `FMX`, the `AAlign` types are handled according to the framework. |
+| `MoveTopLeftAfterBound(ABounds: TControlGroupBounds)` | - | Same as previous, but considering an object of type `TControlGroupBounds`. |
+| `AddToGroups(AControl: TControl; const AGroups: array of string)` | - | Adds the control to one or more groups defined in `AGroups`. |
+| `GetGroupBounds(const AGroupName: string)` | `TControlGroupBounds` | Returns a `record` of type `TControlGroupBounds` with dimension information of a control group. |
+| `GetCurrentLevel` | `TControlCreatorLevel` | Returns the current level |
+| `GetContentWidth` | `Single` | Returns the width occupied by all added controls. Uses `Single` type for better compatibility with the Firemonkey framework. |
+| `GetContentHeight` | `Single` | Returns the height occupied by all added controls. Uses `Single` type for better compatibility with the Firemonkey framework. |
+| `GetComponentRegistry` | `TComponentRegistry` | Returns the registry object of added components. This object is defined in the constructor call by the `ARegistryContextKey` parameter or by the `ARegistryContextHandle` parameter. Different Creators can share the same registry of their components. |
+| `GetItem(const AName: string)` | `TControl` | Returns the Control identified by `AName`. |
+| `ApplyDefaultControlSize(AControl: TControl)` | - | `TControlCreator` has optional fields `ControlHeight` and `ControlWidth` that can be used to set default values for any Control added via `.Add`. `ApplyDefaultControlSize` applies these default values to controls when they are added. |
+| `CanAddToGrid` | `Boolean` | Validates if a new control to be created can be added to the Grid. Requires that `TControlCreator` is in Grid mode and that there is an available cell for inclusion. |
+| `AdjustControlToCell(AControl: TControl; ACellRect: TRect)` | - | Adjusts the size of the control being added to the cell size defined by `ACellRect`. |
+
+**Constructors**
+
+| Constructor | Typical Usage |
+|-------------|---------------|
+| `Create(ARegistryContextKey: string = '')` | Instantiates a new `TControlCreator`. If `ARegistryContextKey` is provided, it will use the existing registry with the same name; otherwise, it will create a new one. If the key is not provided, a unique random key will be generated, resulting in a new registry. |
+| `Create(ARegistryContextHandle: IRegistryContextHandle)` | Instantiates a `TControlCreator` reusing an existing component registry obtained via `ARegistryContextHandle`. |
+
+**Public Methods**
+
+| Method | Return | Description |
+|--------|--------|-------------|
+| `GetControl<T: TControl>(const AName: string)` | `T` | Generic method that returns a control by name. The control type must be specified. |
+| `GetControl(const AName: string)` | `TControl` | Returns a Control by name. |
+| `GetControlsBounds(AControlsNames: array of string)` | `TControlGroupBounds` | Returns a `TControlGroupBounds` object containing the bounds (Top, Left, Height and Width) of a group of controls identified by name. |
+| `GetNamedControl(const AName: string)` | `TControl` | Returns a control by its name. |
+| **Methods** Defined in the Helper Class |
+| `SetupControlBuilderForGridMode<TBuild>(AControlBuilder: IControlBuilder<TBuild>)` | - | When a control is added via `.Add` in Grid mode, `AControlBuilder` is adjusted to represent the correct sizes and positions for the cell where it is being inserted. |
+| `CreateControl<TBuild>(ABuilder: IControlBuilder<TBuild>; AOwner: TComponent = nil)` | `TBuild` | Instantiates the control added via `.Add`. Before calling the `.build` method of the `Builder` object, it makes the necessary adjustments for size and position definition according to mode and configurations. |
+| `External(const AProc: TControlCreatorObjProc)` | `TControlCreator` | Allows injecting a procedure of type `TControlCreatorObjProc` that receives the `TControlCreator` object itself as a parameter.<br><br>`TControlCreatorObjProc = procedure(const ABuilder: TControlCreator) of object;` |
+| `External(const AProc: TControlCreatorProc)` | `TControlCreator` | Allows injecting a procedure of type `TControlCreatorProc` that receives the `TControlCreator` object itself as a parameter.<br><br>`TControlCreatorProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(ABuilder: TControlCreator);` |
+| `SetSpace(AVerticalSpace, AHorizontalSpace: Single)` | `TControlCreator` | Defines the horizontal and vertical spacing between controls added in the Current Level. |
+| `SubLevel(AGroupName: string = '')` | `TControlCreator` | Starts a new level in the level stack without linking to a container. `FLevelStack.Add(CurrentLevel.Clone);`. If `AGroupName` is provided, the added controls will be linked to the Group passed as parameter. |
+| `SubLevel(ADirection: TControlCreatorDirection; AGroupName: string = '')` | `TControlCreator` | Same as previous, but setting a new direction. |
+| `SubLevel(AControlBuilder: TControlBuilder; AGroupName: string = '')` | `TControlCreator` | Same as previous, but defining a container, such as TPanel for example. If `AGroupName` is provided, links the added controls to this group. |
+| `SubLevel<TBuild: class>(AControlBuilder: IControlBuilder<TBuild>; AGroupName: string = '')` | `TControlCreator` | Same as previous methods. Generic to allow different classes than `TControlBuilder` to be used as well, as long as they implement `IControlBuilder`. |
+| `SuperLevel` | `TControlCreator` | Returns to the previous level (or above). |
+| `SetVerticalSpace(AVerticalSpace: Single)` | `TControlCreator` | Defines the vertical spacing between added controls. |
+| `SetHorizontalSpace(AHorizontalSpace: Single)` | `TControlCreator` | Defines the horizontal spacing between added controls. |
+| `SetTop(ATop: Single)` | `TControlCreator` | Defines the Top - in CurrentLevel - of the next control to be added. Also defines `InitialTop` which is used to define the new Top position when calling `.Break`, `.BreakLine` or `.BreakColumn`. |
+| `SetLeft(ALeft: Single)` | `TControlCreator` | Defines the Left - in CurrentLevel - of the next control to be added. Also defines `InitialLeft` which is used to define the new Left position when calling `.Break`, `.BreakLine` or `.BreakColumn`. |
+| `SetTopLeft(ATop, ALeft: Single)` | `TControlCreator` | Defines the Top and Left - in CurrentLevel - of the next control to be added. Also defines `InitialTop` and `InitialLeft` which are used to define the new Top and Left position when calling `.Break`, `.BreakLine` or `.BreakColumn`. |
+| `SetTopLeftNearControl(AControlName: string; APosition: TRelativePosition)` | `TControlCreator` | Defines Top and Left based on an existing control. APosition defines whether below or to the right of the control. Takes into account the spacing defined in Vertical and Horizontal Spaces. |
+| `SetTopLeftNearControls(AControlsNames: string; APosition: TRelativePosition)` | `TControlCreator` | Same as previous, but considering the combination of controls passed as parameters in `AControlsNames`. |
+| `SetTopLeftNearGroup(const AGroupName: string; APosition: TRelativePosition)` | `TControlCreator` | Same as previous but considering a group of controls. |
+| `IncTop(AIncTop: Single)` | `TControlCreator` | Increments Top without changing `InitialTop`. |
+| `IncLeft(AIncLeft: Single)` | `TControlCreator` | Increments Left without changing `InitialLeft`. |
+| `IncTopLeft(AIncTop, AIncLeft: Single)` | `TControlCreator` | Increments Top and Left without changing `InitialTop` and `InitialLeft`. |
+| `SetDirection(ADirection: TControlCreatorDirection)` | `TControlCreator` | Defines the direction in which controls will be inserted. Vertically or Horizontally. <br><br>Each time a control is added, the Top and Left position (`CurrentTop` and `CurrentLeft`) is calculated to be used the next time another Control is added. For this calculation, the current direction is taken into account.<br><br>`TControlCreatorDirection = (cpdHorizontal, cpdVertical);` |
+| `SetControlHeight(AHeight: Single)` | `TControlCreator` | Defines a default height value for all controls that will be added via `.Add` if no value is defined for them. |
+| `SetControlWidth(AWidth: Single)` | `TControlCreator` | Defines a default width value for all controls that will be added via `.Add` if no value is defined for them. |
+| `SetControlWidthAndHeight(AWidth, AHeight: Single)` | `TControlCreator` | Defines a default height and width value for all controls that will be added via `.Add` if these values are not defined for them. |
+| `UnsetControlHeight` | `TControlCreator` | Removes the default value definition for height of controls added via `.Add`. |
+| `UnsetControlWidth` | `TControlCreator` | Removes the default value definition for width of controls added via `.Add`. |
+| `UnsetControlWidthAndHeight` | `TControlCreator` | Removes the default value definition for height and width of controls added via `.Add`. |
+| `GridInit(ARows, ACols: Integer)` | `TControlCreator` | Starts Grid mode by specifying the number of rows and columns. Internally calls `.SubLevel`. |
+| `GridFinish` | `TControlCreator` | Exits Grid mode. Internally calls `.SuperLevel`. |
+| `GridCellSpan(ACellSpan: Integer)` | `TControlCreator` | Expands the size of the current cell to occupy more than one cell. Takes into account the current direction defined in `.SetDirection`. |
+| `GridRowSpan(ARowSpan: Integer)` | `TControlCreator` | Expands the size of the current cell to occupy more than one row. |
+| `GridColSpan(AColSpan: Integer)` | `TControlCreator` | Expands the size of the current cell to occupy more than one column. |
+| `GridSetCellWidthAndHeight(AWidth, AHeight: Integer)` | `TControlCreator` | Defines the default size of all grid cells. |
+| `GridSetColWidth(ACol: Integer; AWidth: Single)` | `TControlCreator` | Defines a custom width for a specific Grid column. The other columns will remain with the default width value. |
+| `GridSetRowHeight(ARow: Integer; AHeight: Single)` | `TControlCreator` | Defines a custom height for a specific Grid row. The other rows will remain with the default height value. |
+| `GridSetColOffset(ACol: Integer; AOffset: Single)` | `TControlCreator` | Defines a vertical offset for a specific column. |
+| `GridSetRowOffset(ARow: Integer; AOffset: Single)` | `TControlCreator` | Defines a horizontal offset for a specific row. |
+| `GridSkipCell` | `TControlCreator` | Skips the current cell. |
+| `GridSkipCells(ANumCells: Integer)` | `TControlCreator` | Skips the next `ANumCells` cells. |
+| `GridGotoCell(ARow, ACol: Integer)` | `TControlCreator` | Moves the current cell to a new position. |
+| `GridAutoExpand` | `TControlCreator` | Defines that the grid can automatically expand rows and columns. |
+| `GridAutoExpandRows` | `TControlCreator` | Defines that the grid can automatically expand rows. |
+| `GridAutoExpandCols` | `TControlCreator` | Defines that the grid can automatically expand columns. |
+| `GridCellPosition` | `TControlCreator` | Defines the position where controls will be inserted in the cell. <br><br>`TCellPosition = (cpCenter, cpTop, cpRight, cpBottom, cpLeft, cpTopRight, cpTopLeft, cpBottomRight, cpBottomLeft);` |
+| `GridCellNoStrech` | `TControlCreator` | Defines that the cell will not stretch the control to fit the cell. |
+| `GridCellStrechAll` | `TControlCreator` | Defines that the cell will stretch the control vertically and horizontally to fit the cell. |
+| `GridCellStrechHorizontal` | `TControlCreator` | Defines that the cell will stretch the control horizontally to fit the cell. |
+| `GridCellStrechVertical` | `TControlCreator` | Defines that the cell will stretch the control vertically to fit the cell. |
+| `GridReturnNumberOfRows` | `TControlCreator` | Returns the current number of rows through `ARows`. |
+| `GridReturnNumberOfCols` | `TControlCreator` | Returns the current number of columns through `ACols`. |
+| `BreakLine` | `TControlCreator` | Moves the Current Top position to a line below while Current Left returns to the Initial Left. |
+| `BreakColumn` | `TControlCreator` | Moves the Current Left position to a column to the right while Current Top returns to the Initial Top. |
+| `BreakLine(AIncTop: Single)` | `TControlCreator` | Same as `.BreakLine` but incrementing Top. |
+| `BreakColumn(AIncLeft: Single)` | `TControlCreator` | Same as `.BreakColumn` but incrementing Left. |
+| `Break` | `TControlCreator` | Calls `.BreakLine` or `.BreakColumn` according to the current direction. |
+| `Break(AIncTopOrLeft: Single)` | `TControlCreator` | Same as `.Break` but incrementing Top or Left. |
+| `Add(AControlBuilder: TControlBuilder)` | `TControlCreator` | Adds a new control through a `TControlBuilder` object. |
+| `MoveControls(const AControl: TControl; const ADX, ADY: Single)` | `TControlCreator` | Moves a control vertically and/or horizontally. |
+| `MoveControls(const AControlNames: array of string; const ADX, ADY: Single)` | `TControlCreator` | Moves the controls identified by the names in `AControlNames`. |
+| `AlignControlsRight(const AControlNames, AReferenceGroup: array of string; const ARightPadding: Single = 0)` | `TControlCreator` | Aligns a set of Controls to the right, considering a group of other controls as reference. If `ARightPadding` is provided, decrements the value in positioning. |
+| `CenterControlsHorizontally(const AControlNames, AReferenceGroup: array of string)` | `TControlCreator` | Centers horizontally a set of controls, considering a group of other controls as reference. |
+| `CenterControlsVertically(const AControlNames, AReferenceGroup: array of string)` | `TControlCreator` | Centers vertically a set of controls, considering a group of other controls as reference. |
+| `CenterControlsInParentVertically(const AControlNames: array of string)` | `TControlCreator` | Centers vertically a set of controls, considering the dimensions of the controls' Parent. |
+| `CenterControlsInParentHorizontally(const AControlNames: array of string)` | `TControlCreator` | Centers horizontally a set of controls, considering the Parent of the controls as reference. |
+| `CenterControlInParentHorizontally` | `TControlCreator` | Centers horizontally the last added control, considering the Parent of the control as reference. |
+| `RecalcParentHeight(AExtraHeight: Single = 0)` | `TControlCreator` | Recalculates the height of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraHeight` is provided, increments the height by the value. |
+| `RecalcParentWidth(AExtraWidth: Single = 0)` | `TControlCreator` | Recalculates the width of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraWidth` is provided, increments the width by the value. |
+| `RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0)` | `TControlCreator` | Recalculates the width and height of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraWidth` and `AExtraHeight` are provided, increments the width and height by the values. |
+| `CopyHeight(const AControlNames, AReferenceGroup: array of string)` | `TControlCreator` | Copies the height formed by the Bounds of the control group passed in `AReferenceGroup` to each of the controls defined in `AControlNames`. |
+| `CopyWidth(const AControlNames, AReferenceGroup: array of string)` | `TControlCreator` | Copies the width formed by the Bounds of the control group passed in `AReferenceGroup` to each of the controls defined in `AControlNames`. |
+| `CopySize(const AControlNames, AReferenceGroup: array of string)` | `TControlCreator` | Copies the width and height formed by the Bounds of the control group passed in `AReferenceGroup` to each of the controls defined in `AControlNames`. |
+| `ReturnCurrentLevel(var ACurrentLevel: TControlCreatorLevel)` | `TControlCreator` | Returns the Current Level through the `ACurrentLevel` parameter. |
+| `ReturnLastControl(out AControl: TControl)` | `TControlCreator` | Returns the last control added via `.Add`. |
+
+**Properties**
+
+| Property | Type | Function |
+|----------|------|----------|
+| `Registry` | `TComponentRegistry` | Returns the `TComponentRegistry` used to store the created components. |
+| `Items[const AName: string]` | `TControl` | Returns a component from the registry by its name. |
+| `NamedControls[const AName: string]` | `TControl` | Returns a control by its name. |
+| `ContentWidth` | `Single` | Returns the width occupied by the added components. |
+| `ContentHeight` | `Single` | Returns the height occupied by the added components. |
+| `CurrentLevel` | `TControlCreatorLevel` | Returns the current `TControlCreatorLevel` object. |
+| `Controls` | `TControlList` | Returns list of added controls. If the `Registry` is shared, it will return objects added from other Creators. |
+
+---
+**DOCUMENTATION UNDER CONSTRUCTION**
