@@ -768,7 +768,7 @@ type
     function GetFContentHeight: Single;
     function GetComponentRegistry: TComponentRegistry;
     function GetItem(const AName: string): TControl;
-    procedure ApplyDefaultControlSize(Control: TControl);
+    procedure ApplyDefaultControlSize(AControl: TControl);
     function CanAddToGrid: Boolean;
     procedure AdjustControlToCell(AControl: TControl; ACellRect: TRect);
   public
@@ -1403,18 +1403,18 @@ begin
   MoveTopLeftAfterControl(Control as TControl);
 end;
 
-procedure TControlCreator.ApplyDefaultControlSize(Control: TControl);
+procedure TControlCreator.ApplyDefaultControlSize(AControl: TControl);
 begin
   {$IFDEF FRAMEWORK_FMX}
   if CurrentLevel.ControlHeight.HasValue then
-    Control.Height := CurrentLevel.ControlHeight.Value;
+    AControl.Height := CurrentLevel.ControlHeight.Value;
   if CurrentLevel.ControlWidth.HasValue then
-    Control.Width := CurrentLevel.ControlWidth.Value;
+    AControl.Width := CurrentLevel.ControlWidth.Value;
   {$ELSE}
   if CurrentLevel.ControlHeight.HasValue then
-    Control.Height := Trunc(CurrentLevel.ControlHeight.Value);
+    AControl.Height := Trunc(CurrentLevel.ControlHeight.Value);
   if CurrentLevel.ControlWidth.HasValue then
-    Control.Width := Trunc(CurrentLevel.ControlWidth.Value);
+    AControl.Width := Trunc(CurrentLevel.ControlWidth.Value);
   {$ENDIF}
 end;
 
