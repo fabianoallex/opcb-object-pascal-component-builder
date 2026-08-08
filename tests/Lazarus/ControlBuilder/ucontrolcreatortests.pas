@@ -92,6 +92,16 @@ type
     procedure TestGridColOffset;
     procedure TestGridBreakLine;
     procedure TestGridBreakColumn;
+    procedure TestBreakHorizontallyWithIncrement;
+    procedure TestBreakVerticallyWithIncrement;
+    procedure TestBreakLineWithIncrement;
+    procedure TestBreakColumnWithIncrement;
+    procedure TestGridSkipCells;
+    procedure TestAlignControlsRight;
+    procedure TestAlignControlsRightWithPadding;
+    procedure TestSetOwnerAndParentDirectly;
+    procedure TestSetParentDirectly;
+    procedure TestGetControlGeneric;
   end;
 
 implementation
@@ -261,6 +271,92 @@ begin
     ;
     AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
     AssertEquals('Propriedade Left diferente da esperada', 15, P.Left);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestBreakHorizontallyWithIncrement;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Break(5) // igual ao Break, mas soma 5 ao Top depois
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+    AssertEquals('Propriedade Top diferente da esperada', 10 + 5, P.Top);
+    AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestBreakVerticallyWithIncrement;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdVertical)
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Break(5) // igual ao Break, mas soma 5 ao Left depois
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+    AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
+    AssertEquals('Propriedade Left diferente da esperada', 15 + 5, P.Left);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestBreakLineWithIncrement;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .BreakLine(5)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+    AssertEquals('Propriedade Top diferente da esperada', 10 + 5, P.Top);
+    AssertEquals('Propriedade Left diferente da esperada', 0, P.Left);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestBreakColumnWithIncrement;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdVertical)
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .BreakColumn(5)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+    AssertEquals('Propriedade Top diferente da esperada', 0, P.Top);
+    AssertEquals('Propriedade Left diferente da esperada', 15 + 5, P.Left);
   finally
     ControlCreator.Free;
   end;
@@ -1203,6 +1299,30 @@ begin
   end;
 end;
 
+procedure TControlCreatorTests.TestGridSkipCells;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdHorizontal)
+      .GridInit(1, 4)
+        .GridSetCellWidthAndHeight(10, 15)
+        .Add(TControlBuilder.Create(TPanel))
+        .GridSkipCells(2)
+        .Add(TControlBuilder.Create(TPanel, P))
+      .GridFinish
+    ;
+
+    AssertEquals('Propriedade Left diferente do esperado', 10 * 3, P.Left);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
 procedure TControlCreatorTests.TestGridRowHeight;
 var
   ControlCreator: TControlCreator;
@@ -2133,6 +2253,117 @@ begin
     ;
 
     AssertNotNull('P não deveria ser null', P);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestAlignControlsRight;
+var
+  ControlCreator: TControlCreator;
+  RefPanel, Btn1, Btn2: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .SetTopLeft(0, 10)
+      .Add(TControlBuilder.Create(TPanel, 'ref_panel', RefPanel).WithWidth(250))
+      .SetTopLeft(0, 0)
+      .Add(TControlBuilder.Create(TPanel, 'btn1', Btn1).WithWidth(50))
+      .Add(TControlBuilder.Create(TPanel, 'btn2', Btn2).WithLeft(50).WithWidth(60))
+      .AlignControlsRight(['btn1', 'btn2'], ['ref_panel'])
+    ;
+
+    // borda direita do ref_panel: Left(10) + Width(250) = 260
+    // grupo [btn1, btn2] tem largura total 110 (50 + 60), deslocado para
+    // que a borda direita do grupo coincida com a do ref_panel
+    AssertEquals('Left de btn1 diferente do esperado', 150, Btn1.Left);
+    AssertEquals('Left de btn2 diferente do esperado', 200, Btn2.Left);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestAlignControlsRightWithPadding;
+var
+  ControlCreator: TControlCreator;
+  RefPanel, Btn1: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .SetTopLeft(0, 10)
+      .Add(TControlBuilder.Create(TPanel, 'ref_panel', RefPanel).WithWidth(250))
+      .SetTopLeft(0, 0)
+      .Add(TControlBuilder.Create(TPanel, 'btn1', Btn1).WithWidth(50))
+      .AlignControlsRight(['btn1'], ['ref_panel'], 10) // com 10px de padding
+    ;
+
+    // borda direita do ref_panel (260) - largura de btn1 (50) - padding (10)
+    AssertEquals('Left de btn1 diferente do esperado', 260 - 50 - 10, Btn1.Left);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestSetOwnerAndParentDirectly;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Regressão: usa SetOwnerAndParent diretamente (não o WithOwnerAndParent
+  // deprecated).
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    AssertSame('Owner do controle diferente do esperado', FForm, P.Owner);
+    AssertSame('Parent do controle diferente do esperado', FForm, P.Parent);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestSetParentDirectly;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetParent(FForm)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    AssertSame('Parent do controle diferente do esperado', FForm, P.Parent);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestGetControlGeneric;
+var
+  ControlCreator: TControlCreator;
+begin
+  // Regressão: GetControl<T> chamava Registry.GetControl<T> internamente
+  // sem "specialize", o que travava o compilador FPC (erro interno
+  // 2015071704) assim que o método genérico era de fato instanciado -
+  // nunca havia sido exercitado por nenhum teste antes.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'painel_generico'))
+    ;
+
+    AssertNotNull('GetControl<T> não deveria devolver nil',
+      ControlCreator.specialize GetControl<TPanel>('painel_generico'));
   finally
     ControlCreator.Free;
   end;
