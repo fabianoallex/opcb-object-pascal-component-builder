@@ -1,0 +1,10 @@
+object Form1: TForm1
+  Left = 375
+  Height = 560
+  Top = 250
+  Width = 1000
+  Caption = 'Form1'
+  Color = clWhite
+  LCLVersion = '4.0.0.4'
+  OnCreate = FormCreate
+end
