@@ -43,9 +43,12 @@ backup/
 *.or
 *.ppl
 *.compiled
-*.lps    # Lazarus project session
-*.lpi~   # Lazarus backup project info
-*.lps~   # Lazarus backup session info
+# Lazarus project session
+*.lps
+# Lazarus backup project info
+*.lpi~
+# Lazarus backup session info
+*.lps~
 
 # Delphi-specific
 __history/
@@ -63,6 +66,12 @@ __recovery/
 /build/
 /output/
 Android64/
+
+# Pastas de código antigo/descontinuado
+_old/
+
+# Bancos de dados gerados por exemplos
+*.db
 
 # Configurações de IDE específicas (opcional ignorar)
 *.dproj.user
