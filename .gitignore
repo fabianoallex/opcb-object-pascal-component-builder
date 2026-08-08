@@ -66,6 +66,9 @@ __recovery/
 /build/
 /output/
 Android64/
+Win32/
+Win64/
+dunitx-results.xml
 
 # Pastas de código antigo/descontinuado
 _old/
