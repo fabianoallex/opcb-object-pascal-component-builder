@@ -42,6 +42,8 @@ type
     procedure TestExternal;
     procedure TestAddToRegistry;                // testa se um conrole ao ser criado é inserido no registro
     procedure TestRemoveControlFromRegistryOnDestroy;  // testa se um controle quando destruído será removido do registro
+    procedure TestReturnLastControlOnEmptyCreatorDoesNotRaise;
+    procedure TestControlsIsolatedPerCreatorInSharedContext;
     procedure TestSubLevel;
     procedure TestSubLevelSubLevel;    // mais de um nivel de profunidade
     procedure TestSubLevelSuperLevel;  // testa se volta ao nivel inicial
@@ -579,6 +581,53 @@ begin
       0, ControlCreator.Controls.Count);
   finally
     ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestReturnLastControlOnEmptyCreatorDoesNotRaise;
+var
+  ControlCreator: TControlCreator;
+  Ctrl: TControl;
+begin
+  // Regressão: "if Self.Controls.Count > 0 then;" tinha um ";" solto que
+  // tornava a guarda inerte, causando exceção ao acessar .Last de uma
+  // lista vazia.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator.ReturnLastControl(Ctrl);
+    AssertNull('Ctrl deveria ser nil quando não há nenhum controle criado', Ctrl);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTests.TestControlsIsolatedPerCreatorInSharedContext;
+var
+  CreatorA, CreatorB: TControlCreator;
+begin
+  // Regressão: Controls devolvia Registry.Controls (todo o contexto
+  // compartilhado), então um creator enxergava controles criados por outro
+  // creator que usasse a mesma chave de contexto.
+  CreatorA := TControlCreator.Create('SharedContextTest');
+  CreatorB := TControlCreator.Create('SharedContextTest');
+  try
+    CreatorA
+      .WithOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel))
+    ;
+    CreatorB
+      .WithOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel))
+      .Add(TControlBuilder.Create(TPanel))
+    ;
+
+    AssertEquals('CreatorA deveria ver só os controles que ele mesmo criou',
+      1, CreatorA.Controls.Count);
+    AssertEquals('CreatorB deveria ver só os controles que ele mesmo criou',
+      2, CreatorB.Controls.Count);
+  finally
+    CreatorA.Free;
+    CreatorB.Free;
   end;
 end;
 

@@ -5,7 +5,7 @@ unit UComponentBuilderTests;
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, OPCB, Dialogs;
+  Classes, SysUtils, fpcunit, testregistry, OPCB, Dialogs, Menus;
 
 type
 
@@ -29,6 +29,7 @@ type
     procedure TestComponentBuilderWithName;
     procedure TestComponentBuilderWithProp;
     procedure TestComponentBuilderFluentWithCalls;
+    procedure TestMenuItemBuilderCreateWithNameAndReference;
   end;
 
 implementation
@@ -136,6 +137,24 @@ begin
     );
   finally
     Obj.Free;
+  end;
+end;
+
+procedure TComponentBuilderTests.TestMenuItemBuilderCreateWithNameAndReference;
+var
+  Builder: TMenuItemBuilder;
+  Item: TMenuItem;
+begin
+  Item := nil;
+  // Regressão: este overload (AClass, AName, out Reference) chamava a si mesmo
+  // em vez de "inherited Create", causando recursão infinita (stack overflow).
+  Builder := TMenuItemBuilder.Create(TMenuItem, 'MyMenuItem', Item);
+  try
+    Builder.Build;
+    AssertNotNull('Item (out Reference) deveria ter sido preenchido', Item);
+    AssertEquals('Nome do item diferente do esperado', 'MyMenuItem', Item.Name);
+  finally
+    Item.Free;
   end;
 end;
 
