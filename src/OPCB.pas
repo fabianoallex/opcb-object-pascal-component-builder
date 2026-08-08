@@ -105,6 +105,23 @@ type
 
   { TObjectBuilderBase }
 
+  // ATENÇÃO - posse de memória: esta classe (e todos os *Builder que dela
+  // descendem: TObjectBuilder, TComponentBuilder, TControlBuilder,
+  // TMenuBuilder, TMenuItemBuilder etc.) herda de TInterfacedObject e por
+  // isso é contada por referência quando atribuída a uma variável de
+  // interface (ex: IControlBuilder<T>) - que é exatamente o tipo de
+  // parâmetro recebido por TControlCreator.Add/SubLevel/SiblingSubLevel e
+  // equivalentes em TComponentCreator/TMenuCreator.
+  //
+  // Use o builder SEMPRE de forma efêmera, criado inline no próprio
+  // parâmetro da chamada:
+  //   Creator.Add(TControlBuilder.Create(TButton).WithCaption('OK'));
+  // Esse é o único padrão seguro. Se, em vez disso, o builder for guardado
+  // numa variável e passado para um desses métodos, ele é destruído
+  // silenciosamente ao sair da chamada (a passagem por parâmetro de
+  // interface derruba o refcount a zero) - qualquer uso posterior dessa
+  // variável é acesso a memória já liberada, e chamar .Free nela depois
+  // é liberar algo que já foi liberado. Não guarde um builder para reuso.
   {$IFDEF FPC}generic{$ENDIF}
   TObjectBuilderBase<TBuild: {$IFDEF FPC}TObject{$ELSE}class{$ENDIF}; TSelf: class> =
     class abstract(TInterfacedObject, {$IFDEF FPC}specialize{$ENDIF} IObjectBuilder<TBuild>)
@@ -755,6 +772,7 @@ type
     FRegistryContextHandle: IRegistryContextHandle;
     FGroups: TControlGroupMap;
     FLevelStack: TControlCreatorLevelStack;
+    FOwnControls: TControlList;
     function GetControls: TControlList;
     procedure MoveTopLeftAfterControl(AControl: TControl);
     procedure MoveTopLeftAfterRect(
@@ -1285,6 +1303,7 @@ begin
   FGroups := TControlGroupMap.Create;
   FLevelStack := TControlCreatorLevelStack.Create(True);
   FLevelStack.Add(TControlCreatorLevel.Create);
+  FOwnControls := TControlList.Create;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
@@ -1379,6 +1398,7 @@ begin
   ApplyDefaultControlSize(Control as TControl);
 
   Registry.AddComponent(Control as TControl, (Control as TControl).Name);
+  FOwnControls.Add(Control as TControl);
 
   // caso especial: TTabSheet / TPageControl
   {$IFDEF FRAMEWORK_FMX}
@@ -1641,6 +1661,7 @@ begin
     GroupList.Free;
   FGroups.Free;
   FLevelStack.Free;
+  FOwnControls.Free;
   inherited;
 end;
 
@@ -1710,6 +1731,9 @@ begin
     end
     else   // sublevel com container
     begin
+      RowSpan := SuperL.GridMode.GetRowSpanForFill;
+      ColSpan := SuperL.GridMode.GetColSpanForFill;
+
       if SuperL.GridMode.CalcCellRectAbsolute(
           SuperL.GridMode.CurrentRow,
           SuperL.GridMode.CurrentCol,
@@ -1896,7 +1920,7 @@ function TControlCreatorHelper.ReturnLastControl(out AControl: TControl): TContr
 begin
   Result := Self;
   AControl := nil;
-  if Self.Controls.Count > 0 then;
+  if Self.Controls.Count > 0 then
     AControl := Self.Controls.Last;
 end;
 
@@ -1948,8 +1972,18 @@ begin
 end;
 
 function TControlCreator.GetControls: TControlList;
+var
+  I: Integer;
 begin
-  Result := Registry.Controls;
+  // Remove referências a controles já destruídos (removidos do Registry
+  // por notificação de free), evitando devolver ponteiros obsoletos, e
+  // restringe o resultado aos controles criados por ESTE creator (e não
+  // por outros creators que compartilhem o mesmo contexto de registry).
+  for I := FOwnControls.Count - 1 downto 0 do
+    if Registry.Controls.IndexOf(FOwnControls[I]) < 0 then
+      FOwnControls.Delete(I);
+
+  Result := FOwnControls;
 end;
 
 function TControlCreator.GetControlsBounds(
@@ -1959,6 +1993,7 @@ var
   Name: string;
   Control: TControl;
   Group: TControlList;
+  NamesStr: string;
 begin
   Result.Reset;
 
@@ -1972,6 +2007,21 @@ begin
       if FGroups.TryGetValue(Name, Group) then
         for Control in Group do
           Result.Include(Control);
+  end;
+
+  if Result.Left > Result.Right then
+  begin
+    NamesStr := '';
+    for I := Low(AControlsNames) to High(AControlsNames) do
+    begin
+      if I > Low(AControlsNames) then
+        NamesStr := NamesStr + ', ';
+      NamesStr := NamesStr + AControlsNames[I];
+    end;
+
+    raise Exception.CreateFmt(
+      'Nenhum controle encontrado para calcular os limites (bounds) do(s) nome(s)/grupo(s) "%s".',
+      [NamesStr]);
   end;
 end;
 
@@ -3848,11 +3898,11 @@ constructor TRegistryContextHandle.Create(const AContextKey: string);
 begin
   inherited Create;
   FIsReleased := False;
-  FContextKey := AContextKey;
   if AContextKey.Trim.IsEmpty then
-    FRegistry := TComponentRegistry.ForContext(GenerateAutoKey)
+    FContextKey := GenerateAutoKey
   else
-    FRegistry := TComponentRegistry.ForContext(AContextKey);
+    FContextKey := AContextKey;
+  FRegistry := TComponentRegistry.ForContext(FContextKey);
 end;
 
 constructor TRegistryContextHandle.Create;
@@ -4780,7 +4830,7 @@ end;
 constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; const AName: string;
   out Reference);
 begin
-  Create(AClass, AName, Reference);
+  inherited Create(AClass, AName, Reference);
 end;
 
 constructor TMenuItemBuilder.Create(AClass: TMenuItemClass; out Reference);
