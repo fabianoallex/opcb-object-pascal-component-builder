@@ -1968,7 +1968,7 @@ end;
 {$IFDEF FPC}generic{$ENDIF}
 function TControlCreator.GetControl<T>(const AName: string): T;
 begin
-  Result := Registry.GetControl<T>(AName);
+  Result := Registry.{$IFDEF FPC}specialize{$ENDIF}GetControl<T>(AName);
 end;
 
 function TControlCreator.GetControls: TControlList;
@@ -3842,7 +3842,7 @@ end;
 {$IFDEF FPC}generic{$ENDIF}
 function TComponentCreator.GetComponent<T>(const AName: string): T;
 begin
-  Result := Registry.GetComponent<T>(AName);
+  Result := Registry.{$IFDEF FPC}specialize{$ENDIF} GetComponent<T>(AName);
 end;
 
 function TComponentCreator.GetComponentRegistry: TComponentRegistry;
@@ -4063,7 +4063,7 @@ end;
 {$IFDEF FPC}generic{$ENDIF}
 function TMenuCreator.GetMenu<T>(const AName: string): T;
 begin
-  Result := Registry.GetComponent<T>(AName);
+  Result := Registry.{$IFDEF FPC}specialize{$ENDIF} GetComponent<T>(AName);
 end;
 
 function TMenuCreator.GetMenuItem(const AName: string): TMenuItem;
@@ -4074,7 +4074,7 @@ end;
 {$IFDEF FPC}generic{$ENDIF}
 function TMenuCreator.GetMenuItem<T>(const AName: string): T;
 begin
-  Result := Registry.GetComponent<T>(AName);
+  Result := Registry.{$IFDEF FPC}specialize{$ENDIF} GetComponent<T>(AName);
 end;
 
 function TMenuCreator.SetOwner(AOwner: TComponent): TMenuCreator;
