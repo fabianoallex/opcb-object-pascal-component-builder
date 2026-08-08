@@ -1,0 +1,204 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{862A5489-0F11-4162-BE88-B7BE8AAAFD65}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="tests\Delphi\VCL\OPCB.Tests.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\custom-helper-for-builders\OPCB.CustomHelperForBuilders.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\dialogs\OPCB.Vcl.Dialogs.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\exemplo-classes-personalizadas\OPCB.Vcl.ExemploClassesPersonalizadas.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\exemplo-menu\OPCB.Vcl.ExemploMenu.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\exemplo-panelflow-card\OPCB.Vcl.ExemploPanelflowCard.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\exemplo-populator-tela-login\OPCB.Vcl.ExemploPopulatorTelaLogin.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\grid-autoexpand\OPCB.Vcl.GridAutoexpand.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\no-dfm\OPCB.Vcl.NoDfm.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\no-dfm-2\OPCB.Vcl.NoDfm2.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\VCL\virtual-keyboard\OPCB.Vcl.VirtualKeyboard.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\FMX\CRUD1\OPCB.Fmx.Crud1.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\FMX\dialogs\OPCB.Fmx.Dialogs.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\FMX\exemplo-menu\OPCB.Fmx.ExemploMenu.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="examples\Builders\FMX\flow-card\OPCB.Fmx.FlowCard.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="OPCB_Tests">
+        <MSBuild Projects="tests\Delphi\VCL\OPCB.Tests.dproj"/>
+    </Target>
+    <Target Name="OPCB_Tests:Clean">
+        <MSBuild Projects="tests\Delphi\VCL\OPCB.Tests.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Tests:Make">
+        <MSBuild Projects="tests\Delphi\VCL\OPCB.Tests.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_CustomHelperForBuilders">
+        <MSBuild Projects="examples\Builders\VCL\custom-helper-for-builders\OPCB.CustomHelperForBuilders.dproj"/>
+    </Target>
+    <Target Name="OPCB_CustomHelperForBuilders:Clean">
+        <MSBuild Projects="examples\Builders\VCL\custom-helper-for-builders\OPCB.CustomHelperForBuilders.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_CustomHelperForBuilders:Make">
+        <MSBuild Projects="examples\Builders\VCL\custom-helper-for-builders\OPCB.CustomHelperForBuilders.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_Dialogs">
+        <MSBuild Projects="examples\Builders\VCL\dialogs\OPCB.Vcl.Dialogs.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_Dialogs:Clean">
+        <MSBuild Projects="examples\Builders\VCL\dialogs\OPCB.Vcl.Dialogs.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_Dialogs:Make">
+        <MSBuild Projects="examples\Builders\VCL\dialogs\OPCB.Vcl.Dialogs.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploClassesPersonalizadas">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-classes-personalizadas\OPCB.Vcl.ExemploClassesPersonalizadas.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploClassesPersonalizadas:Clean">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-classes-personalizadas\OPCB.Vcl.ExemploClassesPersonalizadas.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploClassesPersonalizadas:Make">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-classes-personalizadas\OPCB.Vcl.ExemploClassesPersonalizadas.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploMenu">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-menu\OPCB.Vcl.ExemploMenu.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploMenu:Clean">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-menu\OPCB.Vcl.ExemploMenu.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploMenu:Make">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-menu\OPCB.Vcl.ExemploMenu.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploPanelflowCard">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-panelflow-card\OPCB.Vcl.ExemploPanelflowCard.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploPanelflowCard:Clean">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-panelflow-card\OPCB.Vcl.ExemploPanelflowCard.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploPanelflowCard:Make">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-panelflow-card\OPCB.Vcl.ExemploPanelflowCard.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploPopulatorTelaLogin">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-populator-tela-login\OPCB.Vcl.ExemploPopulatorTelaLogin.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploPopulatorTelaLogin:Clean">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-populator-tela-login\OPCB.Vcl.ExemploPopulatorTelaLogin.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_ExemploPopulatorTelaLogin:Make">
+        <MSBuild Projects="examples\Builders\VCL\exemplo-populator-tela-login\OPCB.Vcl.ExemploPopulatorTelaLogin.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_GridAutoexpand">
+        <MSBuild Projects="examples\Builders\VCL\grid-autoexpand\OPCB.Vcl.GridAutoexpand.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_GridAutoexpand:Clean">
+        <MSBuild Projects="examples\Builders\VCL\grid-autoexpand\OPCB.Vcl.GridAutoexpand.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_GridAutoexpand:Make">
+        <MSBuild Projects="examples\Builders\VCL\grid-autoexpand\OPCB.Vcl.GridAutoexpand.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_NoDfm">
+        <MSBuild Projects="examples\Builders\VCL\no-dfm\OPCB.Vcl.NoDfm.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_NoDfm:Clean">
+        <MSBuild Projects="examples\Builders\VCL\no-dfm\OPCB.Vcl.NoDfm.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_NoDfm:Make">
+        <MSBuild Projects="examples\Builders\VCL\no-dfm\OPCB.Vcl.NoDfm.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_NoDfm2">
+        <MSBuild Projects="examples\Builders\VCL\no-dfm-2\OPCB.Vcl.NoDfm2.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_NoDfm2:Clean">
+        <MSBuild Projects="examples\Builders\VCL\no-dfm-2\OPCB.Vcl.NoDfm2.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_NoDfm2:Make">
+        <MSBuild Projects="examples\Builders\VCL\no-dfm-2\OPCB.Vcl.NoDfm2.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Vcl_VirtualKeyboard">
+        <MSBuild Projects="examples\Builders\VCL\virtual-keyboard\OPCB.Vcl.VirtualKeyboard.dproj"/>
+    </Target>
+    <Target Name="OPCB_Vcl_VirtualKeyboard:Clean">
+        <MSBuild Projects="examples\Builders\VCL\virtual-keyboard\OPCB.Vcl.VirtualKeyboard.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Vcl_VirtualKeyboard:Make">
+        <MSBuild Projects="examples\Builders\VCL\virtual-keyboard\OPCB.Vcl.VirtualKeyboard.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Fmx_Crud1">
+        <MSBuild Projects="examples\Builders\FMX\CRUD1\OPCB.Fmx.Crud1.dproj"/>
+    </Target>
+    <Target Name="OPCB_Fmx_Crud1:Clean">
+        <MSBuild Projects="examples\Builders\FMX\CRUD1\OPCB.Fmx.Crud1.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Fmx_Crud1:Make">
+        <MSBuild Projects="examples\Builders\FMX\CRUD1\OPCB.Fmx.Crud1.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Fmx_Dialogs">
+        <MSBuild Projects="examples\Builders\FMX\dialogs\OPCB.Fmx.Dialogs.dproj"/>
+    </Target>
+    <Target Name="OPCB_Fmx_Dialogs:Clean">
+        <MSBuild Projects="examples\Builders\FMX\dialogs\OPCB.Fmx.Dialogs.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Fmx_Dialogs:Make">
+        <MSBuild Projects="examples\Builders\FMX\dialogs\OPCB.Fmx.Dialogs.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Fmx_ExemploMenu">
+        <MSBuild Projects="examples\Builders\FMX\exemplo-menu\OPCB.Fmx.ExemploMenu.dproj"/>
+    </Target>
+    <Target Name="OPCB_Fmx_ExemploMenu:Clean">
+        <MSBuild Projects="examples\Builders\FMX\exemplo-menu\OPCB.Fmx.ExemploMenu.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Fmx_ExemploMenu:Make">
+        <MSBuild Projects="examples\Builders\FMX\exemplo-menu\OPCB.Fmx.ExemploMenu.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="OPCB_Fmx_FlowCard">
+        <MSBuild Projects="examples\Builders\FMX\flow-card\OPCB.Fmx.FlowCard.dproj"/>
+    </Target>
+    <Target Name="OPCB_Fmx_FlowCard:Clean">
+        <MSBuild Projects="examples\Builders\FMX\flow-card\OPCB.Fmx.FlowCard.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="OPCB_Fmx_FlowCard:Make">
+        <MSBuild Projects="examples\Builders\FMX\flow-card\OPCB.Fmx.FlowCard.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="OPCB_Tests;OPCB_CustomHelperForBuilders;OPCB_Vcl_Dialogs;OPCB_Vcl_ExemploClassesPersonalizadas;OPCB_Vcl_ExemploMenu;OPCB_Vcl_ExemploPanelflowCard;OPCB_Vcl_ExemploPopulatorTelaLogin;OPCB_Vcl_GridAutoexpand;OPCB_Vcl_NoDfm;OPCB_Vcl_NoDfm2;OPCB_Vcl_VirtualKeyboard;OPCB_Fmx_Crud1;OPCB_Fmx_Dialogs;OPCB_Fmx_ExemploMenu;OPCB_Fmx_FlowCard"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="OPCB_Tests:Clean;OPCB_CustomHelperForBuilders:Clean;OPCB_Vcl_Dialogs:Clean;OPCB_Vcl_ExemploClassesPersonalizadas:Clean;OPCB_Vcl_ExemploMenu:Clean;OPCB_Vcl_ExemploPanelflowCard:Clean;OPCB_Vcl_ExemploPopulatorTelaLogin:Clean;OPCB_Vcl_GridAutoexpand:Clean;OPCB_Vcl_NoDfm:Clean;OPCB_Vcl_NoDfm2:Clean;OPCB_Vcl_VirtualKeyboard:Clean;OPCB_Fmx_Crud1:Clean;OPCB_Fmx_Dialogs:Clean;OPCB_Fmx_ExemploMenu:Clean;OPCB_Fmx_FlowCard:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="OPCB_Tests:Make;OPCB_CustomHelperForBuilders:Make;OPCB_Vcl_Dialogs:Make;OPCB_Vcl_ExemploClassesPersonalizadas:Make;OPCB_Vcl_ExemploMenu:Make;OPCB_Vcl_ExemploPanelflowCard:Make;OPCB_Vcl_ExemploPopulatorTelaLogin:Make;OPCB_Vcl_GridAutoexpand:Make;OPCB_Vcl_NoDfm:Make;OPCB_Vcl_NoDfm2:Make;OPCB_Vcl_VirtualKeyboard:Make;OPCB_Fmx_Crud1:Make;OPCB_Fmx_Dialogs:Make;OPCB_Fmx_ExemploMenu:Make;OPCB_Fmx_FlowCard:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
