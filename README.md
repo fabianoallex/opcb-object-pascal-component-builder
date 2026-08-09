@@ -1,12 +1,26 @@
-# OPCB – Object Pascal Component Builder  
+# OPCB – Object Pascal Component Builder
 
 **Versão em português**: veja [README_PT.md](README_PT.md)
 
 ---
 
-🚀 Instantiate and configure Delphi and Lazarus components in a fluent, expressive, and reusable way.  
+🚀 Instantiate and configure Delphi and Lazarus components in a fluent, expressive, and reusable way — **entirely at runtime, with no `.dfm`/`.lfm` required**.
 
-**OPCB (Object Pascal Component Builder)** is a library that simplifies runtime component creation in **Delphi** and **Lazarus**, allowing you to build and configure visual components with a fluent, clear, and organized API.  
+**OPCB (Object Pascal Component Builder)** is a library for **Delphi** and **Lazarus** that lets you build and configure visual components in code, with a fluent, chainable, and readable API. It targets a case the design-time form designer doesn't cover well: UI whose shape is only known at runtime — driven by data, by a schema, by user choices, or by anything else the designer can't see in advance.
+
+---
+
+## Table of Contents
+
+- [Documentation & Articles](#-documentation)
+- [Benefits](#-benefits)
+- [Usage Examples](#-usage-examples)
+- [Features Demonstrated](#-features-demonstrated)
+- [Examples Gallery](#-examples-gallery)
+- [Tested](#-tested)
+- [Requirements](#-requirements)
+- [Installation](#-installation)
+- [License](#-license)
 
 ---
 
@@ -18,19 +32,22 @@
 [articles](articles/en/index.md)
 ---
 
-## ✨ Benefits  
+## ✨ Benefits
 
-- 🔹 **Fluent API** – Configure properties and events in a chained way.  
+- 🔹 **Fluent API** – Configure properties and events in a chained way.
 - 🔹 **Less repetitive code**.
-- 🔹 **Hierarchical organization** – Facilitates creation of nested layouts.  
-- 🔹 **Automatic grid support** – Add controls in cells with `RowSpan` and `ColSpan`.  
-- 🔹 **Compatible with VCL, LCL, and FMX** . 
+- 🔹 **Hierarchical organization** – Facilitates creation of nested layouts.
+- 🔹 **Automatic grid support** – Add controls in cells with `RowSpan` and `ColSpan`.
+- 🔹 **Three builders, one API style** – `TControlCreator` for visual controls, `TComponentCreator` for non-visual components (dialogs, timers, datasets...), `TMenuCreator` for menu trees.
+- 🔹 **RTTI-based property/event assignment** – Set arbitrary properties (`WithProp`) and events (`WithEvent`) by name, even on component classes the library doesn't know about ahead of time.
+- 🔹 **Compatible with VCL, LCL, and FMX**.
+- 🔹 **Extensively tested** – see [Tested](#-tested) below.
 
 ---
 
-## 🚀 Usage Examples  
+## 🚀 Usage Examples
 
-Simple control creation:  
+Simple control creation:
 
 ```pascal
 uses
@@ -59,7 +76,7 @@ begin
       .AlignControlsRight(['button_enviar', 'button_cancelar'], ['edit_name'])
     ;
   finally
-    Creator.Free;;
+    Creator.Free;
   end;
 end;
 ```
@@ -67,7 +84,7 @@ end;
 
 ---
 
-Nested control creation:  
+Nested control creation:
 
 ```pascal
 uses
@@ -109,14 +126,13 @@ begin
   finally
     Creator.Free;
   end;
-end;  
-
+end;
 ```
 ![Exemplo 02](docs/img/img-02.png)
 
 ---
 
-Grid Mode:  
+Grid Mode:
 
 ```pascal
 uses
@@ -169,7 +185,7 @@ begin
   finally
     Creator.Free;
   end;
-end;   
+end;
 ```
 ![Exemplo 03](docs/img/img-03.png)
 
@@ -249,17 +265,17 @@ end;
   - `.SuperLevel` returns to the previous level.
 
 - **Grid layouts**
-  - `.GridInit(Cols, Rows)` starts a grid.
+  - `.GridInit(Rows, Cols)` starts a grid.
   - `.GridSetCellWidthAndHeight(W, H)` defines the cell dimensions.
   - `.GridSetRowOffset(Row, Offset)` applies offset in specific rows.
 
 - **Dynamic control insertion**
-  - `.External(procedure(ACreator: TControlCreator) ...)`  
+  - `.External(procedure(ACreator: TControlCreator) ...)`
     allows batch creation of controls such as keys from arrays/strings.
 
 - **Grid positioning control**
-  - `.Break` → line/column break.  
-  - `.GridSkipCells(N)` → skips cells.  
+  - `.Break` → line/column break *(direction-dependent — see [docs](docs/doc.md) before relying on it for a plain "next line down"; `.BreakLine`/`.BreakColumn` are the unconditional versions)*.
+  - `.GridSkipCells(N)` → skips cells.
   - `.GridColSpan(N)` → merges columns (e.g. **SPACE** key).
 
 - **Automatic container adjustment**
@@ -271,10 +287,57 @@ end;
 
 The example creates:
 
-- A **QWERTY keyboard** with two letter rows and an expanded **[ SPACE ]** key.  
-- A **numeric keyboard** with digits `0–9` and a comma.  
+- A **QWERTY keyboard** with two letter rows and an expanded **[ SPACE ]** key.
+- A **numeric keyboard** with digits `0–9` and a comma.
 - Both organized within a `TPanel` that automatically adjusts to its content.
 
+---
+
+## 🧪 Examples Gallery
+
+Beyond the snippets above, the [`examples/Builders`](examples/Builders) folder has full, runnable projects — one subfolder per platform (`Lazarus`, `VCL`, `FMX`, plus a couple of cross-compiler `VCL-Lazarus` ones). Each is a standalone Delphi/Lazarus project you can open and run directly.
+
+| Platform | Example | What it demonstrates |
+|---|---|---|
+| Lazarus | [`schema-driven-ui`](examples/Builders/Lazarus/schema-driven-ui) | A single generator renders a data-driven field schema as either a 2-column grid or a 1-column stack, and reads values back by field name — UI whose shape only exists at runtime. |
+| Lazarus | [`book-search`](examples/Builders/Lazarus/book-search) | Open Library book-search screen with query box, pagination, progress bar, and dynamically generated book cards. |
+| Lazarus | [`sqlite`](examples/Builders/Lazarus/sqlite) | SQLite-backed app: login screen, main menu/status bar, and a dynamically opened tabbed Users CRUD form. |
+| Lazarus | [`virtual-keyboard`](examples/Builders/Lazarus/virtual-keyboard) | On-screen virtual keyboard (QWERTY + numeric keypad) built from custom-styled speed buttons in a grid. |
+| Lazarus | [`grid-mode`](examples/Builders/Lazarus/grid-mode) | Grid layout mode with column/row spans and skipped cells, arranging 18 panels/buttons irregularly. |
+| Lazarus | [`dialogs`](examples/Builders/Lazarus/dialogs) | Modal builder-dialogs: state list, masked phone, color picker, spin edit, string grid, trackbar, dual-listbox mover, and a searchable in-memory-dataset DB grid. |
+| Lazarus | [`exemplo-menus`](examples/Builders/Lazarus/exemplo-menus) | Main menu and popup menu tree (File/Edit/Search) built via `TMenuCreator`. |
+| Lazarus | [`custom-helper-for-builders`](examples/Builders/Lazarus/custom-helper-for-builders) | How to write your own `class helper` methods (e.g. `WithFontSize`, `WithVisible`) for the library's builder classes. |
+| VCL | [`exemplo-populator-tela-login`](examples/Builders/VCL/exemplo-populator-tela-login) | Full login screen (fields, checkbox, button, footer) built and aligned entirely via the builder. |
+| VCL | [`virtual-keyboard`](examples/Builders/VCL/virtual-keyboard) | On-screen virtual keyboard (QWERTY + numeric keypad) with nested grids, row offsets and spans. |
+| VCL | [`dialogs`](examples/Builders/VCL/dialogs) | Modal builder-dialogs: masked phone, color picker, calendar view, string grid, trackbar, dual-listbox mover, and a searchable `ClientDataSet` DB grid. |
+| VCL | [`grid-autoexpand`](examples/Builders/VCL/grid-autoexpand) | Grid layout mode (`GridInit`/`GridFinish`) with a minimal 2×2 example. |
+| VCL | [`exemplo-menu`](examples/Builders/VCL/exemplo-menu) | Main menu and popup menu tree (File/Edit/Search) built via `TMenuCreator`. |
+| VCL | [`exemplo-panelflow-card`](examples/Builders/VCL/exemplo-panelflow-card) | Adds avatar profile cards (image + name/contact labels) to a flow panel on demand, one click at a time. |
+| VCL | [`exemplo-classes-personalizadas`](examples/Builders/VCL/exemplo-classes-personalizadas) | Building your own custom control class (a self-clicking button) with the builder, alongside regular controls. |
+| VCL | [`custom-helper-for-builders`](examples/Builders/VCL/custom-helper-for-builders) | How to write your own `class helper` methods for the library's builder classes. |
+| VCL | [`no-dfm`](examples/Builders/VCL/no-dfm) / [`no-dfm-2`](examples/Builders/VCL/no-dfm-2) | Minimal forms built with **no `.dfm` file at all** — every control created in code. |
+| VCL-Lazarus | [`no-dfm`](examples/Builders/VCL-Lazarus/no-dfm) | The same no-`.dfm`/`.lfm` idea, written once and compiled unmodified under both Delphi and Lazarus. |
+| FMX | [`dialogs`](examples/Builders/FMX/dialogs) | Modal builder-dialogs: password entry, a string-grid date picker, a trackbar picker, a state picker, and a dual-listbox mover. |
+| FMX | [`exemplo-menu`](examples/Builders/FMX/exemplo-menu) | Main menu and popup menu tree (File/Edit/Search) built via `TMenuCreator`. |
+| FMX | [`flow-card`](examples/Builders/FMX/flow-card) | Adds avatar profile cards to a flow layout on demand, one click at a time. |
+| FMX | [`CRUD1`](examples/Builders/FMX/CRUD1) | Minimal `TOPCBCreators` layout demo (a small starting point, not a full CRUD screen despite the name). |
+
+---
+
+## ✅ Tested
+
+OPCB ships with an extensive automated regression suite, run on every change against **both** compilers this library supports — because the two catch different classes of bugs (the Delphi/DUnitX suite, for instance, is the only one that reliably surfaces memory leaks via FastMM):
+
+- **213 tests** on the Lazarus/FPC suite ([`tests/Lazarus/ControlBuilder`](tests/Lazarus/ControlBuilder)), fpcunit.
+- **207 tests** on the Delphi/VCL suite ([`tests/Delphi/VCL`](tests/Delphi/VCL)), DUnitX.
+- 0 failures, 0 errors, 0 memory leaks on both, as of the last full run.
+
+---
+
+## 🧩 Requirements
+
+- **Delphi**: a version with generics and interface support (10.x or newer recommended). Targets **VCL** and **FMX**.
+- **Lazarus / Free Pascal**: FPC 3.2+ (the library relies on generics and advanced records). Targets the **LCL**.
 
 ---
 
@@ -294,20 +357,20 @@ Download the ZIP file from the GitHub repository and extract it to a folder of y
 
 ### 💠 Delphi
 
-1. Open **Delphi**.  
-2. Go to **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.  
-3. In the **Library Path** field, add the full path to the `src` folder.  
-   Example:  
+1. Open **Delphi**.
+2. Go to **Tools ▸ Options ▸ Language ▸ Delphi Options ▸ Library**.
+3. In the **Library Path** field, add the full path to the `src` folder.
+   Example:
    `C:\opcb\src`
 
 ---
 
 ### 💠 Lazarus
 
-1. Open **Lazarus**.  
-2. Go to **Project ▸ Project Options ▸ Compiler Options ▸ Paths**.  
-3. In **Other unit files (-Fu)**, add the path to the `src` folder.  
-   Example:  
+1. Open **Lazarus**.
+2. Go to **Project ▸ Project Options ▸ Compiler Options ▸ Paths**.
+3. In **Other unit files (-Fu)**, add the path to the `src` folder.
+   Example:
    `C:\opcb\src`
 
 ---
@@ -315,5 +378,11 @@ Download the ZIP file from the GitHub repository and extract it to a folder of y
 ### 🧰 Done!
 
 After that, the project's units will be available for use in your Delphi or Lazarus projects.
+
+---
+
+## 📄 License
+
+OPCB is licensed under the **Apache License, Version 2.0** — see [LICENSE](LICENSE) and [NOTICE](NOTICE) for the full text and attribution details.
 
 ---
