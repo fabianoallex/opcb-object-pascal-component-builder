@@ -852,6 +852,17 @@ type
     property Items[const AName: string]: TControl read GetItem; default;
   end;
 
+  // Métodos fluentes de TControlCreator ficam num class helper, não direto
+  // na classe, porque movê-los para dentro de TControlCreator reproduz um
+  // bug de geração de código do FPC 3.2.2: a unit compila sem erro, mas o
+  // linker falha com "Undefined symbol: .La<N>" (símbolos internos do
+  // assembler) referentes a esta classe. Reproduzido e confirmado em
+  // 2026-08-09 fundindo manualmente este helper de volta em TControlCreator
+  // e recompilando; revertendo o merge, o link volta a funcionar. Gatilho
+  // exato (contagem de métodos? overloads genéricos específicos? nível de
+  // otimização?) não foi isolado. Não mover este código para dentro da
+  // classe, nem para uma interface implementada diretamente por ela, sem
+  // antes confirmar que o bug não volta a ocorrer.
   TControlCreatorHelper = class helper for TControlCreator
   public
     {$IFDEF FPC}generic{$ENDIF}
