@@ -66,6 +66,7 @@ type
     [Test] procedure TestControlBuilderReadOnlyProp;
     [Test] procedure TestControlBuilderSetupAndWithName;
     [Test] procedure TestControlBuilderWithEvent;
+    [Test] procedure TestControlBuilderWithInvalidEventNameRaises;
   end;
 
 implementation
@@ -908,17 +909,29 @@ begin
 end;
 
 procedure TControlBuilderTest.TestControlBuilderReadOnlyProp;
+// Regressao/mudanca de contrato: setar uma propriedade somente-leitura via
+// WithProp agora lanca EPropertyError, em vez de ser ignorado em silencio -
+// uniformizando com o comportamento de propriedade inexistente (que ja
+// sempre lancava) e de evento com nome invalido (WithEvent).
 var
   Builder: TControlBuilder;
   Panel: TPanelWithReadOnlyProp;
+  Raised: Boolean;
 begin
+  Raised := False;
   Panel := nil;
   Builder := TControlBuilder.Create(TPanelWithReadOnlyProp);
   try
     Builder.WithProp('ReadOnlyProp', 99);
-    Panel := Builder.Build as TPanelWithReadOnlyProp;
-    Assert.AreEqual(42, Panel.ReadOnlyProp,
-      'Propriedade read-only ReadOnlyProp nao deveria ser alterada');
+
+    try
+      Panel := Builder.Build as TPanelWithReadOnlyProp;
+    except
+      on E: EPropertyError do
+        Raised := True;
+    end;
+
+    Assert.IsTrue(Raised, 'Setar propriedade somente-leitura deveria lancar EPropertyError');
   finally
     Panel.Free;
     Builder.Free;
@@ -959,6 +972,34 @@ begin
     TButton(Button).Click;
     Assert.IsNotNull(Button, 'Button nao deveria ser nil');
     Assert.AreEqual(True, FClicked, 'Propriedade FClicked diferente da esperada');
+  finally
+    Button.Free;
+    Builder.Free;
+  end;
+end;
+
+procedure TControlBuilderTest.TestControlBuilderWithInvalidEventNameRaises;
+// Regressao/mudanca de contrato: um typo no nome do evento (ex: 'OnClik'
+// em vez de 'OnClick') era ignorado em silencio; agora lanca
+// EPropertyError, igual a uma propriedade inexistente.
+var
+  Builder: TControlBuilder;
+  Button: TControl;
+  Raised: Boolean;
+begin
+  Raised := False;
+  Button := nil;
+  Builder := TControlBuilder.Create(TButton);
+  Builder.WithEvent('OnClik', Self, @TControlBuilderTest.ButtonClick); // typo proposital
+  try
+    try
+      Button := Builder.Build;
+    except
+      on E: EPropertyError do
+        Raised := True;
+    end;
+
+    Assert.IsTrue(Raised, 'Nome de evento invalido deveria lancar EPropertyError');
   finally
     Button.Free;
     Builder.Free;

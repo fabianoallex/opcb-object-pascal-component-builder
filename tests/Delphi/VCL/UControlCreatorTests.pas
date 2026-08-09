@@ -3,7 +3,7 @@ unit UControlCreatorTests;
 interface
 
 uses
-  DUnitX.TestFramework, Vcl.Forms, Vcl.Controls, Vcl.ExtCtrls, OPCB;
+  DUnitX.TestFramework, Vcl.Forms, Vcl.Controls, Vcl.ExtCtrls, Vcl.StdCtrls, OPCB;
 
 type
   [TestFixture]
@@ -90,6 +90,11 @@ type
     [Test] procedure TestGridBreakColumn;
     [Test] procedure TestGrid1x1;
     [Test] procedure TestGridGoToLastCell;
+    [Test] procedure TestGridSpanOverlapRaises;
+    [Test] procedure TestBreakLineOnLastRowIsNoOp;
+    [Test] procedure TestBreakColumnOnLastColIsNoOp;
+    [Test] procedure TestSubLevelWithNonWinControlRaises;
+    [Test] procedure TestAddWithGridFullDiscardsOutReference;
     [Test] procedure TestAlignControlsRight;
     [Test] procedure TestAlignControlsRightWithPadding;
     [Test] procedure TestSetOwnerAndParentDirectly;
@@ -2195,6 +2200,155 @@ begin
 
     Assert.IsNotNull(P, 'P nao deveria ser nil');
   finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestGridSpanOverlapRaises;
+// Regressao: Step so conferia se a celula INICIAL estava livre; o resto do
+// span (via RowSpan/ColSpan) era marcado ocupado sem checar sobreposicao.
+// Aqui a celula (0,0) esta livre, mas o span de 2 linhas invade (1,0), que
+// ja foi ocupada por outro controle - deve lancar erro, nao sobrepor
+// silenciosamente.
+var
+  ControlCreator: TControlCreator;
+  P1, P2: TPanel;
+  Raised: Boolean;
+begin
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .GridInit(3, 3)
+        .GridGotoCell(1, 0)
+        .Add(TControlBuilder.Create(TPanel, P1)) // ocupa (1,0)
+    ;
+
+    try
+      ControlCreator
+        .GridGotoCell(0, 0)
+        .GridRowSpan(2)
+        .Add(TControlBuilder.Create(TPanel, P2)) // (0,0) livre, mas span invade (1,0) ja ocupada
+      ;
+    except
+      on E: Exception do
+        Raised := True;
+    end;
+
+    Assert.IsTrue(Raised, 'Sobreposicao de span deveria lancar excecao');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestBreakLineOnLastRowIsNoOp;
+// Regressao: BreakLine na ultima linha do grid chamava GridGotoCell(Rows,0),
+// que lancava "GridGotoCell: linha fora dos limites" - um metodo que quem
+// chamou BreakLine nunca invocou diretamente. Deve ser no-op, igual ao
+// BreakLine fora do modo grid (que nunca lanca).
+var
+  ControlCreator: TControlCreator;
+  Raised: Boolean;
+begin
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .GridInit(2, 2)
+        .GridGotoCell(1, 0); // ja na ultima linha
+
+    try
+      ControlCreator.BreakLine;
+    except
+      on E: Exception do
+        Raised := True;
+    end;
+
+    Assert.IsFalse(Raised, 'BreakLine na ultima linha nao deveria lancar excecao');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestBreakColumnOnLastColIsNoOp;
+var
+  ControlCreator: TControlCreator;
+  Raised: Boolean;
+begin
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .GridInit(2, 2)
+        .GridGotoCell(0, 1); // ja na ultima coluna
+
+    try
+      ControlCreator.BreakColumn;
+    except
+      on E: Exception do
+        Raised := True;
+    end;
+
+    Assert.IsFalse(Raised, 'BreakColumn na ultima coluna nao deveria lancar excecao');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSubLevelWithNonWinControlRaises;
+// Regressao: SubLevel fazia TWinControl(Control) via cast direto, sem
+// checar o tipo. TLabel nao e TWinControl (e TGraphicControl) - passar um
+// builder de TLabel para SubLevel deveria lancar um erro claro em vez de
+// corromper o proximo Add silenciosamente.
+var
+  ControlCreator: TControlCreator;
+  Raised: Boolean;
+begin
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    try
+      ControlCreator
+        .SetOwnerAndParent(FForm, FForm)
+        .SubLevel(TControlBuilder.Create(TLabel));
+    except
+      on E: Exception do
+        Raised := True;
+    end;
+
+    Assert.IsTrue(Raised, 'SubLevel com um controle que nao e TWinControl deveria lancar excecao');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestAddWithGridFullDiscardsOutReference;
+// Regressao: quando o grid ja esta cheio, Add saia antes de chamar Build,
+// entao o "out Reference" do builder nunca era escrito e a variavel ficava
+// com o valor anterior (lixo) em vez de nil.
+var
+  ControlCreator: TControlCreator;
+  Dummy: TPanel;
+  P1, P2: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  Dummy := TPanel.Create(nil);
+  try
+    P2 := Dummy; // valor nao-nil conhecido, simulando "lixo" de uma referencia anterior
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .Add(TControlBuilder.Create(TPanel, P1))
+        .Add(TControlBuilder.Create(TPanel, P2)) // grid ja cheio: nao deveria criar nem manter o valor antigo
+    ;
+
+    Assert.IsNotNull(P1, 'P1 deveria ter sido criado normalmente');
+    Assert.IsNull(P2, 'P2 deveria ser nil (grid cheio, Build nunca chegou a ser chamado)');
+  finally
+    Dummy.Free;
     ControlCreator.Free;
   end;
 end;

@@ -17,7 +17,10 @@ uses
   DUnitX.TestFramework,
   UObjectBuilderTests in 'UObjectBuilderTests.pas',
   UControlBuilderTests in 'UControlBuilderTests.pas',
-  UControlCreatorTests in 'UControlCreatorTests.pas';
+  UControlCreatorTests in 'UControlCreatorTests.pas',
+  UComponentRegistryTest in 'UComponentRegistryTest.pas',
+  UMenuCreatorTests in 'UMenuCreatorTests.pas',
+  UButtonBuilderTests in 'UButtonBuilderTests.pas';
 
 { keep comment here to protect the following conditional from being removed by the IDE when adding a unit }
 {$IFNDEF TESTINSIGHT}

@@ -141,6 +141,9 @@
         <DCCReference Include="UObjectBuilderTests.pas"/>
         <DCCReference Include="UControlBuilderTests.pas"/>
         <DCCReference Include="UControlCreatorTests.pas"/>
+        <DCCReference Include="UComponentRegistryTest.pas"/>
+        <DCCReference Include="UMenuCreatorTests.pas"/>
+        <DCCReference Include="UButtonBuilderTests.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
