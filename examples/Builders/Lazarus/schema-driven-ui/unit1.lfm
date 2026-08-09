@@ -1,0 +1,50 @@
+object Form1: TForm1
+  Left = 300
+  Height = 700
+  Top = 150
+  Width = 800
+  Caption = 'OPCB - UI orientada a schema'
+  ClientHeight = 700
+  ClientWidth = 800
+  DesignTimePPI = 120
+  LCLVersion = '4.4.0.0'
+  OnCreate = FormCreate
+  object PanelToolbar: TPanel
+    Left = 0
+    Height = 50
+    Top = 0
+    Width = 640
+    Align = alTop
+    BevelOuter = bvNone
+    ClientHeight = 50
+    ClientWidth = 640
+    TabOrder = 0
+    object BtnToggleLayout: TButton
+      Left = 10
+      Height = 35
+      Top = 8
+      Width = 212
+      Caption = 'Alternar layout'
+      TabOrder = 0
+      OnClick = BtnToggleLayoutClick
+    end
+    object BtnSubmit: TButton
+      Left = 232
+      Height = 35
+      Top = 8
+      Width = 150
+      Caption = 'Enviar'
+      TabOrder = 1
+      OnClick = BtnSubmitClick
+    end
+  end
+  object PanelContent: TPanel
+    Left = 0
+    Height = 520
+    Top = 40
+    Width = 640
+    Align = alClient
+    BevelOuter = bvNone
+    TabOrder = 1
+  end
+end
