@@ -5,7 +5,7 @@ program consoletestproject;
 uses
   Interfaces, consoletestrunner, UControlCreatorTests, UControlBuilderTests,
   UObjectBuilderTests, UComponentBuilderTests, UComponentRegistryTest,
-  UMenuCreatorTests, UComponentCreatorTests;
+  UMenuCreatorTests, UComponentCreatorTests, UButtonBuilderTests;
 
 var
   Application: TTestRunner;

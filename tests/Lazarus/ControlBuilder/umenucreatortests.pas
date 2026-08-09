@@ -28,9 +28,28 @@ type
     procedure TestSuperLevelAtRootLevelRaises;
     procedure TestSetOwnerDirectly;
     procedure TestGetMenuGeneric;
+    procedure TestAddMenuBuilderIsFreedNotLeaked;
+    procedure TestAddMenuItemBeforeAddMenuRaises;
   end;
 
 implementation
+
+type
+  { TCountingMenuBuilder }
+
+  TCountingMenuBuilder = class(TMenuBuilder)
+  public
+    destructor Destroy; override;
+  end;
+
+var
+  GMenuBuilderDestroyCount: Integer = 0;
+
+destructor TCountingMenuBuilder.Destroy;
+begin
+  Inc(GMenuBuilderDestroyCount);
+  inherited;
+end;
 
 procedure TMenuCreatorTests.MenuItemClick(Sender: TObject);
 begin
@@ -239,6 +258,56 @@ begin
       MenuCreator.specialize GetMenu<TMainMenu>('MainMenu'));
     AssertNotNull('GetMenuItem<T> não deveria devolver nil',
       MenuCreator.specialize GetMenuItem<TMenuItem>('Item1'));
+  finally
+    MenuCreator.Free;
+  end;
+end;
+
+procedure TMenuCreatorTests.TestAddMenuBuilderIsFreedNotLeaked;
+var
+  MenuCreator: TMenuCreator;
+begin
+  // Regressão: TMenuBuilder é recebido por AddMenu como parâmetro de classe
+  // concreta (não de interface), então o refcounting de TInterfacedObject
+  // nunca entrava em ação nesse caminho - e como ninguém chamava Free,
+  // todo AddMenu vazava o builder. Agora o Creator assume a posse e libera
+  // explicitamente logo após Build.
+  GMenuBuilderDestroyCount := 0;
+  MenuCreator := TMenuCreator.Create;
+  try
+    MenuCreator
+      .SetOwner(FForm)
+      .AddMenu(TCountingMenuBuilder.Create(TMainMenu, 'MainMenu'))
+    ;
+
+    AssertEquals('O builder do menu deveria ter sido liberado exatamente uma vez', 1, GMenuBuilderDestroyCount);
+  finally
+    MenuCreator.Free;
+  end;
+end;
+
+procedure TMenuCreatorTests.TestAddMenuItemBeforeAddMenuRaises;
+{ Regressão: o nível raiz do menu creator começa com Parent = nil;
+  AddMenuItem não checava antes de usar, causando acesso a nil (AV) ao
+  chamar AddMenuItem sem antes um AddMenu. Agora levanta uma exceção clara
+  explicando o pré-requisito. }
+var
+  MenuCreator: TMenuCreator;
+  Raised: Boolean;
+begin
+  Raised := False;
+  MenuCreator := TMenuCreator.Create;
+  try
+    try
+      MenuCreator
+        .SetOwner(FForm)
+        .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'Item1')); // sem AddMenu antes
+    except
+      on E: Exception do
+        Raised := True;
+    end;
+
+    AssertTrue('AddMenuItem sem AddMenu anterior deveria levantar exceção', Raised);
   finally
     MenuCreator.Free;
   end;

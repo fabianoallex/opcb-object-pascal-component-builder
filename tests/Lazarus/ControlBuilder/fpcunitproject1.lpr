@@ -5,7 +5,7 @@ program fpcunitproject1;
 uses
   Interfaces, Forms, GuiTestRunner, UControlCreatorTests, UControlBuilderTests,
   UObjectBuilderTests, UComponentBuilderTests, UComponentRegistryTest,
-  UMenuCreatorTests, UComponentCreatorTests;
+  UMenuCreatorTests, UComponentCreatorTests, UButtonBuilderTests;
 
 {$R *.res}
 

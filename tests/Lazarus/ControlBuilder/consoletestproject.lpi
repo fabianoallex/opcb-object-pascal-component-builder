@@ -71,6 +71,11 @@
         <IsPartOfProject Value="True"/>
         <UnitName Value="UComponentCreatorTests"/>
       </Unit>
+      <Unit>
+        <Filename Value="ubuttonbuildertests.pas"/>
+        <IsPartOfProject Value="True"/>
+        <UnitName Value="UButtonBuilderTests"/>
+      </Unit>
     </Units>
   </ProjectOptions>
   <CompilerOptions>

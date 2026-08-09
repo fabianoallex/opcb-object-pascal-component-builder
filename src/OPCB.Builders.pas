@@ -25,6 +25,7 @@ type
     FEnabled: TOptionalBoolean;
   protected
     function CreateObject: TButton; override;
+    procedure ConfigureObject(AObject: TButton); override;
   public
     constructor Create(const AName: string=''); overload;
     constructor Create(AClass: TButtonClass; const AName: string=''); overload;
@@ -40,13 +41,13 @@ implementation
 
 constructor TButtonBuilder.Create(AClass: TButtonClass; const AName: string);
 begin
-  inherited Create(TButton, AName);
+  inherited Create(AClass, AName);
 end;
 
 constructor TButtonBuilder.Create(AClass: TButtonClass; const AName: string;
   out Reference);
 begin
-  inherited Create(TButton, AName, Reference);
+  inherited Create(AClass, AName, Reference);
 end;
 
 constructor TButtonBuilder.Create(AClass: TButtonClass; out Reference);
@@ -57,6 +58,14 @@ end;
 function TButtonBuilder.CreateObject: TButton;
 begin
   Result := TButtonClass(FObjectClass).Create(Owner);
+end;
+
+procedure TButtonBuilder.ConfigureObject(AObject: TButton);
+begin
+  inherited ConfigureObject(AObject);
+  AObject.ModalResult := FModalResult;
+  if FEnabled.HasValue then
+    AObject.Enabled := FEnabled.Value;
 end;
 
 constructor TButtonBuilder.Create(const AName: string);

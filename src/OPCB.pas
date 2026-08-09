@@ -101,27 +101,34 @@ type
     ['{1FD2411F-05F7-4132-A10D-C06A2CA95781}']
     function Build: TBuild;
     procedure AssignReference(out Reference);
+    procedure DiscardReferences;
   end;
 
   { TObjectBuilderBase }
 
   // ATENÇÃO - posse de memória: esta classe (e todos os *Builder que dela
   // descendem: TObjectBuilder, TComponentBuilder, TControlBuilder,
-  // TMenuBuilder, TMenuItemBuilder etc.) herda de TInterfacedObject e por
-  // isso é contada por referência quando atribuída a uma variável de
-  // interface (ex: IControlBuilder<T>) - que é exatamente o tipo de
-  // parâmetro recebido por TControlCreator.Add/SubLevel/SiblingSubLevel e
-  // equivalentes em TComponentCreator/TMenuCreator.
+  // TMenuBuilder, TMenuItemBuilder etc.) implementa IObjectBuilder<T> (e
+  // especializações como IControlBuilder<T>) - o tipo de parâmetro recebido
+  // por TControlCreator.Add/SubLevel/SiblingSubLevel e equivalentes em
+  // TComponentCreator/TMenuCreator - mas _AddRef/_Release são sobrescritos
+  // abaixo para NÃO fazer contagem de referência de verdade. Ou seja: o
+  // ciclo de vida do builder NÃO é automático, é posse explícita do
+  // Creator que o recebe.
   //
-  // Use o builder SEMPRE de forma efêmera, criado inline no próprio
-  // parâmetro da chamada:
+  // Contrato: ao passar um builder para Add/SubLevel/SiblingSubLevel/
+  // AddMenu/AddMenuItem, o Creator assume a posse e libera (Free) o
+  // builder internamente assim que termina de usá-lo (logo após Build).
+  // Depois dessa chamada o builder está destruído - não o reutilize, não
+  // guarde a referência, não chame .Free nele. O padrão idiomático
+  // continua sendo criar o builder inline no próprio parâmetro:
   //   Creator.Add(TControlBuilder.Create(TButton).WithCaption('OK'));
-  // Esse é o único padrão seguro. Se, em vez disso, o builder for guardado
-  // numa variável e passado para um desses métodos, ele é destruído
-  // silenciosamente ao sair da chamada (a passagem por parâmetro de
-  // interface derruba o refcount a zero) - qualquer uso posterior dessa
-  // variável é acesso a memória já liberada, e chamar .Free nela depois
-  // é liberar algo que já foi liberado. Não guarde um builder para reuso.
+  // Antes desta classe desabilitar o refcounting, esse mesmo código já
+  // funcionava (e continua funcionando) - a diferença é que agora a
+  // liberação é determinística (feita explicitamente pelo Creator) em vez
+  // de depender do refcount da interface cair a zero ao sair de escopo,
+  // o que destruía o builder de forma silenciosa e surpreendente sempre
+  // que ele estivesse guardado numa variável em vez de criado inline.
   {$IFDEF FPC}generic{$ENDIF}
   TObjectBuilderBase<TBuild: {$IFDEF FPC}TObject{$ELSE}class{$ENDIF}; TSelf: class> =
     class abstract(TInterfacedObject, {$IFDEF FPC}specialize{$ENDIF} IObjectBuilder<TBuild>)
@@ -139,6 +146,15 @@ type
     FSetupRefProcList: TSetupRefProcList;
     FProperties: TPropValueList;
     FEvents: TEventValueList;
+    // Desabilita a contagem de referência herdada de TInterfacedObject -
+    // ver comentário de posse de memória acima da declaração da classe.
+    {$IFDEF FPC}
+    function _AddRef: Longint; {$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+    function _Release: Longint; {$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+    {$ELSE}
+    function _AddRef: Integer; stdcall;
+    function _Release: Integer; stdcall;
+    {$ENDIF}
     function CreateObject: TBuild; virtual; abstract;
     procedure ConfigureObject(AObject: TBuild); virtual;
     procedure ApplyPropPath(Instance: TObject; AProp: TPropertyValue);
@@ -153,6 +169,7 @@ type
     destructor Destroy; override;
     procedure AssignReference(out Reference);
     procedure ResetReferences;
+    procedure DiscardReferences;
     function Assign(out Reference): TSelf; overload;
     function WithProp(const APropName: string; const AValue: TValue): TSelf; overload;
     function WithProp(const APropValue: TPropertyValue): TSelf; overload;
@@ -639,6 +656,7 @@ type
     procedure ResetOccupation;
     procedure MarkOccupied(ARow, ACol, ARowSpan, AColSpan: Integer);
     function IsCellFree(ARow, ACol: Integer): Boolean;
+    function IsSpanFree(ARow, ACol, ARowSpan, AColSpan: Integer): Boolean;
     function AdjustRectForCellLayout(
       const CellRect: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
         AControlWidth, AControlHeight: Single
@@ -1081,7 +1099,13 @@ begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
   begin
-    Self.GridGotoCell(CurrentLevel.GridMode.CurrentRow + 1, 0);
+    // Se não há próxima linha (já está na última, sem autoexpand de
+    // linhas), não é um erro do usuário - BreakLine fora do modo grid
+    // também nunca lança nesse caso (é sempre um no-op seguro). Sem essa
+    // checagem, GridGotoCell lançava uma exceção citando a si mesmo, um
+    // método que quem chamou BreakLine nunca invocou diretamente.
+    if CurrentLevel.GridMode.CurrentRow + 1 < CurrentLevel.GridMode.Rows then
+      Self.GridGotoCell(CurrentLevel.GridMode.CurrentRow + 1, 0);
   end
   else
   begin
@@ -1123,7 +1147,10 @@ begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
   begin
-    Self.GridGotoCell(0, CurrentLevel.GridMode.CurrentCol + 1);
+    // Ver comentário equivalente em BreakLine: sem próxima coluna vira
+    // no-op em vez de propagar o erro genérico de GridGotoCell.
+    if CurrentLevel.GridMode.CurrentCol + 1 < CurrentLevel.GridMode.Cols then
+      Self.GridGotoCell(0, CurrentLevel.GridMode.CurrentCol + 1);
   end
   else
   begin
@@ -1170,7 +1197,7 @@ var
       Result :=
         TControl(AControl.Parent).Height
         - TControl(AControl.Parent).Padding.Top
-        + TControl(AControl.Parent).Padding.Bottom
+        - TControl(AControl.Parent).Padding.Bottom
     else
       Result := 0; // não tem dimensão
   end;
@@ -1214,12 +1241,12 @@ var
   function GetParentClientWidth(AControl: TControl): Single;
   begin
     if AControl.Parent is TForm then
-      Result := TForm(AControl.Parent).ClientHeight
+      Result := TForm(AControl.Parent).ClientWidth
     else if AControl.Parent is TControl then
       Result :=
-        TControl(AControl.Parent).Height
-        - TControl(AControl.Parent).Padding.Top
-        + TControl(AControl.Parent).Padding.Bottom
+        TControl(AControl.Parent).Width
+        - TControl(AControl.Parent).Padding.Left
+        - TControl(AControl.Parent).Padding.Right
     else
       Result := 0; // não tem dimensão
   end;
@@ -1260,12 +1287,12 @@ var
   function GetParentClientWidth(AControl: TControl): Single;
   begin
     if AControl.Parent is TForm then
-      Result := TForm(AControl.Parent).ClientHeight
+      Result := TForm(AControl.Parent).ClientWidth
     else if AControl.Parent is TControl then
       Result :=
         TControl(AControl.Parent).Width
-        - TControl(AControl.Parent).Padding.Top
-        + TControl(AControl.Parent).Padding.Bottom
+        - TControl(AControl.Parent).Padding.Left
+        - TControl(AControl.Parent).Padding.Right
     else
       Result := 0; // não tem dimensão
   end;
@@ -1369,7 +1396,15 @@ begin
   ABuilder.Parent := CurrentLevel.Parent;
   ABuilder.Name := ControlName;
 
-  Result := ABuilder.Build;
+  // O Creator assume a posse do builder a partir daqui - ver comentário de
+  // posse de memória em TObjectBuilderBase. Libera sempre, mesmo se Build
+  // lançar exceção (prop/evento inválido), pois ninguém mais tem referência
+  // a ele.
+  try
+    Result := ABuilder.Build;
+  finally
+    (ABuilder as TObject).Free;
+  end;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
@@ -1385,9 +1420,29 @@ begin
   if CurrentLevel.GridMode.Active then
   begin
     if not CanAddToGrid then
+    begin
+      // Build nunca chega a ser chamado, entao ConfigureObject nao roda -
+      // sem isso, a variavel do "out Reference" do builder ficaria com
+      // lixo/valor anterior em vez de nil. O Creator ja assumiu a posse do
+      // builder ao entrar em Add, entao libera aqui mesmo sem ter
+      // construido nada.
+      AControlBuilder.DiscardReferences;
+      (AControlBuilder as TObject).Free;
       Exit;
+    end;
 
-    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
+    // SetupControlBuilderForGridMode chama Step, que pode lancar (ex:
+    // sobreposicao de span) antes de CreateControl/Build sequer rodar - se
+    // isso acontecer, ninguem mais libera o builder (o try/finally que
+    // cuida disso vive dentro de CreateControl, nunca alcancado). O
+    // Creator ja assumiu a posse ao entrar em Add, entao libera aqui e
+    // relanca.
+    try
+      {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
+    except
+      (AControlBuilder as TObject).Free;
+      raise;
+    end;
     Control := {$IFDEF FPC}specialize{$ENDIF} CreateControl<TBuild>(AControlBuilder);
   end
   else
@@ -2706,7 +2761,15 @@ begin
     OwnerToUse := FOwner;
 
   if CurrentLevel.GridMode.Active then
-    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
+    // Ver comentario equivalente em Add<TBuild>: se Step lancar aqui (ex:
+    // sobreposicao de span), o ramo abaixo que chama CreateControl (unico
+    // lugar que libera o builder nesse caminho) nunca e alcancado.
+    try
+      {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
+    except
+      (AControlBuilder as TObject).Free;
+      raise;
+    end;
 
   // Control := specialize CreateControl<TBuild>(AControlBuilder, OwnerToUse);
 
@@ -2722,6 +2785,11 @@ begin
   end;
 
   SubLevel(AGroupName);
+
+  if not (TControl(Control) is TWinControl) then
+    raise Exception.CreateFmt(
+      'SubLevel espera um controle capaz de conter outros controles (%s), mas "%s" é %s.',
+      ['TWinControl', TControl(Control).Name, TControl(Control).ClassName]);
 
   SetParent(
     {$IFDEF FRAMEWORK_FMX}TWinControl(Control)
@@ -3126,7 +3194,16 @@ begin
 
   if AMark then
   begin
-    MarkOccupied(CurrentRow, CurrentCol, ARowSpan, AColSpan);
+    // A célula inicial já foi conferida no "while" acima, mas o span pode
+    // cobrir outras células além dela - confere sobreposição antes de
+    // marcar. MarkOccupied só é chamado no final, depois que o avanço do
+    // cursor pelo span (o "for" abaixo) já teve sucesso - assim, se Next
+    // falhar no meio do caminho e Step tiver que retornar False, nenhuma
+    // célula fica marcada como ocupada por um Step que na verdade falhou.
+    if not IsSpanFree(CurrentRow, CurrentCol, ARowSpan, AColSpan) then
+      raise Exception.CreateFmt(
+        'Não foi possível posicionar o controle na célula (%d,%d): o intervalo de %d linha(s) x %d coluna(s) sobrepõe célula(s) já ocupada(s) do grid.',
+        [CurrentRow, CurrentCol, ARowSpan, AColSpan]);
 
     ARow := CurrentRow;
     ACol := CurrentCol;
@@ -3134,6 +3211,8 @@ begin
     for I := 1 to AdvanceSpan - 1 do
       if not Next then
         Exit;
+
+    MarkOccupied(ARow, ACol, ARowSpan, AColSpan);
   end
   else
   begin
@@ -3200,6 +3279,20 @@ begin
     Exit;
 
   Result := Status = csEmpty;
+end;
+
+function TGridMode.IsSpanFree(ARow, ACol, ARowSpan, AColSpan: Integer): Boolean;
+var
+  R, C: Integer;
+begin
+  Result := True;
+  for R := ARow to ARow + ARowSpan - 1 do
+    for C := ACol to ACol + AColSpan - 1 do
+      if not IsCellFree(R, C) then
+      begin
+        Result := False;
+        Exit;
+      end;
 end;
 
 procedure TGridMode.ResetSpans;
@@ -3673,7 +3766,12 @@ end;
 
 function TComponentRegistry.GetItem(ACompName: string): TComponent;
 begin
-  Result := GetControl(ACompName);
+  // FNamedComponents é o dicionário completo (todo componente registrado,
+  // visual ou não); FNamedControls é só o subconjunto de controles. Usar
+  // GetControl aqui deixava de fora componentes não-visuais (ex: TTimer
+  // registrado via AddComponent), que nunca eram achados por este indexer
+  // default mesmo existindo no registry.
+  Result := GetComponent(ACompName);
 end;
 
 class function TComponentRegistry.GetContextComponents(const AContext,
@@ -3753,16 +3851,43 @@ begin
 end;
 
 procedure TComponentRegistry.UnregisterComponentForNotification(AComp: TComponent);
+var
+  CompPair: {$IFDEF FPC}specialize{$ENDIF} TPair<string, TComponent>;
+  CtrlPair: {$IFDEF FPC}specialize{$ENDIF} TPair<string, TControl>;
+  KeyToRemove: string;
 begin
   FComponents.Remove(AComp);
 
   if AComp is TControl then
     FControls.Remove(TControl(AComp));
 
-  if AComp.Name <> '' then
+  // Remove pela chave sob a qual o componente foi de fato registrado (o
+  // nome único calculado em AddComponent), não pelo AComp.Name atual: se
+  // o componente foi renomeado depois do registro (ex: Edit.Name :=
+  // 'outro'), AComp.Name já não é mais a chave original, e um
+  // Remove(AComp.Name) direto não achava nada - deixava uma entrada
+  // fantasma no registry, apontando para memória já liberada.
+  KeyToRemove := '';
+  for CompPair in FNamedComponents do
+    if CompPair.Value = AComp then
+    begin
+      KeyToRemove := CompPair.Key;
+      Break;
+    end;
+  if KeyToRemove <> '' then
+    FNamedComponents.Remove(KeyToRemove);
+
+  if AComp is TControl then
   begin
-    FNamedComponents.Remove(AComp.Name);
-    FNamedControls.Remove(AComp.Name);
+    KeyToRemove := '';
+    for CtrlPair in FNamedControls do
+      if CtrlPair.Value = TControl(AComp) then
+      begin
+        KeyToRemove := CtrlPair.Key;
+        Break;
+      end;
+    if KeyToRemove <> '' then
+      FNamedControls.Remove(KeyToRemove);
   end;
 
   AComp.RemoveFreeNotification(FNotifier);
@@ -3801,7 +3926,11 @@ begin
 
   AComponentBuilder.Owner := FOwner;
   AComponentBuilder.Name := ComponentName;
-  Component := AComponentBuilder.Build;
+  try
+    Component := AComponentBuilder.Build;
+  finally
+    (AComponentBuilder as TObject).Free;
+  end;
   Registry.AddComponent(Component, Component.Name);
 end;
 
@@ -3992,7 +4121,11 @@ begin
   AMenuBuilder.Owner := FOwner;
   AMenuBuilder.Name := MenuName;
 
-  Menu := AMenuBuilder.Build;
+  try
+    Menu := AMenuBuilder.Build;
+  finally
+    AMenuBuilder.Free;
+  end;
   Registry.AddComponent(Menu, Menu.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -4010,6 +4143,14 @@ var
   MenuItemName: string;
 begin
   Result := Self;
+
+  if not Assigned(CurrentLevel.Parent) then
+  begin
+    AMenuItemBuilder.Free; // Creator já assumiu a posse do builder
+    raise Exception.Create(
+      'AddMenuItem precisa de um AddMenu (ou SubLevel) anterior definindo o menu pai neste nível; nenhum foi encontrado.');
+  end;
+
   MenuItemName := AMenuItemBuilder.Name;
   if not MenuItemName.IsEmpty then
     MenuItemName := Registry.UniqueName(AMenuItemBuilder.Name);
@@ -4017,7 +4158,11 @@ begin
   AMenuItemBuilder.Owner := FOwner;
   AMenuItemBuilder.Name := MenuItemName;
 
-  MenuItem := AMenuItemBuilder.Build;
+  try
+    MenuItem := AMenuItemBuilder.Build;
+  finally
+    AMenuItemBuilder.Free;
+  end;
   Registry.AddComponent(MenuItem, MenuItem.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -4089,13 +4234,25 @@ var
   MenuItemName: string;
 begin
   Result := Self;
+
+  if not Assigned(CurrentLevel.Parent) then
+  begin
+    AMenuItemBuilder.Free; // Creator já assumiu a posse do builder
+    raise Exception.Create(
+      'SubLevel precisa de um AddMenu anterior definindo o menu pai neste nível; nenhum foi encontrado.');
+  end;
+
   MenuItemName := AMenuItemBuilder.Name;
   if not MenuItemName.IsEmpty then
     MenuItemName := Registry.UniqueName(AMenuItemBuilder.Name);
 
   AMenuItemBuilder.Owner := FOwner;
   AMenuItemBuilder.Name := MenuItemName;
-  MenuItem := AMenuItemBuilder.Build;
+  try
+    MenuItem := AMenuItemBuilder.Build;
+  finally
+    AMenuItemBuilder.Free;
+  end;
   Registry.AddComponent(MenuItem, MenuItem.Name);
 
   {$IFDEF FRAMEWORK_FMX}
@@ -4178,10 +4335,12 @@ begin
     begin
       Prop := RttiType.GetProperty(Ev.EventName);
       if Prop = nil then
-        Continue;
+        raise EPropertyError.CreateFmt('Evento "%s" não encontrado em %s',
+          [Ev.EventName, Instance.ClassName]);
 
       if not (Prop.PropertyType is TRttiMethodType) then
-        Continue;
+        raise EPropertyError.CreateFmt('"%s" em %s não é um evento',
+          [Ev.EventName, Instance.ClassName]);
 
       SetMethodProp(Instance, ev.EventName, Ev.Method);
     end;
@@ -4232,14 +4391,17 @@ begin
           Exit;
       end
       else
-        if RProp.IsWritable then
-        begin
-          PropInfo := GetPropInfo(CurrentObj.ClassInfo, Parts[i]);
-          if RProp.PropertyType.TypeKind = tkSet then
-            SetOrdProp(CurrentObj, PropInfo, Integer(AProp.Value.AsOrdinal))
-          else
-            RProp.SetValue(CurrentObj, AProp.Value);
-        end;
+      begin
+        if not RProp.IsWritable then
+          raise EPropertyError.CreateFmt('Propriedade "%s" de %s é somente leitura',
+            [Parts[i], CurrentObj.ClassName]);
+
+        PropInfo := GetPropInfo(CurrentObj.ClassInfo, Parts[i]);
+        if RProp.PropertyType.TypeKind = tkSet then
+          SetOrdProp(CurrentObj, PropInfo, Integer(AProp.Value.AsOrdinal))
+        else
+          RProp.SetValue(CurrentObj, AProp.Value);
+      end;
     end;
   finally
     Parts.Free;
@@ -4277,6 +4439,26 @@ begin
   inherited;
 end;
 
+{$IFDEF FPC}
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}._AddRef: Longint;
+{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+{$ELSE}
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}._AddRef: Integer; stdcall;
+{$ENDIF}
+begin
+  Result := -1;
+end;
+
+{$IFDEF FPC}
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}._Release: Longint;
+{$IFNDEF WINDOWS}cdecl{$ELSE}stdcall{$ENDIF};
+{$ELSE}
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}._Release: Integer; stdcall;
+{$ENDIF}
+begin
+  Result := -1;
+end;
+
 procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.AssignReference(out Reference);
 begin
   Assign(Reference);
@@ -4286,6 +4468,19 @@ procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}
   .ResetReferences;
 begin
   FTargetFields.Clear;
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}
+  .DiscardReferences;
+var
+  Ref: Pointer;
+begin
+  // Zera as variaveis externas associadas via Assign/out Reference sem
+  // construir o objeto - usado quando quem chamou desiste de fato criar
+  // o controle (ex: grid cheio) antes de invocar Build, para que essas
+  // variaveis nao fiquem com lixo de pilha/valor anterior.
+  for Ref in FTargetFields do
+    PPointer(Ref)^ := nil;
 end;
 
 function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Assign(out Reference): TSelf;
@@ -4362,7 +4557,6 @@ function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Build: TBuild;
 var
   Proc: TSetupProcObjBuild;
   RefProc: TSetupRefProcBuild;
-  Ref: Pointer;
 begin
   Result := CreateObject;
   try
@@ -4384,8 +4578,7 @@ begin
     // Reference tambem ja podem apontar para ele (ConfigureObject roda
     // antes de ApplyPendingProps/ApplyPendingEvents/Setup), entao sao
     // zeradas primeiro para nao ficarem com ponteiro pendente.
-    for Ref in FTargetFields do
-      PPointer(Ref)^ := nil;
+    DiscardReferences;
     (Result as TObject).Free;
     raise;
   end;
