@@ -22,12 +22,15 @@
         * [IMenuItemBuilder](#imenuitembuilder)
             * [TMenuItemBuilderBase](#tmenuitembuilderbase)
             * [TMenuItemBuilder](#tmenuitembuilder)
+        * [TButtonBuilder](#tbuttonbuilder)
     * [Creators](#creators)
         * [TComponentCreator](#tcomponentcreator)
         * [TControlCreator](#tcontrolcreator)
+            * [TControlCreatorSiblingSubLevelOptions](#tcontrolcreatorsiblingsubleveloptions)
         * [TMenuCreator](#tmenucreator)
-        * [TControlCreator](#tcontrolcreator-1)
         * [TOPCBCreators](#topcbcreators)
+    * [Registro](#registro)
+        * [TComponentRegistry](#tcomponentregistry)
 
 
 ## Visão geral
@@ -114,6 +117,7 @@ Após isso, as units do projeto estarão disponíveis para uso em seus projetos 
 
 Builders são classes utilizadas para facilitar a instanciação de objetos.
 
+> **`With*` significa coisas diferentes nos Builders e nos Creators.** Nos **Builders** (`TObjectBuilderBase` e descendentes), os métodos `With*` (`WithOwner`, `WithName`, `WithTag`, `WithParent`, ...) são o jeito permanente e não-deprecated de configurar um objeto ainda não construído — continuam `With*` de propósito, porque os setters não-fluentes `SetOwner`/`SetName`/`SetTag` exigidos pelas interfaces `IComponentBuilder<T>`/`IControlBuilder<T>` já ocupam exatamente esses nomes (uma versão fluente `function SetOwner(...): TSelf` colidiria de verdade com o `procedure SetOwner(...)` já existente — mesma assinatura de parâmetro, só o retorno muda, o que Object Pascal não aceita como overload). Nos **Creators** (`TComponentCreator`, `TControlCreator`, `TMenuCreator`), a maioria dos métodos `With*` está deprecated em favor de um `Set*` equivalente (`WithOwner` → `SetOwner`, `WithOwnerAndParent` → `SetOwnerAndParent`, `WithParent` → `SetParent`) — ali a colisão com setter não-fluente não existe, então a lib migrou pra convenção `Set*` (mais clara, indiscutivelmente) daqui pra frente. Resumindo: num **Builder**, continue usando `With*`; num **Creator**, prefira `Set*` — o compilador avisa dos deprecated de qualquer forma.
 
 ![Diagrama de classes](img/builder-class-diagram.png)
 
@@ -148,6 +152,7 @@ Classe abstrata que implementa a interface `IObjectBuilder<TBuild>`
 `Destroy; override;`	||Destrutor.
 `AssignReference(out Reference);`	||Atribui o objeto criado por `.Build` ao parâmetro recebido. Mantém a referencia em uma lista.
 `ResetReferences;`	||Limpa lista de referências.
+`DiscardReferences;`	||Zera (define como `nil`) cada variável `out Reference` registrada via `.Assign`/os construtores `out Reference`, **sem** construir nada. Usado quando quem chamou desiste de construir de fato (ex.: `TControlCreator.Add` quando o grid já está cheio) e também internamente quando `.Build` lança exceção depois do objeto já ter sido criado - nos dois casos, evita que a variável `out Reference` fique com lixo/valor antigo ou apontando para um objeto prestes a ser liberado.
 `Assign(out Reference): TSelf; overload;`	|`TSelf`|Atribui a referência e retorna a própria instância para uso fluente.
 `WithProp(const APropName: string; const AValue: TValue): TSelf; overload;`	|`TSelf`|Define o valor de uma propriedade simples via RTTI.
 `WithProp(const APropValue: TPropertyValue): TSelf; overload;`	|`TSelf`|Define uma propriedade do objeto via RTTI usando um registro TPropertyValue.
@@ -499,6 +504,39 @@ end;
 * Ideal para criação dinâmica de UI em frameworks compatíveis (VCL, LCL e FMX).
 
 ---
+#### `TButtonBuilder`
+
+`TButtonBuilder` é um builder especializado para `TButton` (e descendentes), declarado na unit separada `OPCB.Builders`, não na unit principal `OPCB`. Adiciona duas propriedades fluentes específicas de botão além de tudo que `TControlBuilderBase` já oferece.
+
+Herança
+
+    TButtonBuilder = class(TControlBuilderBase<TButton, TButtonBuilder>)
+
+**Construtores**
+
+| Construtor | Descrição |
+|--------------|-------------|
+| `Create(const AName: string = '')` | Cria o builder usando o próprio `TButton` como classe a instanciar. |
+| `Create(AClass: TButtonClass; const AName: string = '')` | Cria o builder para uma classe descendente específica de `TButton`. |
+| `Create(AClass: TButtonClass; const AName: string; out Reference)` | Igual ao anterior, e atribui a instância criada a `Reference`. |
+| `Create(AClass: TButtonClass; out Reference)` | Igual ao anterior, sem definir um nome inicial. |
+
+**Métodos fluentes**
+
+| Método | Retorno | Descrição |
+|--------|--------|-------------|
+| `WithModalResult(AModalResult: Integer)` | `TButtonBuilder` | Define o `ModalResult` do botão (ex.: `mrOk`, `mrCancel`) - comum em botões de diálogo. |
+| `WithEnabled(AEnabled: Boolean)` | `TButtonBuilder` | Define o estado `Enabled` do botão. |
+
+**Exemplo**
+```pascal
+Creator.Add(TButtonBuilder.Create(TButton, 'BtnOk')
+  .WithCaption('OK')
+  .WithModalResult(mrOk)
+);
+```
+
+---
 #### `IMenuBuilder`
 
 A interface `IMenuBuilder\<TBuild\>` estende `IComponentBuilder\<TBuild\>`
@@ -643,6 +681,7 @@ TObjectBuilderBase
 | `External(const AProc: TComponentCreatorProc)` | `TComponentCreator` | Permite a injeção de código externo por meio de uma *procedure* do tipo `TComponentCreatorProc`. |
 | `GetComponent<T: TComponent>(const AName: string): T; overload;` | `T` | Método genérico que tenta retornar um componente pelo seu nome. |
 | `GetComponent(const AName: string): TComponent;` | `TComponent` | Retorna um componente pelo nome informado. |
+| `WithOwner(AOwner: TComponent)` ⚠️ *deprecated* | `TComponentCreator` | Deprecated, use `.SetOwner`. |
 | `SetOwner(AOwner: TComponent)` | `TComponentCreator` | Método fluente que define o *Owner* a ser utilizado nos componentes adicionados via `.Add`. |
 | `Add(AComponentBuilder: IComponentBuilder<TComponent>)` | `TComponentCreator` | Método fluente que adiciona um novo componente a partir de um `TComponentBuilder`. |
 
@@ -711,7 +750,6 @@ TControlCreator foi desenhada para facilitar a criação de controles visuais e 
 |`GetItem(const AName: string)`|`TControl`|Retorna o Controle identificado por `AName`.|
 |`ApplyDefaultControlSize(AControl: TControl)`||`TControlCreator` possui os campos opcionais `ControlHeight` e `ControlWidth` que podem ser usados para definir valores padrões para qualquer Controle adicionado via `.Add`. `ApplyDefaultControlSize` Aplica esses valores padrões aos controles ao serem adicionados.
 |`CanAddToGrid`|`Boolean`|Valida se um novo controle a ser criado pode ser adicionado ao Grid. É preciso que `TControlCreator` esteja no modo Grid e exista célula disponível para inclusão.
-|`AdjustControlToCell(AControl: TControl; ACellRect: TRect)`||Ajusta o tamanho do controle que está sendo adicionado para o tamanho da célula definido por `ACellRect`.|
 
 **Construtores**
 | Construtor | Uso típico |
@@ -731,12 +769,20 @@ TControlCreator foi desenhada para facilitar a criação de controles visuais e 
 |`CreateControl<TBuild>(ABuilder: IControlBuilder<TBuild>; AOwner: TComponent = nil)`|`TBuild`|Instancia o controle adicionado via `.Add`. Antes de chamar o método `.build` do objeto `Builder` faz os ajustes necessários para definição de tamanho e posição conforme modo e configurações.
 |`External(const AProc: TControlCreatorObjProc)`|`TControlCreator`|Permite injetar um procedure do tipo `TControlCreatorObjProc` que recebe como parâmetro o próprio objeto `TControlCreator`.<br><br>`TControlCreatorObjProc = procedure(const ABuiler: TControlCreator) of object;`
 |`External(const AProc: TControlCreatorProc)`|`TControlCreator`|Permite injetar um procedure do tipo `TControlCreatorProc` que recebe como parâmetro o próprio objeto `TControlCreator`.<br><br>`TControlCreatorProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(ABuiler: TControlCreator);`
+|`WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl)` ⚠️ *deprecated*|`TControlCreator`|Deprecated, use `.SetOwnerAndParent`. (No FMX, `AParent` é um `TFmxObject`.)
+|`SetOwnerAndParent(AOwner: TComponent; AParent: TWinControl)`|`TControlCreator`|Método fluente que define o `Owner` e o `Parent` inicial usados nos controles adicionados depois - normalmente a primeira chamada da cadeia. (No FMX, `AParent` é um `TFmxObject`.)
+|`WithParent(AParent: TWinControl)` ⚠️ *deprecated*|`TControlCreator`|Deprecated, use `.SetParent`.
+|`SetParent(AParent: TWinControl)`|`TControlCreator`|Método fluente que define o `Parent` usado nos controles adicionados depois, sem mexer no `Owner`.
 |`SetSpace(AVerticalSpace, AHorizontalSpace: Single)`|`TControlCreator`|Define os espaçamentos horizontais e verticais entre os controles adicionados no Level Corrente.
 |`SubLevel(AGroupName: string='')`|`TControlCreator`|Inicia um novo nível na stack level sem vincular a um container. `FLevelStack.Add(CurrentLevel.Clone);`. Se `AGroupName` for informado, os controles adicionados serão vinculados ao Grupo passado como parâmetro. 
 |`SubLevel(ADirection: TControlCreatorDirection; AGroupName: string='')`|`TControlCreator`|Mesmo que o anterior, mas definindo nova direção.
-|`SubLevel(AControlBuilder: TControlBuilder; AGroupName: string='')`|`TControlCreator`|Mesmo que anterior, mas definindo um container, como TPanel por exemplo. Se informado `AGroupName` vincula os controles adicionados a esse grupo. 
+|`SubLevel(AControlBuilder: TControlBuilder; AGroupName: string='')`|`TControlCreator`|Mesmo que anterior, mas definindo um container, como TPanel por exemplo - o container é criado e vira o `Parent` do novo level. Se informado `AGroupName` vincula os controles adicionados a esse grupo. 
 |`SubLevel<TBuild: class>(AControlBuilder: IControlBuilder<TBuild>; AGroupName: string='')`|`TControlCreator`|Mesmo que os métodos anteriores. É Genérico para permitir que classes diferentes de `TControlBuilder` sejam utilizadas também, desde que implementem `IControlBuilder`
-|`SuperLevel`|`TControlCreator`|Volta ao level anterior (ou acima).
+|`SubLevel(...)` — combinações com direção/builder|`TControlCreator`|As quatro formas acima também combinam com um parâmetro explícito `ADirection: TControlCreatorDirection` (ex.: `SubLevel(AControlBuilder, ADirection, AGroupName)`), totalizando 6 overloads de `SubLevel`.
+|`SuperLevel`|`TControlCreator`|Volta ao level anterior (ou acima). Lança exceção se chamado sem ter pra onde voltar.
+|`SiblingSubLevel(...)` — ~12 overloads|`TControlCreator`|Atalho para `.SuperLevel` seguido de `.SubLevel(...)` (opcionalmente dando `.Break` antes) - fecha o level atual e abre imediatamente um level *irmão*, numa chamada só. Existe nas mesmas combinações do `SubLevel` (com/sem builder, com/sem `ADirection` explícito), mais um parâmetro extra `ABreak: Boolean` pra controlar se o level pai deve quebrar de linha antes de abrir o irmão. É essa família que causa a "explosão de overloads" mencionada abaixo - prefira o overload com `TControlCreatorSiblingSubLevelOptions` pra qualquer coisa além do caso mais simples.
+|`SiblingSubLevel(const AOptions: TControlCreatorSiblingSubLevelOptions)`|`TControlCreator`|Igual ao anterior, mas recebendo um único valor de opções encadeável em vez de um overload dedicado por combinação de parâmetro - veja [`TControlCreatorSiblingSubLevelOptions`](#tcontrolcreatorsiblingsubleveloptions) abaixo. Também disponível combinado com um builder: `SiblingSubLevel<TBuild>(AControlBuilder, AOptions)` / `SiblingSubLevel(AControlBuilder: TControlBuilder, AOptions)`.
+|`SiblingSubLevelWithBreak(...)` ⚠️ *deprecated* — 6 overloads|`TControlCreator`|Atalho deprecated para `SiblingSubLevel(..., ABreak: True)` - só existia pra fixar `ABreak` como `True`. Use `SiblingSubLevel(..., True)` ou `SiblingSubLevel(TControlCreatorSiblingSubLevelOptions.Create.WithBreak)`.
 |`SetVerticalSpace(AVerticalSpace: Single)`|`TControlCreator`|Define o espaçamento vertical entre os controles adicionados.
 |`SetHorizontalSpace(AHorizontalSpace: Single)`|`TControlCreator`|Define o espaçamento horizontal entre os controles adicionados.
 |`SetTop(ATop: Single)`|`TControlCreator`|Define o Top - em CurrentLevel - do próximo controle a ser adicionado. Define também o `InicialTop` que é utilizado para definir a nova posição de Top  ao chamar o `.Break`, `.BreakLine` ou `.BreakColumn`.
@@ -785,6 +831,8 @@ TControlCreator foi desenhada para facilitar a criação de controles visuais e 
 |`Break`|`TControlCreator`|Chama `.BreakLine` ou `.BreakColumn` de acordo com a direção atual.
 |`Break(AIncTopOrLeft: Single)`|`TControlCreator`|Mesmo que `.Break` mas incrementando Top ou Left.
 |`Add(AControlBuilder: TControlBuilder)`|`TControlCreator`|Adiciona um novo controle através de um objeto `TControlBuilder`.
+|`Add<TBuild: class>(AControlBuilder: IControlBuilder<TBuild>)`|`TControlCreator`|Overload genérico do anterior - aceita qualquer builder que implemente `IControlBuilder<TBuild>`, não só `TControlBuilder`. Também disponível com um parâmetro extra `const AGroups: array of string` pra já adicionar o controle a um ou mais grupos.
+|`Add(AClass: TControlClass; ...)` — 6 overloads|`TControlCreator`|Atalho que monta um `TControlBuilder` internamente, pra não precisar escrever `Add(TControlBuilder.Create(...))` no caso comum. Combina um `const AName: string` opcional, um `out Reference` opcional, e um callback de setup opcional `AProc: TControlSetupProcObj`, ex.: `Add(TPanel, 'MeuPainel', MinhaVarPainel)` ou `Add(TPanel, 'MeuPainel', proc(C: TControl) begin ... end)`.
 |MoveControls(const AControl: TControl; const ADX, ADY: Single)`|`TControlCreator`|Move um controle vertical e/ou horizontalmente.
 |`MoveControls(const AControlNames: array of string; const ADX, ADY: Single)`|`TControlCreator`|Move os controles identificados pelos nomes em `AControlNames`.
 |`AlignControlsRight(const AControlNames, AReferenceGroup: array of string; const ARightPadding: Single = 0)`|`TControlCreator`|Alinha um conjunto de Controles a direita, considerando um grupo de outros controles como referência. Se `ARightPadding` informando, decrementa o valor no posicionamento.
@@ -801,6 +849,28 @@ TControlCreator foi desenhada para facilitar a criação de controles visuais e 
 |`function CopySize(const AControlNames, AReferenceGroup: array of string)`|`TControlCreator`|Copia a largura e a altura formada pelo Bounds do grupo de controles passados em `AReferenceGroup` para cada um dos controles definidos em `AControlNames`.
 |`ReturnCurrentLevel(var ACurrentLevel: TControlCreatorLevel)`|`TControlCreator`|Retorna o Level Corrente através do parâmetro `ACurrentLevel`
 |`ReturnLastControl(out AControl: TControl)`|`TControlCreator`|Retorna o último controle adicionado através `.Add`.
+|`DiscardReferences` *(no builder, não no creator)*||Não é método de `TControlCreator` - veja [`TObjectBuilderBase`](#tobjectbuilderbase). Mencionado aqui porque é o que faz variáveis `out Reference` voltarem `nil` (em vez de ficar com lixo) quando um controle nunca chega a ser construído de fato - ex.: `Add` desistindo porque o grid já está cheio.
+
+##### `TControlCreatorSiblingSubLevelOptions`
+
+Um pequeno record encadeável usado pelos overloads `SiblingSubLevel(const AOptions: ...)` (ver tabela acima) pra evitar precisar de um overload posicional dedicado pra cada combinação de `Direction`/`GroupName`/`Break`. Não substitui os overloads posicionais - eles continuam existindo e funcionando -, é só mais um jeito de chamar `SiblingSubLevel` que não cresce combinatorialmente se mais parâmetros opcionais forem adicionados no futuro.
+
+| Método | Retorno | Descrição |
+|--------|--------|-------------|
+| `Create` *(class function)* | `TControlCreatorSiblingSubLevelOptions` | Inicia um valor de opções novo e vazio (sem direção, sem grupo, sem break). |
+| `WithDirection(ADirection: TControlCreatorDirection)` | `TControlCreatorSiblingSubLevelOptions` | Define a direção pra trocar no novo level irmão. Se nunca chamado, o level irmão herda a direção que o level pai já tinha. |
+| `WithGroup(const AGroupName: string)` | `TControlCreatorSiblingSubLevelOptions` | Define o nome do grupo do novo level irmão, mesmo significado do parâmetro `AGroupName` dos overloads posicionais. |
+| `WithBreak(ABreak: Boolean = True)` | `TControlCreatorSiblingSubLevelOptions` | Define se o level pai deve dar `.Break` antes do level irmão abrir. |
+
+**Exemplo**
+```pascal
+Creator.SiblingSubLevel(
+  TControlCreatorSiblingSubLevelOptions.Create
+    .WithDirection(cpdVertical)
+    .WithGroup('second')
+    .WithBreak
+);
+```
 
 **Propriedades**
 | Propriedade | Tipo | Função |
@@ -814,4 +884,188 @@ TControlCreator foi desenhada para facilitar a criação de controles visuais e 
 |`Controls`|`TControlList`|Retorna lista de controles adicionados. Se o `Registry` for compartilhado, irá retornar os objetos adicionados a partir de outros Creators.
 
 ---
-**DOCUMENTAÇÃO EM CONSTRUÇÃO**
+
+#### TMenuCreator
+
+`TMenuCreator` centraliza a criação de árvores de menu (`TMainMenu`, `TPopupMenu` e seus itens) usando o mesmo estilo fluente baseado em levels do `TControlCreator`, sem precisar arrastar componentes de menu pro form em tempo de design.
+
+Diferente do `TControlCreator`, o `TMenuCreator` não tem modo grid nem lógica de posicionamento (`SetTop`/`SetLeft`/`Break`/etc.) - menu não tem layout visual pra calcular, então sua stack de levels só controla a qual `TMenuItem` (ou `TFmxObject`, no FMX) os novos itens devem ser filhos.
+
+**Campos privados**
+
+| Campo | Tipo | Descrição |
+|-------|------|-------------|
+| `FOwner` | `TComponent` | Define o *Owner* dos menus/itens adicionados via `.AddMenu`/`.AddMenuItem`. |
+| `FRegistryContextHandle` | `IRegistryContextHandle` | Indica o *ContextHandle* usado para registrar os componentes criados. Permite compartilhar o registro com outros *Creators*, como `TControlCreator`, `TComponentCreator`, etc. |
+| `FLevelStack` | `TMenuCreatorLevelStack` | `TMenuCreatorLevelStack = TObjectList<TMenuCreatorLevel>;` <br> Stack de objetos `TMenuCreatorLevel` (cada um só guarda um `Parent: TMenuItem`, ou `TFmxObject` no FMX). Chamadas a `.SubLevel` e `.SuperLevel` empilham e desempilham levels - o topo da pilha é o level corrente, ou seja, de qual item os itens de menu recém-adicionados vão ser filhos. |
+
+**Construtores**
+
+| Construtor | Uso típico |
+|-------------|-------------|
+| `Create(ARegistryContextKey: string = '')` | Instancia um novo `TMenuCreator`. Se `ARegistryContextKey` for informado, reutiliza o registro existente com essa chave; caso contrário cria um novo (com chave aleatória se nenhuma for dada). |
+| `Create(ARegistryContextHandle: IRegistryContextHandle)` | Instancia um `TMenuCreator` reutilizando um registro de componentes existente, obtido via `ARegistryContextHandle`. |
+
+**Métodos públicos**
+
+| Método | Retorno | Descrição |
+|--------|--------|-------------|
+| `WithOwner(AOwner: TComponent)` ⚠️ *deprecated* | `TMenuCreator` | Deprecated, use `.SetOwner`. |
+| `SetOwner(AOwner: TComponent)` | `TMenuCreator` | Método fluente que define o owner usado nos menus/itens adicionados depois. |
+| `External(const AProc: TMenuCreatorObjProc)` | `TMenuCreator` | Injeta um procedure do tipo `TMenuCreatorObjProc` (`procedure(const ABuilder: TMenuCreator) of object`) que recebe o próprio creator, útil pra construir itens de menu em lote/loop a partir de um método. |
+| `External(const AProc: TMenuCreatorProc)` | `TMenuCreator` | Igual ao anterior, mas para um procedure simples (não `of object`) do tipo `TMenuCreatorProc`. |
+| `AddMenu(AMenuBuilder: TMenuBuilder)` | `TMenuCreator` | Cria um menu de nível raiz (ex.: um `TMainMenu` ou `TPopupMenu`) a partir de `AMenuBuilder` e o torna a raiz do level corrente - chamadas seguintes de `.AddMenuItem`/`.SubLevel` anexam itens a ele. |
+| `AddMenuItem(AMenuItemBuilder: TMenuItemBuilder)` | `TMenuCreator` | Adiciona um novo `TMenuItem` (construído a partir de `AMenuItemBuilder`) como filho do parent do level corrente. Exige que um `.AddMenu` (ou `.SubLevel`) já tenha rodado antes - senão lança uma exceção clara, já que o level raiz começa sem parent nenhum pra anexar. |
+| `SubLevel(AMenuItemBuilder: TMenuItemBuilder)` | `TMenuCreator` | Adiciona um novo `TMenuItem` como `.AddMenuItem`, mas também empilha um novo level usando esse item como parent - então chamadas seguintes de `.AddMenuItem` adicionam *sub*-itens a ele (monta um submenu). |
+| `SuperLevel` | `TMenuCreator` | Desempilha o level corrente, voltando ao level pai empilhado pelo último `.SubLevel` (ou à raiz do menu). Lança exceção se chamado no level raiz, já que não há pra onde voltar. |
+| `GetMenu<T: TMenu>(const AName: string): T` | `T` | Método genérico que retorna um menu previamente adicionado pelo nome, já convertido para `T`. |
+| `GetMenu(const AName: string): TMenu` | `TMenu` | Igual ao anterior, sem a conversão genérica. |
+| `GetMenuItem<T: TMenuItem>(const AName: string): T` | `T` | Método genérico que retorna um item de menu previamente adicionado pelo nome, já convertido para `T`. |
+| `GetMenuItem(const AName: string): TMenuItem` | `TMenuItem` | Igual ao anterior, sem a conversão genérica. |
+
+**Propriedades**
+
+| Propriedade | Tipo | Descrição |
+|----------|------|-------------|
+| `CurrentLevel` | `TMenuCreatorLevel` | Retorna o objeto do level corrente (só o `Parent` importa aqui). |
+| `Registry` | `TComponentRegistry` | Retorna o `TComponentRegistry` usado para armazenar os menus/itens criados - veja [TComponentRegistry](#tcomponentregistry). |
+
+**Exemplo**
+```pascal
+var
+  Creator: TMenuCreator;
+begin
+  Creator := TMenuCreator.Create;
+  try
+    Creator
+      .SetOwner(Self)
+      .AddMenu(TMenuBuilder.Create(TMainMenu, 'MainMenu'))
+        .SubLevel(TMenuItemBuilder.Create(TMenuItem, 'FileMenu').WithCaption('&File'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'FileNew').WithCaption('&New'))
+          .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'FileOpen').WithCaption('&Open'))
+        .SuperLevel
+        .AddMenuItem(TMenuItemBuilder.Create(TMenuItem, 'EditMenu').WithCaption('&Edit'))
+    ;
+
+    Self.Menu := Creator.GetMenu<TMainMenu>('MainMenu');
+  finally
+    Creator.Free;
+  end;
+end;
+```
+
+---
+
+#### TOPCBCreators
+
+Um wrapper fino de conveniência em torno dos três creators (`TComponentCreator`, `TControlCreator`, `TMenuCreator`), útil quando uma tela precisa de mais de um deles compartilhando o **mesmo** registro de componentes - em vez de criar e conectar cada um manualmente com um `ARegistryContextKey`/`IRegistryContextHandle` combinando, `TOPCBCreators` cria os três já compartilhando um automaticamente.
+
+Herança
+
+    TOPCBCreators = class
+
+**Campos privados**
+
+| Campo | Tipo | Descrição |
+|-------|------|-------------|
+| `FRegistryContextHandle` | `IRegistryContextHandle` | O único contexto de registro compartilhado pelos três creators abaixo. |
+| `FComponentCreator` | `TComponentCreator` | Instância interna de `TComponentCreator`, criada sob demanda. |
+| `FControlCreator` | `TControlCreator` | Instância interna de `TControlCreator`, criada sob demanda. |
+| `FMenuCreator` | `TMenuCreator` | Instância interna de `TMenuCreator`, criada sob demanda. |
+
+**Construtores**
+
+| Construtor | Descrição |
+|-------------|-------------|
+| `Create(const ARegistryContextKey: string = '')` | Cria o wrapper. Se `ARegistryContextKey` for informado, os três creators internos compartilham o registro dessa chave; caso contrário um registro compartilhado novo é usado. |
+
+**Métodos públicos**
+
+| Método | Retorno | Descrição |
+|--------|--------|-------------|
+| `AsComponentCreator` | `TComponentCreator` | Retorna o `TComponentCreator` interno, compartilhando o registro com os outros dois. |
+| `AsControlCreator` | `TControlCreator` | Retorna o `TControlCreator` interno, compartilhando o registro com os outros dois. |
+| `AsMenuCreator` | `TMenuCreator` | Retorna o `TMenuCreator` interno, compartilhando o registro com os outros dois. |
+
+**Exemplo**
+```pascal
+var
+  Creators: TOPCBCreators;
+begin
+  Creators := TOPCBCreators.Create;
+  try
+    Creators.AsControlCreator
+      .SetOwnerAndParent(Self, Self)
+      .Add(TControlBuilder.Create(TPanel, 'MainPanel'))
+    ;
+
+    Creators.AsMenuCreator
+      .SetOwner(Self)
+      .AddMenu(TMenuBuilder.Create(TMainMenu, 'MainMenu'))
+    ;
+
+    // Os dois creators acima compartilham o mesmo registro, então
+    // qualquer um consegue buscar componentes/controles que o outro criou:
+    Creators.AsComponentCreator.GetComponent('MainMenu');
+  finally
+    Creators.Free;
+  end;
+end;
+```
+
+---
+
+### Registro
+
+#### TComponentRegistry
+
+`TComponentRegistry` é o registro interno, indexado por nome, que sustenta cada creator (`TComponentCreator`, `TControlCreator`, `TMenuCreator`) - é ele quem de fato guarda "o componente chamado X" e responde as buscas de `GetComponent`/`GetControl`/`Items[]`. A maior parte do código nunca mexe nele diretamente: o construtor de um creator (parâmetro `ARegistryContextKey`/`ARegistryContextHandle`) já cria ou reaproveita um internamente, e os creators expõem esse registro via a propriedade `.Registry` quando o acesso direto é útil (ex.: buscar algo que um creator *diferente* adicionou, quando os dois compartilham registro).
+
+**Chaves de contexto e compartilhamento**
+
+Cada instância de registro vive atrás de uma string chamada **chave de contexto**. Dois creators construídos com a mesma chave (ou o mesmo `IRegistryContextHandle`) compartilham a *mesma* instância de `TComponentRegistry` - é assim que o `TOPCBCreators` (acima) faz seus três creators se enxergarem. O registro é contado por referência internamente por chave: fica vivo enquanto existir pelo menos um creator/handle daquela chave, e é liberado automaticamente quando o último é liberado.
+
+Normalmente você nunca chama os métodos de gerenciamento de contexto do próprio registro (`ForContext`/`ReleaseContext`) - eles são `protected`, pensados pra serem chamados internamente pelos creators (e por `TRegistryContextHandle`). Se precisar de um handle de registro diretamente (por exemplo, pra compartilhar um registro entre creators criados em pontos diferentes do código, sem precisar passar uma string `ARegistryContextKey` por tudo), use o método de classe público abaixo:
+
+| Método de classe | Retorno | Descrição |
+|--------------|--------|-------------|
+| `GetContextHandle(AKey: string): IRegistryContextHandle` | `IRegistryContextHandle` | Retorna um handle contado por referência pro registro de `AKey` (criando se necessário). Passe o mesmo handle pro construtor `Create(ARegistryContextHandle)` de vários creators pra fazê-los compartilhar o registro; liberar a referência da interface (ou chamar `.ReleaseContext`) libera a posse do registro. |
+| `ClearAll` | | Libera **todo** registro vivo no processo, independente da chave de contexto. Pensado pra desmontagem total (ex.: encerramento da aplicação/testes), não uso rotineiro - não checa se alguma outra parte do código ainda tem uma referência viva a algum desses registros. |
+| `GetComponentFromContext<T: TComponent>(const AContextKey, AComponentlName: string): T` | `T` | Busca de conveniência num passo só: pega (ou cria) o registro de `AContextKey`, busca `AComponentlName`, e libera o contexto - sem precisar segurar um handle. Overload genérico, convertido para `T`. |
+| `GetComponentFromContext(const AContextKey, AComponentlName: string): TComponent` | `TComponent` | Igual ao anterior, sem a conversão genérica. |
+| `GetControlFromContext<T: TControl>(const AContextKey, AControlName: string): T` | `T` | Mesma ideia de `GetComponentFromContext`, mas para controles. Overload genérico, convertido para `T`. |
+| `GetControlFromContext(const AContextKey, AControlName: string): TControl` | `TControl` | Igual ao anterior, sem a conversão genérica. |
+
+**API de instância**
+
+Com uma instância de `TComponentRegistry` em mãos (tipicamente via a propriedade `.Registry` de um creator), isso é o que dá pra fazer com ela:
+
+| Método | Retorno | Descrição |
+|--------|--------|-------------|
+| `Add(AControl: TControl; const AName: string = '')` | | Registra um controle sob `AName` (gerando um nome único automaticamente se omitido) e passa a rastrear sua destruição (ver `RegisterComponentForNotification`). Usado internamente por `TControlCreator.Add`. |
+| `AddComponent(AComponent: TComponent; const AName: string = '')` | | Igual ao `Add`, mas para qualquer `TComponent` (visual ou não) - usado internamente por `TComponentCreator.Add`. |
+| `GetComponent<T: TComponent>(const AName: string): T` | `T` | Busca genérica pelo nome, convertida para `T`; lança exceção se não encontrar. |
+| `GetComponent(const AName: string): TComponent` | `TComponent` | Igual ao anterior, sem a conversão genérica; lança exceção se não encontrar. |
+| `TryGetComponent<T: TComponent>(const AName: string; out AComponent: T): Boolean` | `Boolean` | Busca sem exceção: devolve `False` (e deixa `AComponent` sem definir) em vez de lançar quando `AName` não existe. |
+| `TryGetComponent(const AName: string; out AComponent: TComponent): Boolean` | `Boolean` | Igual ao anterior, sem a conversão genérica. |
+| `GetControl<T: TControl>(const AName: string): T` | `T` | Busca genérica pelo nome, restrita a controles visuais, convertida para `T`; lança exceção se não encontrar. |
+| `GetControl(const AName: string): TControl` | `TControl` | Igual ao anterior, sem a conversão genérica; lança exceção se não encontrar. |
+| `TryGetControl<T: TControl>(const AName: string; out AControl: T): Boolean` | `Boolean` | Busca de controle sem exceção. |
+| `TryGetControl(const AName: string; out AControl: TControl): Boolean` | `Boolean` | Igual ao anterior, sem a conversão genérica. |
+| `RegisterComponentForNotification(AComp: TComponent)` | | Conecta o `FreeNotification` do componente pra que o registro remova a entrada automaticamente quando o componente for destruído - chamado internamente por `Add`/`AddComponent`, raramente precisa ser chamado direto. |
+| `UnregisterComponentForNotification(AComp: TComponent)` | | Desfaz o anterior; também é tratado automaticamente no fluxo normal. |
+
+**Propriedades**
+
+| Propriedade | Tipo | Descrição |
+|----------|------|-------------|
+| `Components` | `TComponentList` | Lista de todo componente registrado (visual ou não). |
+| `Controls` | `TControlList` | Lista de todo controle *visual* registrado (subconjunto de `Components`). |
+| `NamedComponents` | `TStrComponentDictionary` | O dicionário nome→componente que sustenta o registro. |
+| `Items[ACompName: string]` | `TComponent` | Propriedade indexada default - `Registry['Foo']` busca pelo nome em *todos* os componentes registrados (visual ou não), diferente de `TControlCreator.NamedControls` que só busca controles. |
+| `RegistryLifetime` | `TRegistryLifetime` | `(rlTransient, rlPersistent)`. Controla quando o registro pode ser liberado; `rlPersistent` mantém ele vivo mesmo que a contagem de referência normalmente o liberasse. |
+| `ContextKey` | `string` | A chave de contexto sob a qual essa instância de registro está registrada. |
+
+---
+
+Esta referência cobre todas as classes públicas que a biblioteca expõe. Para código executável, de ponta a ponta, veja a seção "Galeria de Exemplos" do [README principal](../README_PT.md), ou navegue direto em [`examples/Builders`](../examples/Builders).
