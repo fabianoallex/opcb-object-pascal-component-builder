@@ -96,6 +96,20 @@ type
 
   TEventValueList = {$IFDEF FPC}specialize{$ENDIF} TList<TEventValue>;
 
+  // ATENÇÃO - GUID compartilhado entre especializações: em Delphi/FPC, o
+  // GUID de uma interface genérica é fixo no template e não varia por
+  // especialização - IObjectBuilder<TButton> e IObjectBuilder<TPanel> (e
+  // qualquer outro T) compartilham o MESMO GUID abaixo. Isso é uma
+  // limitação da linguagem, não um bug corrigível aqui: não há como o
+  // Object Pascal gerar um GUID distinto por instanciação genérica.
+  // Na prática isso não afeta o uso normal da API (os parâmetros
+  // IObjectBuilder<T>/IControlBuilder<T> etc. são resolvidos em tempo de
+  // compilação pelo próprio genérico), mas significa que `Supports`/`as`
+  // usados explicitamente contra um desses tipos podem "aceitar" um
+  // objeto de uma especialização diferente da esperada - não use
+  // Supports/as para distinguir entre especializações diferentes destas
+  // interfaces. O mesmo vale para IComponentBuilder<T>, IMenuBuilder<T> e
+  // IMenuItemBuilder<T> logo abaixo, que nem declaram GUID próprio.
   {$IFDEF FPC}generic{$ENDIF}
   IObjectBuilder<TBuild> = interface
     ['{1FD2411F-05F7-4132-A10D-C06A2CA95781}']
@@ -139,7 +153,6 @@ type
     TSetupRefProcList = {$IFDEF FPC}specialize{$ENDIF} TList<TSetupRefProcBuild>;
     TPointerList = {$IFDEF FPC}specialize{$ENDIF} TList<Pointer>;
   protected
-    FObject: TObject;
     FObjectClass: TObjectClass;
     FTargetFields: TPointerList;
     FSetupProcList: TSetupProcObjList;
@@ -235,6 +248,18 @@ type
     procedure SetName(AValue: string);
     procedure SetOwner(AValue: TComponent);
     procedure SetTag(AValue: NativeInt);
+    // WithOwner/WithName/WithTag (e, na classe descendente
+    // TControlBuilderBase, WithParent/WithOwnerAndParent) NÃO seguem a
+    // depreciação With*->Set* aplicada nos Creators (TComponentCreator,
+    // TMenuCreator, TControlCreator). Não é um esquecimento: os nomes
+    // SetOwner/SetName/SetTag/SetParent já estão ocupados logo acima
+    // pelos setters não-fluentes (procedure, sem TSelf) que implementam
+    // as properties Owner/Name/Tag/Parent das interfaces IComponentBuilder
+    // <T>/IControlBuilder<T> - uma versão fluente "function SetOwner(...):
+    // TSelf" colidiria de verdade com "procedure SetOwner(AValue: ...)"
+    // (mesma assinatura de parâmetro, só o retorno muda, o que o Object
+    // Pascal não aceita como overload). Portanto os Builders continuam
+    // com o prefixo With* propositalmente.
     function WithOwner(AOwner: TComponent): TSelf;
     function WithName(AName: string): TSelf;
     function WithTag(ATag: NativeInt): TSelf;
@@ -427,7 +452,14 @@ type
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
     function WithParent(AParent: TWinControl): TSelf;
-    function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TSelf;
+    // Diferente de WithOwner/WithName/WithTag/WithParent (ver comentário em
+    // TComponentBuilderBase), WithOwnerAndParent não colide com nenhum
+    // setter não-fluente existente (não há "procedure SetOwnerAndParent"
+    // implementando property de interface) - por isso, ao contrário dos
+    // outros, ele pode seguir a mesma depreciação já aplicada em
+    // TControlCreator.WithOwnerAndParent.
+    function WithOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TSelf; deprecated 'Use SetOwnerAndParent instead';
+    function SetOwnerAndParent(AOwner: TComponent; AParent: TWinControl): TSelf;
     property Parent: TWinControl read GetParent write SetParent;
     property Caption: TOptionalString read FCaption write FCaption;
     property Text: TOptionalString read FText write FText;
@@ -558,11 +590,6 @@ type
     property ContextKey: string read GetContextKey;
   end;
 
-  TAutoSizeContainer = class(TPanel)
-  public
-    constructor Create(AOwner: TComponent); override;
-  end;
-
   TControlGroupBounds = record
     Left: Single;
     Top: Single;
@@ -650,9 +677,6 @@ type
     function PeekNext(out NextRow, NextCol: Integer): Boolean;
     function Next: Boolean;
     function Step(out ARowSpan, AColSpan: Integer; out ARow, ACol: Integer; AMark: Boolean = True): Boolean;
-    function CalcSpanRect(ARow, ACol, ARowSpan, AColSpan: Integer;
-      AHorizontalSpace, AVerticalSpace: Single;
-      out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}): Boolean;
     procedure ResetOccupation;
     procedure MarkOccupied(ARow, ACol, ARowSpan, AColSpan: Integer);
     function IsCellFree(ARow, ACol: Integer): Boolean;
@@ -722,8 +746,8 @@ type
 
   TMenuCreatorLevelStack = {$IFDEF FPC}specialize{$ENDIF} TObjectList<TMenuCreatorLevel>;
   TComponentCreator = class;
-  TComponentCreatorObjProc = procedure(const ABuiler: TComponentCreator) of object;
-  TComponentCreatorProc = procedure(const ABuiler: TComponentCreator);
+  TComponentCreatorObjProc = procedure(const ABuilder: TComponentCreator) of object;
+  TComponentCreatorProc = procedure(const ABuilder: TComponentCreator);
 
   TComponentCreator = class
   private
@@ -748,8 +772,8 @@ type
   end;
 
   TMenuCreator = class;
-  TMenuCreatorObjProc = procedure(const ABuiler: TMenuCreator) of object;
-  TMenuCreatorProc = procedure(const ABuiler: TMenuCreator);
+  TMenuCreatorObjProc = procedure(const ABuilder: TMenuCreator) of object;
+  TMenuCreatorProc = procedure(const ABuilder: TMenuCreator);
 
   TMenuCreator = class
   private
@@ -757,7 +781,7 @@ type
     FRegistryContextHandle: IRegistryContextHandle;
     FLevelStack: TMenuCreatorLevelStack;
     function GetComponentRegistry: TComponentRegistry;
-    function GetCurrenteLevel: TMenuCreatorLevel;
+    function GetCurrentLevel: TMenuCreatorLevel;
   public
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
@@ -776,13 +800,13 @@ type
     {$IFDEF FPC}generic{$ENDIF}
     function GetMenuItem<T: TMenuItem>(const AName: string): T; overload;
     function GetMenuItem(const AName: string): TMenuItem; overload;
-    property CurrentLevel: TMenuCreatorLevel read GetCurrenteLevel;
+    property CurrentLevel: TMenuCreatorLevel read GetCurrentLevel;
     property Registry: TComponentRegistry read GetComponentRegistry;
   end;
 
   TControlCreator = class;
-  TControlCreatorObjProc = procedure(const ABuiler: TControlCreator) of object;
-  TControlCreatorProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(ABuiler: TControlCreator);
+  TControlCreatorObjProc = procedure(const ABuilder: TControlCreator) of object;
+  TControlCreatorProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(ABuilder: TControlCreator);
 
   TControlCreator = class
   private
@@ -799,14 +823,13 @@ type
     procedure MoveTopLeftAfterBound(ABounds: TControlGroupBounds);
     procedure AddToGroups(AControl: TControl; const AGroups: array of string);
     function GetGroupBounds(const AGroupName: string): TControlGroupBounds;
-    function GetCurrenteLevel: TControlCreatorLevel;
+    function GetCurrentLevel: TControlCreatorLevel;
     function GetContentWidth: Single;
     function GetFContentHeight: Single;
     function GetComponentRegistry: TComponentRegistry;
     function GetItem(const AName: string): TControl;
     procedure ApplyDefaultControlSize(AControl: TControl);
     function CanAddToGrid: Boolean;
-    procedure AdjustControlToCell(AControl: TControl; ACellRect: TRect);
   public
     constructor Create(ARegistryContextKey: string=''); overload;
     constructor Create(ARegistryContextHandle: IRegistryContextHandle); overload;
@@ -818,7 +841,7 @@ type
     property NamedControls[const AName: string]: TControl read GetNamedControl;
     property ContentWidth: Single read GetContentWidth;
     property ContentHeight: Single read GetFContentHeight;
-    property CurrentLevel: TControlCreatorLevel read GetCurrenteLevel;
+    property CurrentLevel: TControlCreatorLevel read GetCurrentLevel;
     property Controls: TControlList read GetControls;
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TControl read GetItem; default;
@@ -1042,6 +1065,12 @@ begin
 end;
 
 function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithOwnerAndParent(
+  AOwner: TComponent; AParent: TWinControl): TSelf;
+begin
+  Result := SetOwnerAndParent(AOwner, AParent);
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.SetOwnerAndParent(
   AOwner: TComponent; AParent: TWinControl): TSelf;
 begin
   Result := TSelf(Self);
@@ -1517,20 +1546,6 @@ begin
   Result := CurrentLevel.GridMode.PeekNext(R, C);
 end;
 
-procedure TControlCreator.AdjustControlToCell(AControl: TControl; ACellRect: TRect);
-var
-  RControl: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
-begin
-  RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(
-    ACellRect,
-    AControl.Width,
-    AControl.Height
-  );
-
-  TProtectedControl(AControl).Left := RControl.Left;
-  TProtectedControl(AControl).Top := RControl.Top;
-end;
-
 function TControlCreatorHelper.Add(AControlBuilder: TControlBuilder): TControlCreator;
 begin
   Result := {$IFDEF FPC}specialize{$ENDIF} Add<TControl>(AControlBuilder);
@@ -1749,7 +1764,7 @@ var
 
 begin
   if FLevelStack.Count <= 1 then
-    raise Exception.Create('PreviousLevel chamado no nível raiz');
+    raise Exception.Create('SuperLevel chamado no nível raiz');
 
   SubL := FLevelStack.Last;
   SuperL := FLevelStack[FLevelStack.Count - 2];
@@ -2080,7 +2095,7 @@ begin
   end;
 end;
 
-function TControlCreator.GetCurrenteLevel: TControlCreatorLevel;
+function TControlCreator.GetCurrentLevel: TControlCreatorLevel;
 begin
   Result := FLevelStack.Last;
 end;
@@ -3226,36 +3241,6 @@ begin
   Result := True;
 end;
 
-function TGridMode.CalcSpanRect(ARow, ACol, ARowSpan, AColSpan: Integer;
-  AHorizontalSpace, AVerticalSpace: Single;
-  out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}): Boolean;
-var
-  W, H: Single;
-  I: Integer;
-begin
-  if (ARow < 0) or (ACol < 0) then
-  begin
-    Result := False;
-    Exit;
-  end;
-
-  H := AVerticalSpace * (ARowSpan - 1);
-  for I := 0 to ARowSpan - 1 do
-    H := H + GetRowHeight(ARow + I);
-
-  W := AHorizontalSpace * (AColSpan - 1);
-  for I := 0 to AColSpan - 1 do
-    W := W + GetColWidth(ACol + I);
-
-  {$IFDEF FRAMEWORK_FMX}
-  R := RectF(0, 0, W, H);
-  {$ELSE}
-  R := Rect(0, 0, Trunc(W), Trunc(H));
-  {$ENDIF}
-
-  Result := True;
-end;
-
 procedure TGridMode.ResetOccupation;
 begin
   FOccupation.Clear;
@@ -3542,17 +3527,6 @@ destructor TControlCreatorLevel.Destroy;
 begin
   GridMode.Free;
   inherited Destroy;
-end;
-
-{ TAutoSizeContainer }
-
-constructor TAutoSizeContainer.Create(AOwner: TComponent);
-begin
-  inherited Create(AOwner);
-  {$IFNDEF FRAMEWORK_FMX}
-  BevelOuter := bvNone;
-  AutoSize := True;
-  {$ENDIF}
 end;
 
 { TComponentRegistry }
@@ -4195,7 +4169,7 @@ begin
   Result := FRegistryContextHandle.GetRegistry;
 end;
 
-function TMenuCreator.GetCurrenteLevel: TMenuCreatorLevel;
+function TMenuCreator.GetCurrentLevel: TMenuCreatorLevel;
 begin
   Result := FLevelStack.Last;
 end;
@@ -4268,7 +4242,7 @@ end;
 function TMenuCreator.SuperLevel: TMenuCreator;
 begin
   if FLevelStack.Count <= 1 then
-    raise Exception.Create('PreviousLevel chamado no nível raiz');
+    raise Exception.Create('SuperLevel chamado no nível raiz');
 
   FLevelStack.Delete(FLevelStack.Count - 1); // remove nível atual
   Result := Self;
@@ -4376,32 +4350,36 @@ begin
     Parts.DelimitedText := Aprop.PropName;
 
     Context := TRttiContext.Create;
-    for i := 0 to Parts.Count - 1 do
-    begin
-      RType := Context.GetType(CurrentObj.ClassType);
-      RProp := RType.GetProperty(Parts[i]);
-      if not Assigned(RProp) then
-        raise EPropertyError.CreateFmt('Propriedade "%s" não encontrada em %s',
-          [Parts[i], CurrentObj.ClassName]);
-
-      if i < Parts.Count - 1 then
+    try
+      for i := 0 to Parts.Count - 1 do
       begin
-        CurrentObj := RProp.GetValue(CurrentObj).AsObject;
-        if not Assigned(CurrentObj) then
-          Exit;
-      end
-      else
-      begin
-        if not RProp.IsWritable then
-          raise EPropertyError.CreateFmt('Propriedade "%s" de %s é somente leitura',
+        RType := Context.GetType(CurrentObj.ClassType);
+        RProp := RType.GetProperty(Parts[i]);
+        if not Assigned(RProp) then
+          raise EPropertyError.CreateFmt('Propriedade "%s" não encontrada em %s',
             [Parts[i], CurrentObj.ClassName]);
 
-        PropInfo := GetPropInfo(CurrentObj.ClassInfo, Parts[i]);
-        if RProp.PropertyType.TypeKind = tkSet then
-          SetOrdProp(CurrentObj, PropInfo, Integer(AProp.Value.AsOrdinal))
+        if i < Parts.Count - 1 then
+        begin
+          CurrentObj := RProp.GetValue(CurrentObj).AsObject;
+          if not Assigned(CurrentObj) then
+            Exit;
+        end
         else
-          RProp.SetValue(CurrentObj, AProp.Value);
+        begin
+          if not RProp.IsWritable then
+            raise EPropertyError.CreateFmt('Propriedade "%s" de %s é somente leitura',
+              [Parts[i], CurrentObj.ClassName]);
+
+          PropInfo := GetPropInfo(CurrentObj.ClassInfo, Parts[i]);
+          if RProp.PropertyType.TypeKind = tkSet then
+            SetOrdProp(CurrentObj, PropInfo, Integer(AProp.Value.AsOrdinal))
+          else
+            RProp.SetValue(CurrentObj, AProp.Value);
+        end;
       end;
+    finally
+      Context.Free;
     end;
   finally
     Parts.Free;

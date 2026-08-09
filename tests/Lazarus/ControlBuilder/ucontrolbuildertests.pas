@@ -63,6 +63,7 @@ type
     procedure TestControlBuilderWithOnClick;
     procedure TestControlBuilderWithOwner;
     procedure TestControlBuilderWithParent;
+    procedure TestControlBuilderSetOwnerAndParentDirectly;
     procedure TestControlBuilderWithConstraints;
     procedure TestControlBuilderWithInexistentProp;
     procedure TestControlBuilderWithInvalidType;
@@ -791,6 +792,32 @@ begin
     Builder := TControlBuilder.Create(TPanel);
     Builder.Owner := Form;
     Builder.Parent := ParentPanel; // aqui testamos o Parent
+    ChildPanel := Builder.Build as TPanel;
+
+    AssertNotNull('ChildPanel não deveria ser nil', ChildPanel);
+    AssertSame('Owner do ChildPanel deveria ser o Form', Form, ChildPanel.Owner);
+    AssertSame('Parent do ChildPanel deveria ser o ParentPanel', ParentPanel, ChildPanel.Parent);
+  finally
+    Form.Free; // libera ParentPanel e ChildPanel também
+    Builder.Free;
+  end;
+end;
+
+procedure TControlBuilderTests.TestControlBuilderSetOwnerAndParentDirectly;
+// Regressão: usa SetOwnerAndParent diretamente (não o WithOwnerAndParent
+// deprecated), completando no Builder a mesma depreciação já aplicada nos
+// Creators.
+var
+  Builder: TControlBuilder;
+  Form: TForm;
+  ParentPanel, ChildPanel: TPanel;
+begin
+  Form := TForm.CreateNew(nil);
+  try
+    ParentPanel := TPanel.Create(Form);
+    ParentPanel.Parent := Form;
+
+    Builder := TControlBuilder.Create(TPanel).SetOwnerAndParent(Form, ParentPanel);
     ChildPanel := Builder.Build as TPanel;
 
     AssertNotNull('ChildPanel não deveria ser nil', ChildPanel);
