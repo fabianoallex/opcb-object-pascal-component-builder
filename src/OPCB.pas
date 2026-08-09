@@ -4362,17 +4362,33 @@ function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Build: TBuild;
 var
   Proc: TSetupProcObjBuild;
   RefProc: TSetupRefProcBuild;
+  Ref: Pointer;
 begin
   Result := CreateObject;
-  ConfigureObject(Result);
-  ApplyPendingProps(Result);
-  ApplyPendingEvents(Result);
+  try
+    ConfigureObject(Result);
+    ApplyPendingProps(Result);
+    ApplyPendingEvents(Result);
 
-  for Proc in FSetupProcList do
-    Proc(Result);
+    for Proc in FSetupProcList do
+      Proc(Result);
 
-  for RefProc in FSetupRefProcList do
-    RefProc(Result);
+    for RefProc in FSetupRefProcList do
+      RefProc(Result);
+  except
+    // Se algo falhar apos a criacao (prop/evento invalido, setup do
+    // usuario), o objeto ja foi criado por CreateObject e precisa ser
+    // destruido aqui - do contrario ele vaza, pois a excecao impede o
+    // Result de chegar ate quem chamou Build e nenhum outro codigo tem
+    // referencia a ele. As variaveis externas associadas via Assign/out
+    // Reference tambem ja podem apontar para ele (ConfigureObject roda
+    // antes de ApplyPendingProps/ApplyPendingEvents/Setup), entao sao
+    // zeradas primeiro para nao ficarem com ponteiro pendente.
+    for Ref in FTargetFields do
+      PPointer(Ref)^ := nil;
+    (Result as TObject).Free;
+    raise;
+  end;
 end;
 
 function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.Setup(
