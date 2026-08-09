@@ -57,6 +57,7 @@ begin
     AssertNotNull('Obj não deveria ser nil', Obj);
   finally
     Obj.Free;
+    Builder.Free;
   end;
 end;
 
@@ -75,6 +76,7 @@ begin
       TObjectDescendent, Obj.ClassType);
   finally
     Obj.Free;
+    Builder.Free;
   end;
 end;
 
@@ -93,6 +95,7 @@ begin
       TPanel, Obj.ClassType);
   finally
     Obj.Free;
+    Builder.Free;
   end;
 end;
 
@@ -108,6 +111,7 @@ begin
     AssertNotNull('Obj não deveria ser nil', Obj);
   finally
     Obj.Free;
+    Builder.Free;
   end;
 end;
 
@@ -148,6 +152,7 @@ begin
 
   finally
     Object_1.Free; // apenas uma vez, pois todas são a mesma instância
+    Builder.Free;
   end;
 end;
 
@@ -182,29 +187,35 @@ begin
   Builder := TObjectBuilder.Create(TObjectDescendent, Object_1);
   Builder.Assign(Object_2);
 
-  // primeira build
-  Object_Build := Builder.Build;
-  AssertNotNull(Object_Build);
-  AssertNotNull(Object_1);
-  AssertNotNull(Object_2);
-  AssertTrue('Todas as referências devem apontar para a mesma instância',
-             (Object_Build = Object_1) and (Object_1 = Object_2));
+  try
+    // primeira build
+    Object_Build := Builder.Build;
+    AssertNotNull(Object_Build);
+    AssertNotNull(Object_1);
+    AssertNotNull(Object_2);
+    AssertTrue('Todas as referências devem apontar para a mesma instância',
+               (Object_Build = Object_1) and (Object_1 = Object_2));
 
-  // salvar referência da primeira instância
-  FirstInstance := Object_Build;
+    // salvar referência da primeira instância
+    FirstInstance := Object_Build;
 
-  // segunda build
-  Object_Build := Builder.Build;
-  AssertNotNull(Object_Build);
-  AssertNotNull(Object_1);
-  AssertNotNull(Object_2);
+    // segunda build
+    Object_Build := Builder.Build;
+    AssertNotNull(Object_Build);
+    AssertNotNull(Object_1);
+    AssertNotNull(Object_2);
 
-  // validar que é uma nova instância
-  AssertTrue('Cada Build deve retornar uma nova instância', Object_Build <> FirstInstance);
+    // validar que é uma nova instância
+    AssertTrue('Cada Build deve retornar uma nova instância', Object_Build <> FirstInstance);
 
-  // validar que todas as referências foram atualizadas
-  AssertTrue('Todas as referências devem apontar para a nova instância',
-             (Object_Build = Object_1) and (Object_1 = Object_2));
+    // validar que todas as referências foram atualizadas
+    AssertTrue('Todas as referências devem apontar para a nova instância',
+               (Object_Build = Object_1) and (Object_1 = Object_2));
+  finally
+    FirstInstance.Free; // instância da primeira build, já substituída em Object_1/Object_2
+    Object_Build.Free;  // instância da segunda build (= Object_1 = Object_2)
+    Builder.Free;
+  end;
 end;
 
 procedure TObjectBuilderTests.TestObjectBuilderResetReferences;
@@ -218,20 +229,26 @@ begin
 
   Builder := TObjectBuilder.Create(TObject, Object_1);
 
-  Builder.Assign(Object_2).Build;
+  try
+    Builder.Assign(Object_2).Build;
 
-  // Resetar referências e usar novas
-  Builder.ResetReferences;
-  Builder.Assign(Object_3).Build;
+    // Resetar referências e usar novas
+    Builder.ResetReferences;
+    Builder.Assign(Object_3).Build;
 
-  // validar que a primeira build não foi sobrescrita
-  AssertNotNull('Object_1 não deveria ser nil', Object_1);
-  AssertNotNull('Object_2 não deveria ser nil', Object_2);
+    // validar que a primeira build não foi sobrescrita
+    AssertNotNull('Object_1 não deveria ser nil', Object_1);
+    AssertNotNull('Object_2 não deveria ser nil', Object_2);
 
-  // validar que a segunda build foi atribuída apenas à nova referência
-  AssertNotNull('Object_3 não deveria ser nil', Object_3);
-  AssertTrue('Object_3 deveria ser diferente de Object_1', Object_3 <> Object_1);
-  AssertTrue('Object_3 deveria ser diferente de Object_2', Object_3 <> Object_2);
+    // validar que a segunda build foi atribuída apenas à nova referência
+    AssertNotNull('Object_3 não deveria ser nil', Object_3);
+    AssertTrue('Object_3 deveria ser diferente de Object_1', Object_3 <> Object_1);
+    AssertTrue('Object_3 deveria ser diferente de Object_2', Object_3 <> Object_2);
+  finally
+    Object_1.Free; // = Object_2 (mesma instância da primeira build)
+    Object_3.Free;
+    Builder.Free;
+  end;
 end;
 
 procedure TObjectBuilderTests.TestObjectBuilderSetup;
@@ -248,6 +265,7 @@ begin
     AssertEquals('Propriedade FFoo de Obj diferente da esperada', 188, Obj.FFoo);
   finally
     Obj.Free;
+    Builder.Free;
   end;
 end;
 
@@ -267,6 +285,7 @@ begin
     AssertEquals('Propriedade FBar de Obj diferente da esperada', 456, Obj.FBar);
   finally
     Obj.Free;
+    Builder.Free;
   end;
 end;
 
@@ -280,12 +299,13 @@ begin
   Builder.WithProp('Foo', 251); // altera via rtti
   Builder.WithProp('Bar', 938);  // altera via rtti
   try
-    Obj := Builder.Build as TObjectDescendent;  // auto free Builder
+    Obj := Builder.Build as TObjectDescendent;
     AssertNotNull('Obj não deveria ser nil', Obj);
     AssertEquals('Propriedade Foo de Obj diferente da esperada', 251, Obj.Foo);
     AssertEquals('Propriedade Bar de Obj diferente da esperada', 938, Obj.Bar);
   finally
     Obj.Free;
+    Builder.Free;
   end;
 end;
 

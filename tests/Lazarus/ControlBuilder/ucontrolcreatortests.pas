@@ -2343,6 +2343,9 @@ begin
 
     AssertSame('Parent do controle diferente do esperado', FForm, P.Parent);
   finally
+    // SetParent (diferente de SetOwnerAndParent) não define Owner, então P
+    // não é liberado automaticamente pelo FForm.Free do TearDown.
+    P.Free;
     ControlCreator.Free;
   end;
 end;

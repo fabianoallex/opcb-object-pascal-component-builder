@@ -127,6 +127,7 @@ begin
     AssertNotNull('Control não deveria ser nil', Control);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -145,6 +146,7 @@ begin
       TPanel, Control.ClassType);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -160,6 +162,7 @@ begin
     AssertNotNull('Control não deveria ser nil', Control);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -200,6 +203,7 @@ begin
 
   finally
     Control_1.Free; // apenas uma vez, pois todas são a mesma instância
+    Builder.Free;
   end;
 end;
 
@@ -216,6 +220,7 @@ begin
     AssertEquals('Control com nome diferente do esperado', 'PanelTeste', Control.Name);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -250,29 +255,35 @@ begin
   Builder := TControlBuilder.Create(TPanel, Control_1);
   Builder.Assign(Control_2);
 
-  // primeira build
-  Control_Build := Builder.Build;
-  AssertNotNull(Control_Build);
-  AssertNotNull(Control_1);
-  AssertNotNull(Control_2);
-  AssertTrue('Todas as referências devem apontar para a mesma instância',
-             (Control_Build = Control_1) and (Control_1 = Control_2));
+  try
+    // primeira build
+    Control_Build := Builder.Build;
+    AssertNotNull(Control_Build);
+    AssertNotNull(Control_1);
+    AssertNotNull(Control_2);
+    AssertTrue('Todas as referências devem apontar para a mesma instância',
+               (Control_Build = Control_1) and (Control_1 = Control_2));
 
-  // salvar referência da primeira instância
-  FirstInstance := Control_Build;
+    // salvar referência da primeira instância
+    FirstInstance := Control_Build;
 
-  // segunda build
-  Control_Build := Builder.Build;
-  AssertNotNull(Control_Build);
-  AssertNotNull(Control_1);
-  AssertNotNull(Control_2);
+    // segunda build
+    Control_Build := Builder.Build;
+    AssertNotNull(Control_Build);
+    AssertNotNull(Control_1);
+    AssertNotNull(Control_2);
 
-  // validar que é uma nova instância
-  AssertTrue('Cada Build deve retornar uma nova instância', Control_Build <> FirstInstance);
+    // validar que é uma nova instância
+    AssertTrue('Cada Build deve retornar uma nova instância', Control_Build <> FirstInstance);
 
-  // validar que todas as referências foram atualizadas
-  AssertTrue('Todas as referências devem apontar para a nova instância',
-             (Control_Build = Control_1) and (Control_1 = Control_2));
+    // validar que todas as referências foram atualizadas
+    AssertTrue('Todas as referências devem apontar para a nova instância',
+               (Control_Build = Control_1) and (Control_1 = Control_2));
+  finally
+    FirstInstance.Free; // instância da primeira build, já substituída em Control_1/Control_2
+    Control_Build.Free; // instância da segunda build (= Control_1 = Control_2)
+    Builder.Free;
+  end;
 end;
 
 procedure TControlBuilderTests.TestControlBuilderResetReferences;
@@ -286,20 +297,26 @@ begin
 
   Builder := TControlBuilder.Create(TPanel, Control_1);
 
-  Builder.Assign(Control_2).Build;
+  try
+    Builder.Assign(Control_2).Build;
 
-  // Resetar referências e usar novas
-  Builder.ResetReferences;
-  Builder.Assign(Control_3).Build;
+    // Resetar referências e usar novas
+    Builder.ResetReferences;
+    Builder.Assign(Control_3).Build;
 
-  // validar que a primeira build não foi sobrescrita
-  AssertNotNull('Control_1 não deveria ser nil', Control_1);
-  AssertNotNull('Control_2 não deveria ser nil', Control_2);
+    // validar que a primeira build não foi sobrescrita
+    AssertNotNull('Control_1 não deveria ser nil', Control_1);
+    AssertNotNull('Control_2 não deveria ser nil', Control_2);
 
-  // validar que a segunda build foi atribuída apenas à nova referência
-  AssertNotNull('Control_3 não deveria ser nil', Control_3);
-  AssertTrue('Control_3 deveria ser diferente de Control_1', Control_3 <> Control_1);
-  AssertTrue('Control_3 deveria ser diferente de Control_2', Control_3 <> Control_2);
+    // validar que a segunda build foi atribuída apenas à nova referência
+    AssertNotNull('Control_3 não deveria ser nil', Control_3);
+    AssertTrue('Control_3 deveria ser diferente de Control_1', Control_3 <> Control_1);
+    AssertTrue('Control_3 deveria ser diferente de Control_2', Control_3 <> Control_2);
+  finally
+    Control_1.Free; // = Control_2 (mesma instância da primeira build)
+    Control_3.Free;
+    Builder.Free;
+  end;
 end;
 
 procedure TControlBuilderTests.TestControlBuilderSetup;
@@ -316,6 +333,7 @@ begin
     AssertEquals('Propriedade Height de Control diferente da esperada', 299, Control.Height);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -335,6 +353,7 @@ begin
     AssertEquals('Propriedade Width de Control diferente da esperada', 177, Control.Width);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -354,6 +373,7 @@ begin
     AssertEquals('Propriedade Width de Control diferente da esperada', 344, Control.Width);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -371,6 +391,7 @@ begin
     AssertEquals('Propriedade Width de Button diferente da esperada', False, Button.Enabled);
   finally
     Button.Free;
+    Builder.Free;
   end;
 end;
 
@@ -388,6 +409,7 @@ begin
     AssertEquals('Propriedade Font Size de Control diferente da esperada', 25, Control.Font.Size);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -408,6 +430,7 @@ begin
     AssertFalse('Font.Style não deveria conter fsUnderline', fsUnderline in Control.Font.Style);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -428,6 +451,7 @@ begin
     AssertEquals('Font.Color diferente do esperado', clRed, Control.Font.Color);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -450,6 +474,7 @@ begin
   finally
     Panel.Free;
     PopupMenu.Free;
+    Builder.Free;
   end;
 end;
 
@@ -470,6 +495,7 @@ begin
   finally
     Panel.Free;
     PopupMenu.Free;
+    Builder.Free;
   end;
 end;
 
@@ -494,6 +520,7 @@ begin
     Panel.Free;
     PopupMenu1.Free;
     PopupMenu2.Free;
+    Builder.Free;
   end;
 end;
 
@@ -519,6 +546,7 @@ begin
     );
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -543,6 +571,7 @@ begin
     AssertTrue('Anchors não deveria conter akBottom', akBottom in Panel.Anchors);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -560,6 +589,7 @@ begin
     AssertEquals('Propriedade Name de Panel diferente da esperada', 'PanelTeste', Panel.Name);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -577,6 +607,7 @@ begin
     AssertEquals('Propriedade Tag diferente da esperada', 77, Panel.Tag);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -594,6 +625,7 @@ begin
     AssertEquals('Propriedade Width diferente da esperada', 205, Panel.Width);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -611,6 +643,7 @@ begin
     AssertEquals('Propriedade Height diferente da esperada', 154, Panel.Height);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -628,6 +661,7 @@ begin
     AssertEquals('Propriedade Top diferente da esperada', 25, Panel.Top);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -645,6 +679,7 @@ begin
     AssertEquals('Propriedade Left diferente da esperada', 32, Panel.Left);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -662,6 +697,7 @@ begin
     AssertEquals('Propriedade Caption diferente da esperada', 'TesteCaption', Panel.Caption);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -679,6 +715,7 @@ begin
     AssertEquals('Propriedade Text diferente da esperada', 'TesteText', Edit.Text);
   finally
     Edit.Free;
+    Builder.Free;
   end;
 end;
 
@@ -696,6 +733,7 @@ begin
     AssertEquals('Propriedade Caption diferente da esperada', 'TesteCaption', Panel.Caption);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -714,6 +752,7 @@ begin
     AssertEquals('Propriedade FClicked diferente da esperada', True, FClicked);
   finally
     Button.Free;
+    Builder.Free;
   end;
 end;
 
@@ -733,6 +772,7 @@ begin
     AssertSame('Owner do Panel deveria ser o Form', Form, Panel.Owner);
   finally
     Form.Free;  // já libera o Panel também
+    Builder.Free;
   end;
 end;
 
@@ -757,6 +797,7 @@ begin
     AssertSame('Parent do ChildPanel deveria ser o ParentPanel', ParentPanel, ChildPanel.Parent);
   finally
     Form.Free; // libera ParentPanel e ChildPanel também
+    Builder.Free;
   end;
 end;
 
@@ -786,6 +827,7 @@ begin
     AssertEquals('Constraints.MaxHeight não aplicado corretamente', 150, Panel.Constraints.MaxHeight);
   finally
     Form.Free;  // libera Panel também
+    Builder.Free;
   end;
 end;
 
@@ -810,6 +852,7 @@ begin
     AssertTrue('Deveria lançar EPropertyError ao tentar setar propriedade inexistente', Raised);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -838,6 +881,7 @@ begin
     AssertTrue('Deveria lançar exceção ao tentar setar tipo inválido', Raised);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -858,6 +902,7 @@ begin
     AssertEquals('Height não deveria aceitar valor fora do range', 0, Panel.Height);
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -877,6 +922,7 @@ begin
     );
   finally
     Panel.Free;
+    Builder.Free;
   end;
 end;
 
@@ -893,10 +939,11 @@ begin
   ;
 
   try
-    Control := Builder.Build;  // auto free Builder
+    Control := Builder.Build;
     AssertNotNull('Control não deveria ser nil', Control);
   finally
     Control.Free;
+    Builder.Free;
   end;
 end;
 
@@ -915,6 +962,7 @@ begin
     AssertEquals('Propriedade FClicked diferente da esperada', True, FClicked);
   finally
     Button.Free;
+    Builder.Free;
   end;
 end;
 
