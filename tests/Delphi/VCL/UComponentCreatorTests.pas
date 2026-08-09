@@ -1,38 +1,33 @@
 unit UComponentCreatorTests;
 
-{$mode objfpc}{$H+}
-
 interface
 
 uses
-  Classes, SysUtils, fpcunit, testregistry, Forms, Dialogs, OPCB;
+  DUnitX.TestFramework, Vcl.Forms, Vcl.Dialogs, OPCB;
 
 type
-
-  { TComponentCreatorTests }
-
-  TComponentCreatorTests = class(TTestCase)
+  [TestFixture]
+  TComponentCreatorTest = class
   private
     FForm: TForm;
     procedure ExternalMethod(const ACreator: TComponentCreator);
-  protected
-    procedure SetUp; override;
-    procedure TearDown; override;
-  published
-    procedure TestAdd;
-    procedure TestSetOwnerDirectly;
-    procedure TestGetComponent;
-    procedure TestAddComponentBuilderIsFreedNotLeaked;
-    procedure TestExternalObjProc;
-    procedure TestExternalProc;
-    procedure TestWithOwnerDeprecated;
+  public
+    [Setup]
+    procedure Setup;
+    [TearDown]
+    procedure TearDown;
+    [Test] procedure TestAdd;
+    [Test] procedure TestSetOwnerDirectly;
+    [Test] procedure TestGetComponent;
+    [Test] procedure TestAddComponentBuilderIsFreedNotLeaked;
+    [Test] procedure TestExternalObjProc;
+    [Test] procedure TestExternalProc;
+    [Test] procedure TestWithOwnerDeprecated;
   end;
 
 implementation
 
 type
-  { TCountingComponentBuilder }
-
   TCountingComponentBuilder = class(TComponentBuilder)
   public
     destructor Destroy; override;
@@ -47,7 +42,7 @@ begin
   inherited;
 end;
 
-procedure TComponentCreatorTests.ExternalMethod(const ACreator: TComponentCreator);
+procedure TComponentCreatorTest.ExternalMethod(const ACreator: TComponentCreator);
 begin
   ACreator.Add(TComponentBuilder.Create(TOpenDialog, 'ExternalMethodDialog'));
 end;
@@ -57,17 +52,17 @@ begin
   ACreator.Add(TComponentBuilder.Create(TOpenDialog, 'ExternalProcDialog'));
 end;
 
-procedure TComponentCreatorTests.SetUp;
+procedure TComponentCreatorTest.Setup;
 begin
   FForm := TForm.Create(nil);
 end;
 
-procedure TComponentCreatorTests.TearDown;
+procedure TComponentCreatorTest.TearDown;
 begin
   FForm.Free;
 end;
 
-procedure TComponentCreatorTests.TestAdd;
+procedure TComponentCreatorTest.TestAdd;
 var
   ComponentCreator: TComponentCreator;
   Dialog: TOpenDialog;
@@ -80,18 +75,18 @@ begin
     ;
 
     Dialog := ComponentCreator.GetComponent('OpenDialog1') as TOpenDialog;
-    AssertNotNull('Dialog não deveria ser nil', Dialog);
+    Assert.IsNotNull(Dialog, 'Dialog nao deveria ser nil');
   finally
     ComponentCreator.Free;
   end;
 end;
 
-procedure TComponentCreatorTests.TestSetOwnerDirectly;
+procedure TComponentCreatorTest.TestSetOwnerDirectly;
 var
   ComponentCreator: TComponentCreator;
   Dialog: TOpenDialog;
 begin
-  // Regressão: usa SetOwner diretamente (não o WithOwner deprecated).
+  // Regressao: usa SetOwner diretamente (nao o WithOwner deprecated).
   ComponentCreator := TComponentCreator.Create;
   try
     ComponentCreator
@@ -100,13 +95,13 @@ begin
     ;
 
     Dialog := ComponentCreator.GetComponent('OpenDialog1') as TOpenDialog;
-    AssertSame('Owner do componente diferente do esperado', FForm, Dialog.Owner);
+    Assert.IsTrue(FForm = Dialog.Owner, 'Owner do componente diferente do esperado');
   finally
     ComponentCreator.Free;
   end;
 end;
 
-procedure TComponentCreatorTests.TestGetComponent;
+procedure TComponentCreatorTest.TestGetComponent;
 var
   ComponentCreator: TComponentCreator;
 begin
@@ -117,19 +112,19 @@ begin
       .Add(TComponentBuilder.Create(TOpenDialog, 'OpenDialog1'))
     ;
 
-    AssertNotNull('GetComponent<T> não deveria devolver nil',
-      ComponentCreator.specialize GetComponent<TOpenDialog>('OpenDialog1'));
+    Assert.IsNotNull(ComponentCreator.GetComponent<TOpenDialog>('OpenDialog1'),
+      'GetComponent<T> nao deveria devolver nil');
   finally
     ComponentCreator.Free;
   end;
 end;
 
-procedure TComponentCreatorTests.TestAddComponentBuilderIsFreedNotLeaked;
+procedure TComponentCreatorTest.TestAddComponentBuilderIsFreedNotLeaked;
 var
   ComponentCreator: TComponentCreator;
 begin
-  // Simetria com TestAddMenuBuilderIsFreedNotLeaked (umenucreatortests.pas):
-  // o Creator assume posse do builder em Add e deve liberá-lo exatamente
+  // Simetria com TestAddMenuBuilderIsFreedNotLeaked (UMenuCreatorTests.pas):
+  // o Creator assume posse do builder em Add e deve libera-lo exatamente
   // uma vez.
   GComponentBuilderDestroyCount := 0;
   ComponentCreator := TComponentCreator.Create;
@@ -139,13 +134,13 @@ begin
       .Add(TCountingComponentBuilder.Create(TOpenDialog, 'OpenDialog1'))
     ;
 
-    AssertEquals('O builder do componente deveria ter sido liberado exatamente uma vez', 1, GComponentBuilderDestroyCount);
+    Assert.AreEqual(1, GComponentBuilderDestroyCount, 'O builder do componente deveria ter sido liberado exatamente uma vez');
   finally
     ComponentCreator.Free;
   end;
 end;
 
-procedure TComponentCreatorTests.TestExternalObjProc;
+procedure TComponentCreatorTest.TestExternalObjProc;
 var
   ComponentCreator: TComponentCreator;
 begin
@@ -153,17 +148,17 @@ begin
   try
     ComponentCreator
       .SetOwner(FForm)
-      .External(@ExternalMethod)
+      .External(ExternalMethod)
     ;
 
-    AssertNotNull('Componente criado dentro do External (of object) não deveria ser nil',
-      ComponentCreator.GetComponent('ExternalMethodDialog'));
+    Assert.IsNotNull(ComponentCreator.GetComponent('ExternalMethodDialog'),
+      'Componente criado dentro do External (of object) nao deveria ser nil');
   finally
     ComponentCreator.Free;
   end;
 end;
 
-procedure TComponentCreatorTests.TestExternalProc;
+procedure TComponentCreatorTest.TestExternalProc;
 var
   ComponentCreator: TComponentCreator;
 begin
@@ -171,17 +166,17 @@ begin
   try
     ComponentCreator
       .SetOwner(FForm)
-      .External(@ExternalComponentCreatorProc)
+      .External(ExternalComponentCreatorProc)
     ;
 
-    AssertNotNull('Componente criado dentro do External (procedure simples) não deveria ser nil',
-      ComponentCreator.GetComponent('ExternalProcDialog'));
+    Assert.IsNotNull(ComponentCreator.GetComponent('ExternalProcDialog'),
+      'Componente criado dentro do External (procedure simples) nao deveria ser nil');
   finally
     ComponentCreator.Free;
   end;
 end;
 
-procedure TComponentCreatorTests.TestWithOwnerDeprecated;
+procedure TComponentCreatorTest.TestWithOwnerDeprecated;
 var
   ComponentCreator: TComponentCreator;
   Dialog: TOpenDialog;
@@ -194,13 +189,13 @@ begin
     ;
 
     Dialog := ComponentCreator.GetComponent('OpenDialog1') as TOpenDialog;
-    AssertSame('Owner do componente diferente do esperado', FForm, Dialog.Owner);
+    Assert.IsTrue(FForm = Dialog.Owner, 'Owner do componente diferente do esperado');
   finally
     ComponentCreator.Free;
   end;
 end;
 
 initialization
+  TDUnitX.RegisterTestFixture(TComponentCreatorTest);
 
-  RegisterTest(TComponentCreatorTests);
 end.

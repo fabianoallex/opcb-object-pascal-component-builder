@@ -18,6 +18,7 @@ uses
   UObjectBuilderTests in 'UObjectBuilderTests.pas',
   UControlBuilderTests in 'UControlBuilderTests.pas',
   UControlCreatorTests in 'UControlCreatorTests.pas',
+  UComponentCreatorTests in 'UComponentCreatorTests.pas',
   UComponentRegistryTest in 'UComponentRegistryTest.pas',
   UMenuCreatorTests in 'UMenuCreatorTests.pas',
   UButtonBuilderTests in 'UButtonBuilderTests.pas';

@@ -100,6 +100,32 @@ type
     [Test] procedure TestAddWithGridFullDiscardsOutReference;
     [Test] procedure TestAlignControlsRight;
     [Test] procedure TestAlignControlsRightWithPadding;
+    [Test] procedure TestMoveControlsSingleControlAppliesDelta;
+    [Test] procedure TestMoveControlsByNamesAppliesDeltaToEach;
+    [Test] procedure TestMoveControlsByNamesRaisesWhenControlNotFound;
+    [Test] procedure TestSetTopLeftNearControlBelow;
+    [Test] procedure TestSetTopLeftNearControlRight;
+    [Test] procedure TestSetTopLeftNearControlsBelow;
+    [Test] procedure TestSetTopLeftNearControlsRight;
+    [Test] procedure TestSetTopLeftNearGroupBelow;
+    [Test] procedure TestSetTopLeftNearGroupRight;
+    [Test] procedure TestRecalcParentHeightOnly;
+    [Test] procedure TestRecalcParentWidthOnly;
+    [Test] procedure TestCenterControlsHorizontally;
+    [Test] procedure TestCenterControlsVertically;
+    [Test] procedure TestCenterControlsInParentHorizontally;
+    [Test] procedure TestCenterControlsInParentVertically;
+    [Test] procedure TestCenterControlInParentHorizontally;
+    [Test] procedure TestCopyHeightAppliesReferenceHeight;
+    [Test] procedure TestCopyWidthAppliesReferenceWidth;
+    [Test] procedure TestCopySizeAppliesReferenceWidthAndHeight;
+    [Test] procedure TestCopyHeightRaisesWhenControlNotFound;
+    [Test] procedure TestCopyWidthRaisesWhenControlNotFound;
+    [Test] procedure TestCopySizeRaisesWhenControlNotFound;
+    [Test] procedure TestReturnCurrentLevel;
+    [Test] procedure TestAddControlBuilderIsFreedNotLeaked;
+    [Test] procedure TestAddControlBuilderExceptionDuringBuildStillFreesBuilder;
+    [Test] procedure TestAddControlBuilderExceptionDuringBuildNullsOutReference;
     [Test] procedure TestSetOwnerAndParentDirectly;
     [Test] procedure TestSetParentDirectly;
     [Test] procedure TestGetControlGeneric;
@@ -108,7 +134,22 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils, System.TypInfo, System.Rtti;
+
+type
+  TCountingControlBuilder = class(TControlBuilder)
+  public
+    destructor Destroy; override;
+  end;
+
+var
+  GControlBuilderDestroyCount: Integer = 0;
+
+destructor TCountingControlBuilder.Destroy;
+begin
+  Inc(GControlBuilderDestroyCount);
+  inherited;
+end;
 
 procedure TControlCreatorTest.ExternalMethod(const ACreator: TControlCreator);
 var
@@ -2596,6 +2637,611 @@ begin
     Assert.IsNotNull(ControlCreator.GetControl<TPanel>('painel_generico'),
       'GetControl<T> nao deveria devolver nil');
   finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestMoveControlsSingleControlAppliesDelta;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, P).WithTop(10).WithLeft(20))
+      .MoveControls(P, 5, 7)
+    ;
+
+    Assert.AreEqual(20 + 5, P.Left, 'Propriedade Left diferente da esperada');
+    Assert.AreEqual(10 + 7, P.Top, 'Propriedade Top diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestMoveControlsByNamesAppliesDeltaToEach;
+var
+  ControlCreator: TControlCreator;
+  P1, P2: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'p1', P1).WithTop(10).WithLeft(20))
+      .Add(TControlBuilder.Create(TPanel, 'p2', P2).WithTop(30).WithLeft(40))
+      .MoveControls(['p1', 'p2'], 5, 7)
+    ;
+
+    Assert.AreEqual(20 + 5, P1.Left, 'Propriedade Left de P1 diferente da esperada');
+    Assert.AreEqual(10 + 7, P1.Top, 'Propriedade Top de P1 diferente da esperada');
+    Assert.AreEqual(40 + 5, P2.Left, 'Propriedade Left de P2 diferente da esperada');
+    Assert.AreEqual(30 + 7, P2.Top, 'Propriedade Top de P2 diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestMoveControlsByNamesRaisesWhenControlNotFound;
+var
+  ControlCreator: TControlCreator;
+  Raised: Boolean;
+begin
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator.SetOwnerAndParent(FForm, FForm);
+
+    try
+      ControlCreator.MoveControls(['inexistente'], 1, 1);
+    except
+      on E: Exception do
+        Raised := Pos('inexistente', E.Message) > 0;
+    end;
+
+    Assert.IsTrue(Raised, 'Deveria ter levantado excecao para controle inexistente');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetTopLeftNearControlBelow;
+var
+  ControlCreator: TControlCreator;
+  Ref, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetSpace(5, 6)
+      .Add(TControlBuilder.Create(TPanel, 'ref', Ref).WithTop(10).WithLeft(20).WithWidthAndHeight(50, 30))
+      .SetTopLeftNearControl('ref', rpBelow)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.AreEqual(20, P.Left, 'Propriedade Left diferente da esperada');
+    Assert.AreEqual(10 + 30 + 5, P.Top, 'Propriedade Top diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetTopLeftNearControlRight;
+var
+  ControlCreator: TControlCreator;
+  Ref, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetSpace(5, 6)
+      .Add(TControlBuilder.Create(TPanel, 'ref', Ref).WithTop(10).WithLeft(20).WithWidthAndHeight(50, 30))
+      .SetTopLeftNearControl('ref', rpRight)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.AreEqual(10, P.Top, 'Propriedade Top diferente da esperada');
+    Assert.AreEqual(20 + 50 + 6, P.Left, 'Propriedade Left diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetTopLeftNearControlsBelow;
+var
+  ControlCreator: TControlCreator;
+  Ref1, Ref2, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetSpace(5, 6)
+      .Add(TControlBuilder.Create(TPanel, 'ref1', Ref1).WithTop(10).WithLeft(20).WithWidthAndHeight(50, 30))
+      .Add(TControlBuilder.Create(TPanel, 'ref2', Ref2).WithTop(10).WithLeft(80).WithWidthAndHeight(50, 60))
+      .SetTopLeftNearControls(['ref1', 'ref2'], rpBelow)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    // Bounds envelope de [ref1, ref2]: Left=20 (min), Bottom=max(40, 70)=70
+    Assert.AreEqual(20, P.Left, 'Propriedade Left diferente da esperada');
+    Assert.AreEqual(70 + 5, P.Top, 'Propriedade Top diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetTopLeftNearControlsRight;
+var
+  ControlCreator: TControlCreator;
+  Ref1, Ref2, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetSpace(5, 6)
+      .Add(TControlBuilder.Create(TPanel, 'ref1', Ref1).WithTop(10).WithLeft(20).WithWidthAndHeight(50, 30))
+      .Add(TControlBuilder.Create(TPanel, 'ref2', Ref2).WithTop(10).WithLeft(80).WithWidthAndHeight(50, 60))
+      .SetTopLeftNearControls(['ref1', 'ref2'], rpRight)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    // Bounds envelope de [ref1, ref2]: Right=max(70, 130)=130
+    Assert.AreEqual(10, P.Top, 'Propriedade Top diferente da esperada');
+    Assert.AreEqual(130 + 6, P.Left, 'Propriedade Left diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetTopLeftNearGroupBelow;
+var
+  ControlCreator: TControlCreator;
+  G1, G2, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetSpace(5, 6)
+      .SubLevel('g')
+        .Add(TControlBuilder.Create(TPanel, G1).WithTop(10).WithLeft(20).WithWidthAndHeight(50, 30))
+        .Add(TControlBuilder.Create(TPanel, G2).WithTop(10).WithLeft(80).WithWidthAndHeight(50, 60))
+      .SuperLevel
+      .SetTopLeftNearGroup('g', rpBelow)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.AreEqual(20, P.Left, 'Propriedade Left diferente da esperada');
+    Assert.AreEqual(70 + 5, P.Top, 'Propriedade Top diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetTopLeftNearGroupRight;
+var
+  ControlCreator: TControlCreator;
+  G1, G2, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetSpace(5, 6)
+      .SubLevel('g')
+        .Add(TControlBuilder.Create(TPanel, G1).WithTop(10).WithLeft(20).WithWidthAndHeight(50, 30))
+        .Add(TControlBuilder.Create(TPanel, G2).WithTop(10).WithLeft(80).WithWidthAndHeight(50, 60))
+      .SuperLevel
+      .SetTopLeftNearGroup('g', rpRight)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.AreEqual(10, P.Top, 'Propriedade Top diferente da esperada');
+    Assert.AreEqual(130 + 6, P.Left, 'Propriedade Left diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestRecalcParentHeightOnly;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SubLevel(TControlBuilder.Create(TPanel, P).WithWidth(999).WithHeight(10).WithLeft(15))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .RecalcParentHeight
+      .SuperLevel
+    ;
+
+    Assert.AreEqual(25, P.Height, 'Propriedade Height diferente da esperada');
+    Assert.AreEqual(999, P.Width, 'Propriedade Width nao deveria ser alterada por RecalcParentHeight');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestRecalcParentWidthOnly;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SubLevel(TControlBuilder.Create(TPanel, P).WithHeight(999).WithWidth(10).WithLeft(15))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+        .RecalcParentWidth
+      .SuperLevel
+    ;
+
+    Assert.AreEqual(20, P.Width, 'Propriedade Width diferente da esperada');
+    Assert.AreEqual(999, P.Height, 'Propriedade Height nao deveria ser alterada por RecalcParentWidth');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCenterControlsHorizontally;
+var
+  ControlCreator: TControlCreator;
+  Ref, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'ref', Ref).WithTop(0).WithLeft(0).WithWidthAndHeight(100, 10))
+      .Add(TControlBuilder.Create(TPanel, 'p', P).WithTop(50).WithLeft(0).WithWidthAndHeight(20, 10))
+      .CenterControlsHorizontally(['p'], ['ref'])
+    ;
+
+    // Centro X do ref: 0 + 100/2 = 50. Left de P para centralizar: 50 - 20/2 = 40
+    Assert.AreEqual(40, P.Left, 'Propriedade Left diferente da esperada');
+    Assert.AreEqual(50, P.Top, 'Propriedade Top nao deveria mudar');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCenterControlsVertically;
+var
+  ControlCreator: TControlCreator;
+  Ref, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'ref', Ref).WithTop(0).WithLeft(0).WithWidthAndHeight(10, 100))
+      .Add(TControlBuilder.Create(TPanel, 'p', P).WithTop(0).WithLeft(50).WithWidthAndHeight(10, 20))
+      .CenterControlsVertically(['p'], ['ref'])
+    ;
+
+    // Centro Y do ref: 0 + 100/2 = 50. Top de P para centralizar: 50 - 20/2 = 40
+    Assert.AreEqual(40, P.Top, 'Propriedade Top diferente da esperada');
+    Assert.AreEqual(50, P.Left, 'Propriedade Left nao deveria mudar');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCenterControlsInParentHorizontally;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+  ExpectedCenterX: Single;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'p', P).WithTop(0).WithLeft(0).WithWidthAndHeight(20, 10))
+      .CenterControlsInParentHorizontally(['p'])
+    ;
+
+    // Nao fixamos o ClientWidth de FForm (depende do ambiente), entao
+    // comparamos contra o valor real em runtime em vez de um literal.
+    ExpectedCenterX := FForm.ClientWidth / 2;
+    Assert.AreEqual(ExpectedCenterX, P.Left + (P.Width / 2), 0.5, 'Centro horizontal de P diferente do esperado');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCenterControlsInParentVertically;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+  ExpectedCenterY: Single;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'p', P).WithTop(0).WithLeft(0).WithWidthAndHeight(10, 20))
+      .CenterControlsInParentVertically(['p'])
+    ;
+
+    ExpectedCenterY := FForm.ClientHeight / 2;
+    Assert.AreEqual(ExpectedCenterY, P.Top + (P.Height / 2), 0.5, 'Centro vertical de P diferente do esperado');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCenterControlInParentHorizontally;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+  ExpectedCenterX: Single;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, P).WithTop(0).WithLeft(0).WithWidthAndHeight(20, 10))
+      .CenterControlInParentHorizontally
+    ;
+
+    ExpectedCenterX := FForm.ClientWidth / 2;
+    Assert.AreEqual(ExpectedCenterX, P.Left + (P.Width / 2), 0.5, 'Centro horizontal de P diferente do esperado');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCopyHeightAppliesReferenceHeight;
+var
+  ControlCreator: TControlCreator;
+  Ref, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'ref', Ref).WithWidthAndHeight(50, 77))
+      .Add(TControlBuilder.Create(TPanel, 'p', P).WithWidthAndHeight(50, 10))
+      .CopyHeight(['p'], ['ref'])
+    ;
+
+    Assert.AreEqual(77, P.Height, 'Propriedade Height diferente da esperada');
+    Assert.AreEqual(50, P.Width, 'Propriedade Width nao deveria mudar');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCopyWidthAppliesReferenceWidth;
+var
+  ControlCreator: TControlCreator;
+  Ref, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'ref', Ref).WithWidthAndHeight(88, 30))
+      .Add(TControlBuilder.Create(TPanel, 'p', P).WithWidthAndHeight(10, 30))
+      .CopyWidth(['p'], ['ref'])
+    ;
+
+    Assert.AreEqual(88, P.Width, 'Propriedade Width diferente da esperada');
+    Assert.AreEqual(30, P.Height, 'Propriedade Height nao deveria mudar');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCopySizeAppliesReferenceWidthAndHeight;
+var
+  ControlCreator: TControlCreator;
+  Ref, P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'ref', Ref).WithWidthAndHeight(88, 77))
+      .Add(TControlBuilder.Create(TPanel, 'p', P).WithWidthAndHeight(10, 10))
+      .CopySize(['p'], ['ref'])
+    ;
+
+    Assert.AreEqual(88, P.Width, 'Propriedade Width diferente da esperada');
+    Assert.AreEqual(77, P.Height, 'Propriedade Height diferente da esperada');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCopyHeightRaisesWhenControlNotFound;
+var
+  ControlCreator: TControlCreator;
+  Raised: Boolean;
+begin
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'ref').WithWidthAndHeight(50, 77))
+    ;
+
+    try
+      ControlCreator.CopyHeight(['inexistente'], ['ref']);
+    except
+      on E: Exception do
+        Raised := Pos('inexistente', E.Message) > 0;
+    end;
+
+    Assert.IsTrue(Raised, 'Deveria ter levantado excecao para controle inexistente');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCopyWidthRaisesWhenControlNotFound;
+var
+  ControlCreator: TControlCreator;
+  Raised: Boolean;
+begin
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'ref').WithWidthAndHeight(50, 77))
+    ;
+
+    try
+      ControlCreator.CopyWidth(['inexistente'], ['ref']);
+    except
+      on E: Exception do
+        Raised := Pos('inexistente', E.Message) > 0;
+    end;
+
+    Assert.IsTrue(Raised, 'Deveria ter levantado excecao para controle inexistente');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestCopySizeRaisesWhenControlNotFound;
+var
+  ControlCreator: TControlCreator;
+  Raised: Boolean;
+begin
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TControlBuilder.Create(TPanel, 'ref').WithWidthAndHeight(50, 77))
+    ;
+
+    try
+      ControlCreator.CopySize(['inexistente'], ['ref']);
+    except
+      on E: Exception do
+        Raised := Pos('inexistente', E.Message) > 0;
+    end;
+
+    Assert.IsTrue(Raised, 'Deveria ter levantado excecao para controle inexistente');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestReturnCurrentLevel;
+var
+  ControlCreator: TControlCreator;
+  Level: TControlCreatorLevel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SubLevel('g')
+      .ReturnCurrentLevel(Level)
+    ;
+
+    Assert.IsTrue(ControlCreator.CurrentLevel = Level, 'Level devolvido deveria ser o mesmo objeto do CurrentLevel');
+    Assert.AreEqual('g', Level.GroupName, 'GroupName do level devolvido diferente do esperado');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestAddControlBuilderIsFreedNotLeaked;
+var
+  ControlCreator: TControlCreator;
+begin
+  // Simetria com TestAddMenuBuilderIsFreedNotLeaked (UMenuCreatorTests.pas):
+  // o Creator assume posse do builder em Add e deve libera-lo exatamente
+  // uma vez.
+  GControlBuilderDestroyCount := 0;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add(TCountingControlBuilder.Create(TPanel))
+    ;
+
+    Assert.AreEqual(1, GControlBuilderDestroyCount, 'O builder do controle deveria ter sido liberado exatamente uma vez');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestAddControlBuilderExceptionDuringBuildStillFreesBuilder;
+var
+  ControlCreator: TControlCreator;
+  Raised: Boolean;
+begin
+  // Vazamento-em-excecao e uma classe recorrente de bug nesta lib - o
+  // builder precisa ser liberado mesmo quando WithProp aponta pra uma
+  // propriedade inexistente e Build lanca EPropertyError, nao so no
+  // caminho feliz.
+  GControlBuilderDestroyCount := 0;
+  Raised := False;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator.SetOwnerAndParent(FForm, FForm);
+
+    try
+      ControlCreator.Add(TCountingControlBuilder.Create(TPanel).WithProp('FooBar', 123));
+    except
+      on E: EPropertyError do
+        Raised := True;
+    end;
+
+    Assert.IsTrue(Raised, 'Deveria ter lancado EPropertyError para propriedade inexistente');
+    Assert.AreEqual(1, GControlBuilderDestroyCount, 'O builder do controle deveria ter sido liberado mesmo com Build lancando excecao');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestAddControlBuilderExceptionDuringBuildNullsOutReference;
+var
+  ControlCreator: TControlCreator;
+  Dummy: TPanel;
+  P: TPanel;
+  Raised: Boolean;
+begin
+  // O outro ponto que chama DiscardReferences - dentro do except de
+  // TObjectBuilderBase.Build, quando CreateObject ja criou o objeto mas
+  // ApplyPendingProps falha - precisa deixar a referencia externa nil em
+  // vez de apontar pro objeto ja liberado.
+  ControlCreator := TControlCreator.Create;
+  Dummy := TPanel.Create(nil);
+  Raised := False;
+  try
+    P := Dummy; // valor nao-nil conhecido, simulando "lixo" de uma referencia anterior
+    ControlCreator.SetOwnerAndParent(FForm, FForm);
+
+    try
+      ControlCreator.Add(TControlBuilder.Create(TPanel, P).WithProp('FooBar', 123));
+    except
+      on E: EPropertyError do
+        Raised := True;
+    end;
+
+    Assert.IsTrue(Raised, 'Deveria ter lancado EPropertyError para propriedade inexistente');
+    Assert.IsNull(P, 'P deveria ser nil (Build falhou depois de criar o objeto, referencia nao pode ficar pendurada)');
+  finally
+    Dummy.Free;
     ControlCreator.Free;
   end;
 end;

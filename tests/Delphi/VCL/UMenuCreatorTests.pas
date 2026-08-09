@@ -12,6 +12,7 @@ type
     FForm: TForm;
     FClickCount: Integer;
     procedure MenuItemClick(Sender: TObject);
+    procedure ExternalMethod(const ACreator: TMenuCreator);
   public
     [Setup]
     procedure Setup;
@@ -27,6 +28,11 @@ type
     [Test] procedure TestGetMenuGeneric;
     [Test] procedure TestAddMenuBuilderIsFreedNotLeaked;
     [Test] procedure TestAddMenuItemBeforeAddMenuRaises;
+    [Test] procedure TestAddMenuItemBuilderIsFreedNotLeaked;
+    [Test] procedure TestSubLevelMenuItemBuilderIsFreedNotLeaked;
+    [Test] procedure TestExternalObjProc;
+    [Test] procedure TestExternalProc;
+    [Test] procedure TestWithOwnerDeprecated;
   end;
 
 implementation
@@ -37,13 +43,35 @@ type
     destructor Destroy; override;
   end;
 
+  TCountingMenuItemBuilder = class(TMenuItemBuilder)
+  public
+    destructor Destroy; override;
+  end;
+
 var
   GMenuBuilderDestroyCount: Integer = 0;
+  GMenuItemBuilderDestroyCount: Integer = 0;
 
 destructor TCountingMenuBuilder.Destroy;
 begin
   Inc(GMenuBuilderDestroyCount);
   inherited;
+end;
+
+destructor TCountingMenuItemBuilder.Destroy;
+begin
+  Inc(GMenuItemBuilderDestroyCount);
+  inherited;
+end;
+
+procedure TMenuCreatorTest.ExternalMethod(const ACreator: TMenuCreator);
+begin
+  ACreator.AddMenu(TMenuBuilder.Create(TMainMenu, 'ExternalMethodMenu'));
+end;
+
+procedure ExternalMenuCreatorProc(const ACreator: TMenuCreator);
+begin
+  ACreator.AddMenu(TMenuBuilder.Create(TMainMenu, 'ExternalProcMenu'));
 end;
 
 procedure TMenuCreatorTest.MenuItemClick(Sender: TObject);
@@ -297,6 +325,104 @@ begin
     end;
 
     Assert.IsTrue(Raised, 'AddMenuItem sem AddMenu anterior deveria levantar excecao');
+  finally
+    MenuCreator.Free;
+  end;
+end;
+
+procedure TMenuCreatorTest.TestAddMenuItemBuilderIsFreedNotLeaked;
+var
+  MenuCreator: TMenuCreator;
+begin
+  // Simetria com TestAddMenuBuilderIsFreedNotLeaked: AddMenuItem e um
+  // caminho de posse separado de AddMenu, precisa da mesma garantia.
+  GMenuItemBuilderDestroyCount := 0;
+  MenuCreator := TMenuCreator.Create;
+  try
+    MenuCreator
+      .SetOwner(FForm)
+      .AddMenu(TMenuBuilder.Create(TMainMenu, 'MainMenu'))
+      .AddMenuItem(TCountingMenuItemBuilder.Create(TMenuItem, 'Item1').WithCaption('Item 1'))
+    ;
+
+    Assert.AreEqual(1, GMenuItemBuilderDestroyCount, 'O builder do item de menu deveria ter sido liberado exatamente uma vez');
+  finally
+    MenuCreator.Free;
+  end;
+end;
+
+procedure TMenuCreatorTest.TestSubLevelMenuItemBuilderIsFreedNotLeaked;
+var
+  MenuCreator: TMenuCreator;
+begin
+  // Simetria com TestAddMenuBuilderIsFreedNotLeaked: SubLevel(AMenuItemBuilder)
+  // tem seu proprio caminho de posse, separado do de AddMenuItem.
+  GMenuItemBuilderDestroyCount := 0;
+  MenuCreator := TMenuCreator.Create;
+  try
+    MenuCreator
+      .SetOwner(FForm)
+      .AddMenu(TMenuBuilder.Create(TMainMenu, 'MainMenu'))
+      .SubLevel(TCountingMenuItemBuilder.Create(TMenuItem, 'FileMenu').WithCaption('&File'))
+      .SuperLevel
+    ;
+
+    Assert.AreEqual(1, GMenuItemBuilderDestroyCount, 'O builder do item de menu usado em SubLevel deveria ter sido liberado exatamente uma vez');
+  finally
+    MenuCreator.Free;
+  end;
+end;
+
+procedure TMenuCreatorTest.TestExternalObjProc;
+var
+  MenuCreator: TMenuCreator;
+begin
+  MenuCreator := TMenuCreator.Create;
+  try
+    MenuCreator
+      .SetOwner(FForm)
+      .External(ExternalMethod)
+    ;
+
+    Assert.IsNotNull(MenuCreator.GetMenu('ExternalMethodMenu'),
+      'Menu criado dentro do External (of object) nao deveria ser nil');
+  finally
+    MenuCreator.Free;
+  end;
+end;
+
+procedure TMenuCreatorTest.TestExternalProc;
+var
+  MenuCreator: TMenuCreator;
+begin
+  MenuCreator := TMenuCreator.Create;
+  try
+    MenuCreator
+      .SetOwner(FForm)
+      .External(ExternalMenuCreatorProc)
+    ;
+
+    Assert.IsNotNull(MenuCreator.GetMenu('ExternalProcMenu'),
+      'Menu criado dentro do External (procedure simples) nao deveria ser nil');
+  finally
+    MenuCreator.Free;
+  end;
+end;
+
+procedure TMenuCreatorTest.TestWithOwnerDeprecated;
+var
+  MenuCreator: TMenuCreator;
+  MainMenu: TMainMenu;
+begin
+  MenuCreator := TMenuCreator.Create;
+  try
+    MenuCreator
+      .WithOwner(FForm)
+      .AddMenu(TMenuBuilder.Create(TMainMenu, 'MainMenu'))
+    ;
+
+    MainMenu := MenuCreator.GetMenu('MainMenu') as TMainMenu;
+    Assert.IsTrue(FForm = MainMenu.Owner, 'Owner do menu diferente do esperado');
   finally
     MenuCreator.Free;
   end;

@@ -3,7 +3,7 @@ unit UComponentRegistryTest;
 interface
 
 uses
-  DUnitX.TestFramework, System.Classes, Vcl.ExtCtrls, OPCB;
+  DUnitX.TestFramework, System.SysUtils, System.Classes, Vcl.Controls, Vcl.ExtCtrls, OPCB;
 
 type
   TComponentRegistry_ = class(TComponentRegistry)
@@ -19,6 +19,17 @@ type
     [Test] procedure TestReleaseContext;
     [Test] procedure TestGetItemFindsNonVisualComponent;
     [Test] procedure TestRenamedComponentLeavesNoPhantomEntryOnDestroy;
+    [Test] procedure TestCreateRaisesGuardException;
+    [Test] procedure TestGetComponentRaisesWhenNotFound;
+    [Test] procedure TestGetControlRaisesWhenNotFound;
+    [Test] procedure TestTryGetComponentReturnsFalseWhenNotFound;
+    [Test] procedure TestTryGetComponentReturnsTrueWhenFound;
+    [Test] procedure TestTryGetControlReturnsFalseWhenNotFound;
+    [Test] procedure TestTryGetControlReturnsTrueWhenFound;
+    [Test] procedure TestGetComponentFromContext;
+    [Test] procedure TestGetControlFromContext;
+    [Test] procedure TestClearAllRemovesAllContexts;
+    [Test] procedure TestGetContextHandleWrapsForContext;
   end;
 
 implementation
@@ -139,6 +150,212 @@ begin
   finally
     OwnerComp.Free;
     TComponentRegistry_.ReleaseContext('test_rename_phantom');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestCreateRaisesGuardException;
+var
+  Raised: Boolean;
+  Registry: TComponentRegistry;
+begin
+  Raised := False;
+  try
+    Registry := TComponentRegistry.Create;
+    Registry.Free; // nao deveria chegar aqui
+  except
+    on E: Exception do
+      Raised := (E.Message = 'Use TComponentRegistry.ForContext');
+  end;
+  Assert.IsTrue(Raised, 'TComponentRegistry.Create deveria orientar a usar ForContext');
+end;
+
+procedure TComponentRegistryTest.TestGetComponentRaisesWhenNotFound;
+var
+  Registry: TComponentRegistry;
+  Raised: Boolean;
+begin
+  Registry := TComponentRegistry_.ForContext('test_getcomponent_notfound');
+  Raised := False;
+  try
+    try
+      Registry.GetComponent('inexistente');
+    except
+      on E: Exception do
+        Raised := Pos('inexistente', E.Message) > 0;
+    end;
+    Assert.IsTrue(Raised, 'GetComponent deveria levantar excecao para nome inexistente');
+  finally
+    TComponentRegistry_.ReleaseContext('test_getcomponent_notfound');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestGetControlRaisesWhenNotFound;
+var
+  Registry: TComponentRegistry;
+  Raised: Boolean;
+begin
+  Registry := TComponentRegistry_.ForContext('test_getcontrol_notfound');
+  Raised := False;
+  try
+    try
+      Registry.GetControl('inexistente');
+    except
+      on E: Exception do
+        Raised := Pos('inexistente', E.Message) > 0;
+    end;
+    Assert.IsTrue(Raised, 'GetControl deveria levantar excecao para nome inexistente');
+  finally
+    TComponentRegistry_.ReleaseContext('test_getcontrol_notfound');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestTryGetComponentReturnsFalseWhenNotFound;
+var
+  Registry: TComponentRegistry;
+  Found: TComponent;
+begin
+  Registry := TComponentRegistry_.ForContext('test_trygetcomponent');
+  try
+    Assert.IsFalse(Registry.TryGetComponent('inexistente', Found),
+      'TryGetComponent deveria devolver False para nome inexistente');
+  finally
+    TComponentRegistry_.ReleaseContext('test_trygetcomponent');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestTryGetComponentReturnsTrueWhenFound;
+var
+  Registry: TComponentRegistry;
+  OwnerComp: TComponent;
+  Timer: TTimer;
+  Found: TComponent;
+begin
+  Registry := TComponentRegistry_.ForContext('test_trygetcomponent_found');
+  OwnerComp := TComponent.Create(nil);
+  try
+    Timer := TTimer.Create(OwnerComp);
+    Registry.AddComponent(Timer, 'MeuTimer');
+
+    Assert.IsTrue(Registry.TryGetComponent('MeuTimer', Found),
+      'TryGetComponent deveria devolver True para nome existente');
+    Assert.IsTrue(TComponent(Timer) = Found, 'Componente devolvido diferente do esperado');
+  finally
+    OwnerComp.Free;
+    TComponentRegistry_.ReleaseContext('test_trygetcomponent_found');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestTryGetControlReturnsFalseWhenNotFound;
+var
+  Registry: TComponentRegistry;
+  Found: TControl;
+begin
+  Registry := TComponentRegistry_.ForContext('test_trygetcontrol');
+  try
+    Assert.IsFalse(Registry.TryGetControl('inexistente', Found),
+      'TryGetControl deveria devolver False para nome inexistente');
+  finally
+    TComponentRegistry_.ReleaseContext('test_trygetcontrol');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestTryGetControlReturnsTrueWhenFound;
+var
+  Registry: TComponentRegistry;
+  P: TPanel;
+  Found: TControl;
+begin
+  Registry := TComponentRegistry_.ForContext('test_trygetcontrol_found');
+  P := TPanel.Create(nil);
+  try
+    Registry.Add(P, 'MeuPainel');
+
+    Assert.IsTrue(Registry.TryGetControl('MeuPainel', Found),
+      'TryGetControl deveria devolver True para nome existente');
+    Assert.IsTrue(TControl(P) = Found, 'Controle devolvido diferente do esperado');
+  finally
+    P.Free;
+    TComponentRegistry_.ReleaseContext('test_trygetcontrol_found');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestGetComponentFromContext;
+var
+  Registry: TComponentRegistry;
+  OwnerComp: TComponent;
+  Timer: TTimer;
+  Found: TComponent;
+begin
+  // Atalho de classe: abre o contexto, busca e libera internamente - nao
+  // precisa que o chamador segure um ForContext/ReleaseContext proprio.
+  Registry := TComponentRegistry_.ForContext('test_getcomponentfromcontext');
+  OwnerComp := TComponent.Create(nil);
+  try
+    Timer := TTimer.Create(OwnerComp);
+    Registry.AddComponent(Timer, 'MeuTimer');
+
+    Found := TComponentRegistry.GetComponentFromContext('test_getcomponentfromcontext', 'MeuTimer');
+    Assert.IsTrue(TComponent(Timer) = Found, 'Componente devolvido diferente do esperado');
+  finally
+    OwnerComp.Free;
+    TComponentRegistry_.ReleaseContext('test_getcomponentfromcontext');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestGetControlFromContext;
+var
+  Registry: TComponentRegistry;
+  P: TPanel;
+  Found: TControl;
+begin
+  Registry := TComponentRegistry_.ForContext('test_getcontrolfromcontext');
+  P := TPanel.Create(nil);
+  try
+    Registry.Add(P, 'MeuPainel');
+
+    Found := TComponentRegistry.GetControlFromContext('test_getcontrolfromcontext', 'MeuPainel');
+    Assert.IsTrue(TControl(P) = Found, 'Controle devolvido diferente do esperado');
+  finally
+    P.Free;
+    TComponentRegistry_.ReleaseContext('test_getcontrolfromcontext');
+  end;
+end;
+
+procedure TComponentRegistryTest.TestClearAllRemovesAllContexts;
+var
+  Registry: TComponentRegistry;
+begin
+  // ClearAll e global para o processo (libera TODO contexto vivo em
+  // FInstances, nao so o desta chave) - seguro aqui porque nenhum outro
+  // teste desta suite mantem um contexto aberto entre metodos (cada um
+  // fecha o proprio no finally antes de retornar). Se algum teste futuro
+  // passar a manter contexto aberto entre chamadas, este teste passaria a
+  // liberar objetos que esse outro teste ainda espera vivos.
+  Registry := TComponentRegistry_.ForContext('test_clearall');
+  Assert.IsNotNull(Registry, 'Registry nao deveria ser nil antes do ClearAll');
+
+  TComponentRegistry_.ClearAll;
+
+  Assert.IsFalse(Assigned(TComponentRegistry_.FInstances),
+    'FInstances deveria estar nil depois de ClearAll');
+end;
+
+procedure TComponentRegistryTest.TestGetContextHandleWrapsForContext;
+var
+  Handle: IRegistryContextHandle;
+  Registry: TComponentRegistry;
+begin
+  Handle := TComponentRegistry.GetContextHandle('test_contexthandle');
+  try
+    Registry := TComponentRegistry_.ForContext('test_contexthandle');
+    try
+      Assert.IsTrue(Registry = Handle.Registry,
+        'Registry do handle deveria ser o mesmo devolvido por ForContext para a mesma chave');
+    finally
+      TComponentRegistry_.ReleaseContext('test_contexthandle');
+    end;
+  finally
+    Handle := nil; // dispara ReleaseContext via destructor da interface
   end;
 end;
 
