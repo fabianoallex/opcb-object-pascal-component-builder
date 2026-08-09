@@ -2302,10 +2302,15 @@ procedure TControlCreatorTest.TestSubLevelWithNonWinControlRaises;
 // Regressao: SubLevel fazia TWinControl(Control) via cast direto, sem
 // checar o tipo. TLabel nao e TWinControl (e TGraphicControl) - passar um
 // builder de TLabel para SubLevel deveria lancar um erro claro em vez de
-// corromper o proximo Add silenciosamente.
+// corromper o proximo Add silenciosamente. Tambem verifica que a excecao
+// nao deixa FLevelStack com um nivel extra orfao (a checagem de tipo
+// precisa rodar ANTES do SubLevel(AGroupName) empilhar um nivel novo) - um
+// Add logo depois deve continuar criando no nivel original, com FForm
+// como Parent direto.
 var
   ControlCreator: TControlCreator;
   Raised: Boolean;
+  P: TPanel;
 begin
   Raised := False;
   ControlCreator := TControlCreator.Create;
@@ -2320,6 +2325,12 @@ begin
     end;
 
     Assert.IsTrue(Raised, 'SubLevel com um controle que nao e TWinControl deveria lancar excecao');
+
+    P := nil;
+    ControlCreator.Add(TControlBuilder.Create(TPanel, P));
+    Assert.IsNotNull(P, 'P nao deveria ser nil');
+    Assert.IsTrue(FForm = P.Parent,
+      'Parent do controle criado depois deveria ser FForm diretamente (nivel nao deveria ter ficado corrompido)');
   finally
     ControlCreator.Free;
   end;

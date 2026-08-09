@@ -21,7 +21,7 @@ type
   TButtonBuilder = class;
   TButtonBuilder = class({$IFDEF FPC}specialize{$ENDIF} TControlBuilderBase<TButton, TButtonBuilder>)
   private
-    FModalResult: Integer;
+    FModalResult: TOptionalInteger;
     FEnabled: TOptionalBoolean;
   protected
     function CreateObject: TButton; override;
@@ -63,7 +63,8 @@ end;
 procedure TButtonBuilder.ConfigureObject(AObject: TButton);
 begin
   inherited ConfigureObject(AObject);
-  AObject.ModalResult := FModalResult;
+  if FModalResult.HasValue then
+    AObject.ModalResult := FModalResult.Value;
   if FEnabled.HasValue then
     AObject.Enabled := FEnabled.Value;
 end;

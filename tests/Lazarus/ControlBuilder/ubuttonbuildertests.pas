@@ -11,6 +11,11 @@ type
   TMyCustomButton = class(TButton)
   end;
 
+  TMyOkButton = class(TButton)
+  public
+    constructor Create(AOwner: TComponent); override;
+  end;
+
   { TButtonBuilderTests }
 
   TButtonBuilderTests = class(TTestCase)
@@ -22,9 +27,16 @@ type
   published
     procedure TestCreateWithClassRespectsAClass;
     procedure TestConfigureObjectAppliesModalResultAndEnabled;
+    procedure TestConfigureObjectDoesNotOverrideModalResultWhenNotSet;
   end;
 
 implementation
+
+constructor TMyOkButton.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  ModalResult := mrOk;
+end;
 
 procedure TButtonBuilderTests.SetUp;
 begin
@@ -83,6 +95,33 @@ begin
     AssertNotNull('Button não deveria ser nil', Button);
     AssertEquals('ModalResult diferente do esperado', Integer(mrOk), Integer(Button.ModalResult));
     AssertFalse('Enabled deveria ser False', Button.Enabled);
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TButtonBuilderTests.TestConfigureObjectDoesNotOverrideModalResultWhenNotSet;
+{ Regressão: ConfigureObject aplicava FModalResult incondicionalmente
+  (campo Integer comum, default 0/mrNone) mesmo quando WithModalResult
+  nunca foi chamado, sobrescrevendo um ModalResult que uma subclasse já
+  define no próprio construtor. Corrigido usando TOptionalInteger, como o
+  resto da lib faz (ex: FEnabled: TOptionalBoolean, no mesmo builder). }
+var
+  ControlCreator: TControlCreator;
+  Button: TButton;
+begin
+  Button := nil;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .WithOwnerAndParent(FForm, FForm)
+      .specialize Add<TButton>(TButtonBuilder.Create(TMyOkButton, 'Btn1', Button))
+      // sem WithModalResult
+    ;
+
+    AssertNotNull('Button não deveria ser nil', Button);
+    AssertEquals('ModalResult definido pela subclasse não deveria ter sido sobrescrito',
+      Integer(mrOk), Integer(Button.ModalResult));
   finally
     ControlCreator.Free;
   end;

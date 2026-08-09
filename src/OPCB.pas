@@ -517,6 +517,7 @@ type
   TStrComponentRegistryEntryDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TComponentRegistryEntry>;
   TStrComponentDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TComponent>;
   TStrControlDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControl>;
+  TComponentStrDictionary = {$IFDEF FPC}specialize{$ENDIF} TDictionary<TComponent, string>;
   TControlList = {$IFDEF FPC}specialize{$ENDIF} TList<TControl>;
   TComponentList = {$IFDEF FPC}specialize{$ENDIF} TList<TComponent>;
   TControlGroupMap = {$IFDEF FPC}specialize{$ENDIF} TDictionary<string, TControlList>;
@@ -556,6 +557,10 @@ type
     FControls: TControlList;
     FNamedComponents: TStrComponentDictionary;
     FNamedControls: TStrControlDictionary;
+    // Índice reverso (componente -> nome sob o qual foi registrado) para
+    // permitir remoção O(1) em UnregisterComponentForNotification sem
+    // depender de AComp.Name (que pode ter mudado desde o registro).
+    FRegisteredNames: TComponentStrDictionary;
     FRegistryLifetime: TRegistryLifetime;
     constructor CreatePrivate;
     function GetItem(ACompName: string): TComponent;
@@ -766,7 +771,7 @@ type
     function GetComponent(const AName: string): TComponent; overload;
     function WithOwner(AOwner: TComponent): TComponentCreator; deprecated 'Use SetOwner instead';
     function SetOwner(AOwner: TComponent): TComponentCreator;
-    function Add(AComponentBuilder: {$IFDEF FPC}specialize{$ENDIF} IComponentBuilder<TComponent>): TComponentCreator; overload;
+    function Add(const AComponentBuilder: {$IFDEF FPC}specialize{$ENDIF} IComponentBuilder<TComponent>): TComponentCreator; overload;
     property Registry: TComponentRegistry read GetComponentRegistry;
     property Items[const AName: string]: TComponent read GetItem; default;
   end;
@@ -850,9 +855,18 @@ type
   TControlCreatorHelper = class helper for TControlCreator
   public
     {$IFDEF FPC}generic{$ENDIF}
-    procedure SetupControlBuilderForGridMode<TBuild>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+    procedure SetupControlBuilderForGridMode<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+    // Envolve SetupControlBuilderForGridMode num try/except que libera o
+    // builder (já sob posse do Creator) e relança, caso Step detecte
+    // sobreposição de span e lance antes de CreateControl/Build sequer
+    // rodar. Centralizado aqui em vez de duplicado em cada chamador
+    // (Add<TBuild>/SubLevel<TBuild>) para não depender de lembrar de
+    // repetir o try/except em cada novo caminho que precisar chamar
+    // SetupControlBuilderForGridMode.
     {$IFDEF FPC}generic{$ENDIF}
-    function CreateControl<TBuild>(ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AOwner: TComponent = nil): TBuild;
+    procedure SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+    {$IFDEF FPC}generic{$ENDIF}
+    function CreateControl<TBuild>(const ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AOwner: TComponent = nil): TBuild;
     function External(const AProc: TControlCreatorObjProc): TControlCreator; overload;
     function External(const AProc: TControlCreatorProc): TControlCreator; overload;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlCreator;
@@ -872,28 +886,28 @@ type
       AGroupName: string=''): TControlCreator; overload;
     // main
     {$IFDEF FPC}generic{$ENDIF}
-    function SubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload;
+    function SubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload;
     function SubLevel(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
+    function SubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
     function SubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SiblingSubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SiblingSubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''; ABreak: Boolean=False): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SiblingSubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ABreak: Boolean=False): TControlCreator; overload;
+    function SiblingSubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ABreak: Boolean=False): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder; ABreak: Boolean=False): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SiblingSubLevel<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator; overload;
+    function SiblingSubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SiblingSubLevelWithBreak<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload;
+    function SiblingSubLevelWithBreak<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload;
     function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SiblingSubLevelWithBreak<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
+    function SiblingSubLevelWithBreak<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
     function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
     function SetVerticalSpace(AVerticalSpace: Single): TControlCreator;
     function SetHorizontalSpace(AHorizontalSpace: Single): TControlCreator;
@@ -955,9 +969,9 @@ type
     function SetParent(AParent: TWinControl): TControlCreator;
     // main
     {$IFDEF FPC}generic{$ENDIF}
-    function Add<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; const AGroups: array of string): TControlCreator; overload;
+    function Add<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; const AGroups: array of string): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function Add<TBuild: class>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator; overload;
+    function Add<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator; overload;
     function Add(AControlBuilder: TControlBuilder): TControlCreator; overload;
     function Add(AClass: TControlClass; const AName: string=''): TControlCreator; overload;
     function Add(AClass: TControlClass; const AName: string; out Reference): TControlCreator; overload;
@@ -1363,7 +1377,7 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-procedure TControlCreatorHelper.SetupControlBuilderForGridMode<TBuild>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+procedure TControlCreatorHelper.SetupControlBuilderForGridMode<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
 var
   Row, Col: Integer;
   RowSpan, ColSpan: Integer;
@@ -1402,8 +1416,19 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
+procedure TControlCreatorHelper.SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+begin
+  try
+    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
+  except
+    (AControlBuilder as TObject).Free;
+    raise;
+  end;
+end;
+
+{$IFDEF FPC}generic{$ENDIF}
 function TControlCreatorHelper.CreateControl<TBuild>(
-  ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   AOwner: TComponent = nil): TBuild;
 var
   ControlName: string;
@@ -1438,7 +1463,7 @@ end;
 
 {$IFDEF FPC}generic{$ENDIF}
 function TControlCreatorHelper.Add<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   const AGroups: array of string): TControlCreator;
 var
   Control: TBuild;
@@ -1460,18 +1485,7 @@ begin
       Exit;
     end;
 
-    // SetupControlBuilderForGridMode chama Step, que pode lancar (ex:
-    // sobreposicao de span) antes de CreateControl/Build sequer rodar - se
-    // isso acontecer, ninguem mais libera o builder (o try/finally que
-    // cuida disso vive dentro de CreateControl, nunca alcancado). O
-    // Creator ja assumiu a posse ao entrar em Add, entao libera aqui e
-    // relanca.
-    try
-      {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
-    except
-      (AControlBuilder as TObject).Free;
-      raise;
-    end;
+    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(AControlBuilder);
     Control := {$IFDEF FPC}specialize{$ENDIF} CreateControl<TBuild>(AControlBuilder);
   end
   else
@@ -1588,7 +1602,7 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.Add<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>): TControlCreator;
 begin
   Result := {$IFDEF FPC}specialize{$ENDIF} Add<TBuild>(AControlBuilder, []);
 end;
@@ -2748,7 +2762,7 @@ end;
 
 {$IFDEF FPC}generic{$ENDIF}
 function TControlCreatorHelper.SubLevel<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   AGroupName: string
 ): TControlCreator;
 var
@@ -2776,15 +2790,7 @@ begin
     OwnerToUse := FOwner;
 
   if CurrentLevel.GridMode.Active then
-    // Ver comentario equivalente em Add<TBuild>: se Step lancar aqui (ex:
-    // sobreposicao de span), o ramo abaixo que chama CreateControl (unico
-    // lugar que libera o builder nesse caminho) nunca e alcancado.
-    try
-      {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
-    except
-      (AControlBuilder as TObject).Free;
-      raise;
-    end;
+    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(AControlBuilder);
 
   // Control := specialize CreateControl<TBuild>(AControlBuilder, OwnerToUse);
 
@@ -2799,12 +2805,16 @@ begin
     MoveTopLeftAfterControl(Control as TControl);
   end;
 
-  SubLevel(AGroupName);
-
+  // Checa ANTES de empilhar um novo nível (SubLevel(AGroupName) abaixo) -
+  // se a checagem rodasse depois, uma falha aqui deixaria FLevelStack com
+  // um nível extra e órfão (nunca teve Parent ajustado por SetParent),
+  // corrompendo o estado do creator para qualquer uso subsequente.
   if not (TControl(Control) is TWinControl) then
     raise Exception.CreateFmt(
       'SubLevel espera um controle capaz de conter outros controles (%s), mas "%s" é %s.',
       ['TWinControl', TControl(Control).Name, TControl(Control).ClassName]);
+
+  SubLevel(AGroupName);
 
   SetParent(
     {$IFDEF FRAMEWORK_FMX}TWinControl(Control)
@@ -2826,7 +2836,7 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SubLevel<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   ADirection: TControlCreatorDirection; AGroupName: string): TControlCreator;
 begin
   Result := {$IFDEF FPC}specialize{$ENDIF} SubLevel<TBuild>(AControlBuilder, AGroupName);
@@ -2834,7 +2844,7 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevel<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string; ABreak: Boolean): TControlCreator;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string; ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
   if ABreak then
@@ -2865,7 +2875,7 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-function TControlCreatorHelper.SiblingSubLevel<TBuild>(AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string; ABreak: Boolean): TControlCreator;
+function TControlCreatorHelper.SiblingSubLevel<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string; ABreak: Boolean): TControlCreator;
 begin
   Result := SuperLevel;
   if ABreak then
@@ -2874,21 +2884,21 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevel<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   ABreak: Boolean): TControlCreator;
 begin
   Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, '', ABreak);
 end;
 
 {$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevel<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator;
 begin
   Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, ADirection, '', ABreak);
 end;
 
 {$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevelWithBreak<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   ADirection: TControlCreatorDirection; AGroupName: string): TControlCreator;
 begin
   Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, ADirection, AGroupName, True);
@@ -2905,7 +2915,7 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevelWithBreak<TBuild>(
-  AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
   AGroupName: string): TControlCreator;
 begin
   Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, AGroupName, True);
@@ -3548,6 +3558,7 @@ begin
       raise Exception.CreateFmt('Já existe um componente registrado com o nome "%s".', [AName]);
 
     FNamedComponents.Add(AName, AComponent);
+    FRegisteredNames.AddOrSetValue(AComponent, AName);
 
     if AComponent is TControl then
       FNamedControls.Add(AName, TControl(AComponent))
@@ -3615,6 +3626,7 @@ begin
   FControls := TControlList.Create;
   FNamedComponents := TStrComponentDictionary.Create;
   FNamedControls := TStrControlDictionary.Create;
+  FRegisteredNames := TComponentStrDictionary.Create;
 end;
 
 destructor TComponentRegistry.Destroy;
@@ -3623,6 +3635,7 @@ begin
   FControls.Free;
   FNamedComponents.Free;
   FNamedControls.Free;
+  FRegisteredNames.Free;
   FNotifier.Free;
   inherited;
 end;
@@ -3826,9 +3839,7 @@ end;
 
 procedure TComponentRegistry.UnregisterComponentForNotification(AComp: TComponent);
 var
-  CompPair: {$IFDEF FPC}specialize{$ENDIF} TPair<string, TComponent>;
-  CtrlPair: {$IFDEF FPC}specialize{$ENDIF} TPair<string, TControl>;
-  KeyToRemove: string;
+  RegisteredName: string;
 begin
   FComponents.Remove(AComp);
 
@@ -3836,32 +3847,18 @@ begin
     FControls.Remove(TControl(AComp));
 
   // Remove pela chave sob a qual o componente foi de fato registrado (o
-  // nome único calculado em AddComponent), não pelo AComp.Name atual: se
-  // o componente foi renomeado depois do registro (ex: Edit.Name :=
-  // 'outro'), AComp.Name já não é mais a chave original, e um
-  // Remove(AComp.Name) direto não achava nada - deixava uma entrada
-  // fantasma no registry, apontando para memória já liberada.
-  KeyToRemove := '';
-  for CompPair in FNamedComponents do
-    if CompPair.Value = AComp then
-    begin
-      KeyToRemove := CompPair.Key;
-      Break;
-    end;
-  if KeyToRemove <> '' then
-    FNamedComponents.Remove(KeyToRemove);
-
-  if AComp is TControl then
+  // nome único calculado em AddComponent, guardado em FRegisteredNames),
+  // não pelo AComp.Name atual: se o componente foi renomeado depois do
+  // registro (ex: Edit.Name := 'outro'), AComp.Name já não é mais a
+  // chave original, e um Remove(AComp.Name) direto não achava nada -
+  // deixava uma entrada fantasma no registry, apontando para memória já
+  // liberada. FRegisteredNames é o índice reverso que permite achar essa
+  // chave em O(1) em vez de varrer FNamedComponents/FNamedControls.
+  if FRegisteredNames.TryGetValue(AComp, RegisteredName) then
   begin
-    KeyToRemove := '';
-    for CtrlPair in FNamedControls do
-      if CtrlPair.Value = TControl(AComp) then
-      begin
-        KeyToRemove := CtrlPair.Key;
-        Break;
-      end;
-    if KeyToRemove <> '' then
-      FNamedControls.Remove(KeyToRemove);
+    FNamedComponents.Remove(RegisteredName);
+    FNamedControls.Remove(RegisteredName);
+    FRegisteredNames.Remove(AComp);
   end;
 
   AComp.RemoveFreeNotification(FNotifier);
@@ -3888,7 +3885,7 @@ end;
 
 { TComponentsBuilder }
 
-function TComponentCreator.Add(AComponentBuilder: {$IFDEF FPC}specialize{$ENDIF}IComponentBuilder<TComponent>): TComponentCreator;
+function TComponentCreator.Add(const AComponentBuilder: {$IFDEF FPC}specialize{$ENDIF}IComponentBuilder<TComponent>): TComponentCreator;
 var
   Component: TComponent;
   ComponentName: string;

@@ -3,10 +3,15 @@ unit UButtonBuilderTests;
 interface
 
 uses
-  DUnitX.TestFramework, Vcl.Forms, Vcl.StdCtrls, Vcl.Controls, OPCB, OPCB.Builders;
+  System.Classes, DUnitX.TestFramework, Vcl.Forms, Vcl.StdCtrls, Vcl.Controls, OPCB, OPCB.Builders;
 
 type
   TMyCustomButton = class(TButton)
+  end;
+
+  TMyOkButton = class(TButton)
+  public
+    constructor Create(AOwner: TComponent); override;
   end;
 
   [TestFixture]
@@ -20,9 +25,16 @@ type
     procedure TearDown;
     [Test] procedure TestCreateWithClassRespectsAClass;
     [Test] procedure TestConfigureObjectAppliesModalResultAndEnabled;
+    [Test] procedure TestConfigureObjectDoesNotOverrideModalResultWhenNotSet;
   end;
 
 implementation
+
+constructor TMyOkButton.Create(AOwner: TComponent);
+begin
+  inherited Create(AOwner);
+  ModalResult := mrOk;
+end;
 
 procedure TButtonBuilderTest.Setup;
 begin
@@ -81,6 +93,33 @@ begin
     Assert.IsNotNull(Button, 'Button nao deveria ser nil');
     Assert.AreEqual(Integer(mrOk), Integer(Button.ModalResult), 'ModalResult diferente do esperado');
     Assert.IsFalse(Button.Enabled, 'Enabled deveria ser False');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TButtonBuilderTest.TestConfigureObjectDoesNotOverrideModalResultWhenNotSet;
+// Regressao: ConfigureObject aplicava FModalResult incondicionalmente
+// (campo Integer comum, default 0/mrNone) mesmo quando WithModalResult
+// nunca foi chamado, sobrescrevendo um ModalResult que uma subclasse ja
+// define no proprio construtor. Corrigido usando TOptionalInteger, como o
+// resto da lib faz (ex: FEnabled: TOptionalBoolean, no mesmo builder).
+var
+  ControlCreator: TControlCreator;
+  Button: TButton;
+begin
+  Button := nil;
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .Add<TButton>(TButtonBuilder.Create(TMyOkButton, 'Btn1', Button))
+      // sem WithModalResult
+    ;
+
+    Assert.IsNotNull(Button, 'Button nao deveria ser nil');
+    Assert.AreEqual(Integer(mrOk), Integer(Button.ModalResult),
+      'ModalResult definido pela subclasse nao deveria ter sido sobrescrito');
   finally
     ControlCreator.Free;
   end;
