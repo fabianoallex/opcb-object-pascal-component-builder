@@ -607,6 +607,30 @@ type
   end;
 
   TControlCreatorDirection = (cpdHorizontal, cpdVertical);
+
+  { TControlCreatorSiblingSubLevelOptions }
+
+  // Agrupa os parâmetros opcionais de SiblingSubLevel/SiblingSubLevelWithBreak
+  // (Direction/GroupName/Break) num único valor encadeável. Object Pascal
+  // não tem parâmetros nomeados nem permite pular um opcional no meio da
+  // lista, então cada combinação usada na prática vinha exigindo um overload
+  // posicional próprio (Direction sozinho, Break sozinho, Direction+Break,
+  // etc.) - daí a explosão de ~12 assinaturas de SiblingSubLevel. Os
+  // overloads posicionais antigos continuam existindo (nada foi removido);
+  // este é só mais um jeito de chamar, e o único que não precisa crescer
+  // combinatorialmente se um novo parâmetro opcional for adicionado no
+  // futuro.
+  TControlCreatorSiblingSubLevelOptions = record
+    Direction: TControlCreatorDirection;
+    HasDirection: Boolean;
+    GroupName: string;
+    Break: Boolean;
+    class function Create: TControlCreatorSiblingSubLevelOptions; static;
+    function WithDirection(ADirection: TControlCreatorDirection): TControlCreatorSiblingSubLevelOptions;
+    function WithGroup(const AGroupName: string): TControlCreatorSiblingSubLevelOptions;
+    function WithBreak(ABreak: Boolean = True): TControlCreatorSiblingSubLevelOptions;
+  end;
+
   TRelativePosition = (rpRight, rpBelow);
   TGridFillDirection = (gfdRowFirst, gfdColFirst);
   TGridCellStatus = (csEmpty, csOccupied);
@@ -892,9 +916,10 @@ type
     function SiblingSubLevel(ABreak: Boolean=False): TControlCreator; overload;
     function SiblingSubLevel(ADirection: TControlCreatorDirection;
       ABreak: Boolean): TControlCreator; overload;
-    function SiblingSubLevelWithBreak(AGroupName: string=''): TControlCreator; overload;
+    function SiblingSubLevel(const AOptions: TControlCreatorSiblingSubLevelOptions): TControlCreator; overload;
+    function SiblingSubLevelWithBreak(AGroupName: string=''): TControlCreator; overload; deprecated 'Use SiblingSubLevel(..., True) or SiblingSubLevel(TControlCreatorSiblingSubLevelOptions.Create.WithBreak) instead';
     function SiblingSubLevelWithBreak(ADirection: TControlCreatorDirection;
-      AGroupName: string=''): TControlCreator; overload;
+      AGroupName: string=''): TControlCreator; overload; deprecated 'Use SiblingSubLevel(..., True) or SiblingSubLevel(TControlCreatorSiblingSubLevelOptions.Create.WithBreak) instead';
     // main
     {$IFDEF FPC}generic{$ENDIF}
     function SubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload;
@@ -915,11 +940,14 @@ type
     function SiblingSubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator; overload;
     function SiblingSubLevel(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SiblingSubLevelWithBreak<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload;
-    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator; overload;
+    function SiblingSubLevel<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; const AOptions: TControlCreatorSiblingSubLevelOptions): TControlCreator; overload;
+    function SiblingSubLevel(AControlBuilder: TControlBuilder; const AOptions: TControlCreatorSiblingSubLevelOptions): TControlCreator; overload;
     {$IFDEF FPC}generic{$ENDIF}
-    function SiblingSubLevelWithBreak<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
-    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload;
+    function SiblingSubLevelWithBreak<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AGroupName: string=''): TControlCreator; overload; deprecated 'Use SiblingSubLevel(..., True) or SiblingSubLevel(TControlCreatorSiblingSubLevelOptions.Create.WithBreak) instead';
+    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; AGroupName: string=''): TControlCreator; overload; deprecated 'Use SiblingSubLevel(..., True) or SiblingSubLevel(TControlCreatorSiblingSubLevelOptions.Create.WithBreak) instead';
+    {$IFDEF FPC}generic{$ENDIF}
+    function SiblingSubLevelWithBreak<TBuild: class>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload; deprecated 'Use SiblingSubLevel(..., True) or SiblingSubLevel(TControlCreatorSiblingSubLevelOptions.Create.WithBreak) instead';
+    function SiblingSubLevelWithBreak(AControlBuilder: TControlBuilder; ADirection: TControlCreatorDirection; AGroupName: string=''): TControlCreator; overload; deprecated 'Use SiblingSubLevel(..., True) or SiblingSubLevel(TControlCreatorSiblingSubLevelOptions.Create.WithBreak) instead';
     function SetVerticalSpace(AVerticalSpace: Single): TControlCreator;
     function SetHorizontalSpace(AHorizontalSpace: Single): TControlCreator;
     function SetTopLeft(ATop, ALeft: Single): TControlCreator;
@@ -1674,6 +1702,38 @@ begin
   MoveControls(AControlNames, DeltaX, 0);
 end;
 
+{ TControlCreatorSiblingSubLevelOptions }
+
+class function TControlCreatorSiblingSubLevelOptions.Create: TControlCreatorSiblingSubLevelOptions;
+begin
+  Result.Direction := cpdHorizontal;
+  Result.HasDirection := False;
+  Result.GroupName := '';
+  Result.Break := False;
+end;
+
+function TControlCreatorSiblingSubLevelOptions.WithDirection(
+  ADirection: TControlCreatorDirection): TControlCreatorSiblingSubLevelOptions;
+begin
+  Result := Self;
+  Result.Direction := ADirection;
+  Result.HasDirection := True;
+end;
+
+function TControlCreatorSiblingSubLevelOptions.WithGroup(
+  const AGroupName: string): TControlCreatorSiblingSubLevelOptions;
+begin
+  Result := Self;
+  Result.GroupName := AGroupName;
+end;
+
+function TControlCreatorSiblingSubLevelOptions.WithBreak(
+  ABreak: Boolean): TControlCreatorSiblingSubLevelOptions;
+begin
+  Result := Self;
+  Result.Break := ABreak;
+end;
+
 function TControlCreatorHelper.SubLevel(AGroupName: string): TControlCreator;
 var
   R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
@@ -2303,6 +2363,15 @@ begin
   SubLevel(AGroupName);
 end;
 
+function TControlCreatorHelper.SiblingSubLevel(
+  const AOptions: TControlCreatorSiblingSubLevelOptions): TControlCreator;
+begin
+  if AOptions.HasDirection then
+    Result := SiblingSubLevel(AOptions.Direction, AOptions.GroupName, AOptions.Break)
+  else
+    Result := SiblingSubLevel(AOptions.GroupName, AOptions.Break);
+end;
+
 function TControlCreatorHelper.SetControlHeight(AHeight: Single): TControlCreator;
 begin
   Result := Self;
@@ -2906,6 +2975,22 @@ end;
   ADirection: TControlCreatorDirection; ABreak: Boolean): TControlCreator;
 begin
   Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, ADirection, '', ABreak);
+end;
+
+{$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevel<TBuild>(
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  const AOptions: TControlCreatorSiblingSubLevelOptions): TControlCreator;
+begin
+  if AOptions.HasDirection then
+    Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, AOptions.Direction, AOptions.GroupName, AOptions.Break)
+  else
+    Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TBuild>(AControlBuilder, AOptions.GroupName, AOptions.Break);
+end;
+
+function TControlCreatorHelper.SiblingSubLevel(AControlBuilder: TControlBuilder;
+  const AOptions: TControlCreatorSiblingSubLevelOptions): TControlCreator;
+begin
+  Result := {$IFDEF FPC}specialize{$ENDIF} SiblingSubLevel<TControl>(AControlBuilder, AOptions);
 end;
 
 {$IFDEF FPC}generic{$ENDIF} function TControlCreatorHelper.SiblingSubLevelWithBreak<TBuild>(

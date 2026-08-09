@@ -46,6 +46,9 @@ type
     [Test] procedure TestSubLevelSuperLevel;
     [Test] procedure TestSubLevelEmpty;
     [Test] procedure TestSubLevelDirectionSuperLevelDirection;
+    [Test] procedure TestSiblingSubLevelWithOptionsMatchesPositionalOverload;
+    [Test] procedure TestSiblingSubLevelWithOptionsWithoutDirectionKeepsInheritedDirection;
+    [Test] procedure TestSiblingSubLevelWithOptionsAndBuilderMatchesPositionalOverload;
     [Test] procedure TestRecalcParentSize;
     [Test] procedure TestRecalcParentSizeWithExtraSizes;
     [Test] procedure TestGridMode;
@@ -855,6 +858,128 @@ begin
     Assert.AreEqual(80 + 80, P2.Left, 'Propriedade Left do Panel diferente da esperada');
   finally
     ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSiblingSubLevelWithOptionsMatchesPositionalOverload;
+var
+  CreatorOptions, CreatorPositional: TControlCreator;
+  POptions, PPositional: TPanel;
+begin
+  // O overload TControlCreatorSiblingSubLevelOptions existe so pra evitar a
+  // explosao combinatoria de overloads posicionais (Direction/GroupName/
+  // Break); ele precisa produzir exatamente o mesmo resultado que o
+  // overload posicional equivalente.
+  CreatorOptions := TControlCreator.Create;
+  CreatorPositional := TControlCreator.Create;
+  try
+    CreatorOptions
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdHorizontal)
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .SubLevel('first')
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .SiblingSubLevel(
+        TControlCreatorSiblingSubLevelOptions.Create
+          .WithDirection(cpdVertical)
+          .WithGroup('second')
+          .WithBreak
+      )
+      .Add(TControlBuilder.Create(TPanel, POptions))
+    ;
+
+    CreatorPositional
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdHorizontal)
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .SubLevel('first')
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .SiblingSubLevel(cpdVertical, 'second', True)
+      .Add(TControlBuilder.Create(TPanel, PPositional))
+    ;
+
+    Assert.AreEqual(PPositional.Top, POptions.Top, 'Top diferente entre o overload de Options e o posicional equivalente');
+    Assert.AreEqual(PPositional.Left, POptions.Left, 'Left diferente entre o overload de Options e o posicional equivalente');
+    Assert.AreEqual(CreatorPositional.CurrentLevel.GroupName, CreatorOptions.CurrentLevel.GroupName, 'GroupName do level diferente entre Options e posicional');
+    Assert.IsTrue(CreatorPositional.CurrentLevel.Direction = CreatorOptions.CurrentLevel.Direction, 'Direction do level diferente entre Options e posicional');
+  finally
+    CreatorOptions.Free;
+    CreatorPositional.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSiblingSubLevelWithOptionsWithoutDirectionKeepsInheritedDirection;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+  DirectionBefore, DirectionAfter: TControlCreatorDirection;
+begin
+  // Quando Options nao chama WithDirection, HasDirection fica False e o
+  // level novo deve herdar a direcao do level pai, igual ao overload
+  // posicional SiblingSubLevel(AGroupName, ABreak) (sem ADirection).
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDirection(cpdVertical)
+      .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+      .SubLevel('first')
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(15, 10))
+    ;
+    DirectionBefore := ControlCreator.CurrentLevel.Direction;
+
+    // SiblingSubLevel sai do level 'first' (SuperLevel) antes de abrir o
+    // novo level 'g' - por isso precisa estar dentro de algum SubLevel
+    // antes de ser chamado, senao levanta "SuperLevel chamado no nivel raiz".
+    ControlCreator
+      .SiblingSubLevel(TControlCreatorSiblingSubLevelOptions.Create.WithGroup('g'))
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+    DirectionAfter := ControlCreator.CurrentLevel.Direction;
+
+    Assert.IsTrue(DirectionBefore = DirectionAfter, 'Direcao deveria ser herdada do level pai quando Options nao chama WithDirection');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSiblingSubLevelWithOptionsAndBuilderMatchesPositionalOverload;
+var
+  CreatorOptions, CreatorPositional: TControlCreator;
+  ContainerOptions, ContainerPositional: TPanel;
+  POptions, PPositional: TPanel;
+begin
+  // Mesma equivalencia de TestSiblingSubLevelWithOptionsMatchesPositionalOverload,
+  // mas para o overload de SiblingSubLevel que recebe um TControlBuilder
+  // (o caminho que tambem cobre a especializacao generica IControlBuilder<TBuild>,
+  // ja que o overload concreto delega pra SiblingSubLevel<TControl>).
+  CreatorOptions := TControlCreator.Create;
+  CreatorPositional := TControlCreator.Create;
+  try
+    CreatorOptions
+      .SetOwnerAndParent(FForm, FForm)
+      .SubLevel(TControlBuilder.Create(TPanel, ContainerOptions).WithWidthAndHeight(100, 100))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+      .SiblingSubLevel(
+        TControlBuilder.Create(TPanel),
+        TControlCreatorSiblingSubLevelOptions.Create.WithDirection(cpdVertical).WithBreak
+      )
+      .Add(TControlBuilder.Create(TPanel, POptions))
+    ;
+
+    CreatorPositional
+      .SetOwnerAndParent(FForm, FForm)
+      .SubLevel(TControlBuilder.Create(TPanel, ContainerPositional).WithWidthAndHeight(100, 100))
+        .Add(TControlBuilder.Create(TPanel).WithWidthAndHeight(20, 25))
+      .SiblingSubLevel(TControlBuilder.Create(TPanel), cpdVertical, True)
+      .Add(TControlBuilder.Create(TPanel, PPositional))
+    ;
+
+    Assert.AreEqual(PPositional.Top, POptions.Top, 'Top diferente entre o overload de Options com builder e o posicional equivalente');
+    Assert.AreEqual(PPositional.Left, POptions.Left, 'Left diferente entre o overload de Options com builder e o posicional equivalente');
+  finally
+    CreatorOptions.Free;
+    CreatorPositional.Free;
   end;
 end;
 
