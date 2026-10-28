@@ -1,5 +1,28 @@
 # Changelog
 
+## v0.2.0 - 2026-10-28
+
+### Added
+
+- **Per-class default properties: `SetDefaultProp`/`UnsetDefaultProps`.**
+  `SetDefaultProp(AClass, APropName, AValue)` registers a property value applied
+  to every control of that class or a descendant added afterwards, unless its
+  builder sets that property itself (through a typed method like `WithHeight` or
+  through `WithProp`). When defaults for several classes match, the closest class
+  wins; for the same class, the last one registered wins. Defaults belong to the
+  current level: nested `SubLevel`s inherit them, and ones set inside a `SubLevel`
+  don't leak back after `SuperLevel`. `UnsetDefaultProps(AClass)` removes the
+  defaults registered for exactly that class.
+- `Name`, `Tag`, `Owner`, `Parent` and `OnClick` are never applied as defaults. In
+  a grid, `Width`, `Height`, `Top`, `Left` and `Align` are skipped too, because the
+  grid computes them.
+- `SetControlHeight`/`SetControlWidth` still win over a `SetDefaultProp` default
+  for `Height`/`Width`.
+
+### Tests
+
+- 22 new tests in both suites (DUnitX for the VCL, FPCUnit for the LCL).
+
 ## v0.1.0 - 2026-10-28
 
 First tagged version. Everything up to commit `b61c993` plus the two fixes below,
