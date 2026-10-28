@@ -4066,7 +4066,10 @@ begin
     ;
 
     Assert.IsTrue(Assigned(B.OnClick), 'OnClick explicito nao pode ser sobrescrito/afetado pelo default');
-    Assert.IsTrue(B.OnClick = DummyOnClickHandler, 'OnClick explicito deve permanecer o handler setado');
+    Assert.IsTrue(
+      (TMethod(B.OnClick).Code = @TControlCreatorTest.DummyOnClickHandler) and
+      (TMethod(B.OnClick).Data = Pointer(Self)),
+      'OnClick explicito deve permanecer o handler setado');
   finally
     ControlCreator.Free;
   end;
