@@ -720,6 +720,9 @@ type
       out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}
     ): Boolean;
     procedure ResetSpans;
+    // The area covered by the occupied cells, False if none is occupied.
+    function CalcOccupiedRect(AHorizontalSpace, AVerticalSpace: Single;
+      out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}): Boolean;
     property Active: Boolean read FActive;
     property Rows: Integer read FRows;
     property Cols: Integer read FCols;
@@ -858,6 +861,10 @@ type
     function GetComponentRegistry: TComponentRegistry;
     function GetItem(const AName: string): TControl;
     procedure ApplyDefaultControlSize(AControl: TControl);
+    procedure PlaceControlInGridCell(AControl: TControl;
+      const ACell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF});
+    procedure MoveFlowPastRect(
+      const ARect: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF});
     function CanAddToGrid: Boolean;
   public
     constructor Create(ARegistryContextKey: string=''); overload;
@@ -889,8 +896,14 @@ type
   // antes confirmar que o bug não volta a ocorrer.
   TControlCreatorHelper = class helper for TControlCreator
   public
+    // Fills the builder's position and size from the grid's next cell.
+    // ACell/AHasCell return that cell so the caller can place the control
+    // again with PlaceControlInGridCell once it's built (see there).
     {$IFDEF FPC}generic{$ENDIF}
-    procedure SetupControlBuilderForGridMode<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+    procedure SetupControlBuilderForGridMode<TBuild>(
+      const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+      out ACell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+      out AHasCell: Boolean);
     // Envolve SetupControlBuilderForGridMode num try/except que libera o
     // builder (já sob posse do Creator) e relança, caso Step detecte
     // sobreposição de span e lance antes de CreateControl/Build sequer
@@ -899,7 +912,10 @@ type
     // repetir o try/except em cada novo caminho que precisar chamar
     // SetupControlBuilderForGridMode.
     {$IFDEF FPC}generic{$ENDIF}
-    procedure SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+    procedure SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(
+      const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+      out ACell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+      out AHasCell: Boolean);
     {$IFDEF FPC}generic{$ENDIF}
     function CreateControl<TBuild>(const ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AOwner: TComponent = nil): TBuild;
     function External(const AProc: TControlCreatorObjProc): TControlCreator; overload;
@@ -1416,13 +1432,25 @@ begin
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-procedure TControlCreatorHelper.SetupControlBuilderForGridMode<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+procedure TControlCreatorHelper.SetupControlBuilderForGridMode<TBuild>(
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  out ACell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  out AHasCell: Boolean);
 var
   Row, Col: Integer;
   RowSpan, ColSpan: Integer;
   RCell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
   RControl: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  W, H: Single;
+  HasW, HasH: Boolean;
 begin
+  AHasCell := False;
+  {$IFDEF FRAMEWORK_FMX}
+  ACell := TRectF.Create(0, 0, 0, 0);
+  {$ELSE}
+  ACell := Rect(0, 0, 0, 0);
+  {$ENDIF}
+
   if not CurrentLevel.GridMode.Active then
     Exit;
 
@@ -1438,27 +1466,60 @@ begin
      Row, Col, RowSpan, ColSpan,
      CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace, RCell) then
   begin
-    RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(
-      RCell,
-      IfThen(AControlBuilder.Width.HasValue, AControlBuilder.Width.Value, 0),
-      IfThen(AControlBuilder.Height.HasValue, AControlBuilder.Height.Value,0)
-    );
+    AHasCell := True;
+    ACell := RCell;
+
+    // The size a control is placed with, per dimension: the cell's when the
+    // grid stretches that dimension; else the builder's; else the level's
+    // default (SetControlWidth/SetControlHeight). With none of them the
+    // builder is left without that size, so the control keeps its own (its
+    // class default, or what AutoSize gives it), and PlaceControlInGridCell
+    // positions it once it's built. Placing it as if it were 0 wide/high
+    // put its top/left at the middle of the cell.
+    HasW := True;
+    W := 0;
+    if csHorizontal in CurrentLevel.GridMode.CellStrech then
+      W := 0 // AdjustRectForCellLayout uses the cell's width
+    else if AControlBuilder.Width.HasValue then
+      W := AControlBuilder.Width.Value
+    else if CurrentLevel.ControlWidth.HasValue then
+      W := CurrentLevel.ControlWidth.Value
+    else
+      HasW := False;
+
+    HasH := True;
+    H := 0;
+    if csVertical in CurrentLevel.GridMode.CellStrech then
+      H := 0 // AdjustRectForCellLayout uses the cell's height
+    else if AControlBuilder.Height.HasValue then
+      H := AControlBuilder.Height.Value
+    else if CurrentLevel.ControlHeight.HasValue then
+      H := CurrentLevel.ControlHeight.Value
+    else
+      HasH := False;
+
+    RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(RCell, W, H);
 
     AControlBuilder.Align := {$IFDEF FRAMEWORK_FMX}TAlignLayout.None{$ELSE}alNone{$ENDIF};
     AControlBuilder.Left := RControl.Left;
     AControlBuilder.Top  := RControl.Top;
-    AControlBuilder.Height := RControl.Bottom - RControl.Top;
-    AControlBuilder.Width := RControl.Right - RControl.Left;
+    if HasH then
+      AControlBuilder.Height := RControl.Bottom - RControl.Top;
+    if HasW then
+      AControlBuilder.Width := RControl.Right - RControl.Left;
   end;
 
   CurrentLevel.GridMode.ResetSpans;
 end;
 
 {$IFDEF FPC}generic{$ENDIF}
-procedure TControlCreatorHelper.SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+procedure TControlCreatorHelper.SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(
+  const AControlBuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>;
+  out ACell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  out AHasCell: Boolean);
 begin
   try
-    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder);
+    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridMode<TBuild>(AControlBuilder, ACell, AHasCell);
   except
     (AControlBuilder as TObject).Free;
     raise;
@@ -1507,8 +1568,11 @@ function TControlCreatorHelper.Add<TBuild>(
 var
   Control: TBuild;
   Level: TControlCreatorLevel;
+  Cell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  HasCell: Boolean;
 begin
   Result := Self;
+  HasCell := False;
 
   if CurrentLevel.GridMode.Active then
   begin
@@ -1524,7 +1588,7 @@ begin
       Exit;
     end;
 
-    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(AControlBuilder);
+    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(AControlBuilder, Cell, HasCell);
     Control := {$IFDEF FPC}specialize{$ENDIF} CreateControl<TBuild>(AControlBuilder);
   end
   else
@@ -1532,7 +1596,13 @@ begin
     Control := {$IFDEF FPC}specialize{$ENDIF} CreateControl<TBuild>(AControlBuilder);
   end;
 
-  ApplyDefaultControlSize(Control as TControl);
+  // In a grid cell the default size was already taken into account when the
+  // cell rect was computed (and must not undo a stretched dimension);
+  // applying it again here would resize the control after it was placed.
+  if HasCell then
+    PlaceControlInGridCell(Control as TControl, Cell)
+  else
+    ApplyDefaultControlSize(Control as TControl);
 
   Registry.AddComponent(Control as TControl, (Control as TControl).Name);
   FOwnControls.Add(Control as TControl);
@@ -1573,6 +1643,54 @@ begin
   if CurrentLevel.ControlWidth.HasValue then
     AControl.Width := Trunc(CurrentLevel.ControlWidth.Value);
   {$ENDIF}
+end;
+
+procedure TControlCreator.PlaceControlInGridCell(AControl: TControl;
+  const ACell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF});
+var
+  R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  Strech: TCellStrech;
+begin
+  // Positions the built control in its cell from the size it actually has.
+  // That matters when the builder had no size for a dimension (the control
+  // kept its own, unknown until it was built), and when the control didn't
+  // take the size it was given. A stretched dimension is left as it is.
+  Strech := CurrentLevel.GridMode.CellStrech;
+  R := CurrentLevel.GridMode.AdjustRectForCellLayout(ACell, AControl.Width, AControl.Height);
+  {$IFDEF FRAMEWORK_FMX}
+  if not (csHorizontal in Strech) then
+    AControl.Position.X := R.Left;
+  if not (csVertical in Strech) then
+    AControl.Position.Y := R.Top;
+  {$ELSE}
+  if not (csHorizontal in Strech) then
+    AControl.Left := R.Left;
+  if not (csVertical in Strech) then
+    AControl.Top := R.Top;
+  {$ENDIF}
+end;
+
+procedure TControlCreator.MoveFlowPastRect(
+  const ARect: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF});
+begin
+  // Makes sure what comes next on the current level starts past ARect: to
+  // its right on this line (horizontal), below it in this column (vertical),
+  // and past it after a Break. Used for the area of a finished grid.
+  if CurrentLevel.Direction = cpdHorizontal then
+  begin
+    CurrentLevel.CurrentLeft :=
+      Max(CurrentLevel.CurrentLeft, ARect.Right + CurrentLevel.HorizontalSpace);
+    CurrentLevel.MaxControlHeight := Max(CurrentLevel.MaxControlHeight,
+      ARect.Bottom - CurrentLevel.CurrentTop + CurrentLevel.VerticalSpace);
+  end;
+
+  if CurrentLevel.Direction = cpdVertical then
+  begin
+    CurrentLevel.CurrentTop :=
+      Max(CurrentLevel.CurrentTop, ARect.Bottom + CurrentLevel.VerticalSpace);
+    CurrentLevel.MaxControlWidth := Max(CurrentLevel.MaxControlWidth,
+      ARect.Right - CurrentLevel.CurrentLeft + CurrentLevel.HorizontalSpace);
+  end;
 end;
 
 function TControlCreator.CanAddToGrid: Boolean;
@@ -1947,7 +2065,11 @@ begin
     GetControlsBounds([CurrentLevel.GroupName]).Bottom
     + AExtraHeight;
   {$ELSE}
-  CurrentLevel.Parent.Height := Trunc(
+  // The controls' coordinates are relative to the parent's client area, so
+  // that is what has to fit them. Height includes a form's caption and
+  // borders on the VCL (on the LCL a form's Height is already its client
+  // height), and a panel's window border (BorderStyle = bsSingle) on both.
+  CurrentLevel.Parent.ClientHeight := Trunc(
     GetControlsBounds([CurrentLevel.GroupName]).Bottom
     + AExtraHeight
   );
@@ -1971,7 +2093,8 @@ begin
     GetControlsBounds([CurrentLevel.GroupName]).Right
     + AExtraWidth;
   {$ELSE}
-  CurrentLevel.Parent.Width := Trunc(
+  // Client size, see RecalcParentHeight.
+  CurrentLevel.Parent.ClientWidth := Trunc(
     GetControlsBounds([CurrentLevel.GroupName]).Right
     + AExtraWidth
   );
@@ -2412,9 +2535,18 @@ begin
 end;
 
 function TControlCreatorHelper.GridInit(ARows, ACols: Integer): TControlCreator;
+var
+  OuterControlWidth, OuterControlHeight: TOptionalSingle;
 begin
   Result := Self;
+  // The grid lives in a level of its own, an implementation detail: the
+  // default control size set on the level the grid is opened from still
+  // applies to the grid's controls (a plain SubLevel starts without one).
+  OuterControlWidth := CurrentLevel.ControlWidth;
+  OuterControlHeight := CurrentLevel.ControlHeight;
   SubLevel;
+  CurrentLevel.ControlWidth := OuterControlWidth;
+  CurrentLevel.ControlHeight := OuterControlHeight;
   CurrentLevel.GridMode.Activate(
     ARows,
     ACols,
@@ -2611,12 +2743,23 @@ begin
 end;
 
 function TControlCreatorHelper.GridFinish: TControlCreator;
+var
+  GridRect: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  HasGridRect: Boolean;
 begin
   Result := Self;
   if CurrentLevel.GridMode.Active then
   begin
+    HasGridRect := CurrentLevel.GridMode.CalcOccupiedRect(
+      CurrentLevel.HorizontalSpace, CurrentLevel.VerticalSpace, GridRect);
     CurrentLevel.GridMode.Inactivate;
     SuperLevel;
+    // SuperLevel moves on from the bounds of the grid's controls, measured
+    // from the top/left of the first one. A control that doesn't fill its
+    // cell (centered, or at the bottom/right of it) made the next line start
+    // over the grid's last row. What follows starts past the grid's cells.
+    if HasGridRect and not CurrentLevel.GridMode.Active then
+      MoveFlowPastRect(GridRect);
   end;
 end;
 
@@ -2849,6 +2992,8 @@ var
   Control: TBuild;
   OwnerToUse: TComponent;
   IsTabChild: Boolean;
+  Cell: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+  HasCell: Boolean;
 begin
   Result := Self;
 
@@ -2869,8 +3014,9 @@ begin
   else
     OwnerToUse := FOwner;
 
+  HasCell := False;
   if CurrentLevel.GridMode.Active then
-    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(AControlBuilder);
+    {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(AControlBuilder, Cell, HasCell);
 
   // Control := specialize CreateControl<TBuild>(AControlBuilder, OwnerToUse);
 
@@ -2882,6 +3028,8 @@ begin
   else
   begin
     Control := {$IFDEF FPC}specialize{$ENDIF} CreateControl<TBuild>(AControlBuilder, OwnerToUse);
+    if HasCell then
+      PlaceControlInGridCell(Control as TControl, Cell);
     MoveTopLeftAfterControl(Control as TControl);
   end;
 
@@ -3390,6 +3538,41 @@ procedure TGridMode.ResetSpans;
 begin
   RowSpan := 1;
   ColSpan := 1;
+end;
+
+function TGridMode.CalcOccupiedRect(AHorizontalSpace, AVerticalSpace: Single;
+  out R: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF}): Boolean;
+var
+  Coord: TGridCellCoord;
+  Status: TGridCellStatus;
+  CellR: {$IFDEF FRAMEWORK_FMX}TRectF{$ELSE}TRect{$ENDIF};
+begin
+  // Union of the occupied cells' rects, one by one, so row/col offsets and
+  // per-row/col sizes are taken into account.
+  Result := False;
+  {$IFDEF FRAMEWORK_FMX}
+  R := TRectF.Create(0, 0, 0, 0);
+  {$ELSE}
+  R := Rect(0, 0, 0, 0);
+  {$ENDIF}
+  for Coord in FOccupation.Keys do
+  begin
+    if not FOccupation.TryGetValue(Coord, Status) or (Status <> csOccupied) then
+      Continue;
+    if not CalcCellRectAbsolute(Coord.Row, Coord.Col, 1, 1,
+      AHorizontalSpace, AVerticalSpace, CellR) then
+      Continue;
+    if not Result then
+      R := CellR
+    else
+    begin
+      R.Left := Min(R.Left, CellR.Left);
+      R.Top := Min(R.Top, CellR.Top);
+      R.Right := Max(R.Right, CellR.Right);
+      R.Bottom := Max(R.Bottom, CellR.Bottom);
+    end;
+    Result := True;
+  end;
 end;
 
 function TGridMode.AdjustRectForCellLayout(

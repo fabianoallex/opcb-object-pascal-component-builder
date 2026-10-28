@@ -730,7 +730,9 @@ TControlCreator was designed to facilitate the creation of visual controls and p
 | `GetContentHeight` | `Single` | Returns the height occupied by all added controls. Uses `Single` type for better compatibility with the Firemonkey framework. |
 | `GetComponentRegistry` | `TComponentRegistry` | Returns the registry object of added components. This object is defined in the constructor call by the `ARegistryContextKey` parameter or by the `ARegistryContextHandle` parameter. Different Creators can share the same registry of their components. |
 | `GetItem(const AName: string)` | `TControl` | Returns the Control identified by `AName`. |
-| `ApplyDefaultControlSize(AControl: TControl)` | - | `TControlCreator` has optional fields `ControlHeight` and `ControlWidth` that can be used to set default values for any Control added via `.Add`. `ApplyDefaultControlSize` applies these default values to controls when they are added. |
+| `ApplyDefaultControlSize(AControl: TControl)` | - | `TControlCreator` has optional fields `ControlHeight` and `ControlWidth` that can be used to set default values for any Control added via `.Add`. `ApplyDefaultControlSize` applies these default values to controls when they are added. Not used for a control placed in a grid cell: there the default size is taken into account before the cell rect is computed (see [Grid mode: control size](#grid-mode-control-size-and-what-follows-the-grid)). |
+| `PlaceControlInGridCell(AControl: TControl; const ACell: TRect)` | - | Positions a control, once built, in its grid cell from the size it actually has (a stretched dimension is left as it is). Needed when the builder had no size for a dimension: the control keeps its own, known only after it's built. |
+| `MoveFlowPastRect(const ARect: TRect)` | - | Makes what comes next on the current level start past `ARect` (to its right, below it, and past it after a `Break`). Used by `GridFinish` with the area of the grid's occupied cells. |
 | `CanAddToGrid` | `Boolean` | Validates if a new control to be created can be added to the Grid. Requires that `TControlCreator` is in Grid mode and that there is an available cell for inclusion. |
 
 **Constructors**
@@ -749,7 +751,7 @@ TControlCreator was designed to facilitate the creation of visual controls and p
 | `GetControlsBounds(AControlsNames: array of string)` | `TControlGroupBounds` | Returns a `TControlGroupBounds` object containing the bounds (Top, Left, Height and Width) of a group of controls identified by name. |
 | `GetNamedControl(const AName: string)` | `TControl` | Returns a control by its name. |
 | **Methods** Defined in the Helper Class |
-| `SetupControlBuilderForGridMode<TBuild>(AControlBuilder: IControlBuilder<TBuild>)` | - | When a control is added via `.Add` in Grid mode, `AControlBuilder` is adjusted to represent the correct sizes and positions for the cell where it is being inserted. |
+| `SetupControlBuilderForGridMode<TBuild>(AControlBuilder: IControlBuilder<TBuild>; out ACell: TRect; out AHasCell: Boolean)` | - | When a control is added via `.Add` in Grid mode, `AControlBuilder` is adjusted to represent the correct sizes and positions for the cell where it is being inserted. Returns the cell in `ACell` (`AHasCell` = `True` when there is one), so the control can be placed again with `PlaceControlInGridCell` once it's built. |
 | `CreateControl<TBuild>(ABuilder: IControlBuilder<TBuild>; AOwner: TComponent = nil)` | `TBuild` | Instantiates the control added via `.Add`. Before calling the `.build` method of the `Builder` object, it makes the necessary adjustments for size and position definition according to mode and configurations. |
 | `External(const AProc: TControlCreatorObjProc)` | `TControlCreator` | Allows injecting a procedure of type `TControlCreatorObjProc` that receives the `TControlCreator` object itself as a parameter.<br><br>`TControlCreatorObjProc = procedure(const ABuilder: TControlCreator) of object;` |
 | `External(const AProc: TControlCreatorProc)` | `TControlCreator` | Allows injecting a procedure of type `TControlCreatorProc` that receives the `TControlCreator` object itself as a parameter.<br><br>`TControlCreatorProc = {$IFNDEF FPC}reference to{$ENDIF} procedure(ABuilder: TControlCreator);` |
@@ -779,14 +781,14 @@ TControlCreator was designed to facilitate the creation of visual controls and p
 | `IncLeft(AIncLeft: Single)` | `TControlCreator` | Increments Left without changing `InitialLeft`. |
 | `IncTopLeft(AIncTop, AIncLeft: Single)` | `TControlCreator` | Increments Top and Left without changing `InitialTop` and `InitialLeft`. |
 | `SetDirection(ADirection: TControlCreatorDirection)` | `TControlCreator` | Defines the direction in which controls will be inserted. Vertically or Horizontally. <br><br>Each time a control is added, the Top and Left position (`CurrentTop` and `CurrentLeft`) is calculated to be used the next time another Control is added. For this calculation, the current direction is taken into account.<br><br>`TControlCreatorDirection = (cpdHorizontal, cpdVertical);` |
-| `SetControlHeight(AHeight: Single)` | `TControlCreator` | Defines a default height value for all controls that will be added via `.Add` if no value is defined for them. |
-| `SetControlWidth(AWidth: Single)` | `TControlCreator` | Defines a default width value for all controls that will be added via `.Add` if no value is defined for them. |
+| `SetControlHeight(AHeight: Single)` | `TControlCreator` | Defines a default height value for all controls that will be added via `.Add` if no value is defined for them. It belongs to the current level: a `SubLevel` starts without one, but the grid opened by `GridInit` keeps it. Outside a grid it is applied to the control after it's built, over a height set on the builder too; in a grid cell see [Grid mode: control size](#grid-mode-control-size-and-what-follows-the-grid). |
+| `SetControlWidth(AWidth: Single)` | `TControlCreator` | Defines a default width value for all controls that will be added via `.Add` if no value is defined for them. Same scope and grid rules as `SetControlHeight`. |
 | `SetControlWidthAndHeight(AWidth, AHeight: Single)` | `TControlCreator` | Defines a default height and width value for all controls that will be added via `.Add` if these values are not defined for them. |
 | `UnsetControlHeight` | `TControlCreator` | Removes the default value definition for height of controls added via `.Add`. |
 | `UnsetControlWidth` | `TControlCreator` | Removes the default value definition for width of controls added via `.Add`. |
 | `UnsetControlWidthAndHeight` | `TControlCreator` | Removes the default value definition for height and width of controls added via `.Add`. |
-| `GridInit(ARows, ACols: Integer)` | `TControlCreator` | Starts Grid mode by specifying the number of rows and columns. Internally calls `.SubLevel`. |
-| `GridFinish` | `TControlCreator` | Exits Grid mode. Internally calls `.SuperLevel`. |
+| `GridInit(ARows, ACols: Integer)` | `TControlCreator` | Starts Grid mode by specifying the number of rows and columns. Internally calls `.SubLevel`; the default control size (`SetControlHeight`/`SetControlWidth`) of the level it's called on carries into the grid. |
+| `GridFinish` | `TControlCreator` | Exits Grid mode. Internally calls `.SuperLevel`. What is added next in the outer level (after a `Break`/`BreakLine`/`BreakColumn` too) starts past the grid's occupied cells, not only past its controls. |
 | `GridCellSpan(ACellSpan: Integer)` | `TControlCreator` | Expands the size of the current cell to occupy more than one cell. Takes into account the current direction defined in `.SetDirection`. |
 | `GridRowSpan(ARowSpan: Integer)` | `TControlCreator` | Expands the size of the current cell to occupy more than one row. |
 | `GridColSpan(AColSpan: Integer)` | `TControlCreator` | Expands the size of the current cell to occupy more than one column. |
@@ -825,15 +827,46 @@ TControlCreator was designed to facilitate the creation of visual controls and p
 | `CenterControlsInParentVertically(const AControlNames: array of string)` | `TControlCreator` | Centers vertically a set of controls, considering the dimensions of the controls' Parent. |
 | `CenterControlsInParentHorizontally(const AControlNames: array of string)` | `TControlCreator` | Centers horizontally a set of controls, considering the Parent of the controls as reference. |
 | `CenterControlInParentHorizontally` | `TControlCreator` | Centers horizontally the last added control, considering the Parent of the control as reference. |
-| `RecalcParentHeight(AExtraHeight: Single = 0)` | `TControlCreator` | Recalculates the height of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraHeight` is provided, increments the height by the value. |
-| `RecalcParentWidth(AExtraWidth: Single = 0)` | `TControlCreator` | Recalculates the width of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraWidth` is provided, increments the width by the value. |
-| `RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0)` | `TControlCreator` | Recalculates the width and height of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraWidth` and `AExtraHeight` are provided, increments the width and height by the values. |
+| `RecalcParentHeight(AExtraHeight: Single = 0)` | `TControlCreator` | Recalculates the height of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraHeight` is provided, increments the height by the value. Sets the parent's **client** height (`ClientHeight`): the controls' coordinates are relative to the client area, while `Height` includes a VCL form's caption and borders, or a panel's border (`BorderStyle = bsSingle`). Under FMX it sets `Height` (a level's parent is a `TControl` there, with no non-client area). |
+| `RecalcParentWidth(AExtraWidth: Single = 0)` | `TControlCreator` | Recalculates the width of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraWidth` is provided, increments the width by the value. Sets the parent's **client** width (`ClientWidth`), see `RecalcParentHeight`. |
+| `RecalcParentSize(AExtraHeight: Single = 0; AExtraWidth: Single = 0)` | `TControlCreator` | Recalculates the width and height of the Parent (container) of the current level based on the dimension of already added controls. If `AExtraWidth` and `AExtraHeight` are provided, increments the width and height by the values. Sets the parent's client size (`ClientHeight`/`ClientWidth`), see `RecalcParentHeight`. |
 | `CopyHeight(const AControlNames, AReferenceGroup: array of string)` | `TControlCreator` | Copies the height formed by the Bounds of the control group passed in `AReferenceGroup` to each of the controls defined in `AControlNames`. |
 | `CopyWidth(const AControlNames, AReferenceGroup: array of string)` | `TControlCreator` | Copies the width formed by the Bounds of the control group passed in `AReferenceGroup` to each of the controls defined in `AControlNames`. |
 | `CopySize(const AControlNames, AReferenceGroup: array of string)` | `TControlCreator` | Copies the width and height formed by the Bounds of the control group passed in `AReferenceGroup` to each of the controls defined in `AControlNames`. |
 | `ReturnCurrentLevel(var ACurrentLevel: TControlCreatorLevel)` | `TControlCreator` | Returns the Current Level through the `ACurrentLevel` parameter. |
 | `ReturnLastControl(out AControl: TControl)` | `TControlCreator` | Returns the last control added via `.Add`. |
 | `DiscardReferences` *(on the builder, not the creator)* | | Not a `TControlCreator` method — see [`TObjectBuilderBase`](#tobjectbuilderbase). Mentioned here because it's what makes `out Reference` variables come back `nil` (instead of keeping stale/garbage data) when a control never actually gets built — e.g. `Add` bailing out because the grid is already full. |
+
+##### Grid mode: control size and what follows the grid
+
+For each dimension (width, height), a control added in a grid cell is sized and placed with the first of these that applies:
+
+1. the cell's size, when the grid stretches that dimension (`GridCellStrechAll`, `GridCellStrechHorizontal`, `GridCellStrechVertical`; `GridCellStrechAll` is the default);
+2. the size set on the builder (`WithHeight`, `WithWidth`, ...);
+3. the level's default size (`SetControlHeight`/`SetControlWidth`, set inside the grid or on the level `GridInit` was called on);
+4. the control's own size once it's built: its class default (a `TEdit` is 23 high on both the VCL and the LCL for Windows) or what `AutoSize` gives it (a `TLabel`).
+
+The control is then positioned in the cell by `GridCellPosition` (centered by default) from that size. A stretched dimension is never overridden by the default size, and in a cell the builder's size wins over the default (outside a grid, the default size is applied after the control is built and replaces the builder's).
+
+Case 4 uses the size the control has right after it's built. A control whose size changes later keeps its top/left, so it may end up a pixel or so off center: an LCL `TLabel` can re-autosize when its form is shown (on Windows, measured 17 high right after it's built, 15 once shown). Give it a height (builder or default) or stretch the cell when that matters.
+
+```pascal
+LCreator
+  .SetTopLeft(12, 12)
+  .GridInit(4, 2)
+    .GridSetCellWidthAndHeight(160, 28)
+    .GridSetColWidth(0, 80)
+    .GridCellStrechHorizontal                          // width from the cell, height from the control
+    .Add(TControlBuilder.Create(TLabel).WithCaption('Server'))
+    .Add(TControlBuilder.Create(TEdit, 'edtServer'))  // its own 23, centered in the row's 28
+    // ...
+  .GridFinish
+  .SetDirection(cpdHorizontal)
+  .BreakLine(8)                                       // 8 below the grid's last row of cells
+  .Add(TControlBuilder.Create(TButton, 'btnOk').WithCaption('OK').WithWidth(80));
+```
+
+After `GridFinish`, what follows in the outer level starts past the grid's occupied cells (the cells that got a control, spans included), so a control that doesn't fill its cell doesn't pull the next line up over the grid.
 
 ##### `TControlCreatorSiblingSubLevelOptions`
 

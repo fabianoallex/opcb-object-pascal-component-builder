@@ -11,6 +11,8 @@ type
   private
     FForm: TForm;
     procedure ExternalMethod(const ACreator: TControlCreator);
+    procedure AssertInsideCellAndCentered(const AWhat: string; AControl: TControl;
+      ACellTop, ACellHeight: Integer);
   public
     [Setup]
     procedure Setup;
@@ -129,6 +131,14 @@ type
     [Test] procedure TestSetOwnerAndParentDirectly;
     [Test] procedure TestSetParentDirectly;
     [Test] procedure TestGetControlGeneric;
+    [Test] procedure TestGridControlWithoutHeightIsCenteredInsideCell;
+    [Test] procedure TestGridDefaultHeightSetInsideGridPlacesAndSizesControls;
+    [Test] procedure TestGridDefaultHeightSetBeforeGridInitReachesGridControls;
+    [Test] procedure TestGridBuilderHeightWinsOverDefaultHeight;
+    [Test] procedure TestGridStretchKeepsCellHeightOverDefaultHeight;
+    [Test] procedure TestGridControlAfterFinishAndBreakLineStartsBelowGrid;
+    [Test] procedure TestRecalcParentSizeSetsFormClientSize;
+    [Test] procedure TestRecalcParentSizeSetsPanelClientSize;
   end;
 
 implementation
@@ -3242,6 +3252,280 @@ begin
     Assert.IsNull(P, 'P deveria ser nil (Build falhou depois de criar o objeto, referencia nao pode ficar pendurada)');
   finally
     Dummy.Free;
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.AssertInsideCellAndCentered(const AWhat: string;
+  AControl: TControl; ACellTop, ACellHeight: Integer);
+var
+  GapAbove, GapBelow: Integer;
+begin
+  Assert.IsTrue(AControl.Height > 0,
+    Format('%s: height should be > 0, got %d', [AWhat, AControl.Height]));
+  Assert.IsTrue(AControl.Top >= ACellTop,
+    Format('%s: top %d is above the cell top %d', [AWhat, AControl.Top, ACellTop]));
+  Assert.IsTrue(AControl.Top + AControl.Height <= ACellTop + ACellHeight,
+    Format('%s: bottom %d is below the cell bottom %d',
+      [AWhat, AControl.Top + AControl.Height, ACellTop + ACellHeight]));
+  GapAbove := AControl.Top - ACellTop;
+  GapBelow := (ACellTop + ACellHeight) - (AControl.Top + AControl.Height);
+  Assert.IsTrue(Abs(GapAbove - GapBelow) <= 1,
+    Format('%s: not vertically centered (gap above %d, gap below %d)',
+      [AWhat, GapAbove, GapBelow]));
+end;
+
+procedure TControlCreatorTest.TestGridControlWithoutHeightIsCenteredInsideCell;
+var
+  ControlCreator: TControlCreator;
+  E: array[0..3] of TEdit;
+  I: Integer;
+begin
+  // A 2x2 grid of edits with no height (neither on the builder nor as a
+  // default): each edit keeps its own height and is centered in its cell.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetTopLeft(12, 12)
+      .GridInit(2, 2)
+        .GridSetCellWidthAndHeight(100, 28)
+        .GridCellStrechHorizontal
+        .Add(TControlBuilder.Create(TEdit, E[0]))
+        .Add(TControlBuilder.Create(TEdit, E[1]))
+        .Add(TControlBuilder.Create(TEdit, E[2]))
+        .Add(TControlBuilder.Create(TEdit, E[3]))
+      .GridFinish;
+
+    for I := 0 to 3 do
+    begin
+      AssertInsideCellAndCentered(Format('edit %d', [I]), E[I], 12 + 28 * (I div 2), 28);
+      Assert.AreEqual(12 + 100 * (I mod 2), E[I].Left, Format('edit %d: left', [I]));
+      Assert.AreEqual(100, E[I].Width, Format('edit %d: width (horizontal stretch)', [I]));
+    end;
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestGridDefaultHeightSetInsideGridPlacesAndSizesControls;
+var
+  ControlCreator: TControlCreator;
+  E: array[0..3] of TEdit;
+  I: Integer;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetTopLeft(12, 12)
+      .GridInit(2, 2)
+        .SetControlHeight(20)
+        .GridSetCellWidthAndHeight(100, 28)
+        .GridCellStrechHorizontal
+        .Add(TControlBuilder.Create(TEdit, E[0]))
+        .Add(TControlBuilder.Create(TEdit, E[1]))
+        .Add(TControlBuilder.Create(TEdit, E[2]))
+        .Add(TControlBuilder.Create(TEdit, E[3]))
+      .GridFinish;
+
+    for I := 0 to 3 do
+    begin
+      Assert.AreEqual(20, E[I].Height, Format('edit %d: height', [I]));
+      Assert.AreEqual(12 + 28 * (I div 2) + 4, E[I].Top, Format('edit %d: top', [I]));
+    end;
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestGridDefaultHeightSetBeforeGridInitReachesGridControls;
+var
+  ControlCreator: TControlCreator;
+  E: array[0..3] of TEdit;
+  I: Integer;
+begin
+  // GridInit opens an internal level; the default size set on the level the
+  // grid is opened from must still apply to the grid's controls.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetTopLeft(12, 12)
+      .SetControlHeight(20)
+      .GridInit(2, 2)
+        .GridSetCellWidthAndHeight(100, 28)
+        .GridCellStrechHorizontal
+        .Add(TControlBuilder.Create(TEdit, E[0]))
+        .Add(TControlBuilder.Create(TEdit, E[1]))
+        .Add(TControlBuilder.Create(TEdit, E[2]))
+        .Add(TControlBuilder.Create(TEdit, E[3]))
+      .GridFinish;
+
+    for I := 0 to 3 do
+    begin
+      Assert.AreEqual(20, E[I].Height, Format('edit %d: height', [I]));
+      Assert.AreEqual(12 + 28 * (I div 2) + 4, E[I].Top, Format('edit %d: top', [I]));
+    end;
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestGridBuilderHeightWinsOverDefaultHeight;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .GridInit(1, 1)
+        .SetControlHeight(20)
+        .GridSetCellWidthAndHeight(100, 28)
+        .GridCellNoStrech
+        .Add(TControlBuilder.Create(TPanel, P).WithWidthAndHeight(50, 16))
+      .GridFinish;
+
+    Assert.AreEqual(16, P.Height, 'height');
+    Assert.AreEqual(50, P.Width, 'width');
+    Assert.AreEqual(6, P.Top, 'top (centered)');
+    Assert.AreEqual(25, P.Left, 'left (centered)');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestGridStretchKeepsCellHeightOverDefaultHeight;
+var
+  ControlCreator: TControlCreator;
+  E: array[0..3] of TEdit;
+  I: Integer;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetTopLeft(12, 12)
+      .GridInit(2, 2)
+        .SetControlWidthAndHeight(60, 20)
+        .GridSetCellWidthAndHeight(100, 28)
+        .GridCellStrechAll
+        .Add(TControlBuilder.Create(TEdit, E[0]))
+        .Add(TControlBuilder.Create(TEdit, E[1]))
+        .Add(TControlBuilder.Create(TEdit, E[2]))
+        .Add(TControlBuilder.Create(TEdit, E[3]))
+      .GridFinish;
+
+    for I := 0 to 3 do
+    begin
+      Assert.AreEqual(28, E[I].Height, Format('edit %d: height (stretched)', [I]));
+      Assert.AreEqual(100, E[I].Width, Format('edit %d: width (stretched)', [I]));
+      Assert.AreEqual(12 + 28 * (I div 2), E[I].Top, Format('edit %d: top', [I]));
+    end;
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestGridControlAfterFinishAndBreakLineStartsBelowGrid;
+var
+  ControlCreator: TControlCreator;
+  E: array[0..3] of TEdit;
+  B: TButton;
+  I, MaxBottom: Integer;
+begin
+  // The probe from pascal-agenda-faa: a button row after the grid used to
+  // start over the grid's last row.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetTopLeft(12, 12)
+      .GridInit(2, 2)
+        .GridSetCellWidthAndHeight(100, 28)
+        .GridCellStrechHorizontal
+        .Add(TControlBuilder.Create(TEdit, E[0]))
+        .Add(TControlBuilder.Create(TEdit, E[1]))
+        .Add(TControlBuilder.Create(TEdit, E[2]))
+        .Add(TControlBuilder.Create(TEdit, E[3]))
+      .GridFinish
+      .SetDirection(cpdHorizontal)
+      .BreakLine(8)
+      .Add(TControlBuilder.Create(TButton, B).WithWidth(80));
+
+    MaxBottom := 0;
+    for I := 0 to 3 do
+      if E[I].Top + E[I].Height > MaxBottom then
+        MaxBottom := E[I].Top + E[I].Height;
+
+    Assert.IsTrue(B.Top >= MaxBottom + 8,
+      Format('button top %d should be at least 8 below the last grid control (bottom %d)',
+        [B.Top, MaxBottom]));
+    // The grid's two rows of 28 end at 12 + 56 = 68.
+    Assert.AreEqual(68 + 8, B.Top, 'button top: the grid bottom plus the BreakLine increment');
+    Assert.AreEqual(12, B.Left, 'button left');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestRecalcParentSizeSetsFormClientSize;
+var
+  ControlCreator: TControlCreator;
+  Form: TForm;
+  B: TButton;
+begin
+  // On the VCL a form's Height/Width include its caption and borders; the
+  // controls have to fit in its client area.
+  Form := TForm.CreateNew(nil);
+  try
+    Form.BorderStyle := bsDialog;
+    ControlCreator := TControlCreator.Create;
+    try
+      ControlCreator
+        .SetOwnerAndParent(Form, Form)
+        .SetTopLeft(100, 10)
+        .Add(TControlBuilder.Create(TButton, B).WithWidthAndHeight(75, 25))
+        .RecalcParentSize(10, 10);
+
+      Assert.AreEqual(135, Form.ClientHeight, 'ClientHeight');
+      Assert.AreEqual(B.Left + B.Width + 10, Form.ClientWidth, 'ClientWidth');
+    finally
+      ControlCreator.Free;
+    end;
+  finally
+    Form.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestRecalcParentSizeSetsPanelClientSize;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+  B: TButton;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SubLevel(TControlBuilder.Create(TPanel, P));
+    P.BorderStyle := bsSingle;
+    // A window border (not BorderWidth, which only insets aligned children)
+    // takes part of Height. Without a handle the VCL reports
+    // ClientHeight = Height; with one it is the window's client area.
+    P.HandleNeeded;
+    ControlCreator
+        .SetTopLeft(100, 10)
+        .Add(TControlBuilder.Create(TButton, B).WithWidthAndHeight(75, 25))
+        .RecalcParentSize(10, 10)
+      .SuperLevel;
+
+    Assert.AreEqual(135, P.ClientHeight, 'ClientHeight');
+    Assert.AreEqual(B.Left + B.Width + 10, P.ClientWidth, 'ClientWidth');
+    Assert.IsTrue(P.Height > P.ClientHeight, 'the border should take part of the panel''s Height');
+  finally
     ControlCreator.Free;
   end;
 end;
