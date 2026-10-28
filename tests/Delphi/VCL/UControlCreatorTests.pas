@@ -11,6 +11,7 @@ type
   private
     FForm: TForm;
     procedure ExternalMethod(const ACreator: TControlCreator);
+    procedure DummyOnClickHandler(Sender: TObject);
     procedure AssertInsideCellAndCentered(const AWhat: string; AControl: TControl;
       ACellTop, ACellHeight: Integer);
   public
@@ -128,6 +129,28 @@ type
     [Test] procedure TestAddControlBuilderIsFreedNotLeaked;
     [Test] procedure TestAddControlBuilderExceptionDuringBuildStillFreesBuilder;
     [Test] procedure TestAddControlBuilderExceptionDuringBuildNullsOutReference;
+    [Test] procedure TestSetDefaultPropAppliesToMatchingClass;
+    [Test] procedure TestSetDefaultPropDoesNotOverrideExplicitGenericProp;
+    [Test] procedure TestSetDefaultPropDoesNotOverrideExplicitTypedProp;
+    [Test] procedure TestSetDefaultPropAppliesTypedPropWhenUnset;
+    [Test] procedure TestSetDefaultPropMatchesSubclasses;
+    [Test] procedure TestSetDefaultPropDoesNotMatchUnrelatedClass;
+    [Test] procedure TestSetDefaultPropInheritsIntoSubLevel;
+    [Test] procedure TestUnsetDefaultPropsRemovesForClass;
+    [Test] procedure TestSetDefaultPropInSubLevelDoesNotLeakToParentAfterSuperLevel;
+    [Test] procedure TestSetDefaultPropAppliesToTop;
+    [Test] procedure TestSetDefaultPropDoesNotOverrideExplicitWithPropForTypedName;
+    [Test] procedure TestSetDefaultPropAppliesInGridMode;
+    [Test] procedure TestSetDefaultPropDoesNotOverrideGridComputedSize;
+    [Test] procedure TestSetDefaultPropAppliesViaSubLevelWithBuilder;
+    [Test] procedure TestSetDefaultPropInSubLevelOverridesParentForSameProp;
+    [Test] procedure TestSetDefaultPropCalledTwiceAtSameLevelLastOneWins;
+    [Test] procedure TestSetControlHeightOverridesSetDefaultPropForSameProp;
+    [Test] procedure TestSetDefaultPropMoreSpecificClassWinsWhenRegisteredFirst;
+    [Test] procedure TestSetDefaultPropMoreSpecificClassWinsWhenRegisteredLast;
+    [Test] procedure TestSetDefaultPropIgnoresTagNameOwner;
+    [Test] procedure TestSetDefaultPropIgnoresParent;
+    [Test] procedure TestSetDefaultPropIgnoresOnClick;
     [Test] procedure TestSetOwnerAndParentDirectly;
     [Test] procedure TestSetParentDirectly;
     [Test] procedure TestGetControlGeneric;
@@ -168,6 +191,12 @@ begin
   ControlBuilder := TControlBuilder.Create(TPanel, 'PanelTest');
   ControlBuilder.WithCaption('EXTERNAL-TEST');
   ACreator.Add<TControl>(ControlBuilder);
+end;
+
+procedure TControlCreatorTest.DummyOnClickHandler(Sender: TObject);
+begin
+  // Vazio de proposito - so serve pra ter um endereco de metodo concreto
+  // pra comparar com B.OnClick nos testes de SetDefaultProp('OnClick', ...).
 end;
 
 procedure TControlCreatorTest.Setup;
@@ -3525,6 +3554,519 @@ begin
     Assert.AreEqual(135, P.ClientHeight, 'ClientHeight');
     Assert.AreEqual(B.Left + B.Width + 10, P.ClientWidth, 'ClientWidth');
     Assert.IsTrue(P.Height > P.ClientHeight, 'the border should take part of the panel''s Height');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropAppliesToMatchingClass;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // 'Enabled' nao tem campo dedicado (TOptional*) no builder - passa pelo
+  // caminho generico (HasPendingProp/WithProp via RTTI).
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Enabled', False)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.IsFalse(P.Enabled, 'Enabled deveria ter sido definido pelo default');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropDoesNotOverrideExplicitGenericProp;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Enabled', False)
+      .Add(TControlBuilder.Create(TPanel, P).WithProp('Enabled', True))
+    ;
+
+    Assert.IsTrue(P.Enabled, 'Enabled definido explicitamente no builder deveria vencer o default');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropDoesNotOverrideExplicitTypedProp;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // 'Height' TEM campo dedicado (TOptionalSingle) no builder - exercita o
+  // outro caminho da checagem (HasValue em vez de HasPendingProp).
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Height', 999)
+      .Add(TControlBuilder.Create(TPanel, P).WithHeight(50))
+    ;
+
+    Assert.AreEqual(50, P.Height, 'Height definido explicitamente via WithHeight deveria vencer o default');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropAppliesTypedPropWhenUnset;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Height', 77)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.AreEqual(77, P.Height, 'Height deveria ter sido aplicado pelo default');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropMatchesSubclasses;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Default registrado para TControl (ancestral) deve valer pra TPanel
+  // (descendente), via InheritsFrom.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TControl, 'Enabled', False)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.IsFalse(P.Enabled, 'Default registrado pra TControl deveria valer pra TPanel (subclasse)');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropDoesNotMatchUnrelatedClass;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TButton, 'Enabled', False)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.IsTrue(P.Enabled, 'Default registrado pra TButton nao deveria afetar TPanel');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropInheritsIntoSubLevel;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Diferente de SetControlHeight/SetControlWidth (que o Clone reseta a
+  // cada SubLevel), os defaults de propriedade sao herdados pelos levels
+  // filhos - um tema definido na raiz continua valendo dentro de um
+  // SubLevel aninhado.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Enabled', False)
+      .SubLevel
+        .Add(TControlBuilder.Create(TPanel, P))
+      .SuperLevel
+    ;
+
+    Assert.IsFalse(P.Enabled, 'Default da raiz deveria valer dentro do SubLevel');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestUnsetDefaultPropsRemovesForClass;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Enabled', False)
+      .UnsetDefaultProps(TPanel)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.IsTrue(P.Enabled, 'UnsetDefaultProps deveria ter removido o default');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropInSubLevelDoesNotLeakToParentAfterSuperLevel;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Um default registrado DENTRO de um SubLevel nao deve "vazar" pro nivel
+  // pai depois do SuperLevel - o Clone copia a lista, nao compartilha a
+  // mesma instancia.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SubLevel
+        .SetDefaultProp(TPanel, 'Enabled', False)
+      .SuperLevel
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.IsTrue(P.Enabled, 'Default registrado dentro do SubLevel nao deveria valer no level pai');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropAppliesToTop;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Regressao: CreateControl preenche Top/Left (com o cursor do level)
+  // ANTES de ApplyDefaultProps rodar, se a checagem de "ja setado" for
+  // feita depois desse preenchimento automatico, Top/Left pareceriam
+  // sempre ja setados e o default nunca seria aplicado. ApplyDefaultProps
+  // agora roda no inicio de Add<TBuild>/SubLevel<TBuild>, antes de
+  // qualquer preenchimento automatico.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Top', 42)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.AreEqual(42, P.Top, 'Top deveria ter sido aplicado pelo default');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropDoesNotOverrideExplicitWithPropForTypedName;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Regressao: 'Height' tem campo dedicado (TOptionalSingle) no builder,
+  // mas WithProp('Height', ...) nao passa por esse campo - so fica em
+  // FProperties. IsPropSet cai pra HasPendingProp quando o campo dedicado
+  // nao foi tocado.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Height', 999)
+      .Add(TControlBuilder.Create(TPanel, P).WithProp('Height', 50))
+    ;
+
+    Assert.AreEqual(50, P.Height, 'Height definido via WithProp deveria vencer o default');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropAppliesInGridMode;
+var
+  ControlCreator: TControlCreator;
+  P1, P2: TPanel;
+begin
+  // Um default pra uma propriedade NAO ligada a posicao/tamanho (Enabled)
+  // deve continuar valendo dentro do modo grid - so Width/Height/Align/
+  // Top/Left ficam de fora nesse modo.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Enabled', False)
+      .GridInit(1, 2)
+        .GridSetCellWidthAndHeight(20, 20)
+        .Add(TControlBuilder.Create(TPanel, P1))
+        .Add(TControlBuilder.Create(TPanel, P2))
+      .GridFinish
+    ;
+
+    Assert.IsFalse(P1.Enabled, 'Default deveria ter sido aplicado a P1 mesmo em modo grid');
+    Assert.IsFalse(P2.Enabled, 'Default deveria ter sido aplicado a P2 mesmo em modo grid');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropDoesNotOverrideGridComputedSize;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Um default pra 'Height' nao pode vencer o tamanho que o grid calculou
+  // pra celula - senao SetDefaultProp quebraria silenciosamente qualquer
+  // layout em grid que combinasse com um tema de altura/largura.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Height', 999)
+      .GridInit(1, 1)
+        .GridSetCellWidthAndHeight(20, 30)
+        .Add(TControlBuilder.Create(TPanel, P))
+      .GridFinish
+    ;
+
+    Assert.AreEqual(30, P.Height, 'Height calculado pelo grid nao deveria ser sobrescrito pelo default');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropAppliesViaSubLevelWithBuilder;
+var
+  ControlCreator: TControlCreator;
+  Container: TPanel;
+begin
+  // SubLevel(AControlBuilder) e o outro ponto de entrada real (alem de
+  // Add) que cria um controle - precisa da mesma aplicacao de defaults.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Enabled', False)
+      .SubLevel(TControlBuilder.Create(TPanel, Container))
+      .SuperLevel
+    ;
+
+    Assert.IsFalse(Container.Enabled, 'Default deveria ter sido aplicado ao container criado via SubLevel');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropInSubLevelOverridesParentForSameProp;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Regressao: sem percorrer de tras pra frente, ApplyDefaultProps aplicava
+  // a entrada do pai (a primeira encontrada) e pulava a entrada mais
+  // especifica do SubLevel por causa do guard de IsPropSet.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Height', 24)
+      .SubLevel
+        .SetDefaultProp(TPanel, 'Height', 30)
+        .Add(TControlBuilder.Create(TPanel, P))
+      .SuperLevel
+    ;
+
+    Assert.AreEqual(30, P.Height, 'Default mais especifico (do SubLevel) deveria vencer o herdado da raiz');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropCalledTwiceAtSameLevelLastOneWins;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TPanel, 'Height', 24)
+      .SetDefaultProp(TPanel, 'Height', 30)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.AreEqual(30, P.Height, 'A segunda chamada de SetDefaultProp deveria vencer a primeira');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetControlHeightOverridesSetDefaultPropForSameProp;
+var
+  ControlCreator: TControlCreator;
+  P: TPanel;
+begin
+  // Documentado (nao e bug): SetControlHeight ja vence ate um WithHeight
+  // explicito na propria instancia - por consistencia, tambem vence um
+  // SetDefaultProp para 'Height'.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetControlHeight(100)
+      .SetDefaultProp(TPanel, 'Height', 50)
+      .Add(TControlBuilder.Create(TPanel, P))
+    ;
+
+    Assert.AreEqual(100, P.Height, 'SetControlHeight deveria vencer o SetDefaultProp para a mesma propriedade');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropMoreSpecificClassWinsWhenRegisteredFirst;
+var
+  ControlCreator: TControlCreator;
+  B: TButton;
+begin
+  // Regressao: o desempate entre defaults de CLASSES DIFERENTES pra mesma
+  // propriedade era so "quem foi registrado por ultimo", nao "quem e mais
+  // especifico". Igual CSS: TButton deveria vencer TControl aqui, nao
+  // importa a ordem de registro.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TButton, 'Enabled', False)
+      .SetDefaultProp(TControl, 'Enabled', True)
+      .Add(TControlBuilder.Create(TButton, B))
+    ;
+
+    Assert.IsFalse(B.Enabled, 'Default de TButton (mais especifico) deveria vencer o de TControl, mesmo registrado antes');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropMoreSpecificClassWinsWhenRegisteredLast;
+var
+  ControlCreator: TControlCreator;
+  B: TButton;
+begin
+  // Mesmo teste com a ordem de registro invertida - junto com o teste
+  // anterior, prova que quem decide e a especificidade da classe, nao a
+  // ordem de chamada.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TControl, 'Enabled', True)
+      .SetDefaultProp(TButton, 'Enabled', False)
+      .Add(TControlBuilder.Create(TButton, B))
+    ;
+
+    Assert.IsFalse(B.Enabled, 'Default de TButton (mais especifico) deveria vencer o de TControl, registrado antes ou depois');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropIgnoresTagNameOwner;
+var
+  ControlCreator: TControlCreator;
+  B: TButton;
+begin
+  // Name/Tag/Owner nao tem TOptional* pra distinguir "nao setado" de
+  // "valor padrao zero/vazio", entao SetDefaultProp simplesmente ignora
+  // essas propriedades (IsUnsupportedDefaultPropName) em vez de arriscar
+  // sobrescrever um valor explicito silenciosamente.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TButton, 'Tag', 999)
+      .Add(TControlBuilder.Create(TButton, B).WithTag(5))
+    ;
+
+    Assert.AreEqual(NativeInt(5), B.Tag, 'Tag explicito nao pode ser sobrescrito por default');
+  finally
+    ControlCreator.Free;
+  end;
+
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TButton, 'Tag', 999)
+      .Add(TControlBuilder.Create(TButton, B))
+    ;
+
+    Assert.AreEqual(NativeInt(0), B.Tag, 'Default de Tag deve ser ignorado, deixando o valor padrao da classe');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropIgnoresParent;
+var
+  ControlCreator: TControlCreator;
+  B: TButton;
+begin
+  // Parent e aplicado por atribuicao direta em CreateControl (ABuilder.
+  // Parent := CurrentLevel.Parent), nao via RTTI/WithProp - antes de
+  // IsUnsupportedDefaultPropName excluir 'Parent', um default registrado
+  // pra essa propriedade era enfileirado em FProperties e explodia em
+  // EPropertyError na hora de aplicar (Parent nao e published em TControl).
+  // O valor de teste e um Integer qualquer (0), nao um TWinControl real -
+  // nao importa, ja que IsUnsupportedDefaultPropName ignora 'Parent' so
+  // pelo nome, sem nunca olhar o valor.
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TButton, 'Parent', 0)
+      .Add(TControlBuilder.Create(TButton, B))
+    ;
+
+    Assert.AreSame(TWinControl(FForm), B.Parent, 'Parent deve continuar vindo do level, sem lancar excecao ao ignorar o default de Parent');
+  finally
+    ControlCreator.Free;
+  end;
+end;
+
+procedure TControlCreatorTest.TestSetDefaultPropIgnoresOnClick;
+var
+  ControlCreator: TControlCreator;
+  B: TButton;
+begin
+  // OnClick e aplicado por atribuicao direta ao campo FOnClick tipado
+  // (nao via RTTI) - qualquer valor basta pra provar que o nome 'OnClick'
+  // e ignorado incondicionalmente antes de qualquer tentativa de
+  // aplicacao (ver IsUnsupportedDefaultPropName).
+  ControlCreator := TControlCreator.Create;
+  try
+    ControlCreator
+      .SetOwnerAndParent(FForm, FForm)
+      .SetDefaultProp(TButton, 'OnClick', 0)
+      .Add(TControlBuilder.Create(TButton, B).WithOnClick(DummyOnClickHandler))
+    ;
+
+    Assert.IsTrue(Assigned(B.OnClick), 'OnClick explicito nao pode ser sobrescrito/afetado pelo default');
+    Assert.IsTrue(B.OnClick = DummyOnClickHandler, 'OnClick explicito deve permanecer o handler setado');
   finally
     ControlCreator.Free;
   end;

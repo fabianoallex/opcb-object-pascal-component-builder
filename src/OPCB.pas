@@ -116,6 +116,21 @@ type
     function Build: TBuild;
     procedure AssignReference(out Reference);
     procedure DiscardReferences;
+    function GetObjectClass: TObjectClass;
+    // Exposto na interface (não só na classe TObjectBuilderBase) para que
+    // código que só enxerga o builder via IObjectBuilder<T>/IControlBuilder
+    // <T> - como TControlCreator.CreateControl<TBuild> - consiga descobrir
+    // a classe concreta que será instanciada ANTES de chamar .Build, sem
+    // precisar de um cast pro tipo genérico da classe base. Usado por
+    // TControlCreator.SetDefaultProp para casar defaults por classe.
+    property ObjectClass: TObjectClass read GetObjectClass;
+    // As duas a seguir também existem só pra dar a TControlCreator.
+    // SetDefaultProp acesso à mesma engrenagem de WithProp (FProperties)
+    // sem expor WithProp em si na interface - WithProp devolve TSelf, que
+    // não faz sentido numa interface genérica compartilhada por builders
+    // de classes concretas diferentes.
+    function HasPendingProp(const APropName: string): Boolean;
+    procedure AddPendingProp(const AProp: TPropertyValue);
   end;
 
   { TObjectBuilderBase }
@@ -194,6 +209,9 @@ type
     function Setup(AProc: TSetupProcObjBuild): TSelf; overload;
     function Setup(AProc: TSetupRefProcBuild): TSelf; overload;
     function Build: TBuild;
+    function GetObjectClass: TObjectClass;
+    function HasPendingProp(const APropName: string): Boolean;
+    procedure AddPendingProp(const AProp: TPropertyValue);
     property ObjectClass: TObjectClass read FObjectClass;
   end;
 
@@ -398,6 +416,17 @@ type
     property Left: TOptionalSingle read GetLeft write SetLeft;
     property OnClick: TNotifyEvent read GetOnClick write SetOnClick;
     property Parent: TWinControl read GetParent write SetParent;
+    // Única checagem "essa propriedade já foi setada, por qualquer via?"
+    // usada por TControlCreator.SetDefaultProp - cobre tanto os campos
+    // dedicados acima (Caption/Text/Align/Width/Height/Top/Left, via
+    // HasValue) quanto qualquer outra propriedade setada via WithProp (via
+    // HasPendingProp, herdado de IObjectBuilder<T>). Implementada aqui (em
+    // TControlBuilderBase, não em TControlCreator) de propósito: quem
+    // adicionar um novo campo dedicado no futuro (ex.: um WithVisible)
+    // mexe nessa mesma classe, então é o lugar natural pra lembrar de
+    // atualizar essa checagem também - ao contrário de uma lista de nomes
+    // hardcoded do lado de fora, que é fácil esquecer de manter em dia.
+    function IsPropSet(const APropName: string): Boolean;
   end;
 
   { TControlBuilderBase }
@@ -452,6 +481,7 @@ type
     function WithText(AText: string): TSelf;
     function WithOnClick(AOnClick: TNotifyEvent): TSelf;
     function WithParent(AParent: TWinControl): TSelf;
+    function IsPropSet(const APropName: string): Boolean;
     // Diferente de WithOwner/WithName/WithTag/WithParent (ver comentário em
     // TComponentBuilderBase), WithOwnerAndParent não colide com nenhum
     // setter não-fluente existente (não há "procedure SetOwnerAndParent"
@@ -740,6 +770,16 @@ type
     property CellPosition: TCellPosition read FCellPosition write SetCellPosition;
   end;
 
+  // Um default de propriedade registrado via TControlCreator.SetDefaultProp,
+  // pareado com a classe-alvo que ele deve casar (por herança, via
+  // InheritsFrom - um default para TControl casa com qualquer descendente).
+  TControlCreatorDefaultProp = record
+    TargetClass: TClass;
+    Prop: TPropertyValue;
+  end;
+
+  TControlCreatorDefaultPropList = {$IFDEF FPC}specialize{$ENDIF} TList<TControlCreatorDefaultProp>;
+
   { TControlCreatorLevel }
 
   TControlCreatorLevel = class
@@ -760,6 +800,13 @@ type
     ControlHeight: TOptionalSingle;
     ControlWidth: TOptionalSingle;
     GridMode: TGridMode;
+    // Defaults de propriedade por classe (TControlCreator.SetDefaultProp).
+    // Diferente de ControlHeight/ControlWidth (que o Clone reseta
+    // deliberadamente a cada SubLevel), esta lista É herdada pelos levels
+    // filhos - um tema definido no nível raiz deve continuar valendo dentro
+    // de um GroupBox aninhado, por exemplo, a menos que o filho registre
+    // seu próprio default para a mesma classe/propriedade.
+    DefaultProps: TControlCreatorDefaultPropList;
     constructor Create;
     destructor Destroy; override;
     function Clone: TControlCreatorLevel;
@@ -918,6 +965,16 @@ type
       out AHasCell: Boolean);
     {$IFDEF FPC}generic{$ENDIF}
     function CreateControl<TBuild>(const ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>; AOwner: TComponent = nil): TBuild;
+    {$IFDEF FPC}generic{$ENDIF}
+    procedure ApplyDefaultProps<TBuild>(const ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+    // Métodos normais (não genéricos) de propósito - chamar uma function
+    // solta de escopo de unit (com parâmetro "array of string" ou não) de
+    // dentro de ApplyDefaultProps<TBuild> faz o FPC 3.2.2 recusar compilar
+    // com "Global Generic template references static symtable". Vira
+    // método da própria classe em vez disso.
+    function IsGridComputedPropName(const APropName: string): Boolean;
+    function IsUnsupportedDefaultPropName(const APropName: string): Boolean;
+    function ClassDistance(AClass, ATargetClass: TClass): Integer;
     function External(const AProc: TControlCreatorObjProc): TControlCreator; overload;
     function External(const AProc: TControlCreatorProc): TControlCreator; overload;
     function SetSpace(AVerticalSpace, AHorizontalSpace: Single): TControlCreator;
@@ -984,6 +1041,8 @@ type
     function UnsetControlHeight: TControlCreator;
     function UnsetControlWidth: TControlCreator;
     function UnsetControlWidthAndHeight: TControlCreator;
+    function SetDefaultProp(AClass: TClass; const APropName: string; const AValue: TValue): TControlCreator;
+    function UnsetDefaultProps(AClass: TClass): TControlCreator;
     function GridInit(ARows, ACols: Integer): TControlCreator;
     function GridFinish: TControlCreator;
     function GridCellSpan(ACellSpan: Integer): TControlCreator;
@@ -1152,6 +1211,39 @@ function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithParent(
 begin
   Result := TSelf(Self);
   FParent := AParent;
+end;
+
+function TControlBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.IsPropSet(
+  const APropName: string): Boolean;
+begin
+  if SameText(APropName, 'Caption') then
+    Result := Caption.HasValue
+  else if SameText(APropName, 'Text') then
+    Result := Text.HasValue
+  else if SameText(APropName, 'Align') then
+    Result := Align.HasValue
+  else if SameText(APropName, 'Width') then
+    Result := Width.HasValue
+  else if SameText(APropName, 'Height') then
+    Result := Height.HasValue
+  else if SameText(APropName, 'Top') then
+    Result := Top.HasValue
+  else if SameText(APropName, 'Left') then
+    Result := Left.HasValue
+  else if SameText(APropName, 'OnClick') then
+    Result := Assigned(OnClick)
+  else if SameText(APropName, 'Parent') then
+    Result := Assigned(Parent)
+  else
+    Result := False;
+
+  // Mesmo pra um dos nomes dedicados acima, o usuário pode ter setado via
+  // WithProp em vez do With* tipado (ex.: .WithProp('Height', 50)) - isso
+  // não passa pelo campo dedicado (FHeight/Height.HasValue continua
+  // False), só fica registrado em FProperties. Sem este OR, um default
+  // para 'Height' sobrescreveria silenciosamente esse WithProp explícito.
+  if not Result then
+    Result := HasPendingProp(APropName);
 end;
 
 function TControlBuilderBase{$IFNDEF FPC}<TBuild; TSelf>{$ENDIF}.WithTag(
@@ -1500,6 +1592,12 @@ begin
 
     RControl := CurrentLevel.GridMode.AdjustRectForCellLayout(RCell, W, H);
 
+    // Align/Left/Top/Height/Width: esta é a lista de propriedades que o
+    // grid calcula pra célula - o mesmo conjunto de nomes vive em
+    // TControlCreatorHelper.IsGridComputedPropName. Se um sexto campo
+    // calculado pelo grid for adicionado aqui algum dia, atualize aquele
+    // método também - SetDefaultProp não pode competir com o que o grid
+    // calcula pra célula.
     AControlBuilder.Align := {$IFDEF FRAMEWORK_FMX}TAlignLayout.None{$ELSE}alNone{$ENDIF};
     AControlBuilder.Left := RControl.Left;
     AControlBuilder.Top  := RControl.Top;
@@ -1523,6 +1621,148 @@ begin
   except
     (AControlBuilder as TObject).Free;
     raise;
+  end;
+end;
+
+function TControlCreatorHelper.IsGridComputedPropName(const APropName: string): Boolean;
+begin
+  // No modo grid, estas 5 são calculadas por SetupControlBuilderForGridMode
+  // pra caber na célula - se uma 6ª propriedade computada pelo grid for
+  // adicionada lá algum dia, replique-a aqui também.
+  Result :=
+    SameText(APropName, 'Width') or
+    SameText(APropName, 'Height') or
+    SameText(APropName, 'Align') or
+    SameText(APropName, 'Top') or
+    SameText(APropName, 'Left');
+end;
+
+function TControlCreatorHelper.IsUnsupportedDefaultPropName(const APropName: string): Boolean;
+begin
+  // Name/Tag/Owner/Parent (campos dedicados tratados em IsPropSet, e não
+  // via WithProp/RTTI) não têm TOptional* - não existe como distinguir
+  // "setada explicitamente" de "no valor zero padrão". São também
+  // estruturais/de identidade (Name precisa ser único por controle,
+  // Parent/Owner definem o ciclo de vida), não propriedades de estilo -
+  // não fazem sentido como "tema" compartilhado. Além disso, Parent nem
+  // é uma propriedade published em todo TControl - tentar aplicá-la via
+  // WithProp/RTTI (ApplyPropPath) explode em tempo de execução. Nenhuma
+  // delas é suportada por SetDefaultProp. OnClick entra pelo mesmo motivo
+  // estrutural (é aplicada por atribuição direta ao FOnClick tipado, não
+  // pela RTTI que WithProp/ApplyPendingProps usa) e por um motivo prático
+  // adicional: no FPC 3.2.2, `TValue.From<TNotifyEvent>(...)` - o único
+  // jeito de o chamador construir o TValue exigido por este método pra um
+  // método de evento - dá "Fatal: Internal error 2015071704" em tempo de
+  // compilação. Ou seja, mesmo sem esta exclusão, ninguém consegue de
+  // fato chamar SetDefaultProp(AClass, 'OnClick', ...) no Lazarus/FPC.
+  Result :=
+    SameText(APropName, 'Name') or
+    SameText(APropName, 'Tag') or
+    SameText(APropName, 'Owner') or
+    SameText(APropName, 'Parent') or
+    SameText(APropName, 'OnClick');
+end;
+
+function TControlCreatorHelper.ClassDistance(AClass, ATargetClass: TClass): Integer;
+var
+  C: TClass;
+begin
+  Result := 0;
+  C := AClass;
+  while (C <> nil) and (C <> ATargetClass) do
+  begin
+    C := C.ClassParent;
+    Inc(Result);
+  end;
+end;
+
+{$IFDEF FPC}generic{$ENDIF}
+procedure TControlCreatorHelper.ApplyDefaultProps<TBuild>(
+  const ABuilder: {$IFDEF FPC}specialize{$ENDIF} IControlBuilder<TBuild>);
+var
+  K, Pos, Distance, ExistingDistance: Integer;
+  Winners: TStringList;
+  DefaultProp: TControlCreatorDefaultProp;
+begin
+  // Evita alocar a TStringList (e percorrer a lista) em todo Add/SubLevel
+  // quando ninguém usou SetDefaultProp - é o caso comum para qualquer
+  // código que não usa esta feature nova.
+  if CurrentLevel.DefaultProps.Count = 0 then
+    Exit;
+
+  // Resolve, num único passe por CurrentLevel.DefaultProps, qual entrada
+  // vence pra cada PropName distinto que casa com a classe de ABuilder -
+  // em vez do J-loop aninhado anterior (O(n²) por controle: pra cada
+  // entrada relevante, reescanear a lista inteira de novo pra achar a
+  // mais específica). Winners mapeia PropName -> índice (em
+  // CurrentLevel.DefaultProps) da entrada vencedora até agora. Ao achar
+  // uma colisão (mesmo PropName já visto), refaz a distância de herança
+  // do vencedor atual pra comparar - isso ainda é O(entradas por
+  // PropName), mas nunca O(total de entradas) por colisão, então o custo
+  // total do método fica O(n) em vez de O(n²).
+  Winners := TStringList.Create;
+  try
+    Winners.CaseSensitive := False;
+    Winners.Sorted := True;
+
+    for K := 0 to CurrentLevel.DefaultProps.Count - 1 do
+    begin
+      DefaultProp := CurrentLevel.DefaultProps[K];
+      if not ABuilder.ObjectClass.InheritsFrom(DefaultProp.TargetClass) then
+        Continue;
+
+      Distance := ClassDistance(ABuilder.ObjectClass, DefaultProp.TargetClass);
+
+      if Winners.Find(DefaultProp.Prop.PropName, Pos) then
+      begin
+        // Entre TODAS as entradas registradas para este PropName que casam
+        // com a classe de ABuilder, vence a de classe mais específica
+        // (menor distância de herança) - tipo CSS: um default para
+        // TButton deve vencer um default mais genérico para TControl, não
+        // importa em que ordem foram registrados. Empate é resolvido pela
+        // entrada mais recente - como K cresce em ordem de registro e
+        // <= (não <) troca o vencedor mesmo em empate, a última entrada
+        // com a mesma distância sempre acaba vencendo.
+        ExistingDistance := ClassDistance(ABuilder.ObjectClass,
+          CurrentLevel.DefaultProps[NativeInt(Winners.Objects[Pos])].TargetClass);
+        if Distance <= ExistingDistance then
+          Winners.Objects[Pos] := TObject(NativeInt(K));
+      end
+      else
+        Winners.AddObject(DefaultProp.Prop.PropName, TObject(NativeInt(K)));
+    end;
+
+    for Pos := 0 to Winners.Count - 1 do
+    begin
+      DefaultProp := CurrentLevel.DefaultProps[NativeInt(Winners.Objects[Pos])];
+
+      // Name/Tag/Owner/Parent/OnClick não são suportados por
+      // SetDefaultProp - ver comentário na declaração de
+      // IsUnsupportedDefaultPropName.
+      if IsUnsupportedDefaultPropName(DefaultProp.Prop.PropName) then
+        Continue;
+
+      // No modo grid, Width/Height/Align/Top/Left são calculados pelo grid
+      // pra caber na célula (SetupControlBuilderForGridMode, chamado logo
+      // depois deste método). IsPropSet não pega esse caso porque o
+      // cálculo do grid ainda não rodou neste ponto, então um default para
+      // uma dessas 5 propriedades entraria em FProperties e, pela ordem de
+      // aplicação em Build (campos dedicados primeiro, FProperties
+      // depois), acabaria vencendo por cima do valor calculado pelo grid,
+      // quebrando o layout. Nesse modo essas 5 ficam de fora dos defaults;
+      // qualquer outra propriedade continua valendo normalmente.
+      if CurrentLevel.GridMode.Active and IsGridComputedPropName(DefaultProp.Prop.PropName) then
+        Continue;
+
+      // IsPropSet (TControlBuilderBase) é quem decide se a propriedade já
+      // foi setada, por qualquer via (campo dedicado tipo WithHeight, ou
+      // WithProp genérico) - de propósito não duplicado aqui, ver
+      // comentário na declaração de IsPropSet.
+      if not ABuilder.IsPropSet(DefaultProp.Prop.PropName) then
+        ABuilder.AddPendingProp(DefaultProp.Prop);
+    end;
+  finally
+    Winners.Free;
   end;
 end;
 
@@ -1550,6 +1790,13 @@ begin
   ABuilder.Parent := CurrentLevel.Parent;
   ABuilder.Name := ControlName;
 
+  // ApplyDefaultProps NÃO roda aqui de propósito - a essa altura Top/Left
+  // (linhas acima) e, no modo grid, Align/Width/Height/Top/Left (já feitos
+  // pelo chamador via SetupControlBuilderForGridMode) já teriam HasValue=
+  // True, mascarando os defaults dessas propriedades como "já setados".
+  // Roda no início de Add<TBuild>/SubLevel<TBuild> em vez disso - ver
+  // comentário lá.
+
   // O Creator assume a posse do builder a partir daqui - ver comentário de
   // posse de memória em TObjectBuilderBase. Libera sempre, mesmo se Build
   // lançar exceção (prop/evento inválido), pois ninguém mais tem referência
@@ -1573,6 +1820,16 @@ var
 begin
   Result := Self;
   HasCell := False;
+
+  // Precisa rodar ANTES de qualquer coisa que preencha Top/Left/Align/
+  // Width/Height no builder (tanto o passo de grid quanto o preenchimento
+  // de Top/Left dentro de CreateControl) - senão os campos já chegam com
+  // HasValue=True por causa desses preenchimentos automáticos, e um
+  // default para uma dessas propriedades nunca teria como ser aplicado
+  // (pareceria "já setado" mesmo sem o usuário ter setado nada). Por isso
+  // fica aqui, no topo de Add<TBuild>/SubLevel<TBuild> - os dois únicos
+  // pontos de entrada reais - em vez de dentro de CreateControl.
+  {$IFDEF FPC}specialize{$ENDIF} ApplyDefaultProps<TBuild>(AControlBuilder);
 
   if CurrentLevel.GridMode.Active then
   begin
@@ -1632,6 +1889,15 @@ end;
 
 procedure TControlCreator.ApplyDefaultControlSize(AControl: TControl);
 begin
+  // ATENÇÃO: isto roda incondicionalmente, depois de Build, e sobrescreve
+  // até um Height/Width explícito no builder da instância (ver
+  // TestSetControlHeight - esse comportamento já é assim de propósito, não
+  // é bug). Por consequência, também vence um SetDefaultProp(..., 'Height'
+  // ou 'Width', ...) para a mesma propriedade - SetControlHeight/
+  // SetControlWidth "força" o valor pra tudo sem exceção, enquanto
+  // SetDefaultProp só preenche o que ainda não foi setado; combinar os
+  // dois pra a mesma propriedade não faz muito sentido, mas se acontecer,
+  // SetControlHeight/SetControlWidth ganham.
   {$IFDEF FRAMEWORK_FMX}
   if CurrentLevel.ControlHeight.HasValue then
     AControl.Height := CurrentLevel.ControlHeight.Value;
@@ -2534,6 +2800,33 @@ begin
   CurrentLevel.ControlWidth := TOptionalSingle.None;
 end;
 
+function TControlCreatorHelper.SetDefaultProp(AClass: TClass;
+  const APropName: string; const AValue: TValue): TControlCreator;
+var
+  DefaultProp: TControlCreatorDefaultProp;
+begin
+  Result := Self;
+  DefaultProp.TargetClass := AClass;
+  // Não usa TPropertyValue.Create<TValue>(...) aqui: o genérico faz
+  // TValue.From<E>(AValue), e com E=TValue isso embrulharia o TValue já
+  // pronto dentro de outro TValue (tipo "TValue de TValue"), quebrando o
+  // SetPropValue em ApplyPropPath. AValue já é o TValue final, então é
+  // atribuição direta.
+  DefaultProp.Prop.PropName := APropName;
+  DefaultProp.Prop.Value := AValue;
+  CurrentLevel.DefaultProps.Add(DefaultProp);
+end;
+
+function TControlCreatorHelper.UnsetDefaultProps(AClass: TClass): TControlCreator;
+var
+  I: Integer;
+begin
+  Result := Self;
+  for I := CurrentLevel.DefaultProps.Count - 1 downto 0 do
+    if CurrentLevel.DefaultProps[I].TargetClass = AClass then
+      CurrentLevel.DefaultProps.Delete(I);
+end;
+
 function TControlCreatorHelper.GridInit(ARows, ACols: Integer): TControlCreator;
 var
   OuterControlWidth, OuterControlHeight: TOptionalSingle;
@@ -3016,7 +3309,17 @@ begin
 
   HasCell := False;
   if CurrentLevel.GridMode.Active then
+  begin
+    // Só roda aqui no caminho de grid: precisa acontecer antes do setup de
+    // grid tocar Width/Height/Align/Top/Left (ver comentário em
+    // Add<TBuild>). No caminho sem grid não roda aqui - Add<TBuild>,
+    // chamado logo abaixo, já aplica os defaults sozinho; chamar aqui de
+    // novo seria trabalho redundante (idempotente por causa do IsPropSet,
+    // mas duplicado sem necessidade, percorrendo DefaultProps duas vezes
+    // à toa em todo SubLevel(builder) fora do modo grid).
+    {$IFDEF FPC}specialize{$ENDIF} ApplyDefaultProps<TBuild>(AControlBuilder);
     {$IFDEF FPC}specialize{$ENDIF} SetupControlBuilderForGridModeOrFreeBuilder<TBuild>(AControlBuilder, Cell, HasCell);
+  end;
 
   // Control := specialize CreateControl<TBuild>(AControlBuilder, OwnerToUse);
 
@@ -3777,6 +4080,8 @@ end;
 { TControlCreatorLevel }
 
 function TControlCreatorLevel.Clone: TControlCreatorLevel;
+var
+  DefaultProp: TControlCreatorDefaultProp;
 begin
   Result := TControlCreatorLevel.Create;
   Result.Parent := Parent;
@@ -3791,6 +4096,11 @@ begin
   Result.MaxControlWidth := MaxControlWidth;
   Result.ControlWidth := TOptionalSingle.None;
   Result.ControlHeight := TOptionalSingle.None;
+  // Cópia própria da lista (não a mesma instância) - o level filho pode
+  // registrar novos defaults sem que eles vazem de volta pro pai quando
+  // o SuperLevel voltar.
+  for DefaultProp in DefaultProps do
+    Result.DefaultProps.Add(DefaultProp);
 end;
 
 constructor TControlCreatorLevel.Create;
@@ -3808,6 +4118,7 @@ begin
   ControlHeight := TOptionalSingle.None;
   GridMode := TGridMode.Create;
   GridMode.Inactivate;
+  DefaultProps := TControlCreatorDefaultPropList.Create;
   Inc(FGroupCounter);
   GroupName := '__LEVEL_GROUP_' + IntToStr(FGroupCounter - 1) + '__';
 end;
@@ -3815,6 +4126,7 @@ end;
 destructor TControlCreatorLevel.Destroy;
 begin
   GridMode.Free;
+  DefaultProps.Free;
   inherited Destroy;
 end;
 
@@ -4743,6 +5055,33 @@ begin
   FTargetFields.Add(@Reference);
 end;
 
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.GetObjectClass: TObjectClass;
+begin
+  Result := FObjectClass;
+end;
+
+function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.HasPendingProp(
+  const APropName: string): Boolean;
+var
+  P: TPropertyValue;
+begin
+  // Usado por TControlCreator.SetDefaultProp para não sobrescrever uma
+  // propriedade que o próprio builder já recebeu via WithProp - só
+  // detecta propriedades atribuídas via WithProp (FProperties), não as
+  // dedicadas com campo próprio (Height/Width/Caption/etc. via With*), que
+  // têm sua própria checagem (HasValue) em TControlCreator.
+  Result := False;
+  for P in FProperties do
+    if SameText(P.PropName, APropName) then
+      Exit(True);
+end;
+
+procedure TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.AddPendingProp(
+  const AProp: TPropertyValue);
+begin
+  FProperties.Add(AProp);
+end;
+
 function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithProp(
   const APropName: string; const AValue: TValue): TSelf;
 var
@@ -4751,7 +5090,7 @@ begin
   Result := TSelf(Self);
   P.PropName := APropName;
   P.Value := AValue;
-  FProperties.Add(P);
+  AddPendingProp(P);
 end;
 
 function TObjectBuilderBase{$IFNDEF FPC}<TBuild, TSelf>{$ENDIF}.WithEvent(const AEventName: string;
